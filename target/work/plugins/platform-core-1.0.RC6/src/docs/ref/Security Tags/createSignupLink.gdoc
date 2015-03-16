@@ -1,0 +1,19 @@
+h1. s:createSignupLink
+
+h2. Purpose
+
+Returns a URL that will take the user to a sign up / registration screen.
+
+This gets the URL from the security provider that is installed.
+
+To render a button that will take the user to this page, see [signupButton|securityTags].
+
+h2. Example
+
+{docx:xml}
+<s:createSignupLink/>
+{docx}
+
+h2. Attributes
+
+None.

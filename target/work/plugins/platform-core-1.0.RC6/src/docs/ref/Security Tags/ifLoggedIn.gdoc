@@ -1,0 +1,20 @@
+h1. s:ifLoggedIn
+
+h2. Purpose
+
+Renders the body of the tag only if the user is logged in.
+
+This uses the underlying security provider to test the condition.
+
+h2. Example
+
+{docx:xml}
+<s:ifLoggedIn>
+    Thanks for logging in!
+</s:ifLoggedIn>
+{docx}
+
+h2. Attributes
+
+None
+

@@ -1,0 +1,75 @@
+*Why an events bus ?*
+ Today's applications rely more and more on non-blocking processing, elasticity and modularity. An events bus loosely couples modules,
+ enabling different codes and frameworks to work together, because *the right tool for the right purpose* paradigm is
+ becoming a reality. The bus may also support *publish/subscribe* pattern, distributing the same message across the handling modules and giving an
+ excellent opportunity to deploy the same application into a cluster or _cloud_.
+
+Within the bus, an event is often as simple as a "callback" with no parameters, but usually there is some extra state passed as an event object.
+An event can be sent to multiple listeners, and any result returned from any listeners is passed back to the original sender of the event.
+An event belongs to a "topic" and often has a "subject". The topic is like a channel that identifies the kind of events. The optional subject is the object that the event "happened to".
+So for example a simple "app started" notification has no subject but may have topic "grails", but a "user logged in" even may have topic "security" and subject set to the user principal supplied by the security plugin you are using.
+
+With Platform-Core plugin we have implemented a couple of features and artifacts to let you simply manage an _event bus_
+and get maximum flexibility when required :
+* Sending *Events methods* injected in your *Domains*, *Controllers* and *Services*
+* *@Listener* annotations for your *Services* methods.
+* Events mapping *DSL artifact* to select and control events topics
+* *Spring beans* with access to underlying API
+* *More cool stuff* with [Events Spring Integration|https://github.com/smaldini/grails-events-si] and [Events Push|https://github.com/smaldini/grails-events-push]
+* Simple *config keys*
+
+In a nutshell, you will :
+* Send events :
+{docx}
+class UserController{
+
+   def registration(){
+         def user = new User(params).save()
+         if(user){
+
+            //non-blocking call, will trigger application listeners for this topic
+            event('mailRegistration', user)
+
+            //blocking call :
+            //event('mailRegistration', user).waitFor()
+
+            //can also be written like that
+            //event topic:'mailRegistration', data:user
+
+            //and if you need to reuse the current thread
+            //event topic:'mailRegistration', data:user, fork:false
+
+            render(view:'sendingRegistrationMail')
+         }else{
+            render(view:'errorRegistration')
+         }
+  }
+}
+{docx}
+
+* Write listeners (or event handler, or event reactor or whatever you call it):
+{docx}
+class UserService{
+
+   //use method name 'mailRegistration' as topic name
+   //can also use custom topic name using topic arg: @Listener(topic='test')
+   @grails.events.Listener
+   def mailRegistration(User user){
+         sendMail{
+            to user.mail
+            subject "Confirmation"
+            html g.render(template:"userMailConfirmation")
+        }
+  }
+
+  //Can also receive an EventMessage to get more information on this particular event)
+  @grails.events.Listener(topic="mailRegistration")
+  def mailRegistration2(org.grails.plugin.platform.events.EventMessage msg){
+        sendMail{
+           to msg.data.mail
+           subject "Confirmation"
+           html g.render(template:"userMailConfirmation")
+        }
+  }
+}
+{docx}

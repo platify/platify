@@ -1,0 +1,23 @@
+<plugin name='console' version='1.4.4' grailsVersion='2.0 &gt; *'>
+  <title>Console Plugin</title>
+  <description>A web-based Groovy console for interactive runtime application management and debugging</description>
+  <documentation>https://github.com/sheehan/grails-console/blob/master/README.md</documentation>
+  <type>ConsoleGrailsPlugin</type>
+  <resources>
+    <resource>org.grails.plugins.console.ConsoleController</resource>
+    <resource>org.grails.plugins.console.ConsoleService</resource>
+    <resource>org.grails.plugins.console.ConsoleTagLib</resource>
+  </resources>
+  <repositories>
+    <repository name='grailsCentral' url='http://grails.org/plugins' />
+    <repository name='mavenCentral' url='http://repo1.maven.org/maven2/' />
+  </repositories>
+  <dependencies>
+    <test>
+      <dependency group='org.spockframework' name='spock-grails-support' version='0.7-groovy-2.0' />
+    </test>
+  </dependencies>
+  <plugins />
+  <runtimePluginRequirements />
+  <behavior />
+</plugin>

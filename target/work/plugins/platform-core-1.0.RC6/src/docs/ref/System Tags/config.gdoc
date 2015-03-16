@@ -1,0 +1,20 @@
+h1. p:config
+
+h2. Purpose
+
+Renders a value from Config.
+
+h2. Example
+
+{docx:xml}
+<p:config name="myapp.upload.url"/>
+{docx}
+
+h2. Attributes
+
+{table}
+*Name* | *Purpose*
+name | Required - The config path string
+default | Optional - The default value to use if there is nothing in the app config
+{table}
+

@@ -1,0 +1,26 @@
+To change application or plugin configuration from within a plugin you need to declare the *doWithConfig* hook in your plugin descriptor.
+
+The code uses a simple DSL that is identical to normal Config except:
+
+# The top level nodes are plugin names or "application" to determine what scope of config you are changing
+# The closure is passed the existing config as its first and only argument
+
+The application Config is loaded first. All the doWithConfig blocks are evaluated and the results merged in.
+
+{docx}
+def doWithConfig = { config ->
+    platformUi {
+        ui.Bootstrap.button.cssClass = 'btn'
+        ui.Bootstrap.tab.cssClass = 'tab-pane'
+        ui.Bootstrap.field.cssClass = 'input'
+    }
+
+    application {
+        // set something based on another config value that has already been
+        // by the application
+        grails.x.y = config.p.q == 'something' ? true : false
+    }
+}
+{docx}
+
+See [doWithConfig|pluginConventions] for more details.

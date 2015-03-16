@@ -1,0 +1,12 @@
+h3. 1.0.M3
+
+* Automatic convention controller navigation includes all actions, not just those with GET allowedMethod
+* Platform "dev" navigation scope items do not render when browsing /platform in your own applications.
+
+h3. 1.0.M1
+
+* Config API - false validation errors with platform-ui due to no x.y.'*' support yet
+* Navigation API - controllers do not auto-register in Grails 1.3.x, no DSL artefact, no reloading
+* Conventions API - API not for public use. Not fully implemented / TBD
+* Events - API not for public use. Scopes not fully implemented / TBD
+* Injection - injection may not re-apply dynamic methods and properties to reloaded or new artefacts, API is not for public use at all yet

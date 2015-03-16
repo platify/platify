@@ -1,0 +1,18 @@
+h1. p:year
+
+h2. Purpose
+
+Renders the current year. Used for copyright messages that never go out of date.
+
+The current year is cached once, so this has a very low overhead.
+
+h2. Example
+
+{docx:xml}
+<p:year/>
+{docx}
+
+h2. Attributes
+
+None
+

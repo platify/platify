@@ -1,0 +1,35 @@
+h1. p:text
+
+h2. Purpose
+
+Renders i18n text like g:message, but automatically namespacing the message codes based on the plugin that provides the GSP
+that calls the tag.
+
+This makes it easy for plugin GSPs to provide i18n strings without clashing with strings from the application or other plugins.
+
+h2. Example
+
+{docx:xml}
+<p:text code="welcome.message"/>
+<p:text code="inbox.title" args="${messages.size()}"/>
+<p:text code="hello">Welcome to our app!</p:text>
+<p:text codes="my.error.code,default.error.code">An error occurred!</p:text>
+<p:text codes="['my.error.code','default.error.code']">An error occurred!</p:text>
+<p:text error="${mybean.errors[0]}"/>
+{docx}
+
+All of these messages will be resolved using @plugin.<GSP plugin name>.<code>@ and the body is used as a default if the message cannot be resolved.
+
+h2. Attributes
+
+{table}
+*Name* | Required | *Purpose*
+code | | The i18n message code
+codes | | A list of i18n message codes
+error | | An Grails field error object
+args | | Arguments for i18n message
+default | | Default value for message if it cannot be resolved
+encodeAs | | Codec to apply to message, defaults to none
+scope | | Optional prefix to use with code or codes. Overrides the automatic scoping behaviour
+plugin | | Optional plugin name in beanNameCase. Overrides the automatic scoping behaviour
+{table}

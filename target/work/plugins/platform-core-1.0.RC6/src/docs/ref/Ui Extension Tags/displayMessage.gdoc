@@ -1,0 +1,45 @@
+h1. p:displayMessage
+
+h2. Purpose
+
+This tag renders a message for the user which has been set using the
+[displayMessage|uiExtensionMethods] or [displayFlashMessage|uiExtensionMethods] methods in the controller.
+
+It will automatically display the message stored in request or flash scope, or
+both if both are set.
+
+The text is rendered using i18n messages and arguments if supplied when the
+@displayMessage@ or @displayFlashMessage@ methods were called. Note that the @p:text@ tag is not used to resolve
+such messages - however the [displayMessage|uiExtensionMethods] methods apply plugin namespacing at point of invocation.
+
+The output is wrapped in a single div, with a class that you supply plus the
+message type.
+
+h2. Example
+
+{docx:xml}
+<p:displayMessage class="msg"/>
+{docx}
+
+So for example with the above, if your controller has called:
+
+{docx}
+displayMessage text:'book.save.error', args:[book.title], type:'alert'
+{docx}
+
+This might output:
+
+{docx:xml}
+<div class="msg alert">
+   Something has gone wrong saving book "The Design of Everyday Things"
+</div>
+{docx}
+
+h2. Attributes
+
+{table}
+*Name* | *Purpose*
+class | Optional CSS classes to apply to the div. The value of the message "type" will be appended to the class list
+cssPrefix | Optional string to prepend to the message type for use as a CSS class on the div. i.e. Specifying "alert-" would result in CSS classes like "alert-warning"
+type | Optional override of the type of the message. If the controller did not set a type or you wish to override it you can e.g. set this to "error"
+{table}

@@ -1,0 +1,11 @@
+<plugin name='cache-headers' version='1.1.7' grailsVersion='2.0 &gt; *'>
+  <author>Graeme Rocher</author>
+  <authorEmail>grocher@gopivotal.com</authorEmail>
+  <title>Caching Headers Plugin</title>
+  <description>Improve your application performance with browser caching, with easy ways to set caching headers in controller responses</description>
+  <documentation>http://grails.org/plugin/cache-headers</documentation>
+  <type>CacheHeadersGrailsPlugin</type>
+  <resources>
+    <resource>com.grailsrocks.cacheheaders.CacheHeadersService</resource>
+  </resources>
+</plugin>

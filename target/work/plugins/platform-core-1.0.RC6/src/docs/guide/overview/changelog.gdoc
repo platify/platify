@@ -1,0 +1,31 @@
+h3. 1.0.RC1
+
+* Injected methods will not overwrite existing methods now, will warn instead
+* Added userExists method to security API
+* Unified i18N text and body handling in UI Extension tags
+* Improved dev-mode UI at /platform
+* Bug fixes and improvements to Events API
+
+h3. 1.0.M3
+
+Was: 1.0.M2 but due to release error we had to roll to M3.
+
+* Events API
+* New UI Extension tags p:text and p:textScope
+* New UI Extension properties pluginFlash, pluginSession, pluginRequestAttributes
+* Documentation for Events API, Navigation API, new UI Extensions
+* A little Grails treat for those browsing /platform/ on Mac
+
+h3. 1.0.M2-SNAPSHOT
+
+* Refined and documented Navigation API
+* There are no longer any "g" namespaced tags. All @g:@ tags have move to @p:@ namespace
+* Added "site.url" Config setting for [siteLink|uiExtensionTags] tag to use instead of grails.serverURL if the two differ for your use case
+* Refactored Injection, Conventions and Navigation implementations into public interface + implementation classes
+* Config reloading supported now - all plugin configs and constraints etc. are re-applied
+* legacyPrefix support in doWithConfigOptions - automatically copies over old Config values to your new plugin namespaced config
+* Added cssPrefix attribute to [displayMessage|uiExtensionTags]
+
+h3. 1.0.M1
+
+First public release with Config and Security APIs and some UI Extensions. Work-in-progress APIs for Events, Injection, Conventions and Navigation.

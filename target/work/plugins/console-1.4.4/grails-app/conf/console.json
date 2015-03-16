@@ -1,0 +1,64 @@
+{
+  "debug": {
+    "js": [
+      "web-app/vendor/js/libs/jquery-1.7.1.min.js",
+      "web-app/vendor/jquery-ui-1.10.3/jquery-ui.min.js",
+      "web-app/vendor/bootstrap/js/bootstrap.min.js",
+      "web-app/vendor/js/libs/underscore-min.js",
+      "web-app/vendor/js/libs/backbone-min.js",
+      "web-app/vendor/js/libs/backbone.marionette.min.js",
+      "web-app/vendor/js/libs/handlebars.runtime.js",
+      "web-app/vendor/jquery-layout/js/jquery.layout-latest.min.js",
+      "web-app/vendor/js/plugins/jquery.hotkeys.js",
+      "web-app/vendor/codemirror-3.18/lib/codemirror.js",
+      "web-app/vendor/codemirror-3.18/mode/groovy/groovy.js",
+      "web-app/dist/debug/jst.js",
+      "web-app/dist/debug/app/app.js",
+      "web-app/dist/debug/app/editor/editor-controller.js",
+      "web-app/dist/debug/app/editor/editor-view.js",
+      "web-app/dist/debug/app/entities/file-collection.js",
+      "web-app/dist/debug/app/entities/file-model.js",
+      "web-app/dist/debug/app/entities/local-file-store.js",
+      "web-app/dist/debug/app/entities/remote-file-store.js",
+      "web-app/dist/debug/app/entities/settings-model.js",
+      "web-app/dist/debug/app/files/files-controller.js",
+      "web-app/dist/debug/app/files/files-section-view.js",
+      "web-app/dist/debug/app/files/scripts-view.js",
+      "web-app/dist/debug/app/main/content-view.js",
+      "web-app/dist/debug/app/main/header-view.js",
+      "web-app/dist/debug/app/main/help-view.js",
+      "web-app/dist/debug/app/main/router.js",
+      "web-app/dist/debug/app/main/settings-view.js",
+      "web-app/dist/debug/app/result/result-collection-view.js",
+      "web-app/dist/debug/app/result/result-collection.js",
+      "web-app/dist/debug/app/result/result-controller.js",
+      "web-app/dist/debug/app/result/result-model.js",
+      "web-app/dist/debug/app/result/result-view.js",
+      "web-app/dist/debug/app/util/modal.js",
+      "web-app/dist/debug/app/util/path.js"
+    ],
+    "css": [
+      "web-app/vendor/bootstrap/css/bootstrap.min.css",
+      "web-app/vendor/font-awesome-4.0.3/css/font-awesome.css",
+      "web-app/vendor/codemirror-3.18/lib/codemirror.css",
+      "web-app/vendor/codemirror-3.18/theme/lesser-dark.css",
+      "web-app/vendor/jquery-layout/css/jquery.layout.css",
+      "web-app/vendor/jquery-ui-1.10.3/jquery-ui.min.css",
+      "web-app/dist/debug/app.css"
+    ]
+  },
+  "release": {
+    "js": [
+      "web-app/dist/release/app.js"
+    ],
+    "css": [
+      "web-app/vendor/bootstrap/css/bootstrap.min.css",
+      "web-app/vendor/font-awesome-4.0.3/css/font-awesome.css",
+      "web-app/vendor/codemirror-3.18/lib/codemirror.css",
+      "web-app/vendor/codemirror-3.18/theme/lesser-dark.css",
+      "web-app/vendor/jquery-layout/css/jquery.layout.css",
+      "web-app/vendor/jquery-ui-1.10.3/jquery-ui.min.css",
+      "web-app/dist/release/app.css"
+    ]
+  }
+}

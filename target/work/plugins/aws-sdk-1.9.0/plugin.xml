@@ -1,0 +1,15 @@
+<plugin name='aws-sdk' version='1.9.0' grailsVersion='2.0 &gt; *'>
+  <author>Benoit Hediard</author>
+  <authorEmail>ben@benorama.com</authorEmail>
+  <title>AWS SDK Plugin</title>
+  <description>The AWS SDK Plugin allows your Grails application to use the Amazon Web Services infrastructure services.
+It provides simple wrapper service around the official AWS SDK for Java.
+
+Using the SDK, developers can build solutions for Amazon Simple Storage Service (Amazon S3), Amazon Elastic Compute Cloud (Amazon EC2), Amazon SimpleDB, and more.
+</description>
+  <documentation>http://agorapulse.github.io/grails-aws-sdk/guide/</documentation>
+  <type>AwsSdkGrailsPlugin</type>
+  <resources>
+    <resource>grails.plugin.awssdk.AmazonWebService</resource>
+  </resources>
+</plugin>

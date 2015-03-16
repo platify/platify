@@ -1,0 +1,25 @@
+h1. removeListeners(String listenerIdPattern)
+
+_Available in Controllers, Domains and Services_
+
+Remove listeners using the pattern argument. The pattern should at least contains the topic information.
+It returns an int number of removed listeners.
+
+h2. Usage
+
+{docx}
+//remove every listeners in TestService
+removeListeners("*:my.TestService")
+{docx}
+
+h2. Arguments
+
+{table}
+*Name* | *Description*
+listenerIdPattern | A pattern to match against when finding listeners in registry.
+{table}
+
+{note}
+Registered listeners generate a unique id (*ListenerId*) applying the following pattern : \\
+@\[namespace://\]topic\[:package.Class\]\[#method\]\[\@hashcode\]@
+{note}

@@ -1,0 +1,24 @@
+h1. p:organization
+
+h2. Purpose
+
+Renders the name of the company or organisation that set in Config.
+
+This allows plugins to provide views that render your organization name in GSPs or emails, for example.
+
+The Config value is set in @plugin.platformCore.organization.name@
+
+h2. Example
+
+{docx:xml}
+<p:organization/>
+<p:organization encodeAs="JavaScript"/>
+{docx}
+
+h2. Attributes
+
+{table}
+*Name* | *Purpose*
+encodeAs | Optional - which codec to use when encoding the output. Default is HTML.
+{table}
+

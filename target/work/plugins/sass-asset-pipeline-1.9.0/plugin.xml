@@ -1,0 +1,9 @@
+<plugin name='sass-asset-pipeline' version='1.9.0' grailsVersion='2.0 &gt; *'>
+  <author>David Estes</author>
+  <authorEmail>destes@bcap.com</authorEmail>
+  <title>SASS/SCSS Asset-Pipeline Plugin</title>
+  <description>Provides SASS/SCSS Compass support for the asset-pipeline static asset management plugin.</description>
+  <documentation>http://github.com/bertramdev/sass-grails-asset-pipeline</documentation>
+  <type>SassAssetPipelineGrailsPlugin</type>
+  <resources />
+</plugin>

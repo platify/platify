@@ -1,0 +1,105 @@
+There are a few Navigation tags available, all detailed in the reference section.
+
+The most common tags you will use are explained here.
+
+It is important to understand that all the tags work by default using the current scope and activation path as determined by the request - but you can override scope and path on all of these tags to render anything you like.
+
+Navigation is rendered by default as an HTML @<ul>@ tag with an @<li>@ containing a single link for each of the items. Nested items are rendered as nested @<ul>@.
+
+All navigation rendering tags support attributes for CSS class, id and custom rendering of items if required. These are still always rendered within @<ul>@.
+
+h3. nav:primary
+
+Use this tag to render the primary user navigation of your site:
+
+{docx:xml}
+<nav:primary scope="admin" id="nav" class="admin"/>
+
+<%-- With custom item rendering --%>
+<nav:primary scope="admin" id="nav" class="admin" custom="true">
+   <li>
+   <p:callTag tag="g:link" attrs="${linkArgs + [class:'nav button']}">
+      <nav:title item="${item}"/>
+   </p:callTag>
+   </li>
+</nav:primary>
+{docx}
+
+This supports custom rendering in the same way as the [menu|navigationTags] tag.
+
+See the [primary|navigationTags] tag reference for full details.
+
+h3. nav:secondary
+
+Use this tag to render the second-level navigation based on the selected item within the current primary navigation. The scope resolved by @nav:primary@ is stored in the request so that this tag knows which scope to use:
+
+{docx:xml}
+<nav:secondary id="secondary-nav" class="admin"/>
+{docx}
+
+This supports custom rendering in the same way as the [menu|navigationTags] tag.
+
+See the [secondary|navigationTags] tag reference for full details.
+
+h3. nav:menu
+
+The menu tag is used internally by the primary/secondary tags and can be called directly to render any part of the navigation structure, with any activation path.
+
+{docx:xml}
+<nav:menu id="main-nav"/>
+
+<%-- Render the admin nav 3-deep, including all nested descendents whether active or not --%>
+<nav:menu scope="admin" depth="3" forceChildren="true"/>
+
+<%-- With custom item rendering --%>
+<nav:menu scope="admin" id="nav" class="admin" custom="true">
+   <li>
+   <p:callTag tag="g:link" attrs="${linkArgs + [class:'nav button']}">
+      <nav:title item="${item}"/>
+   </p:callTag>
+   </li>
+</nav:menu>
+{docx}
+
+See the [menu|navigationTags] tag reference for full details.
+
+h3. nav:title
+
+This renders the i18n title of a specific navigation item passed to it; for use in custom menu rendering.
+
+{docx}
+<nav:primary scope="admin" id="nav" class="admin" custom="true">
+   <li><nav:title item="${item}"/></li>
+</nav:primary>
+{docx}
+
+See the [menu|navigationTags] tag reference for full details.
+
+h3. nav:set
+
+You can call this tag from inside a controller or GSP if you need to define request-specific parameters.
+
+You can "fudge" the current request's activation path or set the default scope to be used by navigation tags.
+
+You may need to do this inside an error.gsp for example, or inside admin pages to reuse a generic theme that renders navigation using @nav:primary@.
+
+{docx:xml}
+<html>
+<body>
+    <!-- pretend we are in messages/inbox even though we are in a GSP with no controller -->
+    <nav:set path="app/messages/inbox"/>
+    <nav:set scope="admin"/>
+
+    <!-- or set those together -->
+    <nav:set path="app/messages/inbox" scope="admin"/>
+
+    <!-- these will use whatever the current active path and scope are -->
+    <nav:primary/>
+    <nav:secondary/>
+
+    <p>Something went wrong!</p>
+</body>
+</html>
+{docx}
+
+See the [set|navigationTags] tag reference for full details.

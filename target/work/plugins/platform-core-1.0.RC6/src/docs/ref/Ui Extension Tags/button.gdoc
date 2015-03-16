@@ -1,0 +1,33 @@
+h1. p:button
+
+h2. Purpose
+
+Renders a text-based button as either a <button>, <a> or <input type="submit"> based on the supplied options.
+
+The text is loaded from namespaced i18n using the same logic as the [text|uiExtensionTags] tag.
+
+h2. Example
+
+{docx:xml}
+<p:button>OK</p:button>
+<p:button text="button.ok"/>
+<p:button disabled="true">Cancel</p:button>
+<p:button kind="anchor" href="#" text="button.cancel"/>
+<p:button kind="submit" text="button.send.to" textArgs="${recipient.name}"/>
+{docx}
+
+The optional body is used as the default text of the label if the i18n code does not resolve using the [text|uiExtensionTags] tag message resolution rules.
+
+h2. Attributes
+
+{table}
+*Name* | *Required* | *Purpose*
+kind | | What kind of button to render. Value can be "button" (the default), or "anchor" or "submit"
+text | | The text of the button, or an i18n code to resolve to use as the text
+textArgs | | Arguments to pass when creating the i18n message text
+disabled | | If set to "true" the button will be disabled
+textScope | | Prefix to use with code or codes. Overrides the automatic scoping behaviour
+textPlugin | | Plugin name in beanNameCase. Overrides the automatic scoping behaviour
+{table}
+
+Any other attributes specified are passed through to the output.

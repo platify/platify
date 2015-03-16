@@ -1,0 +1,23 @@
+h1. p:siteName
+
+h2. Purpose
+
+Renders the name of the site. This is defined in config @plugin.platformCore.site.name@.
+
+For example your Config would set this to the name of your product or service, such as "Twitter".
+
+Plugins and views can use this to refer to your web application.
+
+h2. Example
+
+{docx:xml}
+<p:siteName/>
+<p:siteName encodeAs="JavaScript"/>
+{docx}
+
+h2. Attributes
+
+{table}
+*Name* | *Purpose*
+encodeAs | Optional - which codec to use when encoding the output. Default is HTML.
+{table}
