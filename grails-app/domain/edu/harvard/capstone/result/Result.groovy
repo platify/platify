@@ -1,12 +1,12 @@
 package edu.harvard.capstone.result
 
-import edu.harvard.capstone.user.User
+import edu.harvard.capstone.user.Scientist
 import edu.harvard.capstone.parser.Equipment
 import edu.harvard.capstone.editor.ExperimentalPlateSet
 
 class Result {
 
-	User owner
+	Scientist owner
 	Equipment equipment
 	ExperimentalPlateSet experiment
 	String name
