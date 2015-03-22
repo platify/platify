@@ -1,11 +1,11 @@
 package edu.harvard.capstone.editor
 
 
-import edu.harvard.capstone.user.User
+import edu.harvard.capstone.user.Scientist
 
 class PlateTemplate {
 
-	User owner
+	Scientist owner
 	String name
 
     static constraints = {

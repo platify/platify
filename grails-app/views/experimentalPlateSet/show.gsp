@@ -45,7 +45,7 @@
 				<li class="fieldcontain">
 					<span id="owner-label" class="property-label"><g:message code="experimentalPlateSet.owner.label" default="Owner" /></span>
 					
-						<span class="property-value" aria-labelledby="owner-label"><g:link controller="user" action="show" id="${experimentalPlateSetInstance?.owner?.id}">${experimentalPlateSetInstance?.owner?.encodeAsHTML()}</g:link></span>
+						<span class="property-value" aria-labelledby="owner-label"><g:link controller="null" action="show" id="${experimentalPlateSetInstance?.owner?.id}">${experimentalPlateSetInstance?.owner?.encodeAsHTML()}</g:link></span>
 					
 				</li>
 				</g:if>

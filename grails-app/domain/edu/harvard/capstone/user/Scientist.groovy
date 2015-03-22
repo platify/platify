@@ -1,6 +1,6 @@
 package edu.harvard.capstone.user
 
-class User {
+class Scientist {
 
 	transient springSecurityService
 
