@@ -106,6 +106,9 @@ log4j = {
     //appenders {
     //    console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
     //}
+    info  'grails.app', 'grails.app.jobs'
+    
+    debug 'grails.app.jobs'
 
     error  'org.codehaus.groovy.grails.web.servlet',        // controllers
            'org.codehaus.groovy.grails.web.pages',          // GSP
@@ -118,9 +121,12 @@ log4j = {
            'org.springframework',
            'org.hibernate',
            'net.sf.ehcache.hibernate'
+
 }
 
 // Added by the Spring Security Core plugin:
+grails.plugin.springsecurity.logout.postOnly = false
+grails.plugin.springsecurity.userLookup.usernamePropertyName='email'
 grails.plugin.springsecurity.userLookup.userDomainClassName = 'edu.harvard.capstone.user.Scientist'
 grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'edu.harvard.capstone.user.ScientistRole'
 grails.plugin.springsecurity.authority.className = 'edu.harvard.capstone.user.Role'
@@ -131,6 +137,21 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 	'/**/js/**':                      ['permitAll'],
 	'/**/css/**':                     ['permitAll'],
 	'/**/images/**':                  ['permitAll'],
-	'/**/favicon.ico':                ['permitAll']
+	'/**/favicon.ico':                ['permitAll'],
+    '/assets/**':                     ['permitAll'],
+    '/dbconsole':                     ['ROLE_SUPER_ADMIN'],//['ROLE_ADMIN', 'ROLE_SUPER_ADMIN']],
+    '/dbconsole.*':                   ['ROLE_SUPER_ADMIN'],
+    '/dbconsole/**':                  ['ROLE_SUPER_ADMIN'],
+    '/console':                       ['ROLE_SUPER_ADMIN'],
+    '/console.*':                     ['ROLE_SUPER_ADMIN'],
+    '/console/**':                    ['ROLE_SUPER_ADMIN'],
+    '/**/vendor/**':                  ['ROLE_SUPER_ADMIN'],    
+    '/**/dist/**':                    ['ROLE_SUPER_ADMIN'],
+    '/user/index':                    ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'],
+    '/j_spring_*':                    ['permitAll'],
+    '/login/**':                      ['permitAll'],
+    '/logout/**':                     ['permitAll'],    
+    '/j_spring_security_logout':      ['permitAll'], 
+
 ]
 

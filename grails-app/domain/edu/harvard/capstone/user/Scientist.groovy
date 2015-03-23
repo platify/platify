@@ -4,7 +4,6 @@ class Scientist {
 
 	transient springSecurityService
 
-	String username
 	String password
 	boolean enabled = true
 	boolean accountExpired
@@ -18,10 +17,9 @@ class Scientist {
 	static transients = ['springSecurityService']
 
 	static constraints = {
-		username blank: false, unique: true
+		email email: true, blank: false, unique: true
 		password blank: false
 
-		email email: true 
 	}
 
 	static mapping = {
@@ -29,7 +27,7 @@ class Scientist {
 	}
 
 	Set<Role> getAuthorities() {
-		UserRole.findAllByUser(this).collect { it.role }
+		ScientistRole.findAllByScientist(this).collect { it.role }
 	}
 
 	def beforeInsert() {

@@ -1,0 +1,25 @@
+// Core variables and mixins
+@import "bootstrap";
+
+
+// General Definitions
+.btn{
+	border-radius: 0;
+}
+
+.shadow{
+	-webkit-box-shadow: 0 0 12px rgba(58, 51, 46, 0.26);
+	-moz-box-shadow: 0 0 12px rgba(58, 51, 46, 0.26);
+	box-shadow: 0 0px 12px rgba(58, 51, 46, 0.26);
+}
+
+// Login Screen
+.login-container{
+	@extend .shadow;
+
+	border: 1px solid black;
+	padding: 20px;
+	background-color: #eee;
+}
+  
+

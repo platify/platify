@@ -1,3 +1,6 @@
+<%@ page import="edu.harvard.capstone.user.Scientist" %>
+
+
 <!DOCTYPE html>
 <!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
 <!--[if IE 7 ]>    <html lang="en" class="no-js ie7"> <![endif]-->
@@ -12,17 +15,75 @@
 		<link rel="shortcut icon" href="${resource(dir: 'images', file: 'favicon.ico')}" type="image/x-icon">
 		<link rel="apple-touch-icon" href="${resource(dir: 'images', file: 'apple-touch-icon.png')}">
 		<link rel="apple-touch-icon" sizes="114x114" href="${resource(dir: 'images', file: 'apple-touch-icon-retina.png')}">
-		<link rel="stylesheet" href="${resource(dir: 'css', file: 'main.css')}" type="text/css">
-		<link rel="stylesheet" href="${resource(dir: 'css', file: 'mobile.css')}" type="text/css">
+
+		<asset:stylesheet href="custom.css"/>
+
+		<asset:javascript src="jquery-1.11.2.min.js"/>
+		
 		<g:layoutHead/>
-		<g:javascript library="application"/>		
-		<r:layoutResources />
+		
 	</head>
 	<body>
-		<div id="grailsLogo" role="banner"><a href="http://grails.org"><img src="${resource(dir: 'images', file: 'grails_logo.png')}" alt="Grails"/></a></div>
+
+		<g:set var="userObject" value="${Scientist.findByEmail(sec?.loggedInUserInfo(field:'username'))}"/>
+
+		<header>
+			<nav class="navbar navbar-inverse">
+			  <div class="container-fluid">
+			    <!-- Brand and toggle get grouped for better mobile display -->
+			    <div class="navbar-header">
+			      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#header-navbar">
+			        <span class="sr-only">Toggle navigation</span>
+			        <span class="icon-bar"></span>
+			        <span class="icon-bar"></span>
+			        <span class="icon-bar"></span>
+			      </button>
+			      <a class="navbar-brand" href="#">SurNorte</a>
+			    </div>
+
+			    <!-- Collect the nav links, forms, and other content for toggling -->
+			    <div class="collapse navbar-collapse" id="header-navbar">
+			    	<sec:ifLoggedIn>
+						<ul class="nav navbar-nav">
+							<li class="plate-editor"><a href="#">Plate Editor<span class="sr-only">(current)</span></a></li>
+							<li class="output-parser"><a href="#">Output Parser</a></li>
+							<li class="results"><a href="#">Results</a></li>
+							<sec:ifAnyGranted roles='ROLE_ADMIN, ROLE_SUPER_ADMIN'>
+								<li class="admin" class="dropdown">
+								  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Admin <span class="caret"></span></a>
+								  <ul class="dropdown-menu" role="menu">
+								    <li><a href="#">Users</a></li>
+								    <li class="divider"></li>
+								    <li><a href="#">Templates</a></li>
+								  </ul>
+								</li>
+							</sec:ifAnyGranted>
+						</ul>
+					</sec:ifLoggedIn>
+			      
+			      <ul class="nav navbar-nav navbar-right">
+			        <sec:ifLoggedIn>
+				      	<li class="dropdown user">
+				          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">${userObject?.firstName} <span class="caret"></span></a>
+				          <ul class="dropdown-menu" role="menu">
+				            <li><a href="#">Profile</a></li>
+				            <li><g:link controller="logout">Logout</g:link></li>
+				          </ul>
+				        </li>
+				    </sec:ifLoggedIn>
+				    <sec:ifNotLoggedIn>
+				    	<li class="login"><g:link controller="login">Login</g:link></li>
+					</sec:ifNotLoggedIn>
+			      </ul>
+			    </div><!-- /.navbar-collapse -->
+			  </div><!-- /.container-fluid -->
+			</nav>		
+		</header>
 		<g:layoutBody/>
-		<div class="footer" role="contentinfo"></div>
-		<div id="spinner" class="spinner" style="display:none;"><g:message code="spinner.alt" default="Loading&hellip;"/></div>
-		<r:layoutResources />
+		
+		<!-- main JS libs -->
+		<asset:javascript src="modernizr.min.js"/>
+		<asset:javascript src="bootstrap.js"/>
+
 	</body>
 </html>
