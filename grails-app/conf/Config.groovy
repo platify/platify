@@ -147,11 +147,12 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
     '/console/**':                    ['ROLE_SUPER_ADMIN'],
     '/**/vendor/**':                  ['ROLE_SUPER_ADMIN'],    
     '/**/dist/**':                    ['ROLE_SUPER_ADMIN'],
-    '/user/index':                    ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'],
+    '/scientist/index':               ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'],
     '/j_spring_*':                    ['permitAll'],
     '/login/**':                      ['permitAll'],
     '/logout/**':                     ['permitAll'],    
     '/j_spring_security_logout':      ['permitAll'], 
+    '/scientist/**':                  ['permitAll'], 
 
 ]
 

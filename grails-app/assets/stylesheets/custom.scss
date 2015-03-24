@@ -13,6 +13,12 @@
 	box-shadow: 0 0px 12px rgba(58, 51, 46, 0.26);
 }
 
+.pagination{
+	.currentStep{
+		background-color: #dddddd;
+	}
+}
+
 // Login Screen
 .login-container{
 	@extend .shadow;
@@ -22,4 +28,20 @@
 	background-color: #eee;
 }
   
+
+// User Index
+
+.user-view{
+	color: white;
+	padding: 5px;
+	background-color: cornflowerblue;
+	border-radius: 5px;
+}
+
+.user-delete{
+	color: white;
+	padding: 5px;
+	background-color: lightcoral;
+	border-radius: 5px;
+}
 

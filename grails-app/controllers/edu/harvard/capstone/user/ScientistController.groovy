@@ -1,12 +1,13 @@
 package edu.harvard.capstone.user
 
-
+import grails.plugin.springsecurity.annotation.Secured
 
 import static org.springframework.http.HttpStatus.*
-import grails.transaction.Transactional
 
-@Transactional(readOnly = true)
 class ScientistController {
+
+    def scientistService 
+    def springSecurityService
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
@@ -23,9 +24,17 @@ class ScientistController {
         respond new Scientist(params)
     }
 
-    @Transactional
-    def save(Scientist scientistInstance) {
-        if (scientistInstance == null) {
+    @Secured(['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
+    def save(String firstName, String lastName, String password, String email, Boolean admin) {
+
+        if (!springSecurityService.isLoggedIn()){
+            respond scientistInstance.errors, view:'create'
+            return
+        }  
+
+        def scientistInstance = scientistService.newUser(firstName, lastName, password, email, admin)
+
+         if (scientistInstance == null) {
             notFound()
             return
         }
@@ -33,9 +42,8 @@ class ScientistController {
         if (scientistInstance.hasErrors()) {
             respond scientistInstance.errors, view:'create'
             return
-        }
+        }       
 
-        scientistInstance.save flush:true
 
         request.withFormat {
             form multipartForm {
@@ -50,19 +58,20 @@ class ScientistController {
         respond scientistInstance
     }
 
-    @Transactional
-    def update(Scientist scientistInstance) {
+
+    def update(Long id, String firstName, String lastName, String password, String email, Boolean admin) {
+        def scientistInstance = Scientist.get(id)
         if (scientistInstance == null) {
             notFound()
             return
         }
 
+        scientistInstance = scientistService.updateUser(scientistInstance, firstName, lastName, password, email, admin)
+
         if (scientistInstance.hasErrors()) {
             respond scientistInstance.errors, view:'edit'
             return
         }
-
-        scientistInstance.save flush:true
 
         request.withFormat {
             form multipartForm {
@@ -73,19 +82,19 @@ class ScientistController {
         }
     }
 
-    @Transactional
     def delete(Scientist scientistInstance) {
 
         if (scientistInstance == null) {
             notFound()
             return
         }
-
-        scientistInstance.delete flush:true
+        def id = scientistInstance.id
+        
+        scientistService.deleteUser(scientistInstance)
 
         request.withFormat {
             form multipartForm {
-                flash.message = message(code: 'default.deleted.message', args: [message(code: 'Scientist.label', default: 'Scientist'), scientistInstance.id])
+                flash.message = message(code: 'default.deleted.message', args: [message(code: 'Scientist.label', default: 'Scientist'), id])
                 redirect action:"index", method:"GET"
             }
             '*'{ render status: NO_CONTENT }

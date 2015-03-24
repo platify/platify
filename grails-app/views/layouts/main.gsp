@@ -16,6 +16,9 @@
 		<link rel="apple-touch-icon" href="${resource(dir: 'images', file: 'apple-touch-icon.png')}">
 		<link rel="apple-touch-icon" sizes="114x114" href="${resource(dir: 'images', file: 'apple-touch-icon-retina.png')}">
 
+		
+		<asset:stylesheet href="font-awesome.min.css"/>
+		
 		<asset:stylesheet href="custom.css"/>
 
 		<asset:javascript src="jquery-1.11.2.min.js"/>
@@ -52,7 +55,7 @@
 								<li class="admin" class="dropdown">
 								  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Admin <span class="caret"></span></a>
 								  <ul class="dropdown-menu" role="menu">
-								    <li><a href="#">Users</a></li>
+								    <li><g:link controller="scientist" action="index">Users</g:link></li>
 								    <li class="divider"></li>
 								    <li><a href="#">Templates</a></li>
 								  </ul>
