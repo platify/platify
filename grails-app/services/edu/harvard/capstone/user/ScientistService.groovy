@@ -17,10 +17,10 @@ class ScientistService {
     	def scientistInstance = new Scientist (firstName: firstName,
     										   lastName: lastName,
     										   password: password,
-    										   email: email).save(failOnError: true)
+    										   email: email)
+        scientistInstance.save()
 
-
-		if (!scientistInstance?.hasErrors()){
+		if (scientistInstance && !scientistInstance?.hasErrors()){
 	        // Add Role
 	        def externalUser = Role.findOrCreateByAuthority("ROLE_SCIENTIST").save()
 	        ScientistRole.findOrCreateByScientistAndRole(scientistInstance, externalUser).save()

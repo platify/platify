@@ -28,7 +28,7 @@ class ScientistController {
     def save(String firstName, String lastName, String password, String email, Boolean admin) {
 
         if (!springSecurityService.isLoggedIn()){
-            respond scientistInstance.errors, view:'create'
+            redirect action: "index", method: "GET"
             return
         }  
 

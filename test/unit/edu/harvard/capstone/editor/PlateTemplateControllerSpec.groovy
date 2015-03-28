@@ -1,6 +1,6 @@
 package edu.harvard.capstone.editor
 
-
+import edu.harvard.capstone.user.Scientist
 
 import grails.test.mixin.*
 import spock.lang.*
@@ -11,8 +11,14 @@ class PlateTemplateControllerSpec extends Specification {
 
     def populateValidParams(params) {
         assert params != null
+
+        Scientist owner = new Scientist(firstName: "Test", lastName: "User", email:"my@email.com", password:"test")
+
         // TODO: Populate valid properties like...
-        //params["name"] = 'someValidName'
+        params["name"] = 'Test Plate'
+        params["owner"] = owner
+
+        params
     }
 
     void "Test the index action returns the correct model"() {

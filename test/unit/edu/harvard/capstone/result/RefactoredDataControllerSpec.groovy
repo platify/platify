@@ -1,6 +1,13 @@
 package edu.harvard.capstone.result
 
 
+import edu.harvard.capstone.user.Scientist
+import edu.harvard.capstone.parser.Equipment
+import edu.harvard.capstone.editor.ExperimentalPlateSet
+
+import edu.harvard.capstone.editor.Well
+import edu.harvard.capstone.editor.PlateTemplate
+
 
 import grails.test.mixin.*
 import spock.lang.*
@@ -11,8 +18,20 @@ class RefactoredDataControllerSpec extends Specification {
 
     def populateValidParams(params) {
         assert params != null
-        // TODO: Populate valid properties like...
-        //params["name"] = 'someValidName'
+        Scientist owner = new Scientist(firstName: "Test", lastName: "User", email:"my@email.com", password:"test")
+        Equipment equipment = new Equipment(name: "Test Equipment")
+        ExperimentalPlateSet experiment = new ExperimentalPlateSet(owner: owner, name: "Test Experiment", description: "Test Description")
+        Result result = new Result(owner: owner, equipment: equipment, experiment: experiment, name: "Test Results", description: "Result description")
+
+        PlateTemplate plate = new PlateTemplate(owner: owner, name: "Plate Template")        
+        Well well = new Well(plate: plate, column: "1", row:"1")
+
+        params.result = result
+        params.value = 2.0
+        params.well = well
+
+        params
+
     }
 
     void "Test the index action returns the correct model"() {
