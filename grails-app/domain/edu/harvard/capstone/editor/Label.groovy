@@ -2,7 +2,7 @@ package edu.harvard.capstone.editor
 
 class Label {
 
-	Label category
+	String category
 	String name
 	String value
 

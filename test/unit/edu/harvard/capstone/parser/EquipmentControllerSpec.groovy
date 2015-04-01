@@ -1,12 +1,14 @@
 package edu.harvard.capstone.parser
 
 
+import grails.plugin.springsecurity.SpringSecurityService
+
 
 import grails.test.mixin.*
 import spock.lang.*
 
 @TestFor(EquipmentController)
-@Mock(Equipment)
+@Mock([Equipment, SpringSecurityService, ParserService])
 class EquipmentControllerSpec extends Specification {
 
     def populateValidParams(params) {
@@ -35,28 +37,106 @@ class EquipmentControllerSpec extends Specification {
             model.equipmentInstance!= null
     }
 
-    void "Test the save action correctly persists an instance"() {
+    void "Test save action with a user not logged in"(){
+        when:"The save action is executed with a user not logged in"
+            def springSecurityService = mockFor(SpringSecurityService)
+            springSecurityService.demandExplicit.isLoggedIn {  -> false }
 
-        when:"The save action is executed with an invalid instance"
+            controller.springSecurityService = springSecurityService.createMock()
             request.contentType = FORM_CONTENT_TYPE
-            def equipment = new Equipment()
-            equipment.validate()
-            controller.save(equipment)
+            request.json = "{data': null}"
+            controller.save()
 
-        then:"The create view is rendered again with the correct model"
-            model.equipmentInstance!= null
-            view == 'create'
+        then:"An error is returned"
+            model.equipmentInstance == null
+            response.json.error != null
+            response.json.error == "User not logged in"
+    }
+    void "Test save action with no data passed"(){
+        when:"The save action is executed with no data"
+            def springSecurityService = mockFor(SpringSecurityService)
+            springSecurityService.demandExplicit.isLoggedIn {  -> true }
 
+            controller.springSecurityService = springSecurityService.createMock()
+
+            request.contentType = FORM_CONTENT_TYPE
+            controller.save()
+
+        then:"An error is returned"
+            model.equipmentInstance == null
+            response.json.error != null 
+            response.json.error == "No data received" 
+    }
+
+    void "Test save action with data incorrect"(){
+        when:"Null equipment"
+            def springSecurityService = mockFor(SpringSecurityService)
+            springSecurityService.demandExplicit.isLoggedIn {  -> true }
+            
+            controller.springSecurityService = springSecurityService.createMock()
+
+            def parserService = mockFor(ParserService)
+            parserService.demandExplicit.newEquipment { String n, String mn, String desc, String da ->  null }
+
+            controller.parserService = parserService.createMock()
+            
+
+            request.json = '{"name": "test name"}'
+
+            controller.save()
+
+        then:"An error is returned"
+            model.equipmentInstance == null
+            response.json.error != null 
+            response.json.error == "Error creating the equipment"
+    }
+
+    void "Test the save action with incorrect data"(){
+        when:"The name that is required is missing"
+            def springSecurityService = mockFor(SpringSecurityService)
+            springSecurityService.demandExplicit.isLoggedIn {  -> true }
+            
+            def parserService = mockFor(ParserService)
+            parserService.demandExplicit.newEquipment { String name, String machineName, String description, String data -> 
+                def e = new Equipment(name: name, machineName: machineName, description: description, config: data)
+                e.save()
+                e
+            }
+
+            controller.parserService = parserService.createMock()
+            controller.springSecurityService = springSecurityService.createMock()
+            request.json = "{name: ''}"
+
+            controller.save()
+
+        then:"An error is returned"
+            model.equipmentInstance == null
+            response.json.error != null  
+            response.json.error != "Error creating the equipment"          
+    }
+
+
+    void "Test the save action correctly persists an instance"() {
         when:"The save action is executed with a valid instance"
-            response.reset()
-            populateValidParams(params)
-            equipment = new Equipment(params)
+            def springSecurityService = mockFor(SpringSecurityService)
+            springSecurityService.demandExplicit.isLoggedIn {  -> true }
+            
+            def parserService = mockFor(ParserService)
+            parserService.demandExplicit.newEquipment { String name, String machineName, String description, String data -> 
+                def e = new Equipment(name: name, machineName: machineName, description: description, config: data)
+                e.save()
+                e
+            }
 
-            controller.save(equipment)
+            controller.parserService = parserService.createMock()
+            controller.springSecurityService = springSecurityService.createMock()
+            request.json = "{name: 'my name'}"
+
+            controller.save()
 
         then:"A redirect is issued to the show action"
-            response.redirectedUrl == '/equipment/show/1'
-            controller.flash.message != null
+            response.json.error == null  
+            response.json.equipment != null  
             Equipment.count() == 1
     }
 
@@ -64,16 +144,17 @@ class EquipmentControllerSpec extends Specification {
         when:"The show action is executed with a null domain"
             controller.show(null)
 
-        then:"A 404 error is returned"
-            response.status == 404
+        then:"An empty equipment is returned"
+            !response.json.equipment
 
         when:"A domain instance is passed to the show action"
-            populateValidParams(params)
-            def equipment = new Equipment(params)
-            controller.show(equipment)
+            response.reset()
+
+            def equipmentInstance = new Equipment(name: "test equipment")
+            controller.show(equipmentInstance)
 
         then:"A model is populated containing the domain instance"
-            model.equipmentInstance == equipment
+            response.json.equipment.name == equipmentInstance.name
     }
 
     void "Test that the edit action returns the correct model"() {

@@ -7,10 +7,6 @@ class DomainLabel {
 	LabelType labelType
 
 	enum LabelType{
-		PARSER, WELL, TEMPLATE, PLATE_SET, EXPERIMENT
+		WELL, TEMPLATE, PLATE_SET, EXPERIMENT
 	}
-
-    static constraints = {
-    	domainId unique: ['labelType']
-    }
 }

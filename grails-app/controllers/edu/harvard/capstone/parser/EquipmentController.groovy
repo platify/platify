@@ -5,8 +5,11 @@ package edu.harvard.capstone.parser
 import static org.springframework.http.HttpStatus.*
 import grails.transaction.Transactional
 
-@Transactional(readOnly = true)
+
 class EquipmentController {
+
+    def springSecurityService
+    def parserService
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
@@ -16,33 +19,52 @@ class EquipmentController {
     }
 
     def show(Equipment equipmentInstance) {
-        respond equipmentInstance
+        render(contentType: "application/json") {
+            [equipment: equipmentInstance]
+        }
     }
 
     def create() {
         respond new Equipment(params)
     }
 
-    @Transactional
-    def save(Equipment equipmentInstance) {
-        if (equipmentInstance == null) {
-            notFound()
-            return
-        }
+    
+    def save() {
 
-        if (equipmentInstance.hasErrors()) {
-            respond equipmentInstance.errors, view:'create'
-            return
-        }
-
-        equipmentInstance.save flush:true
-
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.created.message', args: [message(code: 'equipment.label', default: 'Equipment'), equipmentInstance.id])
-                redirect equipmentInstance
+        if (!springSecurityService.isLoggedIn()){
+            render(contentType: "application/json") {
+                [error: "User not logged in"]
             }
-            '*' { respond equipmentInstance, [status: CREATED] }
+            return
+        } 
+        
+        def data = request.JSON        
+        
+        if (!data) {
+            render(contentType: "application/json") {
+                [error: "No data received"]
+            }
+            return
+        }
+
+        def equipmentInstance = parserService.newEquipment(data.name, data.machineName, data.description, data.toString())
+
+        if(equipmentInstance == null){
+            render(contentType: "application/json") {
+                [error: "Error creating the equipment"]
+            }
+            return
+        }
+
+        if(equipmentInstance.hasErrors()){
+            render(contentType: "application/json") {
+                [error: equipmentInstance.errors]
+            }
+            return            
+        }
+
+        render(contentType: "application/json") {
+            [equipment: equipmentInstance]
         }
     }
 
@@ -50,7 +72,7 @@ class EquipmentController {
         respond equipmentInstance
     }
 
-    @Transactional
+
     def update(Equipment equipmentInstance) {
         if (equipmentInstance == null) {
             notFound()
@@ -73,7 +95,7 @@ class EquipmentController {
         }
     }
 
-    @Transactional
+
     def delete(Equipment equipmentInstance) {
 
         if (equipmentInstance == null) {
