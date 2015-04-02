@@ -39,30 +39,6 @@ class PlateTemplateControllerSpec extends Specification {
             model.plateTemplateInstance!= null
     }
 
-    void "Test the save action correctly persists an instance"() {
-
-        when:"The save action is executed with an invalid instance"
-            request.contentType = FORM_CONTENT_TYPE
-            def plateTemplate = new PlateTemplate()
-            plateTemplate.validate()
-            controller.save(plateTemplate)
-
-        then:"The create view is rendered again with the correct model"
-            model.plateTemplateInstance!= null
-            view == 'create'
-
-        when:"The save action is executed with a valid instance"
-            response.reset()
-            populateValidParams(params)
-            plateTemplate = new PlateTemplate(params)
-
-            controller.save(plateTemplate)
-
-        then:"A redirect is issued to the show action"
-            response.redirectedUrl == '/plateTemplate/show/1'
-            controller.flash.message != null
-            PlateTemplate.count() == 1
-    }
 
     void "Test that the show action returns the correct model"() {
         when:"The show action is executed with a null domain"

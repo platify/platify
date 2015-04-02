@@ -1,16 +1,25 @@
 package edu.harvard.capstone.editor
 
 
-
 import static org.springframework.http.HttpStatus.*
-import grails.transaction.Transactional
 
-@Transactional(readOnly = true)
+import grails.plugin.springsecurity.annotation.Secured
+
 class ExperimentalPlateSetController {
 
+    def springSecurityService
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
+
+    @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
     def index(Integer max) {
+        if (!springSecurityService.isLoggedIn())
+            return
+
+        if(!springSecurityService.principal?.getAuthorities().any { it.authority == "ROLE_ADMIN" || it.authority == "ROLE_SUPER_ADMIN"}){
+            params.owner = springSecurityService.principal
+        }
+        
         params.max = Math.min(max ?: 10, 100)
         respond ExperimentalPlateSet.list(params), model:[experimentalPlateSetInstanceCount: ExperimentalPlateSet.count()]
     }
@@ -23,7 +32,7 @@ class ExperimentalPlateSetController {
         respond new ExperimentalPlateSet(params)
     }
 
-    @Transactional
+
     def save(ExperimentalPlateSet experimentalPlateSetInstance) {
         if (experimentalPlateSetInstance == null) {
             notFound()
@@ -50,7 +59,7 @@ class ExperimentalPlateSetController {
         respond experimentalPlateSetInstance
     }
 
-    @Transactional
+
     def update(ExperimentalPlateSet experimentalPlateSetInstance) {
         if (experimentalPlateSetInstance == null) {
             notFound()
@@ -73,7 +82,6 @@ class ExperimentalPlateSetController {
         }
     }
 
-    @Transactional
     def delete(ExperimentalPlateSet experimentalPlateSetInstance) {
 
         if (experimentalPlateSetInstance == null) {

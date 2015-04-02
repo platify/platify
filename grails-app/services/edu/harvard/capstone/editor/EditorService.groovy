@@ -2,6 +2,8 @@ package edu.harvard.capstone.editor
 
 import edu.harvard.capstone.user.Scientist
 
+
+import org.codehaus.groovy.grails.web.json.JSONObject
 import grails.validation.ValidationException
 
 import grails.transaction.Transactional
@@ -14,11 +16,9 @@ class EditorService {
 	/**
 	*	Throws ValidationException if can't create a domain object
 	*/
-
-	/*
     def newTemplate(JSONObject data) {
     	//if no data of the template return, 
-    	if (!data.plate)
+    	if (!data || !data.plate)
     		return
 
     	// get the scientist to attach it as an owner of the plate template
@@ -33,7 +33,7 @@ class EditorService {
 
     	data.plate?.each{ plate ->
     		// first create the plate
-    		def plateInstance = new Plate(owner: scientistInstance, name: plate.name)
+    		def plateInstance = new PlateTemplate(owner: scientistInstance, name: plate.name)
     		plateInstance.save()
     		// if it has errors, delete all the data just created and exit
     		if (plateInstance.hasErrors()){
@@ -51,7 +51,7 @@ class EditorService {
     				labelInstance = new Label(category: label.category, name: label.name, value: label.value)
     				labelInstance.save()
     				if (labelInstance.hasErrors()){
-    					throw new ValidationException("Label is not valid", labelInstance.errors)	
+    					throw new ValidationException("Label for plate is not valid", labelInstance.errors)	
     				}
     			}
     			// add it to the labels that will be assigned to the plate
@@ -78,6 +78,7 @@ class EditorService {
     				controlType = Well.WellControl.EMPTY
     			
     			def wellInstance = new Well(plate: plateInstance, row: well.row, column: well.column, groupName: well.groupName, control: controlType)
+    			wellInstance.save()
     			if (wellInstance.hasErrors()){
 					throw new ValidationException("Well is not valid", wellInstance.errors)	
 				}
@@ -89,7 +90,7 @@ class EditorService {
 	    				labelInstance = new Label(category: label.category, name: label.name, value: label.value)
 	    				labelInstance.save()
 	    				if (labelInstance.hasErrors()){
-	    					throw new ValidationException("Label is not valid", labelInstance.errors)	
+	    					throw new ValidationException("Label for well is not valid", labelInstance.errors)	
 	    				}
 	    			}
 	    			// add it to the labels that will be assigned to the well
@@ -112,6 +113,6 @@ class EditorService {
 
     	return platesList
 
-    }*/
+    }
 }
 	
