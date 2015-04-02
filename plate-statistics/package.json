@@ -1,0 +1,19 @@
+{
+  "name": "plate-statistics",
+  "version": "1.0.0",
+  "description": "Normalizes and does basic statistics on plate results",
+  "main": "statistics.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "qunit-cli test/*.js"
+  },
+  "author": "Dave Bonner <dbonner@gmail.com>",
+  "license": "GPLv3",
+  "devDependencies": {
+    "d3": "^3.5.5",
+    "qunit-cli": "^0.2.0",
+    "qunitjs": "^1.17.1"
+  }
+}
