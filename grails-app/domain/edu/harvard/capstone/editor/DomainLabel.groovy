@@ -3,7 +3,7 @@ package edu.harvard.capstone.editor
 class DomainLabel {
 
 	Label label
-	Integer domainId
+	Long domainId
 	LabelType labelType
 
 	enum LabelType{

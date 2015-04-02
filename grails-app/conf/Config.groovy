@@ -152,7 +152,8 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
     '/login/**':                      ['permitAll'],
     '/logout/**':                     ['permitAll'],    
     '/j_spring_security_logout':      ['permitAll'], 
-    '/scientist/**':                  ['permitAll'], 
+    '/scientist/**':                  ['permitAll'],
+    '/equipment/**':                   ['permitAll'],
 
 ]
 

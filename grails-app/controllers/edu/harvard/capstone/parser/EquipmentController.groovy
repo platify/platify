@@ -28,6 +28,8 @@ class EquipmentController {
         respond new Equipment(params)
     }
 
+
+
     
     def save() {
 

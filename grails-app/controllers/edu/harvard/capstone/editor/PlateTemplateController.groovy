@@ -3,10 +3,11 @@ package edu.harvard.capstone.editor
 import groovy.json.*
 
 import static org.springframework.http.HttpStatus.*
-import grails.transaction.Transactional
 
-@Transactional(readOnly = true)
 class PlateTemplateController {
+
+    def editorService
+    def springSecurityService
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
@@ -23,34 +24,48 @@ class PlateTemplateController {
         respond new PlateTemplate(params)
     }
 
-    @Transactional
-    def save(PlateTemplate plateTemplateInstance) {
-        if (plateTemplateInstance == null) {
-            notFound()
-            return
-        }
-
-        if (plateTemplateInstance.hasErrors()) {
-            respond plateTemplateInstance.errors, view:'create'
-            return
-        }
-
-        plateTemplateInstance.save flush:true
-
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.created.message', args: [message(code: 'plateTemplate.label', default: 'PlateTemplate'), plateTemplateInstance.id])
-                redirect plateTemplateInstance
+    def save() {
+        if (!springSecurityService.isLoggedIn()){
+            render(contentType: "application/json") {
+                [error: "User not logged in"]
             }
-            '*' { respond plateTemplateInstance, [status: CREATED] }
+            return
+        } 
+        
+        def data = request.JSON        
+        
+        if (!data) {
+            render(contentType: "application/json") {
+                [error: "No data received"]
+            }
+            return
         }
-    }
+
+        def plateTemplateInstance = editorService.newTemplate(data)
+
+        if(plateTemplateInstance == null){
+            render(contentType: "application/json") {
+                [error: "Error creating the plate template"]
+            }
+            return
+        }
+
+        if(plateTemplateInstance.hasErrors()){
+            render(contentType: "application/json") {
+                [error: plateTemplateInstance.errors]
+            }
+            return            
+        }
+
+        render(contentType: "application/json") {
+            [plateTemplate: plateTemplateInstance]
+        }
+   }
 
     def edit(PlateTemplate plateTemplateInstance) {
         respond plateTemplateInstance
     }
 
-    @Transactional
     def update(PlateTemplate plateTemplateInstance) {
         if (plateTemplateInstance == null) {
             notFound()
@@ -73,7 +88,6 @@ class PlateTemplateController {
         }
     }
 
-    @Transactional
     def delete(PlateTemplate plateTemplateInstance) {
 
         if (plateTemplateInstance == null) {
