@@ -113,8 +113,6 @@
 		<!-- main JS libs -->
 		<asset:javascript src="modernizr.min.js"/>
 		<asset:javascript src="bootstrap.js"/>
-		<asset:javascript src="jquery-ui.js"/>
-		<asset:javascript src="jquery.event.drag-2.2.js"/>
 
 	</body>
 </html>
