@@ -14,7 +14,7 @@
 /** end of bootstrap css conflict fix**/
 
 
-* {
+.content-body {
     font-family: arial;
     font-size: 8pt;
 }

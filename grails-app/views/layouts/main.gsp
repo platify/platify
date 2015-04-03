@@ -48,12 +48,18 @@
 			    <div class="collapse navbar-collapse" id="header-navbar">
 			    	<sec:ifLoggedIn>
 						<ul class="nav navbar-nav">
-							<li class="plate-editor"><a href="#">Plate Editor<span class="sr-only">(current)</span></a></li>
+							<li class="plate-editor">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Plate Editor <span class="caret"></span></a>
+								<ul class="dropdown-menu" role="menu">
+									<li><a href="#">Templates</a></li>
+									<li class="divider"></li>
+									<li><g:link controller="experimentalPlateSet" action="index">Experiments</g:link></li>
+								</ul>
+							</li>
 							<li class="output-parser">
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Output Parser <span class="caret"></span></a>
 								<ul class="dropdown-menu" role="menu">
 									<li><g:link controller="equipment" action="index">Equipments</g:link></li>
-									<li><g:link controller="experimentalPlateSet" action="index">Experiments</g:link></li>
 									<li class="divider"></li>
 									<li><a href="#">Parse</a></li>
 								</ul>
@@ -95,6 +101,8 @@
 		<!-- main JS libs -->
 		<asset:javascript src="modernizr.min.js"/>
 		<asset:javascript src="bootstrap.js"/>
+		<asset:javascript src="jquery-ui.js"/>
+		<asset:javascript src="jquery.event.drag-2.2.js"/>
 
 	</body>
 </html>
