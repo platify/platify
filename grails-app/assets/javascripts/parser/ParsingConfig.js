@@ -85,11 +85,16 @@ function ParsingConfig(name,
         var plateRanges = []; // elements of form [startRow, startCol, endRow, endCol]
                               // each represents a plate on the grid
 
+        var plateHeight
+            = this.plate.bottomRightCoords[0] - this.plate.topLeftCoords[0] + 1;
+        var plateWidth
+            = this.plate.bottomRightCoords[1] - this.plate.topLeftCoords[1] + 1;
+
         for (var row = startRow; row<=endRow; row++){
             if (this.isPlateStartRow(row, grid)) {
                 plateRanges.push([row,
                                   this.plate.topLeftCoords[1],
-                                  row+this.plate.bottomRightCoords[0] - 1,
+                                  row + plateHeight - 1,
                                   this.plate.bottomRightCoords[1]])
             }
         }
@@ -391,8 +396,6 @@ function ParsingConfig(name,
                     value: value
                 });
             }
-
-
         }
 
         return importData;
@@ -522,7 +525,6 @@ function ParsingConfig(name,
         JSONObject["plateInvariates"] = this.plateInvariates;
         JSONObject["features"] = this.features;
 
-        console.log("JSONObject = " + JSON.stringify(JSONObject));
     }
 
 

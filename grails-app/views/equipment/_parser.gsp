@@ -172,8 +172,9 @@
         </g:javascript> 
     </g:else>
 
-
-    <asset:javascript src="grid/slick.core.js"/>
+	<asset:javascript src="jquery-ui.js"/>
+	<asset:javascript src="jquery.event.drag-2.2.js"/>
+	<asset:javascript src="grid/slick.core.js"/>
     <asset:javascript src="grid/slick.grid.js"/>
     <asset:javascript src="grid/slick.autotooltips.js"/>
     <asset:javascript src="grid/slick.cellrangedecorator.js"/>
