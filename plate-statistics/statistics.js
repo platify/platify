@@ -21,10 +21,8 @@ exports.normalize = function (importData, plateNum, label,
             var well = plate.rows[i].columns[j];
             var raw_value = well.labels.filter(function (obj) { return obj.key === label })[0].value;
 
-            console.log('raw[%d,%d] = %d', i, j, raw_value);
             var norm = scale(raw_value);
             normalized[i][j] = scale(raw_value);
-            console.log('norm[%d,%d] = %d', i, j, norm);
         }
     }
 
