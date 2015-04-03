@@ -1,0 +1,27 @@
+#myGrid {
+    float: left;
+    width:600px;
+    height:500px;
+}
+
+#sidebar{
+    background-color: #ccf;
+    min-height:520px;
+    min-width: 320px;
+    padding-bottom: 40px;
+}
+
+#mainContent {
+    background-color: #999;
+    width:620px;
+    height:520px;
+}
+
+#parsingDescription{
+    width: 300px;
+    height: 100px;
+}
+
+#files {
+    display: none;
+}

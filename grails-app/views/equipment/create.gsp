@@ -1,5 +1,22 @@
 <!DOCTYPE html>
 <html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Get Tabs working</title>
+    <asset:stylesheet href="jquery-ui.css"/>
+    <asset:stylesheet href="grid/style.css"/>
+    <asset:stylesheet href="grid/slick.grid.css"/>
+    <asset:stylesheet href="grid/slick-default-theme.css"/>
+    <asset:stylesheet href="grid/Grid.css"/>
+    <!-- Bootstrap core CSS -->
+    <asset:stylesheet href="bootstrap.min.css"/>
+</head>
+<body class="container">
+	<g:render template="parser"/>
+</body>
+</html>
+
+<%--<html>
 	<head>
 		<meta name="layout" content="main">
 		<g:set var="entityName" value="${message(code: 'equipment.label', default: 'Equipment')}" />
@@ -36,3 +53,4 @@
 		</div>
 	</body>
 </html>
+--%>
