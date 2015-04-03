@@ -160,6 +160,19 @@
         </div>
     </div>
 
+    <g:if env="production">
+        <!-- Markup to include ONLY when in production -->
+        <g:javascript>
+            var hostname = "";      
+        </g:javascript>
+    </g:if>
+    <g:else>
+        <g:javascript>
+            var hostname = "/capstone";       
+        </g:javascript> 
+    </g:else>
+
+
     <asset:javascript src="grid/slick.core.js"/>
     <asset:javascript src="grid/slick.grid.js"/>
     <asset:javascript src="grid/slick.autotooltips.js"/>

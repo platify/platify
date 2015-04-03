@@ -98,6 +98,18 @@
 		</header>
 		<g:layoutBody/>
 		
+		<g:if env="production">
+		    <!-- Markup to include ONLY when in production -->
+		    <g:javascript>
+				var hostname = "";    	
+		    </g:javascript>
+		</g:if>
+		<g:else>
+		    <g:javascript>
+				var hostname = "/capstone";    	
+		    </g:javascript>	
+		</g:else>
+
 		<!-- main JS libs -->
 		<asset:javascript src="modernizr.min.js"/>
 		<asset:javascript src="bootstrap.js"/>
