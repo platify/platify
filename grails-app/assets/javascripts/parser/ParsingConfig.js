@@ -351,10 +351,12 @@ function ParsingConfig(name,
 
                         if (!importData.plates[plate].rows[plateRow].columns[plateColumn]){
                             importData.plates[plate].rows[plateRow].columns[plateColumn]
-                                = {};
+                                = {
+                                    labels: {}
+                                  };
                         }
 
-                        importData.plates[plate].rows[plateRow].columns[plateColumn][category]
+                        importData.plates[plate].rows[plateRow].columns[plateColumn].labels[category]
                             = value;
                     }
                 }
@@ -386,7 +388,7 @@ function ParsingConfig(name,
                 var gridColumn = gridCoordinates[1];
                 var value = grid.getDataPoint(gridRow, gridColumn);
 
-                importData.experimentFeatures[category] = value;
+                importData.experimentFeatures.labels[category] = value;
             }
         }
 

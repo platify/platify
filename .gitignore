@@ -11,5 +11,5 @@ node_modules
 .DS_Store
 
 # intellij idea files
-.*.iml
+*.iml
 .idea
