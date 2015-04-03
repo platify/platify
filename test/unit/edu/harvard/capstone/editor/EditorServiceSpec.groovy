@@ -177,5 +177,50 @@ class EditorServiceSpec extends Specification {
 			PlateTemplate.count() == 1
 			Label.count() == 4
 			Well.count() == 1
-	}							
+	}
+
+	
+	void "Test getting a template with an incorrect template"() {
+		when: "No user logged in"
+
+		def plateTemplate = service.getTemplate(null)
+
+		then:
+		plateTemplate == null
+	}	
+
+	void "Test getting a template"() {
+		when: "Correct parameters"
+    	// Fake springSecurityService - login as id 1
+		Scientist scientistInstance = new Scientist(firstName: "Test", lastName: "User", email:"my@email.com", password:"test")
+		scientistInstance.save()
+		service.springSecurityService = [principal: [id: scientistInstance.id]]
+
+
+		def data = JSON.parse("""
+			{plate: [
+				{name: 'test name', 
+				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
+				wells: [{row: '0', column: '0', 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				}
+			]}
+		""")
+
+		def plateTemplate = service.newTemplate(data)
+		def plate = service.getTemplate(plateTemplate[0])
+
+		then:
+			notThrown ValidationException
+			plateTemplate != null
+			PlateTemplate.count() == 1
+			Label.count() == 4
+			Well.count() == 1
+			data.plate[0].name == plate.name
+			data.plate[0].labels == plate.labels
+			data.plate[0].wells[0].row == plate.wells[0].row
+			data.plate[0].wells[0].column == plate.wells[0].column
+			data.plate[0].wells[0].groupName == plate.wells[0].groupName
+			data.plate[0].wells[0].labels == plate.wells[0].labels
+	}	
+
 }

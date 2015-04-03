@@ -2,6 +2,7 @@ package edu.harvard.capstone.editor
 
 import edu.harvard.capstone.user.Scientist
 
+import grails.converters.JSON
 
 import org.codehaus.groovy.grails.web.json.JSONObject
 import grails.validation.ValidationException
@@ -112,6 +113,52 @@ class EditorService {
     	}
 
     	return platesList
+
+    }
+
+    def getTemplate(PlateTemplate plateTemplateInstance){
+	
+    	if (!plateTemplateInstance)
+    		return
+   		
+   		def template = [:]
+
+    	template.name = plateTemplateInstance.name
+    	template.labels = []
+
+    	def plateLabels = DomainLabel.findAllByDomainIdAndLabelType(plateTemplateInstance.id, DomainLabel.LabelType.TEMPLATE).collect{it.label}
+    	plateLabels.each{ 
+    		def label = [:]
+    		label.category = it.category
+    		label.name = it.name
+    		label.value = it.value
+    		template.labels << label
+    	}
+
+    	template.wells = []
+
+    	def wells = Well.findAllByPlate(plateTemplateInstance)
+    	wells.each{
+    		def well = [:]
+    		well.row = it.row
+    		well.column = it.column
+    		well.groupName = it.groupName
+    		well.control = it.control
+    		well.labels = []
+	    	
+	    	def wellLabels = DomainLabel.findAllByDomainIdAndLabelType(it.id, DomainLabel.LabelType.WELL).collect{it.label}
+	    	wellLabels.each{ 
+	    		def label = [:]
+	    		label.category = it.category
+	    		label.name = it.name
+	    		label.value = it.value
+	    		well.labels << label
+	    	}  
+
+	    	template.wells << well  		
+    	}
+
+    	return template
 
     }
 }

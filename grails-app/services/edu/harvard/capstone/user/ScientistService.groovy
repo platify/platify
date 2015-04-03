@@ -13,7 +13,7 @@ class ScientistService {
     *	Returns: the Scientist instance
     */
     Scientist newUser(String firstName, String lastName, String password, String email, Boolean admin){
-    	log.info "(String $firstName, String $lastName, String $password, String $email, Boolean $admin)"
+    	
     	def scientistInstance = new Scientist (firstName: firstName,
     										   lastName: lastName,
     										   password: password,
@@ -50,7 +50,7 @@ class ScientistService {
     }
 
     Scientist updateUser(Scientist scientistInstance, String firstName, String lastName, String password, String email, Boolean admin){
-    	log.info password
+
     	if (password)
     		scientistInstance.password = password
 

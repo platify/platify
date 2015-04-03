@@ -24,6 +24,36 @@ class PlateTemplateController {
         respond new PlateTemplate(params)
     }
 
+    def getPlate(PlateTemplate plateTemplateInstance){
+        if (!springSecurityService.isLoggedIn()){
+            render(contentType: "application/json") {
+                [error: "User not logged in"]
+            }
+            return
+        } 
+
+        if (plateTemplateInstance == null) {
+            render(contentType: "application/json") {
+                [error: "Plate template not found"]
+            }
+            return
+        }
+
+        if (plateTemplateInstance.hasErrors()) {
+            render(contentType: "application/json") {
+                [error: plateTemplateInstance.errors]
+            }
+            return   
+        }
+
+        def plateTemplate = editorService.getTemplate(plateTemplateInstance)
+
+        render(contentType: "application/json") {
+            [plate: plateTemplateInstance]
+        }        
+
+    }
+
     def save() {
         if (!springSecurityService.isLoggedIn()){
             render(contentType: "application/json") {
