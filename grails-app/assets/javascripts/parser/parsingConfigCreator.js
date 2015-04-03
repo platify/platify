@@ -11,21 +11,6 @@ if (window.File && window.FileReader && window.FileList && window.Blob) {
 }
 
 
-function BioFeature(feaLabel){
-    this.featureLabel=feaLabel;
-    this.description='';
-    this.topLeftCoords=-1;
-    this.bottomRightCoords=-1;
-    this.topLeftValue='';
-    this.bottomRightValue='';
-    this.relativeToLeftX=-1;
-    this.relativeToLeftY=-1;
-    this.color='';
-    this.typeOfFeature=null;  // Plate, , Range, Unique
-
-}
-
-
 var PARSING = 0;
 var PLATE = 1;
 var FEATURES = 2;
@@ -60,7 +45,6 @@ examiner.registerAsLoadListener(function(examiner){
 
 function applyFeatures(){
     parsingConfig.applyFeatures(1, examiner.rowsSize, grid);
-    parsingConfig.getJSONString();
 }
 
 function makePlate(){

@@ -328,7 +328,7 @@ function ParsingConfig(name,
 
                     if (!importData.plates[plate]){
                         importData.plates[plate] = {
-                            labels : [],
+                            labels : {},
                             rows: []
                         };
                     }
@@ -350,15 +350,12 @@ function ParsingConfig(name,
                         }
 
                         if (!importData.plates[plate].rows[plateRow].columns[plateColumn]){
-                            importData.plates[plate].rows[plateRow].columns[plateColumn] = {
-                                labels: []
-                            };
+                            importData.plates[plate].rows[plateRow].columns[plateColumn]
+                                = {};
                         }
 
-                        importData.plates[plate].rows[plateRow].columns[plateColumn].labels.push({
-                            key: category,
-                            value: value
-                        });
+                        importData.plates[plate].rows[plateRow].columns[plateColumn][category]
+                            = value;
                     }
                 }
             } else if (feature.typeOfFeature == PLATE_LEVEL) {
@@ -369,7 +366,7 @@ function ParsingConfig(name,
 
                     if (!importData.plates[plate]){
                         importData.plates[plate] = {
-                            labels : [],
+                            labels : {},
                             rows: []
                         };
                     }
@@ -380,10 +377,8 @@ function ParsingConfig(name,
                     var value = grid.getDataPoint(gridRow, gridColumn);
 
 
-                    importData.plates[plate].labels.push({
-                        key: category,
-                        value: value
-                    });
+                    importData.plates[plate].labels[category]
+                        = value;
                 }
             } else if (feature.typeOfFeature == EXPERIMENT_LEVEL){
                 var gridCoordinates = this.findExperimentLevelFeatureCoords(featureName);
@@ -391,10 +386,7 @@ function ParsingConfig(name,
                 var gridColumn = gridCoordinates[1];
                 var value = grid.getDataPoint(gridRow, gridColumn);
 
-                importData.experimentFeatures.labels.push({
-                    key: category,
-                    value: value
-                });
+                importData.experimentFeatures[category] = value;
             }
         }
 

@@ -5,8 +5,6 @@
 function ImportData(experimentIdentifier, parsingConfigIdentifier){
     this.experimentID = experimentIdentifier;
     this.parsingID = parsingConfigIdentifier;
-    this.experimentFeatures = {
-        labels : []
-    };
+    this.experimentFeatures = {};
     this.plates = [];
 }

@@ -6,3 +6,10 @@
 .project
 .sass-cache
 node_modules
+
+# mac os stuff
+.DS_Store
+
+# intellij idea files
+.*.iml
+.idea
