@@ -8,6 +8,9 @@ class ExperimentalPlateSet {
 	String name
 	String description
 
+	Date lastUpdated
+	Date dateCreated
+
     static constraints = {
     	description blank: true, nullable: true
     }

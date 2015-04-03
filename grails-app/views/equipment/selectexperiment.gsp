@@ -4,7 +4,7 @@
 <html>
 	<head>
 		<meta name="layout" content="main">
-		<g:set var="entityName" value="${message(code: 'experimentalPlateSet.label', default: 'ExperimentalPlateSet')}" />
+		<g:set var="entityName" value="${message(code: 'experimentalPlateSet.label', default: 'Experiments')}" />
 		<title><g:message code="default.list.label" args="[entityName]" /></title>
 	</head>
 	<body>
@@ -15,15 +15,22 @@
 					<div class="nav" role="navigation">
 						<ul class="nav nav-pills nav-stacked">
 							<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
-							<li class="active"><g:link class="create" action="index">List</g:link></li>
-							<li><g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link></li>
+							<li><g:link class="create" action="index">Equipment</g:link></li>
+							<li class="active"><a href="#">Experiments</a></li>
 						</ul>			
 					</div>					
 				</div> <!-- Left Column END -->
 				<!-- Right Column -->
 				<div class="col-sm-9">
 					<div id="list-scientist" class="content scaffold-list" role="main">
-						<h1><g:message code="default.list.label" args="[entityName]" /></h1>
+						<div>
+							<div class="pull-left"><h1><g:message code="default.list.label" args="[entityName]" /></h1></div>
+							<div class="pull-right">
+								<h4>
+									Equipment: <span>${equipmentInstance?.name}</span>
+								</h4>
+							</div>
+						</div>
 						<g:if test="${flash.message}">
 							<div class="message" role="status">${flash.message}</div>
 						</g:if>
@@ -39,7 +46,7 @@
 									<g:sortableColumn property="owner" title="${message(code: 'equipment.machine.label', default: 'Owner')}" />	
 
 									<g:sortableColumn property="dateCreated" title="${message(code: 'equipment.date.label', default: 'Date')}" />																
-									<th>Action</th>
+									<th>Select</th>
 								
 								</tr>
 							</thead>
@@ -59,7 +66,9 @@
 									<td>${fieldValue(bean: experimentInstance, field: "dateCreated")}</td>
 								
 									<td>
-										<g:link id="${experimentInstance.id}" action="show"><i class="fa fa-eye user-view"></i></g:link>
+										<g:link mapping="parse" params='[equipment: "${equipmentInstance?.id}", experiment: "${experimentInstance?.id}"]'>
+											<i class="fa fa-check parse-btn"></i>
+										</g:link>									
 									</td>
 								
 								</tr>

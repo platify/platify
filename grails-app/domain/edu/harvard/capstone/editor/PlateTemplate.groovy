@@ -8,6 +8,9 @@ class PlateTemplate {
 	Scientist owner
 	String name
 
-    static constraints = {
+ 	Date lastUpdated
+	Date dateCreated
+
+   static constraints = {
     }
 }

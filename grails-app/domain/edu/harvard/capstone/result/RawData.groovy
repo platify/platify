@@ -8,6 +8,9 @@ class RawData {
 	Double value
 	Well well
 
+	Date lastUpdated
+	Date dateCreated
+
     static constraints = {
     }
 }

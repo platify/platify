@@ -3,8 +3,8 @@
 
     <div>selected cells = <span id="selectedCells"></span></div>
 
-    <div class="container-fluid max-height no-overflow" id="content">
-        <div class="row max-height">
+    <div class=" max-height no-overflow" id="content">
+        <div class=" max-height">
 
             <div class="col-xs-8" id="mainContent">
                 <div id="myGrid"></div>
@@ -160,9 +160,6 @@
         </div>
     </div>
 
-	<asset:javascript src="jquery-1.11.2.min.js"/>
-	<asset:javascript src="jquery-ui.js"/>
-	<asset:javascript src="jquery.event.drag-2.2.js"/>
     <asset:javascript src="grid/slick.core.js"/>
     <asset:javascript src="grid/slick.grid.js"/>
     <asset:javascript src="grid/slick.autotooltips.js"/>

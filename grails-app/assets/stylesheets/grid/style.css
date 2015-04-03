@@ -13,8 +13,8 @@
 
 #mainContent {
     background-color: #999;
-    width:620px;
-    height:520px;
+    min-width:620px;
+    min-height:520px;
 }
 
 #parsingDescription{

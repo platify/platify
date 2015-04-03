@@ -60,7 +60,7 @@
 									<td>${fieldValue(bean: equipmentInstance, field: "dateCreated")}</td>
 								
 									<td>
-										<g:link id="${equipmentInstance.id}" action="show"><i class="fa fa-check parse-btn"></i></g:link>
+										<g:link id="${equipmentInstance.id}" action="selectexperiment"><i class="fa fa-check parse-btn"></i></g:link>
 									</td>
 								
 								</tr>

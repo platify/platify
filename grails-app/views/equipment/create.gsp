@@ -30,7 +30,7 @@
 					</div>					
 				</div> <!-- Left Column END -->
 				<!-- Right Column -->
-				<div class="col-sm-10 content-body">
+				<div class="col-sm-10 content-body" style="padding-right: 30px">
 					<g:render template="parser"/>
 				</div> <!-- Right Column END -->	
 			</div>

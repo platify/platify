@@ -12,6 +12,9 @@ class Well {
 		POSITIVE, NEGATIVE, EMPTY
 	}
 	
+	Date lastUpdated
+	Date dateCreated
+
     static constraints = {
     	groupName nullable: true, blank: true
     }

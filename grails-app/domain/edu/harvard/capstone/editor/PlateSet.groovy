@@ -6,6 +6,9 @@ class PlateSet {
 	ExperimentalPlateSet experiment
 	String assay
 	
+	Date lastUpdated
+	Date dateCreated
+
     static constraints = {
     }
 }

@@ -1,10 +1,10 @@
 package edu.harvard.capstone.parser
 
-
+import edu.harvard.capstone.editor.ExperimentalPlateSet
 
 import static org.springframework.http.HttpStatus.*
-import grails.transaction.Transactional
 
+import grails.plugin.springsecurity.annotation.Secured
 
 class EquipmentController {
 
@@ -28,11 +28,40 @@ class EquipmentController {
         respond new Equipment(params)
     }
 
+    @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
+    def selectexperiment(Equipment equipmentInstance, Integer max){
+        if (!springSecurityService.isLoggedIn())
+            return
 
+        if(!springSecurityService.principal?.getAuthorities().any { it.authority == "ROLE_ADMIN" || it.authority == "ROLE_SUPER_ADMIN"}){
+            params.owner = springSecurityService.principal
+        }
+        
+        params.max = Math.min(max ?: 10, 100)
+        respond ExperimentalPlateSet.list(params), model:[experimentalPlateSetInstanceCount: ExperimentalPlateSet.count(), equipmentInstance: equipmentInstance]
+    }
+
+    @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
+    def parse(Long equipment, Long experiment){
+        if (!equipment || !experiment) {
+            notFound()
+            return
+        }
+
+        def equipmentInstance = Equipment.get(equipment)
+        def experimentInstance = ExperimentalPlateSet.get(experiment)
+
+        if (!equipmentInstance || !experimentInstance) {
+            notFound()
+            return
+        }
+        log.info equipmentInstance.config
+        respond equipmentInstance, model:[equipmentInstance: equipmentInstance, experimentInstance: experimentInstance]
+    }
 
     
-    def save() {
 
+    def save() {
         if (!springSecurityService.isLoggedIn()){
             render(contentType: "application/json") {
                 [error: "User not logged in"]

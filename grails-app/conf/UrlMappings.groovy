@@ -7,6 +7,9 @@ class UrlMappings {
             }
         }
 
+        name parse: "/parse/$equipment/$experiment"(controller: 'equipment', action:'parse')
+
+
         "/"(view:"/index")
         "500"(view:'/error')
 	}
