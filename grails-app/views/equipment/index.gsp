@@ -37,8 +37,10 @@
 									<g:sortableColumn property="machineName" title="${message(code: 'equipment.machine.label', default: 'Machine')}" />
 								
 									<g:sortableColumn property="description" title="${message(code: 'equipment.description.label', default: 'Description')}" />
+
+									<g:sortableColumn property="dateCreated" title="${message(code: 'equipment.date.label', default: 'Date')}" />
 																
-									<th>Action</th>
+									<th>Parse</th>
 								
 								</tr>
 							</thead>
@@ -54,9 +56,11 @@
 									<td>${fieldValue(bean: equipmentInstance, field: "machineName")}</td>
 								
 									<td>${fieldValue(bean: equipmentInstance, field: "description")}</td>
+
+									<td>${fieldValue(bean: equipmentInstance, field: "dateCreated")}</td>
 								
 									<td>
-										<g:link id="${scientistInstance.id}" action="show"><i class="fa fa-eye user-view"></i></g:link>
+										<g:link id="${equipmentInstance.id}" action="show"><i class="fa fa-check parse-btn"></i></g:link>
 									</td>
 								
 								</tr>

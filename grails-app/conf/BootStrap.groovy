@@ -2,6 +2,8 @@ import edu.harvard.capstone.user.Scientist
 import edu.harvard.capstone.user.ScientistRole
 import edu.harvard.capstone.user.Role
 
+import edu.harvard.capstone.parser.Equipment
+
 class BootStrap {
 
     def init = { servletContext ->
@@ -41,6 +43,85 @@ class BootStrap {
             ScientistRole.findOrCreateByScientistAndRole(dave, externalUser).save(flush: true)
             ScientistRole.findOrCreateByScientistAndRole(dave, adminUser).save(flush: true)
             ScientistRole.findOrCreateByScientistAndRole(dave, superAdmin).save(flush: true)
+
+            def config = '''
+                {
+                  "name": "abc",
+                  "machineName": "defg",
+                  "description": "test6",
+                  "exampleFileName": "envisionMultiPlate copy.txt",
+                  "exampleFileContents": [
+
+                  ],
+                  "delimiter": "tab",
+                  "plate": {
+                    "featureLabel": "plate",
+                    "description": "",
+                    "topLeftCoords": [
+                      1,
+                      1
+                    ],
+                    "bottomRightCoords": [
+                      21,
+                      26
+                    ],
+                    "topLeftValue": "Barcode Assay: ",
+                    "bottomRightValue": "1.184\r",
+                    "relativeToLeftX": 1,
+                    "relativeToLeftY": 1,
+                    "color": 0,
+                    "typeOfFeature": "plate"
+                  },
+                  "experimentFeatures": [
+
+                  ],
+                  "features": [
+                    {
+                      "featureLabel": "data plate",
+                      "description": "",
+                      "topLeftCoords": [
+                        6,
+                        3
+                      ],
+                      "bottomRightCoords": [
+                        21,
+                        26
+                      ],
+                      "topLeftValue": "1.2475",
+                      "bottomRightValue": "1.184\r",
+                      "relativeToLeftX": 2,
+                      "relativeToLeftY": 5,
+                      "color": 1,
+                      "typeOfFeature": "data",
+                      "importData": true
+                    },
+                    {
+                      "featureLabel": "temperature",
+                      "description": "",
+                      "topLeftCoords": [
+                        6,
+                        2
+                      ],
+                      "bottomRightCoords": [
+                        6,
+                        2
+                      ],
+                      "topLeftValue": "22.7",
+                      "bottomRightValue": "22.7",
+                      "relativeToLeftX": 1,
+                      "relativeToLeftY": 5,
+                      "color": 2,
+                      "typeOfFeature": "unique",
+                      "importData": true
+                    }
+                  ],
+                  "multiplePlatesPerFile": true,
+                  "multipleValuesPerWell": false,
+                  "gridFormat": true
+                }
+            '''
+            new Equipment(name: "First Equipment", machineName: "My machine", description: "This is my machine description", config: config).save(flush: true)
+            new Equipment(name: "Second Equipment", machineName: "My greate machine", description: "This is my very long machine description", config: config).save(flush: true)            
 
 		}
 		log.info "Users: " + Scientist.count()
