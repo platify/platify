@@ -53,7 +53,7 @@
 								<ul class="dropdown-menu" role="menu">
 									<li><a href="#">Templates</a></li>
 									<li class="divider"></li>
-									<li><g:link controller="experimentalPlateSet" action="index">Experiments</g:link></li>
+									<li><g:link controller="experimentalPlateSet" action="index">Experiment</g:link></li>
 								</ul>
 							</li>
 							<li class="output-parser">
