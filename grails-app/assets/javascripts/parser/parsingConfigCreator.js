@@ -153,16 +153,17 @@ function saveConfigToServer(){
         processData: false,
         contentType: "application/json; charset=UTF-8"
     	}).done(function() {
-		    alert( "success" );
+    		console.log( "success" );
 		}).fail(function() {
-		  alert( "error" );
+			console.log( "error" );
 		}).always(function() {
-		  alert( "complete" );
+			console.log( "complete" );
 		});
     
  // Set another completion function for the request above
-    jqxhr.always(function() {
-      alert( "second complete" );
+    jqxhr.always(function(resData) {
+    	console.log( "second complete" );
+      console.log(JSON.stringify(resData));
     });
     
 }

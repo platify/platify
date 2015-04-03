@@ -525,6 +525,7 @@ function ParsingConfig(name,
         JSONObject["plateInvariates"] = this.plateInvariates;
         JSONObject["features"] = this.features;
 
+        return JSONObject;
     }
 
 
