@@ -27,7 +27,7 @@ function generateDummyData(dimension, label, negativeControls, positiveControls)
 }
 
 
-QUnit.test('normalize test', function(assert) {
+QUnit.test('normalize test', function (assert) {
     var dimension = 5;
     var label = 'value';
     var negativeControls = [[0,0], [0,1]];
@@ -59,4 +59,17 @@ QUnit.test('normalize test', function(assert) {
         assert.ok(normalized[i].every(function (a) { return 0 <= a <= 1; }),
                   'Row ' + i + ' falls within 0 and 1');
     }
+});
+
+
+QUnit.test("Z' test", function (assert) {
+    var dimension = 5;
+    var label = 'value';
+    var negativeControls = [[0,0], [0,1]];
+    var positiveControls = [[1,0], [1,1]];
+    var importData = generateDummyData(dimension, label,
+		                       negativeControls, positiveControls);
+    var zPrime = stats.zprime(importData, 0, label,
+                              negativeControls, positiveControls);
+    assert.equal(zPrime, 1);
 });
