@@ -1,12 +1,8 @@
 package edu.harvard.capstone.result
 
-import edu.harvard.capstone.editor.Well
-
-class RefactoredData {
+class ResultPlate {
 
 	Result result
-	Double value
-	Well well
 
 	Date lastUpdated
 	Date dateCreated

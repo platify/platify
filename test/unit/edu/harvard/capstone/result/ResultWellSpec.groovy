@@ -6,8 +6,8 @@ import spock.lang.Specification
 /**
  * See the API for {@link grails.test.mixin.domain.DomainClassUnitTestMixin} for usage instructions
  */
-@TestFor(RefactoredData)
-class RefactoredDataSpec extends Specification {
+@TestFor(ResultWell)
+class ResultWellSpec extends Specification {
 
     def setup() {
     }
