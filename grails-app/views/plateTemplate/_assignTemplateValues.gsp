@@ -1,15 +1,13 @@
 <%@ page import="edu.harvard.capstone.parser.Equipment" %>
 
 
-    <h1>Create New Template:</h1>
+    <h2>Create New Template:</h2>
 	<div id="gridPanel" style="float:left; width: 70%">
 		<div id="myGrid" style="width:100%;height:650px;"></div>
 	</div>
 	<div id="labelPanel" style="float:right;width:29%;">
 		<div>Cell Range Selected:<span id="cellRange"></span></div>
 		<hr/>
-		
-		<h4>New Template Value:</h4>
 		<button id="importTemplateValueListBtn" class="ui-state-default ui-corner-all">Import Template Values</button>
 		
 		<hr/>
@@ -48,7 +46,6 @@
     <asset:javascript src="grid/slick.cellselectionmodel.js"/>
     <asset:javascript src="grid/slick.editors.js"/>
     <asset:javascript src="grid/Grid2Merge.js"/>
-    <asset:javascript src="plateEditor/editorAssignLabels.js"/>
     <asset:javascript src="plateEditor/editorCreateTemplate.js"/>
 
 

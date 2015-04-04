@@ -219,10 +219,10 @@ function createColorPicker(cat, label) {
 
 function updateCategoryList() {
 	var newDiv = document.createElement("div");
-	var newH3 = document.createElement("h3");
-	var h3Text = document.createTextNode('Categories:');
-	newH3.appendChild(h3Text);
-	newDiv.appendChild(newH3);
+	var newH4 = document.createElement("h4");
+	var h4Text = document.createTextNode('Categories:');
+	newH4.appendChild(h4Text);
+	newDiv.appendChild(newH4);
 	for (var catKey in catLegend) {
 		var newUl = document.createElement("ul");
 		var newStrong = document.createElement("strong");
@@ -501,6 +501,67 @@ function init(){
 }
 
 window.onload = init;
+
+//data format translation
+function translateModelToOutputJson(pModel) {
+	var plate = {};
+	plate["wells"] = [];
+	for (var row in pModel["rows"]) {
+		for (var column in pModel["rows"][row]["columns"]) {
+			var well = {};
+			well["row"] = row;
+			well["column"] = column;
+			well["control"] = null;
+			var labels = [];
+			for (var catKey in pModel["rows"][row]["columns"][column]["categories"]) {
+				for (var labKey in pModel["rows"][row]["columns"][column]["categories"][catKey]) {
+					var label = {};
+					label["category"] = catKey;
+					label["name"] = labKey;
+					label["color"] = pModel["rows"][row]["columns"][column]["categories"][catKey][labKey];
+					labels.push(label);
+				}
+			}
+			well["labels"] = labels;
+			well["groupName"] = pModel["rows"][row]["columns"][column]["wellGroupName"];
+			plate["wells"].push(well);
+		}
+	}
+	return plate;
+}
+
+// data format translation
+function translateInputJsonToModel(plateJson) {
+	var pModel = {};
+	pModel["rows"] = {};
+	
+	for (var i=0; i < plateJson["wells"].length; i++) {
+		var row = plateJson["wells"][i]["row"];
+		var column = plateJson["wells"][i]["column"];
+		var groupName = plateJson["wells"][i]["groupName"];
+		var labels = plateJson["wells"][i]["labels"];
+		
+		if (pModel["rows"][row] == null) {
+			pModel["rows"][row] = {};
+			pModel["rows"][row]["columns"] = {};
+		}
+		
+		if (pModel["rows"][row]["columns"][column] == null) {
+			pModel["rows"][row]["columns"][column] = {};
+			pModel["rows"][row]["columns"][column]["wellGroupName"] = groupName;
+			pModel["rows"][row]["columns"][column]["categories"] = {};
+		}
+
+		for (var j=0; j < labels.length; j++) {
+			if (pModel["rows"][row]["columns"][column]["categories"][labels[j].category] == null) {
+				pModel["rows"][row]["columns"][column]["categories"][labels[j].category] = {};
+			}
+			pModel["rows"][row]["columns"][column]["categories"][labels[j].category][labels[j].name] = labels[j].color;
+		}
+	}
+
+	return pModel;
+}
 
 // jQuery ui stuff
 $(function() {
