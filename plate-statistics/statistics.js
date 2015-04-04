@@ -1,5 +1,11 @@
 var d3 = require('d3');
 
+/*
+ * Given an importData structure, a plate number, a label category,
+ * and the coordinates of the negative and positive controls, this
+ * will normalize the values for that label against the controls,
+ * returning the results as a 2d array.
+ */
 exports.normalize = function (importData, plateNum, label,
                               negativeControls, positiveControls) {
     var plate = importData.plates[plateNum];
@@ -23,3 +29,4 @@ exports.normalize = function (importData, plateNum, label,
 
     return normalized;
 }
+
