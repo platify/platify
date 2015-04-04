@@ -216,8 +216,9 @@ function addEvent(elementId, eventType, handlerFunction) {
 
 //data format translation
 function translateModelToOutputJson(pModel) {
-	var plate = {};
-	plate["wells"] = [];
+	var plateJson = {};
+	plateJson["plate"] = {};
+	plateJson["plate"]["wells"] = [];
 	for (var row in pModel["rows"]) {
 		for (var column in pModel["rows"][row]["columns"]) {
 			var well = {};
@@ -236,22 +237,23 @@ function translateModelToOutputJson(pModel) {
 			}
 			well["labels"] = labels;
 			well["groupName"] = pModel["rows"][row]["columns"][column]["wellGroupName"];
-			plate["wells"].push(well);
+			plateJson["plate"]["wells"].push(well);
 		}
 	}
-	return plate;
+	return plateJson;
 }
 
 // data format translation
 function translateInputJsonToModel(plateJson) {
 	var pModel = {};
 	pModel["rows"] = {};
+	var plate = plateJson["plate"];
 	
-	for (var i=0; i < plateJson["wells"].length; i++) {
-		var row = plateJson["wells"][i]["row"];
-		var column = plateJson["wells"][i]["column"];
-		var groupName = plateJson["wells"][i]["groupName"];
-		var labels = plateJson["wells"][i]["labels"];
+	for (var i=0; i < plate["wells"].length; i++) {
+		var row = plate["wells"][i]["row"];
+		var column = plate["wells"][i]["column"];
+		var groupName = plate["wells"][i]["groupName"];
+		var labels = plate["wells"][i]["labels"];
 		
 		if (pModel["rows"][row] == null) {
 			pModel["rows"][row] = {};
@@ -275,6 +277,32 @@ function translateInputJsonToModel(plateJson) {
 	return pModel;
 }
 
+// ajax save object call
+function saveConfigToServer(){
+	var plateJson = translateModelToOutputJson(plateModel);
+	console.log(JSON.stringify(plateJson));
+   
+	var jqxhr = $.ajax({
+		url: hostname + "/plateTemplate/save",
+		type: "POST",
+		data: JSON.stringify(plateJson),
+		processData: false,
+		contentType: "application/json; charset=UTF-8"
+	}).done(function() {
+		console.log("success");
+	}).fail(function() {
+		console.log("error");
+	}).always(function() {
+		console.log("complete");
+	});
+   
+	// Set another completion function for the request above
+	jqxhr.always(function(resData) {
+		console.log( "second complete" );
+		console.log(JSON.stringify(resData));
+	});
+}
+
 
 /**
  * This function handles the window load event. It initializes and fills the
@@ -285,6 +313,7 @@ function init(){
 	addEvent("addTemplateValueBtn", "click", addTemplateValue);
 	addEvent("clearLastSelection", "click", removeHighlightedArea);
 	addEvent("clearAllSelection", "click", removeAllHighlightedCells);
+	addEvent("saveTemplate", "click", saveConfigToServer);
 
 	// initially disable selection of grid cells
 	enableGridSelection();

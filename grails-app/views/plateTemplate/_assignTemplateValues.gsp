@@ -22,6 +22,8 @@
 		<hr/>
 		<div>Well Groupings:<span id="wellGroupSpan"></span></div>
 	</div>
+	
+	<button id="saveTemplate">Save Template</button>
 
     <g:if env="production">
         <!-- Markup to include ONLY when in production -->
