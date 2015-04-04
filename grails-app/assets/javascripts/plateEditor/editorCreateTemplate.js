@@ -3,7 +3,7 @@ var DIMENSION = 100;
 var CELL_HEIGHT = 25;
 var CELL_WIDTH = 40;
 var data;
-var cellValues = {};
+var plateModel = {};
 var wellGroupings = [];
 var grid;
 var currentHighlightKeys = [];
@@ -156,15 +156,27 @@ function addTemplateValue() {
 		var row = selCells[cell][0];
 		var column = selCells[cell][1];
 		
-		if (cellValues[row] == null) {
-			cellValues[row] = [];
+		if (plateModel["rows"] == null) {
+			plateModel["rows"] = {};
 		}
-		if (cellValues[row][column] == null) {
-			cellValues[row][column] = cellValue;
+		
+		if (plateModel["rows"][row] == null) {
+			plateModel["rows"][row] = {};
+		}
+		
+		if (plateModel["rows"][row]["columns"] == null) {
+			plateModel["rows"][row]["columns"] = {};
+		}
+		
+		if (plateModel["rows"][row]["columns"][column] == null) {
+			plateModel["rows"][row]["columns"][column] = {};
+			plateModel["rows"][row]["columns"][column]["wellGroupName"] = cellValue;
 		}
 		
 		grid.updateCellContents(row, column, cellValue);
 	}
+	
+	console.log("plateModel1:" + JSON.stringify(plateModel));
 	
 	var wgs = document.getElementById("wellGroupSpan");
 	wgs.innerHTML = wellGroupings;

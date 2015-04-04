@@ -3,7 +3,6 @@ var DIMENSION = 100;
 var CELL_HEIGHT = 50;
 var CELL_WIDTH = 150;
 var data;
-//var categories = {};	// note declaring as an object ???
 var plateModel = {};
 var catLegend = {};
 var grid;
