@@ -55,7 +55,7 @@ class EquipmentController {
             notFound()
             return
         }
-        log.info equipmentInstance.config
+
         respond equipmentInstance, model:[equipmentInstance: equipmentInstance, experimentInstance: experimentInstance]
     }
 

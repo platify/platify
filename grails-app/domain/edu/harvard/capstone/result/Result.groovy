@@ -16,6 +16,7 @@ class Result {
 	Date dateCreated
 
     static constraints = {
+    	name blank: true, nullable: true
     	description blank: true, nullable: true
     }
 

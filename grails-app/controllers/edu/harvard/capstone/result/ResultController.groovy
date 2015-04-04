@@ -1,11 +1,10 @@
 package edu.harvard.capstone.result
 
-
+import grails.plugin.springsecurity.annotation.Secured
 
 import static org.springframework.http.HttpStatus.*
-import grails.transaction.Transactional
 
-@Transactional(readOnly = true)
+
 class ResultController {
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
@@ -23,7 +22,6 @@ class ResultController {
         respond new Result(params)
     }
 
-    @Transactional
     def save(Result resultInstance) {
         if (resultInstance == null) {
             notFound()
@@ -50,7 +48,6 @@ class ResultController {
         respond resultInstance
     }
 
-    @Transactional
     def update(Result resultInstance) {
         if (resultInstance == null) {
             notFound()
@@ -73,7 +70,6 @@ class ResultController {
         }
     }
 
-    @Transactional
     def delete(Result resultInstance) {
 
         if (resultInstance == null) {

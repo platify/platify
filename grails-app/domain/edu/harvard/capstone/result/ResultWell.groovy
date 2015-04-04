@@ -2,10 +2,9 @@ package edu.harvard.capstone.result
 
 import edu.harvard.capstone.editor.Well
 
-class RawData {
+class ResultWell {
 
-	Result result
-	Double value
+	ResultPlate plate
 	Well well
 
 	Date lastUpdated
