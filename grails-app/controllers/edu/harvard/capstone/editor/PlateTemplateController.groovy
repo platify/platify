@@ -4,6 +4,9 @@ import groovy.json.*
 
 import static org.springframework.http.HttpStatus.*
 
+import grails.validation.ValidationException
+
+
 class PlateTemplateController {
 
     def editorService
@@ -71,7 +74,20 @@ class PlateTemplateController {
             return
         }
 
-        def plateTemplateInstance = editorService.newTemplate(data)
+        try{
+            def plateTemplateInstance = editorService.newTemplate(data)
+        }
+        catch (ValidationException e) {
+            render(contentType: "application/json") {
+                [error: e.errors, message: e.message]
+            }            
+            return
+        } catch (RuntimeException e) {
+            render(contentType: "application/json") {
+                [error: e.message]
+            }  
+            return                      
+        }
 
         if(plateTemplateInstance == null){
             render(contentType: "application/json") {

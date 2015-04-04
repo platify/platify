@@ -4,6 +4,8 @@ import grails.plugin.springsecurity.annotation.Secured
 
 import static org.springframework.http.HttpStatus.*
 
+import grails.validation.ValidationException
+
 class RawDataController {
 
     def springSecurityService
@@ -28,8 +30,21 @@ class RawDataController {
             return
         }
 
-        def plateTemplateInstance = resultService.newRawData(data)
-
+        try{
+            def plateTemplateInstance = resultService.newRawData(data)
+        }
+        catch (ValidationException e) {
+            render(contentType: "application/json") {
+                [error: e.errors, message: e.message]
+            }            
+            return
+        } catch (RuntimeException e) {
+            render(contentType: "application/json") {
+                [error: e.message]
+            }  
+            return                      
+        }
+        
         if(plateTemplateInstance == null){
             render(contentType: "application/json") {
                 [error: "Error creating the plate template"]
