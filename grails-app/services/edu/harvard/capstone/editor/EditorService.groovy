@@ -27,60 +27,57 @@ class EditorService {
     	if (!scientistInstance)
     		return
 
+		// first create the plate
+		def plateInstance = new PlateTemplate(owner: scientistInstance, name: data.plate.name)
+		plateInstance.save()
+		// if it has errors, delete all the data just created and exit
+		if (plateInstance.hasErrors()){
+			throw new ValidationException("Plate is not valid", plateInstance.errors)
+		}
 
-    	// for storing the objects
-    	def platesList = []
+		// for storing the created objects
+    	def labelsList = []
+    	def wellsLabelsList = []    		
 
-
-    	data.plate?.each{ plate ->
-    		// first create the plate
-    		def plateInstance = new PlateTemplate(owner: scientistInstance, name: plate.name)
-    		plateInstance.save()
-    		// if it has errors, delete all the data just created and exit
-    		if (plateInstance.hasErrors()){
-    			throw new ValidationException("Plate is not valid", plateInstance.errors)
-    		}
-    		platesList << plateInstance
-    		// for storing the created objects
-	    	def labelsList = []
-	    	def wellsLabelsList = []    		
-
-    		// iterate throught the labels and create if it's a new one
-    		plate.labels.each{ label ->
-    			def labelInstance = Label.get(label.id)
-    			if (!labelInstance){
-    				labelInstance = new Label(category: label.category, name: label.name, value: label.value)
-    				labelInstance.save()
-    				if (labelInstance.hasErrors()){
-    					throw new ValidationException("Label for plate is not valid", labelInstance.errors)	
-    				}
-    			}
-    			// add it to the labels that will be assigned to the plate
-				labelsList << labelInstance
-    		}
-
-    		// link the plate to the labels
-    		labelsList.each{ plateLabel ->
-    			def plateLabelInstance = new DomainLabel(label: plateLabel, domainId: plateInstance.id, labelType: DomainLabel.LabelType.TEMPLATE)
-    			plateLabelInstance.save()
-    			if (plateLabelInstance.hasErrors()){
-					throw new ValidationException("Plate Label is not valid", plateLabelInstance.errors)	
+		// iterate throught the labels and create if it's a new one
+		data.plate.labels.each{ label ->
+			if (label){
+				def labelInstance = Label.get(label.id)
+				if (!labelInstance){
+					labelInstance = new Label(category: label.category, name: label.name, value: label.value)
+					labelInstance.save()
+					if (labelInstance.hasErrors()){
+						throw new ValidationException("Label for plate is not valid", labelInstance.errors)	
+					}
 				}
-    		}
+				// add it to the labels that will be assigned to the plate
+				labelsList << labelInstance
+			}
+		}
 
-    		// create the wells
-    		plate.wells.each{ well ->
-    			def controlType
-    			if (well.control && well.control.toLowerCase().contains("positive"))
-    				controlType = Well.WellControl.POSITIVE
-    			else if (well.control && well.control.toLowerCase().contains("negative"))
-    				controlType = Well.WellControl.NEGATIVE
-    			else
-    				controlType = Well.WellControl.EMPTY
-    			
-    			def wellInstance = new Well(plate: plateInstance, row: well.row, column: well.column, groupName: well.groupName, control: controlType)
-    			wellInstance.save()
-    			if (wellInstance.hasErrors()){
+		// link the plate to the labels
+		labelsList.each{ plateLabel ->
+			def plateLabelInstance = new DomainLabel(label: plateLabel, domainId: plateInstance.id, labelType: DomainLabel.LabelType.TEMPLATE)
+			plateLabelInstance.save()
+			if (plateLabelInstance.hasErrors()){
+				throw new ValidationException("Plate Label is not valid", plateLabelInstance.errors)	
+			}
+		}
+
+		// create the wells
+		data.plate.wells.each{ well ->
+			if (well){
+				def controlType
+				if (well.control && well.control.toLowerCase().contains("positive"))
+					controlType = Well.WellControl.POSITIVE
+				else if (well.control && well.control.toLowerCase().contains("negative"))
+					controlType = Well.WellControl.NEGATIVE
+				else
+					controlType = Well.WellControl.EMPTY
+				
+				def wellInstance = new Well(plate: plateInstance, row: well.row, column: well.column, groupName: well.groupName, control: controlType)
+				wellInstance.save()
+				if (wellInstance.hasErrors()){
 					throw new ValidationException("Well is not valid", wellInstance.errors)	
 				}
 
@@ -106,13 +103,10 @@ class EditorService {
 						throw new ValidationException("Well Label is not valid", wellLabelInstance.errors)	
 					}
 	    		}				
+			}
+		}
 
-    		}
-
-
-    	}
-
-    	return platesList
+    	return plateInstance
 
     }
 

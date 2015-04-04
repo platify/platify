@@ -22,16 +22,16 @@ class RawDataController {
         } 
         
         def data = request.JSON        
-        
+
         if (!data) {
             render(contentType: "application/json") {
                 [error: "No data received"]
             }
             return
         }
-
+        def resultInstance
         try{
-            def plateTemplateInstance = resultService.newRawData(data)
+            resultInstance = resultService.newRawData(data)
         }
         catch (ValidationException e) {
             render(contentType: "application/json") {
@@ -44,23 +44,22 @@ class RawDataController {
             }  
             return                      
         }
-        
-        if(plateTemplateInstance == null){
+        if(resultInstance == null){
             render(contentType: "application/json") {
-                [error: "Error creating the plate template"]
+                [error: "Error storing the raw data"]
             }
             return
         }
 
-        if(plateTemplateInstance.hasErrors()){
+        if(resultInstance.hasErrors()){
             render(contentType: "application/json") {
-                [error: plateTemplateInstance.errors]
+                [error: resultInstance.errors]
             }
             return            
         }
 
         render(contentType: "application/json") {
-            [plateTemplate: plateTemplateInstance]
+            [resultInstance: resultInstance]
         }
 
     }

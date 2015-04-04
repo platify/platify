@@ -73,9 +73,9 @@ class PlateTemplateController {
             }
             return
         }
-
+        def plateTemplateInstance
         try{
-            def plateTemplateInstance = editorService.newTemplate(data)
+            plateTemplateInstance = editorService.newTemplate(data)
         }
         catch (ValidationException e) {
             render(contentType: "application/json") {

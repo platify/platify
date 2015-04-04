@@ -46,9 +46,9 @@ class ResultController {
             }
             return   
         }
-
+        def result
         try{
-            def result = resultService.getResults(resultInstance)    
+            result = resultService.getResults(resultInstance)    
         }
         catch (ValidationException e) {
             render(contentType: "application/json") {
