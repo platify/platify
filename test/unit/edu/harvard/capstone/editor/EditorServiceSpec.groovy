@@ -201,7 +201,7 @@ class EditorServiceSpec extends Specification {
 			{plate: [
 				{name: 'test name', 
 				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
-				wells: [{row: '0', column: '0', 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				wells: [{row: 0, column: 0, 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
 				}
 			]}
 		""")

@@ -268,7 +268,7 @@ class ResultServiceSpec extends Specification {
 					parsingID: '${equipmentInstance.id}',
 					plates: [{
 						labels: {key: ''},
-						firstPlate: 'true'
+						rows: [{columns: {key: 'val'}}]
 					}],
 					experimentFeatures: {labels: {key: 'val', secondKey: 'second val'}}
 				}
@@ -407,7 +407,77 @@ class ResultServiceSpec extends Specification {
 			ResultLabel.count() == 4
 			ResultWell.count() == 1
 			Result.count() == 1
-	}			
+	}		
+
+
+	/* Test the get data */	
+	void "Test getting results with an incorrect resultInstance"() {
+		when: "No data"
+
+		def importData = service.getResults(null)
+
+		then:
+		importData == null
+	}	
+
+	void "Test getting the results"() {
+		when: "Correct parameters"
+    	
+			Scientist scientistInstance = new Scientist(firstName: "Test", lastName: "User", email:"my@email.com", password:"test")
+			scientistInstance.save()
+			service.springSecurityService = [principal: [id: scientistInstance.id]]
+			Equipment equipmentInstance = new Equipment(name: "my equipment", machineName: "my machine name", description: "my description", config: "my config")
+			equipmentInstance.save()
+			ExperimentalPlateSet experimentInstance = new ExperimentalPlateSet(owner: scientistInstance, name: "my experiment", description: "my description")
+			experimentInstance.save()
+			PlateTemplate templateInstance = new PlateTemplate(owner: scientistInstance, name: "my template")
+			templateInstance.save()
+			new PlateSet(plate: templateInstance, experiment: experimentInstance).save()
+			new Well(plate: templateInstance, column: 0, row: 0, groupName: 'my group').save()
+
+
+			def data = JSON.parse("""
+				{
+					experimentID: '${experimentInstance.id}', 
+					parsingID: '${equipmentInstance.id}',
+					plates: [{
+						labels: {key: 'value'},
+						rows: [ 
+							{
+								columns: [
+									{
+										labels: {key: 'value'}
+									}
+								]
+							} 
+						]
+					}],
+					experimentFeatures: {labels: {key: 'val', secondKey: 'second val'}}
+				}
+			""")
+			def resultInstance = service.newRawData(data)
+			def result = service.getResults(resultInstance)
+
+		then:
+			notThrown ValidationException
+			resultInstance != null
+			ResultPlate.count() == 1
+			ResultLabel.count() == 4
+			ResultWell.count() == 1
+			Result.count() == 1
+			result != null
+			result.experimentID == experimentInstance.id
+			result.parsingID == equipmentInstance.id
+			result.plates.size() == 1
+			result.plates[0].labels.key == 'value'
+			result.plates[0].rows.size() == 1
+			result.plates[0].rows[0].columns.size() == 1
+			result.plates[0].rows[0].columns[0].labels.key == 'value'
+			result.experimentFeatures.labels.size() == 2
+			result.experimentFeatures.labels.key == 'val'
+			result.experimentFeatures.labels.secondKey == 'second val'
+	}	
+
 
 }
 

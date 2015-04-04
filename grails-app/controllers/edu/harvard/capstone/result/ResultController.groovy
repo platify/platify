@@ -3,9 +3,12 @@ package edu.harvard.capstone.result
 import grails.plugin.springsecurity.annotation.Secured
 
 import static org.springframework.http.HttpStatus.*
-
+import grails.validation.ValidationException
 
 class ResultController {
+
+    def springSecurityService
+    def resultService
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
@@ -21,6 +24,50 @@ class ResultController {
     def create() {
         respond new Result(params)
     }
+
+    def read(Result resultInstance){
+        if (!springSecurityService.isLoggedIn()){
+            render(contentType: "application/json") {
+                [error: "User not logged in"]
+            }
+            return
+        } 
+
+        if (resultInstance == null) {
+            render(contentType: "application/json") {
+                [error: "Result not found"]
+            }
+            return
+        }
+
+        if (resultInstance.hasErrors()) {
+            render(contentType: "application/json") {
+                [error: resultInstance.errors]
+            }
+            return   
+        }
+
+        try{
+            def result = resultService.getResults(resultInstance)    
+        }
+        catch (ValidationException e) {
+            render(contentType: "application/json") {
+                [error: e.errors, message: e.message]
+            }            
+            return
+        } catch (RuntimeException e) {
+            render(contentType: "application/json") {
+                [error: e.message]
+            }  
+            return                      
+        }
+        
+
+        render(contentType: "application/json") {
+            [ImportData: result]
+        } 
+    }
+
 
     def save(Result resultInstance) {
         if (resultInstance == null) {

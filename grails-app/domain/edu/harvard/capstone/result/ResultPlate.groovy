@@ -4,6 +4,9 @@ class ResultPlate {
 
 	Result result
 
+	Integer rows
+	Integer columns
+
 	Date lastUpdated
 	Date dateCreated
 

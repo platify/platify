@@ -3,8 +3,8 @@ package edu.harvard.capstone.editor
 class Well {
 
 	PlateTemplate plate
-	String column
-	String row
+	Integer column
+	Integer row
 	String groupName
 	WellControl control = WellControl.EMPTY
 

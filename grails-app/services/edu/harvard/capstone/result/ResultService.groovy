@@ -73,7 +73,13 @@ class ResultService {
 
 		// create the result plates
 		data.plates.eachWithIndex{ plate, plateIndex ->
-			def plateInstance = new ResultPlate(result: resultInstance)
+			def numberOfRows = plate.rows?.size()
+			def numberOfColumns = -1
+			if (plate.rows)
+				numberOfColumns = plate.rows[0]?.columns?.size()
+
+			def plateInstance = new ResultPlate(result: resultInstance, rows: numberOfRows, columns: numberOfColumns)
+			
 			plateInstance.save()
 			if (plateInstance.hasErrors()){
     			throw new ValidationException("Plate is not valid", plateInstance.errors)
@@ -116,6 +122,72 @@ class ResultService {
 
     	return resultInstance
 
+    }
+
+    def getResults(Result resultInstance) {
+
+    	if (!resultInstance)
+    		return
+
+    	def importData = [:]
+
+    	importData.experimentID = resultInstance.experiment.id
+    	importData.parsingID = resultInstance.equipment.id
+    	importData.experimentFeatures = [:]
+
+    	def experimentLabels = [:]
+    	ResultLabel.findAllByDomainIdAndLabelType(resultInstance.id, ResultLabel.LabelType.RESULT).each{
+    		experimentLabels[it.name] = it.value
+    	}
+
+    	importData.experimentFeatures.labels = experimentLabels
+    	importData.plates = []
+
+    	ResultPlate.findAllByResult(resultInstance).each{ plateResult ->
+    		def plate = [:]
+    		def plateLabels = [:]
+    		ResultLabel.findAllByDomainIdAndLabelType(plateResult.id, ResultLabel.LabelType.PLATE).each{
+    			plateLabels[it.name] = it.value
+    		}
+    		plate.labels = plateLabels
+    		def numberOfRows = plateResult.rows
+
+
+    		plate.rows = []
+
+    		def numberOfColumns = plateResult.columns
+
+    		(0..numberOfRows-1).each{ rowIndex ->
+    			def row = [:]
+    			row.columns = []
+    			(0..numberOfColumns-1).each{ columnIndex ->
+    				def wellInstance = [:]
+    				wellInstance.labels = [:]
+	
+		    		def wellLabels = [:]
+
+		    		def wellResult = ResultWell.withCriteria{
+		    			well{
+		    				eq("row", rowIndex)
+		    				eq("column", columnIndex)
+		    			}
+		    			eq('plate', plateResult)		    			
+		    		}
+        
+		    		ResultLabel.findAllByDomainIdAndLabelType(wellResult.id, ResultLabel.LabelType.WELL).each{
+		    			wellLabels[it.name] = it.value
+		    		}
+		    		wellInstance.labels = wellLabels
+
+    				row.columns << wellInstance
+    			}
+    			plate.rows << row
+    		}
+
+    		importData.plates << plate
+    	}
+
+    	return importData
     }
 
 }
