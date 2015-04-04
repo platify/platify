@@ -303,14 +303,14 @@ function Grid(containerID){
      * disables updates to cells on selection event
      */
     this.disableCellSelection = function(){
-        selectionEnabled = false;
+        this.selectionEnabled = false;
     };
 	
 	/**
      * enables updates to cells on selection event
      */
     this.enableCellSelection = function(){
-        selectionEnabled = true;
+        this.selectionEnabled = true;
     };
 	
 	/**
@@ -416,7 +416,7 @@ function Grid(containerID){
      * @param data - the object containing the selected cell range data
      */
     function updateSelectedCells(event, data){
-		if (selectionEnabled == true) {
+		if (this.selectionEnabled == true) {
 			_self.selectedStartRow = data[0].fromRow + 1;
 			_self.selectedStartCol = data[0].fromCell;
 			_self.selectedEndRow = data[0].toRow + 1;

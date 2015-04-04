@@ -9,6 +9,12 @@ var STARTING_CHAR_CODE = 65;
 var DRAG_SCROLL_BORDER_THRESHOLD_PX = 30;
 var DRAG_SCROLL_AMOUNT = 20;
 
+var DEFAULT_CELL_WIDTH = 60;
+var DEFAULT_CELL_HEIGHT = 25;
+var DEFAULT_RESIZABILITY = true;
+var DEFAULT_FORMATTER = null;
+var DEFAULT_CELL_CSS = "";
+
 /**
  * Grid Objects! The constructor takes the id of the container element in which the grid
  * will be displayed, this element is most likely a div and must have its dimensions
@@ -26,6 +32,16 @@ function Grid(containerID){
     this.selectedCellsCallBacks = [];
     this.colorCounter = 0;
     this.container = containerID;
+
+    // cell formatting fields;
+    this.cellCSS = DEFAULT_CELL_CSS
+    this.formatter = DEFAULT_FORMATTER
+    this.cellWidth = DEFAULT_CELL_WIDTH;
+    this.cellHeight = DEFAULT_CELL_HEIGHT;
+    this.resizable = DEFAULT_RESIZABILITY;
+
+
+    // highlighting tracking fields
     this.highlightedCellsByColor = {};
     this.highlightedCellsByKey = {};
     this.keyToColor = {};
@@ -35,6 +51,8 @@ function Grid(containerID){
     this.selectedEndRow = null;
     this.selectedStartCol = null;
     this.selectedEndCol = null;
+    this.selectionEnabled = true;
+
 
     /**
      * A setter for the dataset to display in the grid. The underlying SlickGrid object
@@ -58,20 +76,57 @@ function Grid(containerID){
         this.keyToColor = {};
     };
 
-
-
     /**
      * This function creates a new SlickGrid in the constructor specified container with
      * the set data using the setData method.
+     * @param cellWidth - optional, defaults to DEFAULT_CELL_WIDTH, use null to leave at
+     *                      default
+     * @param cellHeight - optional, defaults to DEFAULT_CELL_HEIGHT, use null to leave at
+     *                      default
+     * @param resizable - optional, defaults to true. Determines whether or not the user
+     *                  can resize the column width by dragging the column header borders
+     * @param formatter - optional, defaults to null
+     * @param cellCSS - optional, defaults to ""
      */
-    this.fillUpGrid = function() {
+    this.fillUpGrid = function(cellWidth, cellHeight, resizable, formatter, cellCSS) {
+
+        if (cellWidth){
+            this.cellWidth = cellWidth;
+        } else {
+            this.cellWidth = DEFAULT_CELL_WIDTH;
+        }
+
+        if (cellHeight){
+            this.cellHeight = cellHeight;
+        } else {
+            this.cellHeight = DEFAULT_CELL_HEIGHT;
+        }
+
+        if (resizable === true || resizable === false){
+            this.resizable = resizable;
+        } else {
+            this.resizable = DEFAULT_RESIZABILITY;
+        }
+
+        if (formatter){
+            this.formatter = formatter;
+        } else {
+            this.formatter = DEFAULT_FORMATTER;
+        }
+
+        if (cellCSS){
+            this.cellCSS = cellCSS;
+        } else {
+            this.cellCSS = DEFAULT_CELL_CSS;
+        }
 
         var columns = [];
 
         var options = {
             enableCellNavigation: true,
             enableColumnReorder: false,
-            numberOfColumnsToFreeze: 1
+            numberOfColumnsToFreeze: 1,
+            rowHeight: this.cellHeight
         };
 
         // create column labels, starting with column for the row labels
@@ -80,7 +135,7 @@ function Grid(containerID){
             name: "0",
             field: "0",
             width: 30,
-            resizable: true,
+            resizable: this.resizable,	// cellResizable,
             selectable: false,
             focusable: false
         });
@@ -89,7 +144,10 @@ function Grid(containerID){
                 id: k.toString(),
                 name: k.toString(),
                 field: k.toString(),
-                width: 60
+                width: this.cellWidth,
+                cssClass: this.cellCSS, // cellCssClass,
+                formatter: this.formatter, // cellFormatter
+                resizable: this.resizable
             });
         }
 
@@ -243,10 +301,10 @@ function Grid(containerID){
      */
     this.getSelectedCellBounds = function(){
         return [this.selectedStartRow,
-                this.selectedStartCol,
-                this.selectedEndRow,
-                this.selectedEndCol
-               ];
+            this.selectedStartCol,
+            this.selectedEndRow,
+            this.selectedEndCol
+        ];
     };
 
     /**
@@ -267,6 +325,19 @@ function Grid(containerID){
         return result;
     };
 
+    /**
+     * disables updates to cells on selection event
+     */
+    this.disableCellSelection = function(){
+        this.selectionEnabled = false;
+    };
+
+    /**
+     * enables updates to cells on selection event
+     */
+    this.enableCellSelection = function(){
+        this.selectionEnabled = true;
+    };
 
     /**
      * This function returns an array of all of the cell coordinates that are currently
@@ -325,7 +396,7 @@ function Grid(containerID){
     };
 
     this.getDataPoint = function(row, column){
-      return this.grid.getDataItem(row-1)[column.toString()];
+        return this.grid.getDataItem(row-1)[column.toString()];
     };
 
     /**
@@ -371,20 +442,22 @@ function Grid(containerID){
      * @param data - the object containing the selected cell range data
      */
     function updateSelectedCells(event, data){
-        _self.selectedStartRow = data[0].fromRow + 1;
-        _self.selectedStartCol = data[0].fromCell;
-        _self.selectedEndRow = data[0].toRow + 1;
-        _self.selectedEndCol = data[0].toCell;
+        if (_self.selectionEnabled == true) {
+            _self.selectedStartRow = data[0].fromRow + 1;
+            _self.selectedStartCol = data[0].fromCell;
+            _self.selectedEndRow = data[0].toRow + 1;
+            _self.selectedEndCol = data[0].toCell;
 
-        _self.selectedCellsCallBacks.forEach(function(element){
-           if (data[0].toCell != 0 && data[0].fromCell != 0){
-               element(_self.selectedStartRow,
-                       _self.selectedStartCol,
-                       _self.selectedEndRow,
-                       _self.selectedEndCol
-               )
-           }
-        });
+            _self.selectedCellsCallBacks.forEach(function(element){
+                if (data[0].toCell != 0 && data[0].fromCell != 0){
+                    element(_self.selectedStartRow,
+                        _self.selectedStartCol,
+                        _self.selectedEndRow,
+                        _self.selectedEndCol
+                    )
+                }
+            });
+        }
     }
 
     /**
@@ -467,6 +540,7 @@ Grid.getRowNumber = function(label) {
 
     var number = 0;
     label = label.toUpperCase();
+
     for(var i=0; i < label.length; i++) {
         number *= ROW_HEAD_BASE;
         number += label.charCodeAt(i) - STARTING_CHAR_CODE + 1 ;
@@ -488,7 +562,7 @@ Grid.getCellCoordinates = function(label){
     }
 
     var row = label.substring(0, indexOfFirstNumericChar);
-     row = Grid.getRowNumber(row);
+    row = Grid.getRowNumber(row);
     var col = parseInt(label.substring(indexOfFirstNumericChar));
 
     return [row, col];
@@ -505,4 +579,33 @@ Grid.coordinateArrayIndexOf = function(coordinateArray, coordinatesToSearchFor){
     }
 
     return -1;
+};
+
+Grid.editorCellFormatter = function(row, cell, value, columnDef, dataContext) {
+    //var inputStr = "A3, #FF0000, #00FF00, #0000FF, #9966FF, #66FF99, #99CCFF, #FF99CC, #FF9933, #66CCFF, #FFFF99";
+    //console.log("value"+value);
+    var inputStr = value;
+    if (inputStr != null) {
+        var colorArray = inputStr.split(',');
+        var colnum = Math.sqrt(colorArray.length - 1);
+        colnum = Math.floor(colnum);
+        var rownum = Math.ceil((colorArray.length - 1) / colnum);
+
+        var cellStr = "<table style='width:100%;height:100%'>";
+        cellStr += "<th rowspan='" + (rownum+1) + "'>" + colorArray[0] +"</th>";
+        var i, j=0;
+        var colorIdx = 1;
+        for (i=0; i < colnum; i++) {
+            cellStr += "<tr>";
+            for (j=0; (j < rownum) && (colorIdx < colorArray.length); j++) {
+                cellStr += "<td bgcolor='" + colorArray[colorIdx]+ "'> </td>" ;
+                colorIdx++;
+            }
+            cellStr += "</tr>";
+        }
+        cellStr += "</table>";
+        return cellStr;
+    } else {
+        return "<span style='width:100%'>-</span>";
+    }
 };
