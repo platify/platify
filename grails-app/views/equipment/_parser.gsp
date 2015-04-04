@@ -46,37 +46,14 @@
                             <textarea id="parsingDescription"></textarea>
                         </div>
                         <div>
-                            <label for="platesPerFile">Plate(s) per file</label>
-                            <div id="platesPerFile">
-                                <input type="radio" id="singlePlate" name="numPlates" value="single" />single<br />
-                                <input type="radio" id="multiplePlates" name="numPlates" value="multiple" />multiple<br />
-                            </div>
-                        </div>
-                        <br/>
-                        <div>
-                            <label for="valuesPerPlate">Value(s) per well</label>
-                            <div id="valuesPerPlate">
-                                <input type="radio" id="singleValue" name="numValues" value="single" />single<br />
-                                <input type="radio" id="multipleValues" name="numValues" value="multiple" />multiple<br />
-                            </div>
-                        </div>
-                        <br/>
-                        <div>
-                            <label for="wellValueFormat">Well value format</label>
-                            <div id="wellValueFormat">
-                                <input type="radio" id="gridFormat" name="format" value="grid" />grid<br />
-                                <input type="radio" id="rowFormat" name="format" value="row" />row per well<br />
-                            </div>
-                        </div>
-                        <div>
                             <label for="delimiterList">
                                 delimiter
                             </label>
 
                             <select name="delimiterList" id="delimiterList" size="3">
-                                <option value="comma">comma</option>
-                                <option value="semicolon">semicolon</option>
-                                <option value="tab">tab</option>
+                                <option value="comma" id="comma">comma</option>
+                                <option value="semicolon" id="semicolon">semicolon</option>
+                                <option value="tab" id="tab">tab</option>
                             </select>
                         </div>
                         <div>
@@ -147,7 +124,7 @@
                         <div>
                             <button id="newFeature">new feature</button>
                             <button id="saveFeature">save feature</button>
-                            <button id="deleteFeature">delete</button>
+                            <button id="deleteFeature">delete feature</button>
                         </div>
                         <div>
                             <button id="applyFeatures">apply</button>

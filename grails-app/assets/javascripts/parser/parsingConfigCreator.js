@@ -3,6 +3,10 @@
  * Modified by zacharymartin on 3/17/15.
  */
 
+// the variable def below is for testing ParsingConfig object loading along with parse
+// only mode
+//var equipment = '{"name":"Envision Parse Magic","machineName":"Envision Green Light Analyzer 3424","description":"A great little parsing configuration that you will just love to death","delimiter":"tab","plate":{"featureLabel":"plate","topLeftCoords":[1,1],"bottomRightCoords":[24,26],"topLeftValue":"Barcode Assay: ","relativeToLeftX":1,"relativeToLeftY":1,"color":0,"typeOfFeature":1},"plateInvariates":[[1,1,"Barcode Assay: "]],"features":{"Temperature":{"featureLabel":"Temperature","topLeftCoords":[6,2],"bottomRightCoords":[6,2],"topLeftValue":"22.7","relativeToLeftX":1,"relativeToLeftY":5,"color":1,"typeOfFeature":"plateLevel","importData":true},"green light emission":{"featureLabel":"green light emission","topLeftCoords":[6,3],"bottomRightCoords":[21,26],"topLeftValue":"1.2475","relativeToLeftX":2,"relativeToLeftY":5,"color":2,"typeOfFeature":"wellLevel","importData":true}}}';
+
 // Check for the various File API support.
 if (window.File && window.FileReader && window.FileList && window.Blob) {
     // Great success! All the File APIs are supported.
@@ -19,7 +23,8 @@ var FEATURES = 2;
 var currentTopLeftCoord = null;
 var currentBottomRightCoord = null;
 
-var grid = new Grid("myGrid");
+var examiner;
+var grid;
 var parsingConfig;
 
 var colorPointer = 0;
@@ -32,14 +37,69 @@ var highlightKeys = [];
 //var featureHighlightKeys = [];
 //var invariateHighlightKeys = [];
 
-var examiner = new FileExaminer();
+function loadParsingConfig(JSONparsingConfig){
+    parsingConfig = ParsingConfig.loadParsingConfig(JSONparsingConfig);
 
-examiner.registerAsLoadListener(function(examiner){
+    var parsingNameElement = document.getElementById("parsingName");
+    var machineNameElement = document.getElementById("machineName");
+    var parsingDescriptionElement = document.getElementById("parsingDescription");
+    var firstPlateCellRangeElement = document.getElementById("firstPlateCellRange");
+    var featureCellRangeElement = document.getElementById("featureCellRange");
+    var featureCategoryElement = document.getElementById("featureCategory");
+
+    parsingNameElement.value = parsingConfig.name;
+    machineNameElement.value = parsingConfig.machineName;
+    parsingDescriptionElement.value = parsingConfig.description;
+    firstPlateCellRangeElement.value
+        = Grid.getRowLabel(parsingConfig.plate.topLeftCoords[0])
+            + parsingConfig.plate.topLeftCoords[1] + ":"
+            + Grid.getRowLabel(parsingConfig.plate.bottomRightCoords[0])
+            + parsingConfig.plate.bottomRightCoords[1];
+
+    reloadFeatureSelector();
+
+    parseOnlyMode();
+}
+
+/**
+ * This function sets the parser so that the parsing config cannot be modified
+ */
+function parseOnlyMode(){
+    var parsingNameElement = document.getElementById("parsingName");
+    var machineNameElement = document.getElementById("machineName");
+    var parsingDescriptionElement = document.getElementById("parsingDescription");
+    var firstPlateCellRangeElement = document.getElementById("firstPlateCellRange");
+    var featureCellRangeElement = document.getElementById("featureCellRange");
+    var featureCategoryElement = document.getElementById("featureCategory");
+
+    parsingNameElement.readOnly = true;
+    machineNameElement.readOnly = true;
+    parsingDescriptionElement.readOnly = true;
+    firstPlateCellRangeElement.readOnly = true;
+    featureCellRangeElement.readOnly = true;
+    featureCategoryElement.readOnly = true;
+
+    document.getElementById(parsingConfig.delimiter).selected = true;
+    document.getElementById("delimiterList").disabled = true;
+    document.getElementById("saveConfig").style.display = "none";
+    document.getElementById("saveConfigToServer").style.display = "none";
+    document.getElementById("applyFirstPlate").style.display = "none";
+    document.getElementById(WELL_LEVEL).onclick = function(){return false;};
+    document.getElementById(PLATE_LEVEL).onclick = function(){return false;};
+    document.getElementById(EXPERIMENT_LEVEL).onclick = function(){return false;};
+    document.getElementById("newFeature").style.display = "none";
+    document.getElementById("saveFeature").style.display = "none";
+    document.getElementById("deleteFeature").style.display = "none";
+
+}
+
+
+function handleExaminerLoad(examiner){
     setDelimiter(examiner.delimiter);
     grid.setData(examiner.matrix);
     grid.fillUpGrid();
     grid.registerSelectedCellCallBack(handleSelectedCells);
-});
+}
 
 function applyFeatures(){
     clearFeatureValues();
@@ -193,7 +253,7 @@ function reloadLabelSelector(featureName){
 
 
 function saveConfigToServer(){
-    console.log(parsingConfig.getJSONString());
+    console.log(JSON.stringify(parsingConfig.getJSONString()));
     
     var jqxhr = $.ajax({
         url: hostname+"/equipment/save",
@@ -369,35 +429,19 @@ function createParsingConfig(){
     var name = document.getElementById("parsingName").value;
     var machine = document.getElementById("machineName").value;
     var description = document.getElementById("parsingDescription").value;
-    var exampleFileName = document.getElementById("selectedFile").innerHTML;
-    //var exampleFileContents = examiner.fileContents;
-    //var exampleFileContents = examiner.matrix;
-    var exampleFileContents = "";
-    var multiplePlatesPerFile = document.getElementById("multiplePlates").checked;
-    var multipleValuesPerWell = document.getElementById("multipleValues").checked;
-    var gridFormat = document.getElementById("gridFormat").checked;
+
 
     if (parsingConfig){
         parsingConfig.name = name;
         parsingConfig.machineName = machine;
         parsingConfig.description = description;
-        parsingConfig.exampleFileName = exampleFileName;
-        //parsingConfig.exampleFileContents = exampleFileContents;
         parsingConfig.delimiter = examiner.delimiter;
-        parsingConfig.multiplePlatesPerFile = multiplePlatesPerFile;
-        parsingConfig.multipleValuesPerWell = multipleValuesPerWell;
-        parsingConfig.gridFormat = gridFormat;
     } else {
         parsingConfig = new ParsingConfig(
             name,
             machine,
             description,
-            exampleFileName,
-            exampleFileContents,
-            examiner.delimiter,
-            multiplePlatesPerFile,
-            multipleValuesPerWell,
-            gridFormat
+            examiner.delimiter
         );
     }
 
@@ -474,6 +518,19 @@ function addEvent(elementId, eventType, handlerFunction) {
  * grid with blank data and sets up the event handlers on the
  */
 function init(){
+    examiner = new FileExaminer();
+    grid = new Grid("myGrid");
+
+    // to get jQuery-UI tab functionality working
+    $( "#tabs" ).tabs({
+        active: 0
+    });
+
+    $( "#tabs" ).tabs({
+        beforeActivate: handleTabChange
+    });
+
+    examiner.registerAsLoadListener(handleExaminerLoad);
 
     addEvent("firstPlateCellRange", "change", firstPlateCellRangeChange);
     addEvent("featureCellRange", "change", featureCellRangeChange);
@@ -488,14 +545,9 @@ function init(){
     addEvent("newFeature", "click", clearFeatureValues);
     addEvent("deleteFeature", "click", deleteFeature);
 
-    // to get jQuery-UI tab functionality working
-    $( "#tabs" ).tabs({
-        active: 0
-    });
-
-    $( "#tabs" ).tabs({
-        beforeActivate: handleTabChange
-    });
+    if (equipment){
+        loadParsingConfig(equipment);
+    }
 }
 
 window.onload = init;

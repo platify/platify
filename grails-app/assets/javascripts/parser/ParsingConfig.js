@@ -34,24 +34,14 @@ var MAX_NUM_INVARIATES = 5;
 function ParsingConfig(name,
                        machineName,
                        description,
-                       exampleFileName,
-                       exampleFileContents,
-                       delimiter,
-                       multiplePlatesPerFile,
-                       multipleValuesPerWell,
-                       gridFormat){
+                       delimiter){
     this.name = name;
     this.machineName = machineName;
     this.description = description;
-    this.exampleFileName = exampleFileName;
-    this.exampleFileContents = exampleFileContents;
     this.delimiter = delimiter;
     this.plate = null;
     this.plateInvariates = [];  // elements stored as [relativeRow, relativeColumn, value]
     this.features = {};  // keyed on feature name
-    this.multiplePlatesPerFile = multiplePlatesPerFile;
-    this.multipleValuesPerWell = multipleValuesPerWell;
-    this.gridFormat = gridFormat;
 
 
     function BioFeature(feaLabel){
@@ -525,10 +515,23 @@ function ParsingConfig(name,
         JSONObject["features"] = this.features;
 
         return JSONObject;
-    }
-
-
+    };
 }
+
+ParsingConfig.loadParsingConfig = function(JSONParsingConfig){
+    var rawParsingConfig = JSON.parse(JSONParsingConfig);
+
+    var config = new ParsingConfig(rawParsingConfig.name,
+        rawParsingConfig.machineName,
+        rawParsingConfig.description,
+        rawParsingConfig.delimiter);
+
+    config.plate = rawParsingConfig.plate;
+    config.plateInvariates = rawParsingConfig.plateInvariates;
+    config.features = rawParsingConfig.features;
+
+    return config;
+};
 
 ParsingConfig.wellNumberToPlateCoords = function(index, numberOfWells, rowProportion, colProportion){
     var base = Math.sqrt(numberOfWells/(rowProportion * colProportion));
