@@ -1,104 +1,53 @@
 package edu.harvard.capstone.result
 
-
+import grails.plugin.springsecurity.annotation.Secured
 
 import static org.springframework.http.HttpStatus.*
-import grails.transaction.Transactional
 
-@Transactional(readOnly = true)
 class RawDataController {
+
+    def springSecurityService
+    def resultService
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
-    def index(Integer max) {
-        params.max = Math.min(max ?: 10, 100)
-        respond RawData.list(params), model:[rawDataInstanceCount: RawData.count()]
-    }
-
-    def show(RawData rawDataInstance) {
-        respond rawDataInstance
-    }
-
-    def create() {
-        respond new RawData(params)
-    }
-
-    @Transactional
-    def save(RawData rawDataInstance) {
-        if (rawDataInstance == null) {
-            notFound()
-            return
-        }
-
-        if (rawDataInstance.hasErrors()) {
-            respond rawDataInstance.errors, view:'create'
-            return
-        }
-
-        rawDataInstance.save flush:true
-
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.created.message', args: [message(code: 'rawData.label', default: 'RawData'), rawDataInstance.id])
-                redirect rawDataInstance
+    def save() {
+        if (!springSecurityService.isLoggedIn()){
+            render(contentType: "application/json") {
+                [error: "User not logged in"]
             }
-            '*' { respond rawDataInstance, [status: CREATED] }
-        }
-    }
-
-    def edit(RawData rawDataInstance) {
-        respond rawDataInstance
-    }
-
-    @Transactional
-    def update(RawData rawDataInstance) {
-        if (rawDataInstance == null) {
-            notFound()
+            return
+        } 
+        
+        def data = request.JSON        
+        
+        if (!data) {
+            render(contentType: "application/json") {
+                [error: "No data received"]
+            }
             return
         }
 
-        if (rawDataInstance.hasErrors()) {
-            respond rawDataInstance.errors, view:'edit'
+        def plateTemplateInstance = resultService.newRawData(data)
+
+        if(plateTemplateInstance == null){
+            render(contentType: "application/json") {
+                [error: "Error creating the plate template"]
+            }
             return
         }
 
-        rawDataInstance.save flush:true
-
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.updated.message', args: [message(code: 'RawData.label', default: 'RawData'), rawDataInstance.id])
-                redirect rawDataInstance
+        if(plateTemplateInstance.hasErrors()){
+            render(contentType: "application/json") {
+                [error: plateTemplateInstance.errors]
             }
-            '*'{ respond rawDataInstance, [status: OK] }
+            return            
         }
+
+        render(contentType: "application/json") {
+            [plateTemplate: plateTemplateInstance]
+        }
+
     }
 
-    @Transactional
-    def delete(RawData rawDataInstance) {
-
-        if (rawDataInstance == null) {
-            notFound()
-            return
-        }
-
-        rawDataInstance.delete flush:true
-
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.deleted.message', args: [message(code: 'RawData.label', default: 'RawData'), rawDataInstance.id])
-                redirect action:"index", method:"GET"
-            }
-            '*'{ render status: NO_CONTENT }
-        }
-    }
-
-    protected void notFound() {
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.not.found.message', args: [message(code: 'rawData.label', default: 'RawData'), params.id])
-                redirect action: "index", method: "GET"
-            }
-            '*'{ render status: NOT_FOUND }
-        }
-    }
 }

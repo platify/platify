@@ -3,7 +3,7 @@ var DIMENSION = 100;
 var CELL_HEIGHT = 25;
 var CELL_WIDTH = 40;
 var data;
-var cellValues = {};
+var plateModel = {};
 var wellGroupings = [];
 var grid;
 var currentHighlightKeys = [];
@@ -156,15 +156,27 @@ function addTemplateValue() {
 		var row = selCells[cell][0];
 		var column = selCells[cell][1];
 		
-		if (cellValues[row] == null) {
-			cellValues[row] = [];
+		if (plateModel["rows"] == null) {
+			plateModel["rows"] = {};
 		}
-		if (cellValues[row][column] == null) {
-			cellValues[row][column] = cellValue;
+		
+		if (plateModel["rows"][row] == null) {
+			plateModel["rows"][row] = {};
+		}
+		
+		if (plateModel["rows"][row]["columns"] == null) {
+			plateModel["rows"][row]["columns"] = {};
+		}
+		
+		if (plateModel["rows"][row]["columns"][column] == null) {
+			plateModel["rows"][row]["columns"][column] = {};
+			plateModel["rows"][row]["columns"][column]["wellGroupName"] = cellValue;
 		}
 		
 		grid.updateCellContents(row, column, cellValue);
 	}
+	
+	console.log("plateModel1:" + JSON.stringify(plateModel));
 	
 	var wgs = document.getElementById("wellGroupSpan");
 	wgs.innerHTML = wellGroupings;
@@ -202,6 +214,99 @@ function addEvent(elementId, eventType, handlerFunction) {
 	}
 } // end of function addEvent
 
+//data format translation
+function translateModelToOutputJson(pModel) {
+	var plateJson = {};
+	plateJson["plate"] = [];
+	var plate = {}
+	plate["name"] = document.getElementById("templateName").value;
+	plate["wells"] = [];
+	plate["labels"] = [];		// plate level labels, should set these if available already !!!
+	for (var row in pModel["rows"]) {
+		for (var column in pModel["rows"][row]["columns"]) {
+			var well = {};
+			well["row"] = row;
+			well["column"] = column;
+			well["control"] = null;
+			var labels = [];
+			for (var catKey in pModel["rows"][row]["columns"][column]["categories"]) {
+				for (var labKey in pModel["rows"][row]["columns"][column]["categories"][catKey]) {
+					var label = {};
+					label["category"] = catKey;
+					label["name"] = labKey;
+					label["color"] = pModel["rows"][row]["columns"][column]["categories"][catKey][labKey];
+					labels.push(label);
+				}
+			}
+			well["labels"] = labels;
+			well["groupName"] = pModel["rows"][row]["columns"][column]["wellGroupName"];
+			plate["wells"].push(well);
+		}
+	}
+	plateJson["plate"].push(plate);
+	return plateJson;
+}
+
+// data format translation
+function translateInputJsonToModel(plateJson) {
+	var pModel = {};
+	pModel["rows"] = {};
+	var plate = plateJson["plate"];
+	
+	for (var i=0; i < plate["wells"].length; i++) {
+		var row = plate["wells"][i]["row"];
+		var column = plate["wells"][i]["column"];
+		var groupName = plate["wells"][i]["groupName"];
+		var labels = plate["wells"][i]["labels"];
+		
+		if (pModel["rows"][row] == null) {
+			pModel["rows"][row] = {};
+			pModel["rows"][row]["columns"] = {};
+		}
+		
+		if (pModel["rows"][row]["columns"][column] == null) {
+			pModel["rows"][row]["columns"][column] = {};
+			pModel["rows"][row]["columns"][column]["wellGroupName"] = groupName;
+			pModel["rows"][row]["columns"][column]["categories"] = {};
+		}
+
+		for (var j=0; j < labels.length; j++) {
+			if (pModel["rows"][row]["columns"][column]["categories"][labels[j].category] == null) {
+				pModel["rows"][row]["columns"][column]["categories"][labels[j].category] = {};
+			}
+			pModel["rows"][row]["columns"][column]["categories"][labels[j].category][labels[j].name] = labels[j].color;
+		}
+	}
+
+	return pModel;
+}
+
+// ajax save object call
+function saveConfigToServer(){
+	var plateJson = translateModelToOutputJson(plateModel);
+	console.log(JSON.stringify(plateJson));
+   
+	var jqxhr = $.ajax({
+		url: hostname + "/plateTemplate/save",
+		type: "POST",
+		data: JSON.stringify(plateJson),
+		processData: false,
+		contentType: "application/json; charset=UTF-8"
+	}).done(function() {
+		console.log("success");
+	}).fail(function() {
+		console.log("error");
+	}).always(function() {
+		console.log("complete");
+	});
+   
+	// Set another completion function for the request above
+	jqxhr.always(function(resData) {
+		console.log( "second complete" );
+		console.log("result=" + JSON.stringify(resData));
+	});
+}
+
 
 /**
  * This function handles the window load event. It initializes and fills the
@@ -212,6 +317,7 @@ function init(){
 	addEvent("addTemplateValueBtn", "click", addTemplateValue);
 	addEvent("clearLastSelection", "click", removeHighlightedArea);
 	addEvent("clearAllSelection", "click", removeAllHighlightedCells);
+	addEvent("saveTemplate", "click", saveConfigToServer);
 
 	// initially disable selection of grid cells
 	enableGridSelection();

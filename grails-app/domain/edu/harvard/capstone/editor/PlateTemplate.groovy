@@ -11,6 +11,6 @@ class PlateTemplate {
  	Date lastUpdated
 	Date dateCreated
 
-   static constraints = {
+   	static constraints = {
     }
 }

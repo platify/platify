@@ -10,5 +10,6 @@ class PlateSet {
 	Date dateCreated
 
     static constraints = {
+    	assay nullable: true, blank: true
     }
 }
