@@ -80,12 +80,12 @@ class PlateTemplateController {
             return
         }
 
-        if(plateTemplateInstance.hasErrors()){
+       /* if(plateTemplateInstance.hasErrors()){
             render(contentType: "application/json") {
                 [error: plateTemplateInstance.errors]
             }
             return            
-        }
+        }*/
 
         render(contentType: "application/json") {
             [plateTemplate: plateTemplateInstance]

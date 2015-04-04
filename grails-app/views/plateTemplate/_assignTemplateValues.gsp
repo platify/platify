@@ -23,6 +23,7 @@
 		<div>Well Groupings:<span id="wellGroupSpan"></span></div>
 	</div>
 	
+	<div>Template Name:<input type="text" id="templateName"/></div>
 	<button id="saveTemplate">Save Template</button>
 
     <g:if env="production">

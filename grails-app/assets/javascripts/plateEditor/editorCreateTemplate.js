@@ -217,8 +217,11 @@ function addEvent(elementId, eventType, handlerFunction) {
 //data format translation
 function translateModelToOutputJson(pModel) {
 	var plateJson = {};
-	plateJson["plate"] = {};
-	plateJson["plate"]["wells"] = [];
+	plateJson["plate"] = [];
+	var plate = {}
+	plate["name"] = document.getElementById("templateName").value;
+	plate["wells"] = [];
+	plate["labels"] = [];		// plate level labels, should set these if available already !!!
 	for (var row in pModel["rows"]) {
 		for (var column in pModel["rows"][row]["columns"]) {
 			var well = {};
@@ -237,9 +240,10 @@ function translateModelToOutputJson(pModel) {
 			}
 			well["labels"] = labels;
 			well["groupName"] = pModel["rows"][row]["columns"][column]["wellGroupName"];
-			plateJson["plate"]["wells"].push(well);
+			plate["wells"].push(well);
 		}
 	}
+	plateJson["plate"].push(plate);
 	return plateJson;
 }
 
@@ -299,7 +303,7 @@ function saveConfigToServer(){
 	// Set another completion function for the request above
 	jqxhr.always(function(resData) {
 		console.log( "second complete" );
-		console.log(JSON.stringify(resData));
+		console.log("result=" + JSON.stringify(resData));
 	});
 }
 

@@ -29,6 +29,10 @@ class ExperimentalPlateSetController {
     }
 
     def create() {
+		def templateInstance = null;
+		if (params.id != null) {
+			templateInstance = PlateTemplate.get(params.id)
+		}
         respond new ExperimentalPlateSet(params)
     }
 
