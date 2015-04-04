@@ -134,6 +134,10 @@ function ColorPicker(){
         return "key" + colorKeyCounter;
     };
 
+    this.getCurrentColorIndex = function(){
+        return colorPointer;
+    };
+
     this.resetColorPicker = function(){
         colorPointer = 0;
     };

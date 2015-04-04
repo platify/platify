@@ -6,6 +6,8 @@ var WELL_LEVEL = "wellLevel";
 var PLATE_LEVEL = "plateLevel";
 var EXPERIMENT_LEVEL = "experimentLevel";
 
+var MAX_NUM_INVARIATES = 5;
+
 /**
  * The constructor for ParsingConfig objects.
  * @param name - a unique string name for the parsing configuration
@@ -402,10 +404,12 @@ function ParsingConfig(name,
         for (var i=0; i<plates.length; i++){
             plateIDs.push("plate " + i);
         }
-        this.highlightPlatesAndFeatures(plates, colorPicker, grid);
+        var colorKeys = this.highlightPlatesAndFeatures(plates, colorPicker, grid);
         var data = this.createImportData(plates, grid);
 
         console.log(data);
+
+        return colorKeys;
     };
 
 
@@ -437,6 +441,10 @@ function ParsingConfig(name,
         return newFeature;
     };
 
+    this.deleteFeature = function(nameOfFeatureToDelete){
+        delete this.features[nameOfFeatureToDelete];
+    };
+
     this.addPlate = function(grid){
         this.plate = this.addFeature("plate", grid, true, null, PLATE);
         this.plateInvariates.push([this.plate.topLeftCoords[0],
@@ -460,53 +468,50 @@ function ParsingConfig(name,
     /**
      * This function might be useful for more in depth pattern matching
      */
-    function searchForPlateInvariates(){
+    this.searchForPlateInvariates = function(numRows, grid){
         var valueToLookFor;
         var timesFound;
         var possibleInvariateCoords = [];
+        var plateStartRow = this.plate.topLeftCoords[0];
+        var plateEndRow = this.plate.bottomRightCoords[0];
+        var plateStartCol = this.plate.topLeftCoords[1];
+        var plateEndCol = this.plate.bottomRightCoords[1];
+        var plateHeight = plateEndRow - plateStartRow +1;
         var threshold
-            = Math.floor(rowsSize/((currentBottomRightCoord[0] - currentTopLeftCoord[0])*2));
+            = Math.floor(numRows/(plateHeight*2));
+        var max = (threshold * 2) + 1;
 
-        for(var row=currentTopLeftCoord[0]; row<=currentBottomRightCoord[0]; row++){
-            for(var col=currentTopLeftCoord[1]; col<=currentBottomRightCoord[1]; col++){
+
+        for(var row=plateStartRow; row<=plateEndRow; row++){
+            for(var col=plateStartCol; col<=plateEndCol; col++){
                 valueToLookFor = grid.getDataPoint(row, col).trim();
                 if (valueToLookFor){
                     timesFound = 0;
-                    for(var obsRow = currentBottomRightCoord[0]+1; obsRow<=rowsSize; obsRow++){
+                    for(var obsRow = plateEndRow+1; obsRow<=numRows; obsRow++){
                         var currentValue = grid.getDataPoint(obsRow, col);
                         if (currentValue && currentValue.trim() == valueToLookFor){
                             timesFound++;
-                            if (timesFound >= threshold) {
-
-                                possibleInvariateCoords.push([row,col]);
-                                break;
-                            }
                         }
-
                     }
+                    if (timesFound >= threshold && timesFound <= max) {
 
-
+                        possibleInvariateCoords.push([row,col]);
+                    }
                 }
             }
         }
 
-        var invariatesKey = colorPicker.getDistinctColorKey();
-        grid.setCellColors(possibleInvariateCoords, "#a00", invariatesKey);
+        // trim the possible invariates to MAX_NUM_INVARIATES, taking some from beginning
+        // and some from end of original array
+        if (possibleInvariateCoords.length > MAX_NUM_INVARIATES){
+            var firstInvariates = possibleInvariateCoords.slice(0, MAX_NUM_INVARIATES-2);
+            var lastInvariates = possibleInvariateCoords.slice(-2);
 
-        // load invariate cell selector
-        var invariateSelectElement = document.getElementById("invariateSelect");
-        for (var i=0; i<possibleInvariateCoords.length; i++){
-            var cellRow = possibleInvariateCoords[i][0] + 1;
-            var cellCol = possibleInvariateCoords[i][1];
-            var cellValue = grid.getDataPoint(cellRow, cellCol);
-            var optionValue = cellRow+":"+ cellCol;
-
-            var option = document.createElement("option");
-            option.setAttribute("value", optionValue);
-            option.innerHTML = cellValue + " : " + Grid.getRowLabel(cellRow) + cellCol;
-            invariateSelectElement.appendChild(option);
+            possibleInvariateCoords = firstInvariates.concat(lastInvariates);
         }
-    }
+
+        return possibleInvariateCoords;
+    };
 
     this.getJSONString = function(){
         var JSONObject = {};

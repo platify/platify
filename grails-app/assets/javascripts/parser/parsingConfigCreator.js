@@ -23,15 +23,15 @@ var grid = new Grid("myGrid");
 var parsingConfig;
 
 var colorPointer = 0;
-var colorKeyCounter = 0;
 var colorPicker = new ColorPicker();
 
-var colsSize =-1;
-var rowsSize =-1;
-var numberOfFeatures =-1;
-var numberOfFeaturesCHILD =-1;
-
 var highlightKeys = [];
+
+// TODO - institute more complex highlighting behavior
+//var plateHighlightKeys = [];
+//var featureHighlightKeys = [];
+//var invariateHighlightKeys = [];
+
 var examiner = new FileExaminer();
 
 examiner.registerAsLoadListener(function(examiner){
@@ -39,13 +39,26 @@ examiner.registerAsLoadListener(function(examiner){
     grid.setData(examiner.matrix);
     grid.fillUpGrid();
     grid.registerSelectedCellCallBack(handleSelectedCells);
-    colsSize = examiner.colsSize;
-    rowsSize = examiner.rowsSize;
 });
 
 function applyFeatures(){
-    parsingConfig.applyFeatures(1, examiner.rowsSize, grid);
+    clearFeatureValues();
+    removeAllHighlighting();
+    var colorKeys = parsingConfig.applyFeatures(1, examiner.rowsSize, grid);
+    highlightKeys = highlightKeys.concat(colorKeys);
 }
+
+function removeAllHighlighting(){
+    for(var i=0; i<highlightKeys.length; i++){
+        grid.removeCellColors(highlightKeys[i]);
+    }
+}
+
+function removeLastHighlighting(){
+    grid.removeCellColors(highlightKeys.pop());
+}
+
+
 
 function makePlate(){
     parsingConfig.addPlate(grid);
@@ -68,6 +81,24 @@ function makeFeature(){
 
     // load feature selector
     reloadFeatureSelector();
+
+    // set feature selector to new element
+    var featureSelectElement = document.getElementById("featureList");
+    featureSelectElement.value = category;
+    setFeatureSelect(category);
+}
+
+function deleteFeature(){
+    var featureSelectElement = document.getElementById("featureList");
+    var nameOfFeatureToDelete = featureSelectElement.value;
+
+    removeAllHighlighting();
+
+    if (nameOfFeatureToDelete){
+        parsingConfig.deleteFeature(nameOfFeatureToDelete);
+        reloadFeatureSelector();
+        clearFeatureValues();
+    }
 }
 
 function reloadFeatureSelector(){
@@ -86,17 +117,45 @@ function reloadFeatureSelector(){
     }
 }
 
+function clearFeatureValues(){
+    var featureRangeInput = document.getElementById("featureCellRange");
+    var featureNameInput = document.getElementById("featureCategory");
+    var featureSelectElement = document.getElementById("featureList");
+    var labelSelectElement = document.getElementById("labelList");
+    var wellLevelRadio = document.getElementById(WELL_LEVEL);
+    var plateLevelRadio = document.getElementById(PLATE_LEVEL);
+    var experimentLevelRadio = document.getElementById(EXPERIMENT_LEVEL);
+
+    featureRangeInput.value = "";
+    featureNameInput.value = "";
+    labelSelectElement.innerHTML = "";
+    wellLevelRadio.checked = false;
+    plateLevelRadio.checked = false;
+    experimentLevelRadio.checked = false;
+
+    // deselect all features
+    var featureOptions = featureSelectElement.options
+
+    for (var i=0; i<featureOptions.length; i++){
+        featureOptions[i].selected = false;
+    }
+}
+
 function handleFeatureSelect(event){
     var target = getTargetElement(event);
     var featureName = target.value;
+    setFeatureSelect(featureName);
+}
+
+function setFeatureSelect(featureName){
     var featureRangeInput = document.getElementById("featureCellRange");
     var featureNameInput = document.getElementById("featureCategory");
 
     var feature = parsingConfig.features[featureName];
     var featureRange = Grid.getRowLabel(feature.topLeftCoords[0])
-            + feature.topLeftCoords[1] + ":"
-            + Grid.getRowLabel(feature.bottomRightCoords[0])
-            + feature.bottomRightCoords[1];
+        + feature.topLeftCoords[1] + ":"
+        + Grid.getRowLabel(feature.bottomRightCoords[0])
+        + feature.bottomRightCoords[1];
     var featureType = feature.typeOfFeature;
 
     featureRangeInput.value = featureRange;
@@ -104,6 +163,12 @@ function handleFeatureSelect(event){
     document.getElementById(featureType).checked = true;
 
     reloadLabelSelector(featureName);
+
+    // highlight the feature
+    removeAllHighlighting();
+    var plates = parsingConfig.findPlates(1, examiner.rowsSize, grid);
+    var colorKey = parsingConfig.highlightFeature(featureName, plates, colorPicker, grid);
+    highlightKeys.push(colorKey);
 }
 
 function reloadLabelSelector(featureName){
@@ -339,6 +404,12 @@ function createParsingConfig(){
     console.log(parsingConfig);
 }
 
+function handleTabChange(event, ui){
+    console.log("new tab = " + ui.newTab.index());
+    console.log("old tab = " + ui.oldTab.index());
+    removeAllHighlighting();
+}
+
 /**
  * This function returns the active tab, to be compared with the constants:
  *      PARSING
@@ -414,12 +485,17 @@ function init(){
     addEvent("applyFeatures", "click", applyFeatures);
     addEvent("saveConfigToServer", "click", saveConfigToServer);
     addEvent("featureList", "change", handleFeatureSelect);
+    addEvent("newFeature", "click", clearFeatureValues);
+    addEvent("deleteFeature", "click", deleteFeature);
 
     // to get jQuery-UI tab functionality working
     $( "#tabs" ).tabs({
         active: 0
     });
 
+    $( "#tabs" ).tabs({
+        beforeActivate: handleTabChange
+    });
 }
 
 window.onload = init;
