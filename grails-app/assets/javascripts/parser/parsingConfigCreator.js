@@ -14,28 +14,28 @@ if (window.File && window.FileReader && window.FileList && window.Blob) {
     alert('The File APIs are not fully supported in this browser.');
 }
 
-
+// Tabs constants
 var PARSING = 0;
-var PLATE = 1;
+var PLATES = 1;
 var FEATURES = 2;
-
-
-var currentTopLeftCoord = null;
-var currentBottomRightCoord = null;
+var activeTab = 0;
 
 var examiner;
 var grid;
 var parsingConfig;
+var selectCells;  // a reference to the function to be used for handling cell selection,
+                  // set by handleTabChange function
 
 var colorPointer = 0;
 var colorPicker = new ColorPicker();
 
-var highlightKeys = [];
+
 
 // TODO - institute more complex highlighting behavior
-//var plateHighlightKeys = [];
-//var featureHighlightKeys = [];
-//var invariateHighlightKeys = [];
+var plateHighlightKeys = [];
+var featureHighlightKeys = [];
+var invariateHighlightKeys = [];
+var highlightKeys = [];
 
 function loadParsingConfig(JSONparsingConfig){
     parsingConfig = ParsingConfig.loadParsingConfig(JSONparsingConfig);
@@ -91,6 +91,7 @@ function parseOnlyMode(){
     document.getElementById("saveFeature").style.display = "none";
     document.getElementById("deleteFeature").style.display = "none";
 
+    grid.disableCellSelection();
 }
 
 
@@ -109,19 +110,44 @@ function applyFeatures(){
 }
 
 function removeAllHighlighting(){
+    removeHighlightKeys();
+    removeAllFeatureHighlightKeys();
+    removeAllPlateHighlightKeys();
+    removeAllInvariateHighlightKeys();
+}
+
+function removeHighlightKeys(){
     for(var i=0; i<highlightKeys.length; i++){
         grid.removeCellColors(highlightKeys[i]);
     }
 }
 
-function removeLastHighlighting(){
-    grid.removeCellColors(highlightKeys.pop());
+function removeAllPlateHighlightKeys(){
+    for(var i=0; i<plateHighlightKeys.length; i++){
+        grid.removeCellColors(plateHighlightKeys[i]);
+    }
 }
 
+function removeAllFeatureHighlightKeys(){
+    for(var i=0; i<featureHighlightKeys.length; i++){
+        grid.removeCellColors(featureHighlightKeys[i]);
+    }
+}
 
+function removeAllInvariateHighlightKeys(){
+    for(var i=0; i<invariateHighlightKeys.length; i++){
+        grid.removeCellColors(invariateHighlightKeys[i]);
+    }
+}
 
 function makePlate(){
     parsingConfig.addPlate(grid);
+
+    // highlight the plates on the grid
+    var plates = parsingConfig.findPlates(1, examiner.rowsSize, grid);
+    plateHighlightKeys = plateHighlightKeys.concat(
+        parsingConfig.highlightAllPlates(plates, colorPicker, grid)
+    );
 }
 
 function makeFeature(){
@@ -278,59 +304,6 @@ function saveConfigToServer(){
 }
 
 
-/**
- * replaces anonymous function starting on line 114 of original csvParser.html
- * @param startRow
- * @param startCol
- * @param endRow
- * @param endCol
- */
-function handleSelectedCells(startRow, startCol, endRow, endCol){
-    selectCells(startRow, startCol, endRow, endCol);
-
-    // plate range input on the plate page
-    var plateRangeInput = document.getElementById("firstPlateCellRange");
-    plateRangeInput.value = Grid.getRowLabel(startRow)+startCol+":"
-    +Grid.getRowLabel(endRow)+endCol;
-
-    // feature range input on the feature page
-    var featureRangeInput = document.getElementById("featureCellRange");
-    featureRangeInput.value = Grid.getRowLabel(startRow)+startCol+":"
-    +Grid.getRowLabel(endRow)+endCol;
-}
-
-function selectCells(startRow, startCol, endRow, endCol){
-    // write to the selected cells div, the cells that are selected
-    var out = document.getElementById("selectedCells");
-    out.innerHTML = Grid.getRowLabel(startRow)+startCol+":"
-    +Grid.getRowLabel(endRow)+endCol;
-
-
-
-    // remove previous highlighting
-    if (highlightKeys.length){
-        grid.removeCellColors(highlightKeys.pop());
-    }
-
-
-    // highlight those cells with the current color
-    var coordinatesToHighlight = [];
-    for (var i=startRow; i<=endRow; i++){
-        for (var j=startCol; j<=endCol; j++){
-            coordinatesToHighlight.push([i,j]);
-        }
-    }
-    grid.setCellColors(coordinatesToHighlight,
-                       colorPicker.getColorByIndex(colorPointer),
-                       colorPicker.getCurrentColorKey());
-    highlightKeys.push(colorPicker.getCurrentColorKey());
-
-    // set the current selected cells variables
-    currentTopLeftCoord = [startRow,startCol];
-    currentBottomRightCoord = [endRow,endCol];
-}
-
-
 function handleFileSelect(event) {
     var files;
     var fileNameDisplayElement = document.getElementById("selectedFile");
@@ -344,10 +317,6 @@ function handleFileSelect(event) {
     }
 
     // reset parser
-    currentTopLeftCoord = null;
-    currentBottomRightCoord = null;
-
-
     colorPointer = 0;
 
     fileNameDisplayElement.innerHTML = files[0].name;
@@ -400,6 +369,84 @@ document.addEventListener('drop', function(e) {
 
 }, false);
 
+/**
+ * replaces anonymous function starting on line 114 of original csvParser.html
+ * @param startRow
+ * @param startCol
+ * @param endRow
+ * @param endCol
+ */
+function handleSelectedCells(startRow, startCol, endRow, endCol){
+    selectCells(startRow, startCol, endRow, endCol);
+}
+
+function selectCellsParsing(startRow, startCol, endRow, endCol){
+
+    // remove previous highlighting
+    removeAllHighlighting();
+
+    // highlight those cells with the current color
+    var coordinatesToHighlight = [];
+    for (var i=startRow; i<=endRow; i++){
+        for (var j=startCol; j<=endCol; j++){
+            coordinatesToHighlight.push([i,j]);
+        }
+    }
+
+    var colorKey = colorPicker.getDistinctColorKey();
+    highlightKeys.push(colorKey);
+
+    grid.setCellColors(coordinatesToHighlight,
+        "#d3d3d3",
+        colorKey);
+    highlightKeys.push(colorPicker.getCurrentColorKey());
+}
+
+function selectCellsPlates(startRow, startCol, endRow, endCol){
+    // plate range input on the plate page
+    var plateRangeInput = document.getElementById("firstPlateCellRange");
+    plateRangeInput.value = Grid.getRowLabel(startRow)+startCol+":"
+    +Grid.getRowLabel(endRow)+endCol;
+
+    // remove previous highlighting
+    removeAllHighlighting();
+
+
+    // highlight those cells with the current color
+    var coordinatesToHighlight = [];
+    for (var i=startRow; i<=endRow; i++){
+        for (var j=startCol; j<=endCol; j++){
+            coordinatesToHighlight.push([i,j]);
+        }
+    }
+    grid.setCellColors(coordinatesToHighlight,
+        colorPicker.getColorByIndex(colorPointer),
+        colorPicker.getCurrentColorKey());
+    highlightKeys.push(colorPicker.getCurrentColorKey());
+}
+
+function selectCellsFeatures(startRow, startCol, endRow, endCol){
+    // feature range input on the feature page
+    var featureRangeInput = document.getElementById("featureCellRange");
+    featureRangeInput.value = Grid.getRowLabel(startRow)+startCol+":"
+    +Grid.getRowLabel(endRow)+endCol;
+
+    // remove previous highlighting
+    removeAllHighlighting();
+
+
+    // highlight those cells with the current color
+    var coordinatesToHighlight = [];
+    for (var i=startRow; i<=endRow; i++){
+        for (var j=startCol; j<=endCol; j++){
+            coordinatesToHighlight.push([i,j]);
+        }
+    }
+    grid.setCellColors(coordinatesToHighlight,
+        colorPicker.getColorByIndex(colorPointer),
+        colorPicker.getCurrentColorKey());
+    highlightKeys.push(colorPicker.getCurrentColorKey());
+}
 
 function firstPlateCellRangeChange(){
     var plateRangeInput = document.getElementById("firstPlateCellRange");
@@ -425,6 +472,61 @@ function cellRangeChange(inputElement){
     selectCells(start[0], start[1], end[0], end[1]);
 }
 
+function handleTabChange(event, ui){
+    var newTab = ui.newTab.index();
+    var oldTab = ui.oldTab.index();
+    var plates;
+    activeTab = newTab;
+
+    removeAllHighlighting();
+    clearSelectedCells();
+
+    if (oldTab === PARSING){
+        if (!examiner || !examiner.fileContents){
+            alert("You must specify a file to leave the parsing tab");
+            event.preventDefault();
+            return;
+        }
+
+        if (!parsingConfig){
+            createParsingConfig();
+        }
+    } else if (oldTab === PLATES){
+        if (!parsingConfig || !parsingConfig.plate){
+            alert("You must specify a plate to leave the plates tab");
+            event.preventDefault();
+            return;
+        }
+    } else if (oldTab === FEATURES){
+
+    }
+
+
+    if (newTab === PARSING){
+        selectCells = selectCellsParsing;
+
+    } else if (newTab === PLATES){
+        selectCells = selectCellsPlates;
+
+        if (parsingConfig.plate){
+            plates = parsingConfig.findPlates(1, examiner.rowsSize, grid);
+            plateHighlightKeys = plateHighlightKeys.concat(
+                parsingConfig.highlightAllPlates(plates, colorPicker, grid)
+            );
+        }
+    } else if (newTab === FEATURES){
+        selectCells = selectCellsFeatures;
+    }
+
+}
+
+function clearSelectedCells(){
+    grid.selectedStartRow = null;
+    grid.selectedStartCol = null;
+    grid.selectedEndRow = null;
+    grid.selectedEndCol = null;
+}
+
 function createParsingConfig(){
     var name = document.getElementById("parsingName").value;
     var machine = document.getElementById("machineName").value;
@@ -446,12 +548,6 @@ function createParsingConfig(){
     }
 
     console.log(parsingConfig);
-}
-
-function handleTabChange(event, ui){
-    console.log("new tab = " + ui.newTab.index());
-    console.log("old tab = " + ui.oldTab.index());
-    removeAllHighlighting();
 }
 
 /**
@@ -523,12 +619,14 @@ function init(){
 
     // to get jQuery-UI tab functionality working
     $( "#tabs" ).tabs({
-        active: 0
+        active: activeTab
     });
 
     $( "#tabs" ).tabs({
         beforeActivate: handleTabChange
     });
+
+    selectCells = selectCellsParsing;
 
     examiner.registerAsLoadListener(handleExaminerLoad);
 
@@ -545,7 +643,7 @@ function init(){
     addEvent("newFeature", "click", clearFeatureValues);
     addEvent("deleteFeature", "click", deleteFeature);
 
-    if (equipment){
+    if (typeof equipment != "undefined"){
         loadParsingConfig(equipment);
     }
 }

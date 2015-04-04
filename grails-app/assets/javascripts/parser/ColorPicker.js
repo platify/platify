@@ -8,6 +8,9 @@
  */
 function ColorPicker(){
     var colorPointer = 0;
+    var colorPointerPlate = 0;
+    var colorPointerFeature = 0;
+    var colorPointerInvariate = 0;
     var colorKeyCounter = 0;
 
     var distinctColors = [

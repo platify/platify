@@ -249,24 +249,19 @@ function ParsingConfig(name,
     };
 
     this.highlightPlatesAndFeatures = function(plates, colorPicker, grid){
-        var coordsToHighlight = [];
-        var colorKeys = [];
+        var colorKeys;
         var colorKey;
 
         // first highlight plates
-        for (var plateIndex=0; plateIndex<plates.length; plateIndex++){
-            colorKey = this.highlightPlate(plateIndex, plates, colorPicker, grid);
-            colorKeys.push(colorKey);
-        }
+        colorKeys = this.highlightAllPlates(plates, colorPicker, grid);
 
         // next highlight features
+        var featuresHighlightColorKeys = this.highlightAllFeatures(plates,
+                                                                   colorPicker,
+                                                                   grid);
+        colorKeys = colorKeys.concat(featuresHighlightColorKeys);
 
-        for(var featureName in this.features){
-            colorKey = this.highlightFeature(featureName, plates, colorPicker, grid);
-            colorKeys.push(colorKey);
-        }
-
-        return colorKeys
+        return colorKeys;
     };
 
     this.highlightPlate = function(plateIndex, plates, colorPicker, grid){
@@ -291,6 +286,19 @@ function ParsingConfig(name,
         return colorKey;
     };
 
+    this.highlightAllPlates = function(plates, colorPicker, grid){
+        var colorKeys = [];
+        var colorKey;
+
+        // first highlight plates
+        for (var plateIndex=0; plateIndex<plates.length; plateIndex++){
+            colorKey = this.highlightPlate(plateIndex, plates, colorPicker, grid);
+            colorKeys.push(colorKey);
+        }
+
+        return colorKeys;
+    };
+
     this.highlightFeature = function(featureName, plates, colorPicker, grid){
         var feature = this.features[featureName];
         var colorKey = colorPicker.getDistinctColorKey();
@@ -304,9 +312,22 @@ function ParsingConfig(name,
         return colorKey;
     };
 
+    this.highlightAllFeatures = function(plates, colorPicker, grid){
+        var colorKeys = [];
+        var colorKey;
 
-    this.createImportData = function(plates, grid){
+        for(var featureName in this.features){
+            colorKey = this.highlightFeature(featureName, plates, colorPicker, grid);
+            colorKeys.push(colorKey);
+        }
+
+        return colorKeys;
+    };
+
+
+    this.createImportData = function(plates, plateIDs, grid){
         var importData = new ImportData("test identifier");
+        var plate;
 
         for (var featureName in this.features){
             var feature = this.features[featureName];
@@ -320,6 +341,7 @@ function ParsingConfig(name,
 
                     if (!importData.plates[plate]){
                         importData.plates[plate] = {
+                            plateID: plateIDs[plate],
                             labels : {},
                             rows: []
                         };
@@ -360,6 +382,7 @@ function ParsingConfig(name,
 
                     if (!importData.plates[plate]){
                         importData.plates[plate] = {
+                            plateID: plateIDs[plate],
                             labels : {},
                             rows: []
                         };
@@ -395,7 +418,7 @@ function ParsingConfig(name,
             plateIDs.push("plate " + i);
         }
         var colorKeys = this.highlightPlatesAndFeatures(plates, colorPicker, grid);
-        var data = this.createImportData(plates, grid);
+        var data = this.createImportData(plates,plateIDs, grid);
 
         console.log(data);
 
