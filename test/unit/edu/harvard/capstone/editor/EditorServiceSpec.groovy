@@ -64,7 +64,7 @@ class EditorServiceSpec extends Specification {
 		service.springSecurityService = [principal: [id: scientistInstance.id]]
 
 
-		def data = JSON.parse("{plate: [{key: 'val'},{key: 'val'}]}")
+		def data = JSON.parse("{plate: {key: 'val',key: 'val'} }")
 		def plateTemplate = service.newTemplate(data)
 
 		then:
@@ -83,9 +83,8 @@ class EditorServiceSpec extends Specification {
 
 
 		def data = JSON.parse("""
-			{plate: [
-				{name: 'test name', labels: [{key: 'val'}] }
-			]}
+			{plate: {name: 'test name', labels: [{key: 'val'}] }
+			}
 		""")
 		def plateTemplate = service.newTemplate(data)
 
@@ -106,12 +105,12 @@ class EditorServiceSpec extends Specification {
 
 
 		def data = JSON.parse("""
-			{plate: [
+			{plate: 
 				{name: 'test name', 
 				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
 				wells: [{key: 'key', val: 'val'}] 
 				}
-			]}
+			}
 		""")
 		def plateTemplate = service.newTemplate(data)
 
@@ -133,12 +132,12 @@ class EditorServiceSpec extends Specification {
 
 
 		def data = JSON.parse("""
-			{plate: [
+			{plate: 
 				{name: 'test name', 
 				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
 				wells: [{row: '0', column: '0', 'groupName': 'name', labels: [{key: 'val'}]}] 
 				}
-			]}
+			}
 		""")
 
 		def plateTemplate = service.newTemplate(data)
@@ -161,12 +160,12 @@ class EditorServiceSpec extends Specification {
 
 
 		def data = JSON.parse("""
-			{plate: [
-				{name: 'test name', 
+			{plate: {
+				name: 'test name', 
 				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
 				wells: [{row: '0', column: '0', 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
 				}
-			]}
+			}
 		""")
 
 		def plateTemplate = service.newTemplate(data)
@@ -198,16 +197,17 @@ class EditorServiceSpec extends Specification {
 
 
 		def data = JSON.parse("""
-			{plate: [
-				{name: 'test name', 
-				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
-				wells: [{row: 0, column: 0, 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+			{
+				plate: {
+					name: 'test name', 
+					labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
+					wells: [{row: 0, column: 0, 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
 				}
-			]}
+			}
 		""")
 
 		def plateTemplate = service.newTemplate(data)
-		def plate = service.getTemplate(plateTemplate[0])
+		def plate = service.getTemplate(plateTemplate)
 
 		then:
 			notThrown ValidationException
@@ -215,12 +215,12 @@ class EditorServiceSpec extends Specification {
 			PlateTemplate.count() == 1
 			Label.count() == 4
 			Well.count() == 1
-			data.plate[0].name == plate.name
-			data.plate[0].labels == plate.labels
-			data.plate[0].wells[0].row == plate.wells[0].row
-			data.plate[0].wells[0].column == plate.wells[0].column
-			data.plate[0].wells[0].groupName == plate.wells[0].groupName
-			data.plate[0].wells[0].labels == plate.wells[0].labels
+			data.plate.name == plate.name
+			data.plate.labels == plate.labels
+			data.plate.wells[0].row == plate.wells[0].row
+			data.plate.wells[0].column == plate.wells[0].column
+			data.plate.wells[0].groupName == plate.wells[0].groupName
+			data.plate.wells[0].labels == plate.wells[0].labels
 	}	
 
 }
