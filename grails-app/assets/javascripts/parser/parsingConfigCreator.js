@@ -81,7 +81,7 @@ function parseOnlyMode(){
 
     document.getElementById(parsingConfig.delimiter).selected = true;
     document.getElementById("delimiterList").disabled = true;
-    document.getElementById("saveConfig").style.display = "none";
+    //document.getElementById("saveConfig").style.display = "none";
     document.getElementById("saveConfigToServer").style.display = "none";
     document.getElementById("applyFirstPlate").style.display = "none";
     document.getElementById(WELL_LEVEL).onclick = function(){return false;};
@@ -278,28 +278,48 @@ function reloadLabelSelector(featureName){
 }
 
 
+//TODO move this function to a different file
+function showUserMsg(typMsg,msg){
+	
+	console.log(typMsg);
+	
+	$("#userMsgPanel").addClass("ui-state-"+(typMsg==="error"?"error":"highlight")+" ui-corner-all");
+	$("#userMsgPanel").text(msg);
+	$("#userMsgPanel").show("fade", {}, 500 ,callBckFadeOut);
+}
+
+// TODO move this function to a different file
+function callBckFadeOut() {
+  setTimeout(function() {
+    $( "#userMsgPanel:visible" ).removeClass().fadeOut();
+  }, 5000 );
+};
+
+
+// TODO add the URI for the server call as a parameter
 function saveConfigToServer(){
-    console.log(JSON.stringify(parsingConfig.getJSONString()));
+    
+	createParsingConfig();
+	
+	console.log(JSON.stringify(parsingConfig.getJSONString()));
     
     var jqxhr = $.ajax({
         url: hostname+"/equipment/save",
         type: "POST",
         data: JSON.stringify(parsingConfig.getJSONString()),
-        processData: false,
+        		processData: false,
         contentType: "application/json; charset=UTF-8"
-    	}).done(function() {
-    		console.log( "success" );
-		}).fail(function() {
-			console.log( "error" );
-		}).always(function() {
-			console.log( "complete" );
+    	}).done(function(resData) {
+    		console.log( JSON.stringify(resData) );
+    		if (!resData.error){
+    			showUserMsg("highlight","Parse configuration saved successfully");
+    		}else{
+    			showUserMsg("error","Error. when trying to save configuration => " + JSON.stringify(resData) );
+    		}	
+		}).fail(function(resData) {
+			console.log( "error "  + JSON.stringify(resData));
+			showUserMsg("error","Error. when trying to save configuration => " + JSON.stringify(resData) );
 		});
-    
- // Set another completion function for the request above
-    jqxhr.always(function(resData) {
-    	console.log( "second complete" );
-      console.log(JSON.stringify(resData));
-    });
     
 }
 
@@ -483,7 +503,8 @@ function handleTabChange(event, ui){
 
     if (oldTab === PARSING){
         if (!examiner || !examiner.fileContents){
-            alert("You must specify a file to leave the parsing tab");
+            //alert("You must specify a file to leave the parsing tab");
+            showUserMsg("error","You must specify a file to leave the parsing tab" );
             event.preventDefault();
             return;
         }
@@ -493,7 +514,8 @@ function handleTabChange(event, ui){
         }
     } else if (oldTab === PLATES){
         if (!parsingConfig || !parsingConfig.plate){
-            alert("You must specify a plate to leave the plates tab");
+            //alert("You must specify a plate to leave the plates tab");
+            showUserMsg("error","You must specify a plate to leave the plates tab" );
             event.preventDefault();
             return;
         }
@@ -635,7 +657,7 @@ function init(){
     addEvent("applyFirstPlate", "click", makePlate);
     addEvent("getFile", "click", handleGetFile);
     addEvent("delimiterList", "change", changeDelimiter);
-    addEvent("saveConfig", "click", createParsingConfig);
+    //addEvent("saveConfig", "click", createParsingConfig);
     addEvent("saveFeature", "click", makeFeature);
     addEvent("applyFeatures", "click", applyFeatures);
     addEvent("saveConfigToServer", "click", saveConfigToServer);

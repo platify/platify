@@ -1,11 +1,12 @@
 <%@ page import="edu.harvard.capstone.parser.Equipment" %>
 
 
-    <div>selected cells = <span id="selectedCells"></span></div>
-
     <div class=" max-height no-overflow" id="content">
         <div class=" max-height">
 
+			<!-- Highlight / Error -->
+			<div id="userMsgPanel" ></div>
+		
             <div class="col-xs-8" id="mainContent">
                 <div id="myGrid"></div>
             </div>
@@ -57,8 +58,8 @@
                             </select>
                         </div>
                         <div>
-                            <button id="saveConfig">save</button>
-                            <button id="saveConfigToServer">save to server</button>
+                            <button id="saveConfigToServer">Save</button>
+                            <button id="saveAsConfigToServer" disabled >Save as</button>
                         </div>
 
 
