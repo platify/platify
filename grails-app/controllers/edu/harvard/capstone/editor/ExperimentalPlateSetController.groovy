@@ -2,7 +2,7 @@ package edu.harvard.capstone.editor
 
 
 import static org.springframework.http.HttpStatus.*
-
+import edu.harvard.capstone.parser.Equipment;
 import grails.plugin.springsecurity.annotation.Secured
 
 class ExperimentalPlateSetController {
@@ -25,19 +25,22 @@ class ExperimentalPlateSetController {
         params.max = Math.min(max ?: 10, 100)
         respond ExperimentalPlateSet.list(params), model:[experimentalPlateSetInstanceCount: ExperimentalPlateSet.count()]
     }
+	
+	def showactions(ExperimentalPlateSet experimentalPlateSetInstance) {
+        respond experimentalPlateSetInstance
+    }
 
     def show(ExperimentalPlateSet experimentalPlateSetInstance) {
         respond experimentalPlateSetInstance
     }
 
     def create() {
-		def templateInstance = null;
-		if (params.id != null) {
-			templateInstance = PlateTemplate.get(params.id)
-		}
         respond new ExperimentalPlateSet(params)
     }
-
+	
+	def createPlate(PlateTemplate templateInstance) {
+		[templateId: templateInstance.id]
+	}
 
     def save(String name, String description) {
 

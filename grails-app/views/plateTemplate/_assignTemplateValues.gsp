@@ -24,12 +24,13 @@
 	</div>
 	
 	<div>Template Name:<input type="text" id="templateName"/></div>
-	<button id="saveTemplate">Save Template</button>
+	<button id="saveTemplate">Save Template and Continue</button>
+	<!--<g:link controller="experimentalPlateSet" action="createPlate" id="1">Continue To Next Step</g:link> -->
 
     <g:if env="production">
         <!-- Markup to include ONLY when in production -->
         <g:javascript>
-            var hostname = "";      
+            var hostname = "";
         </g:javascript>
     </g:if>
     <g:else>

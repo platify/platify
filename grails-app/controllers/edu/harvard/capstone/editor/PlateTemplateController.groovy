@@ -1,9 +1,7 @@
 package edu.harvard.capstone.editor
 
 import groovy.json.*
-
 import static org.springframework.http.HttpStatus.*
-
 import grails.validation.ValidationException
 
 
@@ -23,8 +21,9 @@ class PlateTemplateController {
         respond plateTemplateInstance
     }
 
-    def create() {
-        respond new PlateTemplate(params)
+    def create(ExperimentalPlateSet experimentalPlateSetInstance) {
+		
+        respond new PlateTemplate(params), model:[expPlateSetInstance: experimentalPlateSetInstance]
     }
 
     def getPlate(PlateTemplate plateTemplateInstance){
@@ -52,7 +51,7 @@ class PlateTemplateController {
         def plateTemplate = editorService.getTemplate(plateTemplateInstance)
 
         render(contentType: "application/json") {
-            [plate: plateTemplateInstance]
+            [plate: plateTemplate]
         }        
 
     }

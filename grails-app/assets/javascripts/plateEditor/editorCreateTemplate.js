@@ -43,6 +43,22 @@ function createRandomData(){
 }
 
 /**
+ * Loads a json plate model and updates the grid and category legend
+ */
+function loadJsonData(plateJson) {
+	
+	plateModel = translateInputJsonToModel(plateJson);
+	
+	for (var row in plateModel["rows"]) {
+		for (var column in plateModel["rows"][row]["columns"]) {
+			var newContents = plateModel["rows"][row]["columns"][column]["wellGroupName"];		// perhaps use return result, like random data instead !! ??
+			
+			grid.updateCellContents(row, column, newContents);
+		}
+	}
+}
+
+/**
  * A handler function for when the selected cells in the grid changes. This
  * function is registered to listen for these events in the createGrid
  * function using the registerSelectedCellsCallBack function of the Grid
@@ -217,11 +233,11 @@ function addEvent(elementId, eventType, handlerFunction) {
 //data format translation
 function translateModelToOutputJson(pModel) {
 	var plateJson = {};
-	plateJson["plate"] = [];
-	var plate = {}
+	var plate = {};
 	plate["name"] = document.getElementById("templateName").value;
-	plate["wells"] = [];
+	plate["experimentID"] = window.expId;
 	plate["labels"] = [];		// plate level labels, should set these if available already !!!
+	plate["wells"] = [];
 	for (var row in pModel["rows"]) {
 		for (var column in pModel["rows"][row]["columns"]) {
 			var well = {};
@@ -243,7 +259,7 @@ function translateModelToOutputJson(pModel) {
 			plate["wells"].push(well);
 		}
 	}
-	plateJson["plate"].push(plate);
+	plateJson["plate"] = plate;
 	return plateJson;
 }
 
@@ -302,8 +318,20 @@ function saveConfigToServer(){
    
 	// Set another completion function for the request above
 	jqxhr.always(function(resData) {
+		var storedTemplate = JSON.stringify(resData);
 		console.log( "second complete" );
-		console.log("result=" + JSON.stringify(resData));
+		console.log("result=" + storedTemplate);		// should parse for id
+		console.log("storedTemplate['plateTemplate']=" + resData["plateTemplate"]);
+		console.log("storedTemplate['plateTemplate']['id']=" + resData["plateTemplate"]["id"]);
+		
+		if (resData["plateTemplate"] !=null &&  resData["plateTemplate"]["id"] != null) {
+			plateModel["templateID"] = resData["plateTemplate"]["id"];
+			// use less hacky method !!
+			window.location.href = hostname + "/experimentalPlateSet/createPlate/" + plateModel["templateID"];
+		} else {
+			alert("An error while saving the template: " + storedTemplate);
+		}
+		
 	});
 }
 
@@ -314,6 +342,11 @@ function saveConfigToServer(){
  */
 function init(){
 	createGrid();
+	
+	// allows for passing input Json, but it not used here. Perhaps refactor!
+	//var testInputJson = {"plate":{"wells":[{"row":"2","column":"2","control":null,"labels":[{"category":"c1","name":"l1","color":"#ffff00"}],"groupName":"L67"},{"row":"2","column":"3","control":null,"labels":[{"category":"c1","name":"l2","color":"#4780b8"}],"groupName":"L5"},{"row":"3","column":"2","control":null,"labels":[{"category":"c1","name":"l1","color":"#ffff00"},{"category":"c2","name":"l3","color":"#8d7278"}],"groupName":"L51"},{"row":"3","column":"3","control":null,"labels":[{"category":"c1","name":"l2","color":"#4780b8"},{"category":"c2","name":"l3","color":"#8d7278"}],"groupName":"L17"},{"row":"4","column":"2","control":null,"labels":[{"category":"c2","name":"l3","color":"#8d7278"}],"groupName":"L2"},{"row":"4","column":"3","control":null,"labels":[{"category":"c2","name":"l3","color":"#8d7278"}],"groupName":"L47"}],"labels":[]}};
+	//loadJsonData(testInputJson);
+	
 	addEvent("addTemplateValueBtn", "click", addTemplateValue);
 	addEvent("clearLastSelection", "click", removeHighlightedArea);
 	addEvent("clearAllSelection", "click", removeAllHighlightedCells);

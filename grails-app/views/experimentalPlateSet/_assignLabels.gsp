@@ -63,6 +63,11 @@
 	<input type="text" id="editNewLabelValue"/>
 </div>
 
+<button id="savePlate">Save Plate</button>
+<g:link controller="experimentalPlateSet" action="create" id="1">Copy Plate</g:link>
+
+<div id="templateVals">${templateInstance}</div>
+
 <g:if env="production">
     <!-- Markup to include ONLY when in production -->
     <g:javascript>

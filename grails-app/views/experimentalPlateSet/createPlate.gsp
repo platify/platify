@@ -5,6 +5,10 @@
 		<g:set var="entityName" value="${message(code: 'experimentalPlateSet.label', default: 'ExperimentalPlateSet')}" />
 		<title><g:message code="default.create.label" args="[entityName]" /></title>
 		
+		<g:javascript>
+		  window.templateId = ${templateId};
+		</g:javascript>
+		
 		<asset:stylesheet href="jquery-ui.css"/>
 	    <asset:stylesheet href="grid/style.css"/>
 	    <asset:stylesheet href="grid/slick.grid.css"/>
