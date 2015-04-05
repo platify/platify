@@ -23,6 +23,37 @@ class EditorServiceSpec extends Specification {
     def cleanup() {
     }
 
+
+    void "Test experiment creation user missing"(){
+    	when: "Incorrect data"
+    		service.springSecurityService = [principal: [id: null]]
+    		def experiment = service.newExperiment("name", "description")
+    	then:
+    		experiment == null
+    		ExperimentalPlateSet.count() == 0
+    }
+
+    void "Test experiment creation incorrect params"(){
+    	when: "Incorrect data"
+	    	Scientist scientistInstance = new Scientist(firstName: "Test", lastName: "User", email:"my@email.com", password:"test")
+			scientistInstance.save()
+			service.springSecurityService = [principal: [id: scientistInstance.id]]
+    		def experiment = service.newExperiment("", "description")
+    	then:
+    		experiment.hasErrors()
+    		
+    }    
+
+    void "Test experiment creation correct params"(){
+    	when: "Correct data"
+	    	Scientist scientistInstance = new Scientist(firstName: "Test", lastName: "User", email:"my@email.com", password:"test")
+			scientistInstance.save()
+			service.springSecurityService = [principal: [id: scientistInstance.id]]
+    		def experiment = service.newExperiment("name", "description")
+    	then:
+    		experiment != null
+    		ExperimentalPlateSet.count() == 1
+    }        
     /* Template level tests */
 
 	void "Test wrong Data object"() {

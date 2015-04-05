@@ -8,6 +8,8 @@ import grails.plugin.springsecurity.annotation.Secured
 class ExperimentalPlateSetController {
 
     def springSecurityService
+    def editorService
+
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
 
@@ -37,8 +39,16 @@ class ExperimentalPlateSetController {
     }
 
 
-    def save(ExperimentalPlateSet experimentalPlateSetInstance) {
-        if (experimentalPlateSetInstance == null) {
+    def save(String name, String description) {
+
+        if (!springSecurityService.isLoggedIn()){
+            redirect action: "index", method: "GET"
+            return
+        }  
+
+        def experimentalPlateSetInstance = editorService.newExperiment(name, description)
+
+         if (experimentalPlateSetInstance == null) {
             notFound()
             return
         }
@@ -46,10 +56,8 @@ class ExperimentalPlateSetController {
         if (experimentalPlateSetInstance.hasErrors()) {
             respond experimentalPlateSetInstance.errors, view:'create'
             return
-        }
-
-        experimentalPlateSetInstance.save flush:true
-
+        }  
+        
         request.withFormat {
             form multipartForm {
                 flash.message = message(code: 'default.created.message', args: [message(code: 'experimentalPlateSet.label', default: 'ExperimentalPlateSet'), experimentalPlateSetInstance.id])

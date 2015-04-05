@@ -1,5 +1,6 @@
 package edu.harvard.capstone.editor
 
+import grails.plugin.springsecurity.SpringSecurityService
 
 import edu.harvard.capstone.user.Scientist
 
@@ -7,7 +8,7 @@ import grails.test.mixin.*
 import spock.lang.*
 
 @TestFor(ExperimentalPlateSetController)
-@Mock(ExperimentalPlateSet)
+@Mock([Scientist, SpringSecurityService, ExperimentalPlateSet, EditorService])
 class ExperimentalPlateSetControllerSpec extends Specification {
 
     def populateValidParams(params) {
@@ -34,22 +35,85 @@ class ExperimentalPlateSetControllerSpec extends Specification {
 
     void "Test the save action correctly persists an instance"() {
 
-        when:"The save action is executed with an invalid instance"
+        when:"The save action is executed with the user not logged in"
+            def springSecurityService = mockFor(SpringSecurityService)
+            springSecurityService.demandExplicit.isLoggedIn {  -> false }
+
+            controller.springSecurityService = springSecurityService.createMock()
+
             request.contentType = FORM_CONTENT_TYPE
-            def experimentalPlateSet = new ExperimentalPlateSet()
-            experimentalPlateSet.validate()
-            controller.save(experimentalPlateSet)
+            String name = "Name"
+            String description = "My Description"
+
+            controller.save(name, description)
 
         then:"The create view is rendered again with the correct model"
-            model.experimentalPlateSetInstance!= null
+            model.experimentalPlateSetInstance == null
+            response.redirectedUrl == '/experimentalPlateSet/index'
+
+        when:"The save action is executed with an invalid instance"
+            response.reset()
+            springSecurityService.demandExplicit.isLoggedIn {  -> true }
+
+            controller.springSecurityService = springSecurityService.createMock()
+
+            def editorService = mockFor(EditorService)
+            editorService.demandExplicit.newExperiment { String n, String d -> null }
+
+            controller.editorService = editorService.createMock()
+
+            request.contentType = FORM_CONTENT_TYPE
+
+            controller.save(name, description)
+
+        then:"The create view is rendered again with the correct model"
+            model.experimentalPlateSetInstance == null
+            response.redirectedUrl == '/experimentalPlateSet/index'
+
+
+        when:"The save action is executed with an invalid instance"
+            response.reset()
+            springSecurityService.demandExplicit.isLoggedIn {  -> true }
+
+            controller.springSecurityService = springSecurityService.createMock()
+
+
+            editorService = mockFor(EditorService)
+            editorService.demandExplicit.newExperiment { String n, String d -> 
+                def e = new ExperimentalPlateSet()
+                e.validate()
+                e
+            }
+
+            controller.editorService = editorService.createMock()
+
+            request.contentType = FORM_CONTENT_TYPE
+
+            controller.save(name, description)
+
+        then:"The create view is rendered again with the correct model"
+            model.experimentalPlateSetInstance != null
             view == 'create'
 
         when:"The save action is executed with a valid instance"
             response.reset()
-            populateValidParams(params)
-            experimentalPlateSet = new ExperimentalPlateSet(params)
+            
+            springSecurityService.demandExplicit.isLoggedIn {  -> true }
 
-            controller.save(experimentalPlateSet)
+            controller.springSecurityService = springSecurityService.createMock()
+
+            editorService = mockFor(EditorService)
+            editorService.demandExplicit.newExperiment { String n, String d -> 
+                Scientist owner = new Scientist(firstName: "Test", lastName: "User", email:"my@email.com", password:"test")
+                def e = new ExperimentalPlateSet(name: n, description: d, owner: owner)
+                e.save()
+                e
+            }
+            controller.editorService = editorService.createMock()
+
+            request.contentType = FORM_CONTENT_TYPE
+
+            controller.save(name, description)
 
         then:"A redirect is issued to the show action"
             response.redirectedUrl == '/experimentalPlateSet/show/1'
