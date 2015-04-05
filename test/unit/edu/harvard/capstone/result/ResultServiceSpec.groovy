@@ -197,7 +197,7 @@ class ResultServiceSpec extends Specification {
 			experimentInstance.save()
 			PlateTemplate templateInstance = new PlateTemplate(owner: scientistInstance, name: "my template")
 			templateInstance.save()
-			new PlateSet(plate: templateInstance, experiment: experimentInstance).save()
+			new PlateSet(plate: templateInstance, experiment: experimentInstance, barcode: 'barcode').save()
 
 			def data = JSON.parse("{experimentID: '${experimentInstance.id}', parsingID: '${equipmentInstance.id}'}")
 			def resultInstance = service.newRawData(data)
@@ -225,7 +225,7 @@ class ResultServiceSpec extends Specification {
 			experimentInstance.save()
 			PlateTemplate templateInstance = new PlateTemplate(owner: scientistInstance, name: "my template")
 			templateInstance.save()
-			new PlateSet(plate: templateInstance, experiment: experimentInstance).save()
+			new PlateSet(plate: templateInstance, experiment: experimentInstance, barcode: 'barcode').save()
 
 			def data = JSON.parse("""
 				{
@@ -260,13 +260,14 @@ class ResultServiceSpec extends Specification {
 			experimentInstance.save()
 			PlateTemplate templateInstance = new PlateTemplate(owner: scientistInstance, name: "my template")
 			templateInstance.save()
-			new PlateSet(plate: templateInstance, experiment: experimentInstance).save()
+			new PlateSet(plate: templateInstance, experiment: experimentInstance, barcode: 'barcode').save()
 
 			def data = JSON.parse("""
 				{
 					experimentID: '${experimentInstance.id}', 
 					parsingID: '${equipmentInstance.id}',
 					plates: [{
+						plateID: 'barcode',
 						labels: {key: ''},
 						rows: [{columns: {key: 'val'}}]
 					}],
@@ -297,13 +298,14 @@ class ResultServiceSpec extends Specification {
 			experimentInstance.save()
 			PlateTemplate templateInstance = new PlateTemplate(owner: scientistInstance, name: "my template")
 			templateInstance.save()
-			new PlateSet(plate: templateInstance, experiment: experimentInstance).save()
+			new PlateSet(plate: templateInstance, experiment: experimentInstance, barcode: 'barcode').save()
 
 			def data = JSON.parse("""
 				{
 					experimentID: '${experimentInstance.id}', 
 					parsingID: '${equipmentInstance.id}',
 					plates: [{
+						plateID: 'barcode',
 						labels: {key: 'value'},
 						rows: [{columns: {key: 'val'}}]
 					}],
@@ -331,7 +333,7 @@ class ResultServiceSpec extends Specification {
 			experimentInstance.save()
 			PlateTemplate templateInstance = new PlateTemplate(owner: scientistInstance, name: "my template")
 			templateInstance.save()
-			new PlateSet(plate: templateInstance, experiment: experimentInstance).save()
+			new PlateSet(plate: templateInstance, experiment: experimentInstance, barcode: 'barcode').save()
 			new Well(plate: templateInstance, column: '0', row: '0', groupName: 'my group').save()
 
 
@@ -340,6 +342,7 @@ class ResultServiceSpec extends Specification {
 					experimentID: '${experimentInstance.id}', 
 					parsingID: '${equipmentInstance.id}',
 					plates: [{
+						plateID: 'barcode',
 						labels: {key: 'value'},
 						rows: [ 
 							{
@@ -375,7 +378,7 @@ class ResultServiceSpec extends Specification {
 			experimentInstance.save()
 			PlateTemplate templateInstance = new PlateTemplate(owner: scientistInstance, name: "my template")
 			templateInstance.save()
-			new PlateSet(plate: templateInstance, experiment: experimentInstance).save()
+			new PlateSet(plate: templateInstance, experiment: experimentInstance, barcode: 'barcode').save()
 			new Well(plate: templateInstance, column: '0', row: '0', groupName: 'my group').save()
 
 
@@ -384,6 +387,7 @@ class ResultServiceSpec extends Specification {
 					experimentID: '${experimentInstance.id}', 
 					parsingID: '${equipmentInstance.id}',
 					plates: [{
+						plateID: 'barcode',
 						labels: {key: 'value'},
 						rows: [ 
 							{
@@ -432,7 +436,7 @@ class ResultServiceSpec extends Specification {
 			experimentInstance.save()
 			PlateTemplate templateInstance = new PlateTemplate(owner: scientistInstance, name: "my template")
 			templateInstance.save()
-			new PlateSet(plate: templateInstance, experiment: experimentInstance).save()
+			new PlateSet(plate: templateInstance, experiment: experimentInstance, barcode: 'barcode').save()
 			new Well(plate: templateInstance, column: 0, row: 0, groupName: 'my group').save()
 
 
@@ -441,6 +445,7 @@ class ResultServiceSpec extends Specification {
 					experimentID: '${experimentInstance.id}', 
 					parsingID: '${equipmentInstance.id}',
 					plates: [{
+						plateID: 'barcode',
 						labels: {key: 'value'},
 						rows: [ 
 							{

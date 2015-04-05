@@ -78,7 +78,7 @@ class ResultService {
 			if (plate.rows)
 				numberOfColumns = plate.rows[0]?.columns?.size()
 
-			def plateInstance = new ResultPlate(result: resultInstance, rows: numberOfRows, columns: numberOfColumns)
+			def plateInstance = new ResultPlate(result: resultInstance, rows: numberOfRows, columns: numberOfColumns, barcode: plate.plateID)
 			
 			plateInstance.save()
 			if (plateInstance.hasErrors()){

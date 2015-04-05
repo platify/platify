@@ -4,6 +4,8 @@ class ResultPlate {
 
 	Result result
 
+	String barcode
+
 	Integer rows
 	Integer columns
 

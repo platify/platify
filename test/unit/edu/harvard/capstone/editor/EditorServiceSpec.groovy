@@ -14,7 +14,7 @@ import grails.validation.ValidationException
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
  */
 @TestFor(EditorService)
-@Mock([Scientist, Well, PlateTemplate, Label, DomainLabel, ExperimentalPlateSet])
+@Mock([Scientist, Well, PlateTemplate, Label, DomainLabel, ExperimentalPlateSet, PlateSet])
 class EditorServiceSpec extends Specification {
 
     def setup() {
@@ -22,6 +22,8 @@ class EditorServiceSpec extends Specification {
 
     def cleanup() {
     }
+
+    /* Template level tests */
 
 	void "Test wrong Data object"() {
 		when: "Data object null"
@@ -216,11 +218,432 @@ class EditorServiceSpec extends Specification {
 			Label.count() == 4
 			Well.count() == 1
 			data.plate.name == plate.name
-			data.plate.labels == plate.labels
+			data.plate.labels.size() == plate.labels.size()
 			data.plate.wells[0].row == plate.wells[0].row
 			data.plate.wells[0].column == plate.wells[0].column
 			data.plate.wells[0].groupName == plate.wells[0].groupName
-			data.plate.wells[0].labels == plate.wells[0].labels
+			data.plate.wells[0].labels.size() == plate.wells[0].labels.size()
 	}	
 
+
+	/* Plate level tests */
+	void "Test correct creation of a plate"() {
+		when: "Correct parameters"
+    	// Fake springSecurityService - login as id 1
+		Scientist scientistInstance = new Scientist(firstName: "Test", lastName: "User", email:"my@email.com", password:"test")
+		scientistInstance.save()
+		service.springSecurityService = [principal: [id: scientistInstance.id]]
+
+
+		def data = JSON.parse("""
+			{plate: {
+				name: 'test name', 
+				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
+				wells: [{row: '0', column: '0', 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				}
+			}
+		""")
+
+		def plateTemplate = service.newTemplate(data)
+
+		def experiment = new ExperimentalPlateSet(name: "test", description: "description", owner: scientistInstance)
+		experiment.save()
+
+
+		def plateData = JSON.parse("""
+			{plate: {
+				assay: 'my assay', 
+				experimentID: ${experiment.id},
+				templateID: ${plateTemplate.id},
+				plateID: 'barcode',
+				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
+				wells: [{row: '0', column: '0', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				}
+			}
+		""")
+
+		def plateInstance = service.newPlate(plateData)
+
+
+		then:
+			notThrown ValidationException
+			plateTemplate != null
+			plateInstance != null
+			PlateTemplate.count() == 1
+			Label.count() == 8
+			Well.count() == 1
+			PlateSet.count() == 1
+	}
+
+
+	void "Test incorrect creation of a plate, template missing"() {
+		when: "Incorrect parameters"
+    	// Fake springSecurityService - login as id 1
+		Scientist scientistInstance = new Scientist(firstName: "Test", lastName: "User", email:"my@email.com", password:"test")
+		scientistInstance.save()
+		service.springSecurityService = [principal: [id: scientistInstance.id]]
+
+
+		def data = JSON.parse("""
+			{plate: {
+				name: 'test name', 
+				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
+				wells: [{row: '0', column: '0', 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				}
+			}
+		""")
+
+		def plateTemplate = service.newTemplate(data)
+
+		def experiment = new ExperimentalPlateSet(name: "test", description: "description", owner: scientistInstance)
+		experiment.save()
+
+
+		def plateData = JSON.parse("""
+			{plate: {
+				assay: 'my assay', 
+				experimentID: ${experiment.id},
+				plateID: 'barcode',
+				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
+				wells: [{row: '0', column: '0', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				}
+			}
+		""")
+
+		def plateInstance = service.newPlate(plateData)
+
+
+		then:
+			def ex = thrown(RuntimeException)
+			ex.message.contains('A valid template ID is missing')
+			plateInstance == null
+			PlateSet.count() == 0		
+	}
+
+	void "Test incorrect creation of a plate, experiment missing"() {
+		when: "Incorrect parameters"
+    	// Fake springSecurityService - login as id 1
+		Scientist scientistInstance = new Scientist(firstName: "Test", lastName: "User", email:"my@email.com", password:"test")
+		scientistInstance.save()
+		service.springSecurityService = [principal: [id: scientistInstance.id]]
+
+
+		def data = JSON.parse("""
+			{plate: {
+				name: 'test name', 
+				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
+				wells: [{row: '0', column: '0', 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				}
+			}
+		""")
+
+		def plateTemplate = service.newTemplate(data)
+
+		def experiment = new ExperimentalPlateSet(name: "test", description: "description", owner: scientistInstance)
+		experiment.save()
+
+
+		def plateData = JSON.parse("""
+			{plate: {
+				assay: 'my assay', 
+				templateID: ${plateTemplate.id},
+				plateID: 'barcode',
+				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
+				wells: [{row: '0', column: '0', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				}
+			}
+		""")
+
+		def plateInstance = service.newPlate(plateData)
+
+		then:
+			def ex = thrown(RuntimeException)
+			ex.message.contains('A valid experiment ID is missing')
+			plateInstance == null
+			PlateSet.count() == 0	
+	}
+	
+	void "Test incorrect creation of a plate, barcode missing"() {
+		when: "Incorrect parameters"
+    	// Fake springSecurityService - login as id 1
+		Scientist scientistInstance = new Scientist(firstName: "Test", lastName: "User", email:"my@email.com", password:"test")
+		scientistInstance.save()
+		service.springSecurityService = [principal: [id: scientistInstance.id]]
+
+
+		def data = JSON.parse("""
+			{plate: {
+				name: 'test name', 
+				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
+				wells: [{row: '0', column: '0', 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				}
+			}
+		""")
+
+		def plateTemplate = service.newTemplate(data)
+
+		def experiment = new ExperimentalPlateSet(name: "test", description: "description", owner: scientistInstance)
+		experiment.save()
+
+
+		def plateData = JSON.parse("""
+			{plate: {
+				assay: 'my assay', 
+				experimentID: ${experiment.id},
+				templateID: ${plateTemplate.id},
+				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
+				wells: [{row: '0', column: '0', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				}
+			}
+		""")
+
+		def plateInstance = service.newPlate(plateData)
+
+		then:
+			def ex = thrown(ValidationException)
+			ex.message.contains('Plate is not valid')
+			plateInstance == null
+			PlateSet.count() == 0
+	}
+
+	void "Test incorrect creation of a plate, incorrect plate labels"() {
+		when: "Incorrect parameters"
+    	// Fake springSecurityService - login as id 1
+		Scientist scientistInstance = new Scientist(firstName: "Test", lastName: "User", email:"my@email.com", password:"test")
+		scientistInstance.save()
+		service.springSecurityService = [principal: [id: scientistInstance.id]]
+
+
+		def data = JSON.parse("""
+			{plate: {
+				name: 'test name', 
+				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
+				wells: [{row: '0', column: '0', 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				}
+			}
+		""")
+
+		def plateTemplate = service.newTemplate(data)
+
+		def experiment = new ExperimentalPlateSet(name: "test", description: "description", owner: scientistInstance)
+		experiment.save()
+
+
+		def plateData = JSON.parse("""
+			{plate: {
+				assay: 'my assay', 
+				experimentID: ${experiment.id},
+				templateID: ${plateTemplate.id},
+				plateID: 'barcode',
+				labels: [{value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
+				wells: [{row: '0', column: '0', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				}
+			}
+		""")
+
+		def plateInstance = service.newPlate(plateData)
+
+		then:
+			def ex = thrown(ValidationException)
+			ex.message.contains('Label for plate is not valid')
+			plateInstance == null
+			PlateSet.count() == 0
+	}
+
+
+	void "Test incorrect creation of a plate, plate size does not match template size"() {
+		when: "Incorrect parameters"
+    	// Fake springSecurityService - login as id 1
+		Scientist scientistInstance = new Scientist(firstName: "Test", lastName: "User", email:"my@email.com", password:"test")
+		scientistInstance.save()
+		service.springSecurityService = [principal: [id: scientistInstance.id]]
+
+
+		def data = JSON.parse("""
+			{plate: {
+				name: 'test name', 
+				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
+				wells: [{row: '0', column: '0', 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				}
+			}
+		""")
+
+		def plateTemplate = service.newTemplate(data)
+
+		def experiment = new ExperimentalPlateSet(name: "test", description: "description", owner: scientistInstance)
+		experiment.save()
+
+
+		def plateData = JSON.parse("""
+			{plate: {
+				assay: 'my assay', 
+				experimentID: ${experiment.id},
+				templateID: ${plateTemplate.id},
+				plateID: 'barcode',
+				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
+				wells: [{row: '1', column: '1', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				}
+			}
+		""")
+
+		def plateInstance = service.newPlate(plateData)
+
+		then:
+			def ex = thrown(RuntimeException)
+			ex.message.contains('Well is not valid')
+			plateInstance == null
+	}
+
+	void "Test incorrect creation of a plate, plate size does not match template size"() {
+		when: "Incorrect parameters"
+    	// Fake springSecurityService - login as id 1
+		Scientist scientistInstance = new Scientist(firstName: "Test", lastName: "User", email:"my@email.com", password:"test")
+		scientistInstance.save()
+		service.springSecurityService = [principal: [id: scientistInstance.id]]
+
+
+		def data = JSON.parse("""
+			{plate: {
+				name: 'test name', 
+				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
+				wells: [{row: '0', column: '0', 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				}
+			}
+		""")
+
+		def plateTemplate = service.newTemplate(data)
+
+		def experiment = new ExperimentalPlateSet(name: "test", description: "description", owner: scientistInstance)
+		experiment.save()
+
+
+		def plateData = JSON.parse("""
+			{plate: {
+				assay: 'my assay', 
+				experimentID: ${experiment.id},
+				templateID: ${plateTemplate.id},
+				plateID: 'barcode',
+				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
+				wells: [{row: '0', column: '0', labels: [{value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				}
+			}
+		""")
+
+		def plateInstance = service.newPlate(plateData)
+
+		then:
+			def ex = thrown(ValidationException)
+			ex.message.contains('Label for well is not valid')
+			plateInstance == null
+	}	
+
+
+	void "Test getting a plate with an incorrect plate"() {
+		when: "No user logged in"
+
+		def plateTemplate = service.getPlate(null)
+
+		then:
+		plateTemplate == null
+	}	
+
+	void "Test getting a plate"() {
+		when: "Correct parameters"
+    	Scientist scientistInstance = new Scientist(firstName: "Test", lastName: "User", email:"my@email.com", password:"test")
+		scientistInstance.save()
+		service.springSecurityService = [principal: [id: scientistInstance.id]]
+
+
+		def data = JSON.parse("""
+			{plate: {
+				name: 'test name', 
+				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
+				wells: [{row: '0', column: '0', 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				}
+			}
+		""")
+
+		def plateTemplate = service.newTemplate(data)
+
+		def experiment = new ExperimentalPlateSet(name: "test", description: "description", owner: scientistInstance)
+		experiment.save()
+
+
+		def plateData = JSON.parse("""
+			{plate: {
+				assay: 'my assay', 
+				experimentID: ${experiment.id},
+				templateID: ${plateTemplate.id},
+				plateID: 'barcode',
+				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
+				wells: [{row: 0, column: 0, labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				}
+			}
+		""")
+
+		def plateInstance = service.newPlate(plateData)
+		def plate = service.getPlate(plateInstance)
+
+		then:
+			notThrown ValidationException
+			plateTemplate != null
+			PlateTemplate.count() == 1
+			Label.count() == 8
+			Well.count() == 1
+			PlateSet.count() == 1
+			plateData.plate.assay == plate.assay
+			plateData.plate.experimentID == experiment.id
+			plateData.plate.templateID == plateTemplate.id
+			plateData.plate.plateID == plate.plateID
+			plateData.plate.labels.size() == plate.labels.size()
+			plateData.plate.wells[0].row == plate.wells[0].row
+			plateData.plate.wells[0].column == plate.wells[0].column
+			plateData.plate.wells[0].labels.size() == plate.wells[0].labels.size()
+	}
+/*
+	void "Test incorrect creation of a plate, experiment missing"() {
+		when: "Incorrect parameters"
+    	// Fake springSecurityService - login as id 1
+		Scientist scientistInstance = new Scientist(firstName: "Test", lastName: "User", email:"my@email.com", password:"test")
+		scientistInstance.save()
+		service.springSecurityService = [principal: [id: scientistInstance.id]]
+
+
+		def data = JSON.parse("""
+			{plate: {
+				name: 'test name', 
+				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
+				wells: [{row: '0', column: '0', 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				}
+			}
+		""")
+
+		def plateTemplate = service.newTemplate(data)
+
+		def experiment = new ExperimentalPlateSet(name: "test", description: "description", owner: scientistInstance)
+		experiment.save()
+
+
+		def plateData = JSON.parse("""
+			{plate: {
+				assay: 'my assay', 
+				experimentID: ${experiment.id},
+				templateID: ${plateTemplate.id},
+				plateID: 'barcode',
+				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
+				wells: [{row: '0', column: '0', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				}
+			}
+		""")
+
+		def plateInstance = service.newPlate(plateData)
+
+		then:
+			def ex = thrown(ValidationException)
+			ex.message.contains('A valid template ID is missing')
+			plateInstance == null
+			PlateSet.count() == 0
+	}	
+*/
+	
 }
