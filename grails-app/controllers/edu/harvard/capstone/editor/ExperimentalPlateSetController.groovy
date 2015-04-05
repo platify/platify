@@ -25,10 +25,6 @@ class ExperimentalPlateSetController {
         params.max = Math.min(max ?: 10, 100)
         respond ExperimentalPlateSet.list(params), model:[experimentalPlateSetInstanceCount: ExperimentalPlateSet.count()]
     }
-	
-	def showactions(ExperimentalPlateSet experimentalPlateSetInstance) {
-        respond experimentalPlateSetInstance
-    }
 
     def show(ExperimentalPlateSet experimentalPlateSetInstance) {
         respond experimentalPlateSetInstance
@@ -38,8 +34,16 @@ class ExperimentalPlateSetController {
         respond new ExperimentalPlateSet(params)
     }
 	
+	def showactions(ExperimentalPlateSet experimentalPlateSetInstance) {
+		respond experimentalPlateSetInstance
+	}
+	
 	def createPlate(PlateTemplate templateInstance) {
 		[templateId: templateInstance.id]
+	}
+	
+	def selectTemplate(ExperimentalPlateSet experimentalPlateSetInstance) {
+		respond experimentalPlateSetInstance
 	}
 
     def save(String name, String description) {

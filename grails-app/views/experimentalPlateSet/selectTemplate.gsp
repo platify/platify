@@ -6,6 +6,7 @@
 		<title><g:message code="default.create.label" args="[entityName]" /></title>
 		
 		<asset:stylesheet href="jquery-ui.css"/>
+		<asset:stylesheet href="selectize.css"/>
 	    <asset:stylesheet href="grid/style.css"/>
 	    <asset:stylesheet href="grid/slick.grid.css"/>
 	    <asset:stylesheet href="grid/slick-default-theme.css"/>
@@ -29,12 +30,10 @@
 						</ul>			
 					</div>					
 				</div> <!-- Left Column END -->
-				<!-- Right Column -->
+				<!-- right Column -->
 				<div class="col-sm-10 content-body" style="padding-right: 30px">
-					<h4>Add New plate to Experiment:</h4>
-					<g:link id="${experimentalPlateSetInstance.id}" action="selectTemplate">Select Existing Template</g:link>
-					<g:link id="${experimentalPlateSetInstance.id}" controller="plateTemplate" action="create">Create New Template</g:link>
-				</div> <!-- Right Column END -->	
+					<g:render template="previewTemplateGrid"/>
+				</div> <!-- right Column END -->
 			</div>
 		</div>
 	</body>
