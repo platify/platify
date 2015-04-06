@@ -98,7 +98,6 @@ exports.zFactor = function (importData, plateNum, label,
 exports.zScore = function (importData, plateNum, label,
 		           negativeControls, positiveControls) {
     var plate = importData.plates[plateNum];
-
     var negativeStdDev = d3.deviation(negativeControls.map(function (a) {
         return plate.rows[a[0]].columns[a[1]].labels[label];
     }));
@@ -123,4 +122,3 @@ exports.zScore = function (importData, plateNum, label,
 
     return zScores;
 }
-
