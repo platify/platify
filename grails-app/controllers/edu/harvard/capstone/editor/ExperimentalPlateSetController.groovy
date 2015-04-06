@@ -2,12 +2,14 @@ package edu.harvard.capstone.editor
 
 
 import static org.springframework.http.HttpStatus.*
-
+import edu.harvard.capstone.parser.Equipment;
 import grails.plugin.springsecurity.annotation.Secured
 
 class ExperimentalPlateSetController {
 
     def springSecurityService
+    def editorService
+
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
 
@@ -29,16 +31,31 @@ class ExperimentalPlateSetController {
     }
 
     def create() {
-		def templateInstance = null;
-		if (params.id != null) {
-			templateInstance = PlateTemplate.get(params.id)
-		}
         respond new ExperimentalPlateSet(params)
     }
+	
+	def showactions(ExperimentalPlateSet experimentalPlateSetInstance) {
+		respond experimentalPlateSetInstance
+	}
+	
+	def createPlate(PlateTemplate templateInstance) {
+		[templateId: templateInstance.id]
+	}
+	
+	def selectTemplate(ExperimentalPlateSet experimentalPlateSetInstance) {
+		respond experimentalPlateSetInstance
+	}
 
+    def save(String name, String description) {
 
-    def save(ExperimentalPlateSet experimentalPlateSetInstance) {
-        if (experimentalPlateSetInstance == null) {
+        if (!springSecurityService.isLoggedIn()){
+            redirect action: "index", method: "GET"
+            return
+        }  
+
+        def experimentalPlateSetInstance = editorService.newExperiment(name, description)
+
+         if (experimentalPlateSetInstance == null) {
             notFound()
             return
         }
@@ -46,10 +63,8 @@ class ExperimentalPlateSetController {
         if (experimentalPlateSetInstance.hasErrors()) {
             respond experimentalPlateSetInstance.errors, view:'create'
             return
-        }
-
-        experimentalPlateSetInstance.save flush:true
-
+        }  
+        
         request.withFormat {
             form multipartForm {
                 flash.message = message(code: 'default.created.message', args: [message(code: 'experimentalPlateSet.label', default: 'ExperimentalPlateSet'), experimentalPlateSetInstance.id])

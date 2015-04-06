@@ -2,18 +2,15 @@
 <html>
 	<head lang="en">
 		<meta name="layout" content="main">
-		<g:set var="entityName" value="${message(code: 'plateTemplate.label', default: 'PlateTemplate')}" />
+		<g:set var="entityName" value="${message(code: 'experimentalPlateSet.label', default: 'ExperimentalPlateSet')}" />
 		<title><g:message code="default.create.label" args="[entityName]" /></title>
-		
-		<g:javascript>
-		  window.expId = ${expPlateSetInstance.id};
-		</g:javascript>
 		
 		<asset:stylesheet href="jquery-ui.css"/>
 	    <asset:stylesheet href="grid/style.css"/>
 	    <asset:stylesheet href="grid/slick.grid.css"/>
 	    <asset:stylesheet href="grid/slick-default-theme.css"/>
 	    <asset:stylesheet href="grid/Grid.css"/>
+	    
 	</head>
 	<body>
 		<div class="">
@@ -34,7 +31,9 @@
 				</div> <!-- Left Column END -->
 				<!-- Right Column -->
 				<div class="col-sm-10 content-body" style="padding-right: 30px">
-					<g:render template="assignTemplateValues"/>
+					<h4>Add New plate to Experiment:</h4>
+					<g:link id="${experimentalPlateSetInstance.id}" action="selectTemplate">Select Existing Template</g:link>
+					<g:link id="${experimentalPlateSetInstance.id}" controller="plateTemplate" action="create">Create New Template</g:link>
 				</div> <!-- Right Column END -->	
 			</div>
 		</div>

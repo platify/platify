@@ -59,7 +59,7 @@
 							<li class="output-parser">
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Output Parser <span class="caret"></span></a>
 								<ul class="dropdown-menu" role="menu">
-									<li><g:link controller="equipment" action="index">Equipments</g:link></li>
+									<li><g:link controller="equipment" action="index">Equipment</g:link></li>
 									<li class="divider"></li>
 									<li><a href="#">Parse</a></li>
 								</ul>

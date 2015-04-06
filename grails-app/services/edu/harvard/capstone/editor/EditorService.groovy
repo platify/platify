@@ -14,6 +14,16 @@ class EditorService {
 
 	def springSecurityService
 
+
+	def newExperiment(String name, String description){
+		def scientistInstance = Scientist.get(springSecurityService.principal.id)
+		if(!scientistInstance)
+			return
+		def experimentInstance = new ExperimentalPlateSet(name: name, description: description, owner: scientistInstance)
+		experimentInstance.save()
+		experimentInstance
+	}
+	
 	/**
 	*	Throws ValidationException if can't create a domain object
 	*/

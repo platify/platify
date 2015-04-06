@@ -87,37 +87,6 @@ function handleSelectedCells(startRow,startCol,endRow, endCol){
 	highlightKeyCounter++;
 }
 
-/**
- * This function handles the event that the removeHighlighting button is
- * clicked by removing the most recent cell background color change. This
- * is achieved by calling the removeCellColors method of the Grid class with
- * the most key used to create the most recent background color change as
- * stored in the currentHighlightKeys array.
- */
-function removeHighlightedArea(){
-	if (currentHighlightKeys.length > 0) {
-		grid.removeCellColors(currentHighlightKeys.pop());
-		
-		// need to decrement highlightedCoords here !! 
-		//(not the same number of items removed !!!)
-		highlightedCoords.pop();	// need to fix !!
-	}
-}
-
-/**
- * This function handles the event that the removeHighlighting button is
- * clicked by removing the most recent cell background color change. This
- * is achieved by calling the removeCellColors method of the Grid class with
- * the most key used to create the most recent background color change as
- * stored in the currentHighlightKeys array.
- */
-function removeAllHighlightedCells(){
-	while (currentHighlightKeys.length > 0) {
-		grid.removeCellColors(currentHighlightKeys.pop());
-	}
-	// removing all selected cells, so global count disappears
-	highlightedCoords = [];
-}
 
 /**
  * This function creates a new grid applying it to the "myGrid" div on the
@@ -144,64 +113,12 @@ function createGrid(){
 }
 
 function enableGridSelection() {
-	removeAllHighlightedCells();
 	grid.enableCellSelection();
 }
 
 function disableGridSelection() {
-	removeAllHighlightedCells();
 	grid.disableCellSelection();
 }
-
-/**
- * This function changes the style of a particular cell
- */
-function addTemplateValue() {
-	//var selCells = grid.getSelectedCells();
-	var selCells = highlightedCoords;
-	console.log(selCells);
-	var cellValue = document.getElementById("newLabelValue").value;
-	
-	// just keeping list of well values
-	if (wellGroupings.indexOf(cellValue) == -1) {
-		wellGroupings.push(cellValue);
-	}
-	
-	// update selected grid cells with label
-	for (var cell in selCells) {
-		var row = selCells[cell][0];
-		var column = selCells[cell][1];
-		
-		if (plateModel["rows"] == null) {
-			plateModel["rows"] = {};
-		}
-		
-		if (plateModel["rows"][row] == null) {
-			plateModel["rows"][row] = {};
-		}
-		
-		if (plateModel["rows"][row]["columns"] == null) {
-			plateModel["rows"][row]["columns"] = {};
-		}
-		
-		if (plateModel["rows"][row]["columns"][column] == null) {
-			plateModel["rows"][row]["columns"][column] = {};
-			plateModel["rows"][row]["columns"][column]["wellGroupName"] = cellValue;
-		}
-		
-		grid.updateCellContents(row, column, cellValue);
-	}
-	
-	console.log("plateModel1:" + JSON.stringify(plateModel));
-	
-	var wgs = document.getElementById("wellGroupSpan");
-	wgs.innerHTML = wellGroupings;
-	
-	// clear current selection
-	removeAllHighlightedCells();
-}
-
-
 
 /**
  * addEvent - This function adds an event handler to an html element in
@@ -298,14 +215,24 @@ function translateInputJsonToModel(plateJson) {
 }
 
 // ajax save object call
-function saveConfigToServer(){
-	var plateJson = translateModelToOutputJson(plateModel);
-	console.log(JSON.stringify(plateJson));
-   
-	var jqxhr = $.ajax({
-		url: hostname + "/plateTemplate/save",
+function selectAndContinue() {
+
+	var pSelect = document.getElementById("plateSelect");
+	if (pSelect.value != null) {
+		// use less hacky method !!
+		window.location.href = hostname + "/experimentalPlateSet/createPlate/" + pSelect.value;
+	} else {
+		alert("An error while selecting the template. TemplateId is null");
+	}
+}
+
+//ajax save object call
+function fetchTemplateData(tId){
+	
+	var jqxhr = $.ajax({		// need to update to save plate instead of template
+		url: hostname + "/plateTemplate/getPlate/" + tId,
 		type: "POST",
-		data: JSON.stringify(plateJson),
+		data: null,
 		processData: false,
 		contentType: "application/json; charset=UTF-8"
 	}).done(function() {
@@ -318,21 +245,18 @@ function saveConfigToServer(){
    
 	// Set another completion function for the request above
 	jqxhr.always(function(resData) {
-		var storedTemplate = JSON.stringify(resData);
 		console.log( "second complete" );
-		console.log("result=" + storedTemplate);		// should parse for id
-		console.log("storedTemplate['plateTemplate']=" + resData["plateTemplate"]);
-		console.log("storedTemplate['plateTemplate']['id']=" + resData["plateTemplate"]["id"]);
-		
-		if (resData["plateTemplate"] !=null &&  resData["plateTemplate"]["id"] != null) {
-			plateModel["templateID"] = resData["plateTemplate"]["id"];
-			// use less hacky method !!
-			window.location.href = hostname + "/experimentalPlateSet/createPlate/" + plateModel["templateID"];
-		} else {
-			alert("An error while saving the template: " + storedTemplate);
-		}
-		
+		console.log("templateJson=" + JSON.stringify(resData));
+		loadJsonData(resData);	// note may need to clear grid first !!!
 	});
+}
+
+function onPlateSelectChange(){
+	// NEED TO CLEAR Grid DATA HERE, or pass a template with all values !!??
+	// in theory if template has value for all cells this is not needed. plateModel needs to change to ensure this ??!!
+
+	var tId = this.value;
+	fetchTemplateData(tId);
 }
 
 
@@ -342,18 +266,27 @@ function saveConfigToServer(){
  */
 function init(){
 	createGrid();
-	
+
 	// allows for passing input Json, but it not used here. Perhaps refactor!
 	//var testInputJson = {"plate":{"wells":[{"row":"2","column":"2","control":null,"labels":[{"category":"c1","name":"l1","color":"#ffff00"}],"groupName":"L67"},{"row":"2","column":"3","control":null,"labels":[{"category":"c1","name":"l2","color":"#4780b8"}],"groupName":"L5"},{"row":"3","column":"2","control":null,"labels":[{"category":"c1","name":"l1","color":"#ffff00"},{"category":"c2","name":"l3","color":"#8d7278"}],"groupName":"L51"},{"row":"3","column":"3","control":null,"labels":[{"category":"c1","name":"l2","color":"#4780b8"},{"category":"c2","name":"l3","color":"#8d7278"}],"groupName":"L17"},{"row":"4","column":"2","control":null,"labels":[{"category":"c2","name":"l3","color":"#8d7278"}],"groupName":"L2"},{"row":"4","column":"3","control":null,"labels":[{"category":"c2","name":"l3","color":"#8d7278"}],"groupName":"L47"}],"labels":[]}};
 	//loadJsonData(testInputJson);
 	
-	addEvent("addTemplateValueBtn", "click", addTemplateValue);
-	addEvent("clearLastSelection", "click", removeHighlightedArea);
-	addEvent("clearAllSelection", "click", removeAllHighlightedCells);
-	addEvent("saveTemplate", "click", saveConfigToServer);
+	addEvent("saveTemplate", "click", selectAndContinue);
+	addEvent("plateSelect", "change", onPlateSelectChange);
 
 	// initially disable selection of grid cells
-	enableGridSelection();
+	disableGridSelection();
+	
+	var pSelect = document.getElementById("plateSelect");
+	if (pSelect.value != null) {
+		fetchTemplateData(pSelect.value);
+	}
 }
 
 window.onload = init;
+/*
+$(function() {
+	var options = ['horse', 'cow'];
+	
+    $('#plateselect').selectize(options);
+});*/

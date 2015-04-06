@@ -2,11 +2,11 @@
 <html>
 	<head lang="en">
 		<meta name="layout" content="main">
-		<g:set var="entityName" value="${message(code: 'plateTemplate.label', default: 'PlateTemplate')}" />
+		<g:set var="entityName" value="${message(code: 'experimentalPlateSet.label', default: 'ExperimentalPlateSet')}" />
 		<title><g:message code="default.create.label" args="[entityName]" /></title>
 		
 		<g:javascript>
-		  window.expId = ${expPlateSetInstance.id};
+		  window.templateId = ${templateId};
 		</g:javascript>
 		
 		<asset:stylesheet href="jquery-ui.css"/>
@@ -34,7 +34,7 @@
 				</div> <!-- Left Column END -->
 				<!-- Right Column -->
 				<div class="col-sm-10 content-body" style="padding-right: 30px">
-					<g:render template="assignTemplateValues"/>
+					<g:render template="assignLabels"/>
 				</div> <!-- Right Column END -->	
 			</div>
 		</div>

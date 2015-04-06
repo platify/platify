@@ -4,7 +4,7 @@
 <html>
 	<head>
 		<meta name="layout" content="main">
-		<g:set var="entityName" value="${message(code: 'experimentalPlateSet.label', default: 'ExperimentalPlateSet')}" />
+		<g:set var="entityName" value="${message(code: 'experimentalPlateSet.label', default: 'Experiment')}" />
 		<title><g:message code="default.list.label" args="[entityName]" /></title>
 	</head>
 	<body>
@@ -59,7 +59,7 @@
 									<td>${fieldValue(bean: experimentInstance, field: "dateCreated")}</td>
 								
 									<td>
-										<g:link id="${experimentInstance.id}" action="show"><i class="fa fa-eye user-view"></i></g:link>
+										<g:link id="${experimentInstance.id}" action="showactions"><i class="fa fa-check parse-btn"></i></g:link>
 									</td>
 								
 								</tr>

@@ -19,7 +19,7 @@ var tmpEditCat;
  * A function that creates a blank data set for initializing the grid example
  * page. The data set is of dimension DIMENSION x DIMENSION.
  */
-function createBlankData(){
+function createBlankData() {
 	var result = [];
 
 	for (var i=0; i<DIMENSION; i++){
@@ -35,7 +35,7 @@ function createBlankData(){
  * A function that creates a random data set for displaying in the grid example
  * page. The data set is of dimension DIMENSION x DIMENSION.
  */
-function createRandomData(){
+function createRandomData() {
 	var result = [];
 	for (var i=0; i<DIMENSION; i++){
 		result[i] = [];
@@ -44,6 +44,60 @@ function createRandomData(){
 		}
 	}
 	return result;
+}
+
+/**
+ * Loads a json plate model and updates the grid and category legend
+ */
+function loadJsonData(plateJson) {
+	
+	plateModel = translateInputJsonToModel(plateJson);
+	
+	for (var row in plateModel["rows"]) {
+		for (var column in plateModel["rows"][row]["columns"]) {
+		
+			var newContents = plateModel["rows"][row]["columns"][column]["wellGroupName"];
+
+			for (var catKey in plateModel["rows"][row]["columns"][column]["categories"]) {
+				for (var labKey in plateModel["rows"][row]["columns"][column]["categories"][catKey]) {
+					var color = plateModel["rows"][row]["columns"][column]["categories"][catKey][labKey];
+					newContents += "," + color;
+					
+					// cat legend part !! --> only needed for assignlabels page ??
+					// update catLegend color
+					if (catLegend[catKey] == null) {
+						catLegend[catKey] = {};
+					}
+
+					if (catLegend[catKey][labKey] == null) {
+						catLegend[catKey][labKey] = {};
+						catLegend[catKey][labKey]['color'] = color;
+					} else {
+						catLegend[catKey][labKey]['color'] = color;
+						// category and label already exist, just changing color,
+						// in this case cells which already have this label need their color updated also!!
+						updateCellColors(catKey, labKey, color);
+					}
+					
+					// update color legend cell reverse lookup
+					if (catLegend[catKey][labKey]["cellref"] == null) {
+						catLegend[catKey][labKey]["cellref"] = [];
+						catLegend[catKey][labKey]["cellref"].push(row + "-" + column);
+					} else {
+						if (catLegend[catKey][labKey]["cellref"].indexOf(row + "-" + column) == -1) {
+							catLegend[catKey][labKey]["cellref"].push(row + "-" + column);
+						} else {
+							console.log("already there");
+						}
+					}
+				}
+			}
+			
+			grid.updateCellContents(row, column, newContents);
+		}
+	}
+	
+	updateCategoryList();
 }
 
 /**
@@ -115,7 +169,7 @@ function removeAllHighlightedCells(){
 function createGrid(){
 	// construct the Grid object with the id of the html container element
 	// where it should be placed (probably a div) as an argument
-	grid  = new Grid("myGrid");
+	grid = new Grid("myGrid");
 
 	// set the data to be displayed which must be in 2D array form
 	data = createBlankData();
@@ -447,6 +501,9 @@ function addNewLabel() {
 	// output current object model to console
 	console.log("plateModel:" + JSON.stringify(plateModel));
 	console.log("catLegend:" + JSON.stringify(catLegend));
+	
+	var jsonplate = translateModelToOutputJson(plateModel);
+	console.log("jsonplate:" + JSON.stringify(jsonplate));
 }
 
 
@@ -478,14 +535,73 @@ function addEvent(elementId, eventType, handlerFunction) {
 	}
 } // end of function addEvent
 
+// ajax save object call
+function saveConfigToServer(){
+	var plateJson = translateModelToOutputJson(plateModel);
+	console.log(JSON.stringify(plateJson));
+   
+	var jqxhr = $.ajax({		// need to update to save plate instead of template
+		url: hostname + "/plateTemplate/save",
+		type: "POST",
+		data: JSON.stringify(plateJson),
+		processData: false,
+		contentType: "application/json; charset=UTF-8"
+	}).done(function() {
+		console.log("success");
+	}).fail(function() {
+		console.log("error");
+	}).always(function() {
+		console.log("complete");
+	});
+   
+	// Set another completion function for the request above
+	jqxhr.always(function(resData) {
+		console.log( "second complete" );
+		console.log("result=" + JSON.stringify(resData));
+	});
+}
+
+//ajax save object call
+function fetchTemplateData(tId){
+	
+	var jqxhr = $.ajax({		// need to update to save plate instead of template
+		url: hostname + "/plateTemplate/getPlate/" + tId,
+		type: "POST",
+		data: null,
+		processData: false,
+		contentType: "application/json; charset=UTF-8"
+	}).done(function() {
+		console.log("success");
+	}).fail(function() {
+		console.log("error");
+	}).always(function() {
+		console.log("complete");
+	});
+   
+	// Set another completion function for the request above
+	jqxhr.always(function(resData) {
+		console.log( "second complete" );
+		console.log("templateJson=" + JSON.stringify(resData));
+		loadJsonData(resData);
+	});
+}
+
 
 /**
  * This function handles the window load event. It initializes and fills the
  * grid with blank data and sets up the event handlers on the
  */
 function init(){
-	createGrid();
-	loadRandomData();
+	createGrid();		// maybe need template size before creating grid !!
+	
+	//var testInputJson = {"plate":{"wells":[{"row":"2","column":"2","control":null,"labels":[{"category":"c1","name":"l1","color":"#ffff00"}],"groupName":"L67"},{"row":"2","column":"3","control":null,"labels":[{"category":"c1","name":"l2","color":"#4780b8"}],"groupName":"L5"},{"row":"3","column":"2","control":null,"labels":[{"category":"c1","name":"l1","color":"#ffff00"},{"category":"c2","name":"l3","color":"#8d7278"}],"groupName":"L51"},{"row":"3","column":"3","control":null,"labels":[{"category":"c1","name":"l2","color":"#4780b8"},{"category":"c2","name":"l3","color":"#8d7278"}],"groupName":"L17"},{"row":"4","column":"2","control":null,"labels":[{"category":"c2","name":"l3","color":"#8d7278"}],"groupName":"L2"},{"row":"4","column":"3","control":null,"labels":[{"category":"c2","name":"l3","color":"#8d7278"}],"groupName":"L47"}],"labels":[]}};
+	// fetch templateJson
+	console.log("templateId:" + window.templateId);
+	//fetchTemplateData(window.templateId);
+	fetchTemplateData(window.templateId);
+	//loadJsonData(inputJson);
+	//loadRandomData();
+	
 	addEvent("addNewLabel", "click", addNewLabel);
 	addEvent("cancelNewLabel", "click", cancelNewLabel);
 	addEvent("clearLastSelection", "click", removeHighlightedArea);
@@ -494,6 +610,7 @@ function init(){
 	addEvent("cancelDoseStep", "click", cancelDoseStep);
 	addEvent("clearLastSelectionD", "click", removeHighlightedArea);	// duplication !!
 	addEvent("clearAllSelectionD", "click", removeAllHighlightedCells);	// duplication !!
+	addEvent("savePlate", "click", saveConfigToServer);
 
 	// initially disable selection of grid cells
 	disableGridSelection();
@@ -503,8 +620,11 @@ window.onload = init;
 
 //data format translation
 function translateModelToOutputJson(pModel) {
-	var plate = {};
+	var plateJson = {};
+	var plate = {}
+	//plate["name"] = document.getElementById("templateName").value;
 	plate["wells"] = [];
+	plate["labels"] = [];		// plate level labels, should set these if available already !!!
 	for (var row in pModel["rows"]) {
 		for (var column in pModel["rows"][row]["columns"]) {
 			var well = {};
@@ -526,19 +646,21 @@ function translateModelToOutputJson(pModel) {
 			plate["wells"].push(well);
 		}
 	}
-	return plate;
+	plateJson["plate"] = plate;
+	return plateJson;
 }
 
 // data format translation
 function translateInputJsonToModel(plateJson) {
 	var pModel = {};
 	pModel["rows"] = {};
+	var plate = plateJson["plate"];
 	
-	for (var i=0; i < plateJson["wells"].length; i++) {
-		var row = plateJson["wells"][i]["row"];
-		var column = plateJson["wells"][i]["column"];
-		var groupName = plateJson["wells"][i]["groupName"];
-		var labels = plateJson["wells"][i]["labels"];
+	for (var i=0; i < plate["wells"].length; i++) {
+		var row = plate["wells"][i]["row"];
+		var column = plate["wells"][i]["column"];
+		var groupName = plate["wells"][i]["groupName"];
+		var labels = plate["wells"][i]["labels"];
 		
 		if (pModel["rows"][row] == null) {
 			pModel["rows"][row] = {};
