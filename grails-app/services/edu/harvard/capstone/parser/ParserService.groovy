@@ -12,4 +12,13 @@ class ParserService {
     	equipmentInstance.save()
     	equipmentInstance
     }
+
+    def updateEquipment(Equipment equipmentInstance, String name, String machineName, String description, String data) {
+    	equipmentInstance.name = name
+    	equipmentInstance.machineName = machineName
+    	equipmentInstance.description = description
+    	equipmentInstance.config = data
+    	equipmentInstance.save()
+    	equipmentInstance
+    }    
 }

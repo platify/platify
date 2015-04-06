@@ -1,5 +1,6 @@
 package edu.harvard.capstone.parser
 
+import edu.harvard.capstone.result.Result
 class Equipment {
 
 	String name
@@ -19,5 +20,10 @@ class Equipment {
 	static mapping = {
 		description type: 'text'
 		config type: 'text'
+	}
+
+
+	Boolean canUpdate(){
+		!Result.findAllByEquipment(this)
 	}
 }
