@@ -99,7 +99,7 @@ function handleExaminerLoad(examiner){
     setDelimiter(examiner.delimiter);
     grid.setData(examiner.matrix);
     grid.fillUpGrid();
-    grid.registerSelectedCellCallBack(handleSelectedCells);
+    grid.registerSelectedCellCallBack(handleSelectedCells);  // maybe move to init function
 }
 
 function applyFeatures(){
@@ -187,6 +187,18 @@ function deleteFeature(){
     }
 }
 
+function handleNewFeature(){
+    clearFeatureValues();
+    removeAllHighlighting();
+    // highlight plates if already specified
+    if (parsingConfig && parsingConfig.plate && examiner && examiner.rowsSize){
+        plates = parsingConfig.findPlates(1, examiner.rowsSize, grid);
+        plateHighlightKeys = plateHighlightKeys.concat(
+            parsingConfig.highlightAllPlates(plates, colorPicker, grid)
+        );
+    }
+}
+
 function reloadFeatureSelector(){
     var featureSelectElement = document.getElementById("featureList");
 
@@ -250,11 +262,25 @@ function setFeatureSelect(featureName){
 
     reloadLabelSelector(featureName);
 
-    // highlight the feature
     removeAllHighlighting();
-    var plates = parsingConfig.findPlates(1, examiner.rowsSize, grid);
-    var colorKey = parsingConfig.highlightFeature(featureName, plates, colorPicker, grid);
-    highlightKeys.push(colorKey);
+
+
+    if (parsingConfig && parsingConfig.plate && examiner && examiner.rowsSize){
+        var plates = parsingConfig.findPlates(1, examiner.rowsSize, grid);
+
+        // highlight plates
+        plateHighlightKeys = plateHighlightKeys.concat(
+            parsingConfig.highlightAllPlates(plates, colorPicker, grid)
+        );
+
+        // highlight the feature
+        var colorKey = parsingConfig.highlightFeature(featureName, plates, colorPicker, grid);
+        highlightKeys.push(colorKey);
+    }
+
+
+
+
 }
 
 function reloadLabelSelector(featureName){
@@ -293,7 +319,7 @@ function callBckFadeOut() {
   setTimeout(function() {
     $( "#userMsgPanel:visible" ).removeClass().fadeOut();
   }, 5000 );
-};
+}
 
 
 // TODO add the URI for the server call as a parameter
@@ -454,8 +480,15 @@ function selectCellsFeatures(startRow, startCol, endRow, endCol){
     // remove previous highlighting
     removeAllHighlighting();
 
+    // highlight plates if already specified
+    if (parsingConfig && parsingConfig.plate && examiner && examiner.rowsSize){
+        plates = parsingConfig.findPlates(1, examiner.rowsSize, grid);
+        plateHighlightKeys = plateHighlightKeys.concat(
+            parsingConfig.highlightAllPlates(plates, colorPicker, grid)
+        );
+    }
 
-    // highlight those cells with the current color
+    // highlight selected cells with the current color
     var coordinatesToHighlight = [];
     for (var i=startRow; i<=endRow; i++){
         for (var j=startCol; j<=endCol; j++){
@@ -520,7 +553,7 @@ function handleTabChange(event, ui){
             return;
         }
     } else if (oldTab === FEATURES){
-
+        clearFeatureValues();
     }
 
 
@@ -530,7 +563,8 @@ function handleTabChange(event, ui){
     } else if (newTab === PLATES){
         selectCells = selectCellsPlates;
 
-        if (parsingConfig.plate){
+        // highlight plates if already specified
+        if (parsingConfig && parsingConfig.plate && examiner && examiner.rowsSize){
             plates = parsingConfig.findPlates(1, examiner.rowsSize, grid);
             plateHighlightKeys = plateHighlightKeys.concat(
                 parsingConfig.highlightAllPlates(plates, colorPicker, grid)
@@ -538,6 +572,14 @@ function handleTabChange(event, ui){
         }
     } else if (newTab === FEATURES){
         selectCells = selectCellsFeatures;
+
+        // highlight plates if already specified
+        if (parsingConfig && parsingConfig.plate && examiner && examiner.rowsSize){
+            plates = parsingConfig.findPlates(1, examiner.rowsSize, grid);
+            plateHighlightKeys = plateHighlightKeys.concat(
+                parsingConfig.highlightAllPlates(plates, colorPicker, grid)
+            );
+        }
     }
 
 }
@@ -662,7 +704,7 @@ function init(){
     addEvent("applyFeatures", "click", applyFeatures);
     addEvent("saveConfigToServer", "click", saveConfigToServer);
     addEvent("featureList", "change", handleFeatureSelect);
-    addEvent("newFeature", "click", clearFeatureValues);
+    addEvent("newFeature", "click", handleNewFeature);
     addEvent("deleteFeature", "click", deleteFeature);
 
     if (typeof equipment != "undefined"){
