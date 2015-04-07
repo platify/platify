@@ -154,7 +154,7 @@
                     <div>
                         <div>
                             <label for="experiment">experiment</label>
-                            <input type="text" id="experiment"/>
+                            <select id="experiment" name="experiment"></select>
                         </div>
                         <label for="plateList">
                             Plate List
@@ -197,7 +197,7 @@
                         </p>
                         <div>
                             <label for="plateID">plate identifier</label>
-                            <input type="text" id="plateID"/>
+                            <select id="plateID" name="plateID"></select>
                         </div>
                         <div>
                             <button id="setPlateID">set plate id</button>
@@ -229,6 +229,7 @@
         </g:javascript> 
     </g:else>
 
+<asset:javascript src="jquery-1.11.2.min.js"/>
 	<asset:javascript src="jquery-ui.js"/>
 	<asset:javascript src="jquery.event.drag-2.2.js"/>
 	<asset:javascript src="grid/slick.core.js"/>
@@ -239,6 +240,7 @@
     <asset:javascript src="grid/slick.cellcopymanager.js"/>
     <asset:javascript src="grid/slick.cellselectionmodel.js"/>
     <asset:javascript src="grid/slick.editors.js"/>
+    <asset:javascript src="selectize.js"/>
     <asset:javascript src="grid/Grid.js"/>
     <asset:javascript src="parser/FileExaminer.js"/>
     <asset:javascript src="parser/ColorPicker.js"/>

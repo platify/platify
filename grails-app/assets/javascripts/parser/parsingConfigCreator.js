@@ -27,6 +27,10 @@ var importData;
 var selectCells;  // a reference to the function to be used for handling cell selection,
                   // set by handleTabChange function
 
+// selectize elements
+var experimentIDSelectize;
+var plateIDSelectize;
+
 var colorPointer = 0;
 var colorPicker = new ColorPicker();
 
@@ -551,9 +555,7 @@ function handleTabChange(event, ui){
             return;
         }
 
-        if (!parsingConfig){
-            createParsingConfig();
-        }
+        createParsingConfig();
     } else if (oldTab === PLATES){
         if (!parsingConfig || !parsingConfig.plate){
             //alert("You must specify a plate to leave the plates tab");
@@ -738,7 +740,19 @@ function handleByManualEntry() {
     byManuelEntryDiv.style.display = "block";
 }
 
+function handleSetPlateID(){
+    var plateID = plateIDSelectize.getValue();
+    var plateListElement = document.getElementById("plateList");
+    var plateIndex = plateListElement.options[plateListElement.selectedIndex].value;
+
+    importData.plates[plateIndex].plateID = plateID;
+
+    reloadPlatesList();
+}
+
 function sendImportDataToServer(){
+    importData.experimentID = experimentIDSelectize.getValue();
+
     console.log(importData);
 }
 
@@ -818,6 +832,54 @@ function init(){
         beforeActivate: handleTabChange
     });
 
+    var $select1 = $("#experiment").selectize({
+        options: [
+            {text: "experiment1", value: 1},
+            {text: "experiment2", value: 2},
+            {text: "experiment3", value: 3},
+            {text: "experiment4", value: 4},
+            {text: "experiment5", value: 5},
+            {text: "experiment6", value: 6},
+            {text: "experiment7", value: 7}
+        ],
+        create: true
+    });
+
+    experimentIDSelectize = $select1[0].selectize;
+
+    var $select2 = $("#plateID").selectize({
+        options:[
+           {text: "A", value: "A"},
+           {text: "B", value: "B"},
+           {text: "C", value: "C"},
+           {text: "D", value: "D"},
+           {text: "E", value: "E"},
+           {text: "F", value: "F"},
+           {text: "G", value: "G"},
+           {text: "H", value: "H"},
+           {text: "I", value: "I"},
+           {text: "J", value: "J"},
+           {text: "K", value: "K"},
+           {text: "L", value: "L"},
+           {text: "M", value: "M"},
+           {text: "N", value: "N"},
+           {text: "O", value: "O"},
+           {text: "P", value: "P"},
+           {text: "Q", value: "Q"},
+           {text: "R", value: "R"},
+           {text: "S", value: "S"},
+           {text: "T", value: "T"},
+           {text: "U", value: "U"},
+           {text: "V", value: "V"},
+           {text: "W", value: "W"},
+           {text: "X", value: "X"},
+        ],
+        create: true
+
+    });
+
+    plateIDSelectize = $select2[0].selectize;
+
     selectCells = selectCellsParsing;
 
     examiner.registerAsLoadListener(handleExaminerLoad);
@@ -841,6 +903,7 @@ function init(){
     addEvent("plateList", "change", handlePlateSelect);
     addEvent("plateLevelFeatureList", "change", handlePlateLevelFeatureSelect);
     addEvent("sendImportDataToServer", "click", sendImportDataToServer);
+    addEvent("setPlateID", "click", handleSetPlateID);
 
     if (typeof equipment != "undefined"){
     	console.log("INIT " + equipment);

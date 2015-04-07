@@ -11,6 +11,7 @@
     <asset:stylesheet href="grid/slick.grid.css"/>
     <asset:stylesheet href="grid/slick-default-theme.css"/>
     <asset:stylesheet href="grid/Grid.css"/>
+    <asset:stylesheet href="selectize.css"/>
 
 </head>
 <body class="container">
