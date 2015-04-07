@@ -31,9 +31,17 @@
 				</div> <!-- Left Column END -->
 				<!-- Right Column -->
 				<div class="col-sm-10 content-body" style="padding-right: 30px">
-					<h4>Add New plate to Experiment:</h4>
-					<g:link id="${experimentalPlateSetInstance.id}" action="selectTemplate">Select Existing Template</g:link>
-					<g:link id="${experimentalPlateSetInstance.id}" controller="plateTemplate" action="create">Create New Template</g:link>
+					<h2>Selected Experiment:</h2>
+					<p> Experiment ID: ${experimentalPlateSetInstance.id}</p>
+					<p> Experiment Name: ${experimentalPlateSetInstance.name}</p>
+					<p> Experiment Description: ${experimentalPlateSetInstance.description}</p>
+					<p> Experiment Owner: ${experimentalPlateSetInstance.owner}</p>
+					
+					<p> Experiment Plates: !! List of plates for this Experiment !!</p>
+				
+					<h4>Add Plate to Experiment:</h4>
+					<g:link id="${experimentalPlateSetInstance.id}" action="selectTemplate" class="btn btn-info">Select Existing Template</g:link>
+					<g:link id="${experimentalPlateSetInstance.id}" controller="plateTemplate" action="create" class="btn btn-info">Create New Template</g:link>
 				</div> <!-- Right Column END -->	
 			</div>
 		</div>

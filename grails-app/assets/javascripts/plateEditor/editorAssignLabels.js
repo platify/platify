@@ -1,7 +1,7 @@
 // constants
 var DIMENSION = 100;
 var CELL_HEIGHT = 35;
-var CELL_WIDTH = 90;
+var CELL_WIDTH = 75;
 var data;
 var plateModel = {};
 var catLegend = {};
@@ -457,7 +457,8 @@ function createNewLabel(cat, label, color, applyToCells) {
 		
 		if (plateModel["rows"][row]["columns"][column]["wellGroupName"] == null) {
 			// shouldn't real be neccessary if json is loaded at init
-			plateModel["rows"][row]["columns"][column]["wellGroupName"] = data[row-1][column-1];
+			//plateModel["rows"][row]["columns"][column]["wellGroupName"] = data[row-1][column-1];
+			plateModel["rows"][row]["columns"][column]["wellGroupName"] = "-";
 		}
 		plateModel["rows"][row]["columns"][column]["categories"][cat] = {};
 		plateModel["rows"][row]["columns"][column]["categories"][cat][label] = color;
@@ -561,6 +562,14 @@ function saveConfigToServer(){
 	jqxhr.always(function(resData) {
 		console.log( "second complete" );
 		console.log("result=" + JSON.stringify(resData));
+		
+		if (resData["plateTemplate"] !=null &&  resData["plateTemplate"]["id"] != null) {
+			plateModel["templateID"] = resData["plateTemplate"]["id"];
+			// use less hacky method !!
+			window.location.href = hostname + "/experimentalPlateSet/showactions/1"; // need to add correct experimentID !!!
+		} else {
+			alert("An error while saving the template: " + storedTemplate);
+		}
 	});
 }
 
@@ -625,7 +634,8 @@ window.onload = init;
 function translateModelToOutputJson(pModel) {
 	var plateJson = {};
 	var plate = {}
-	//plate["name"] = document.getElementById("templateName").value;
+	plate["name"] = pModel["name"];
+	plate["plateID"] = document.getElementById("barcode").value;
 	plate["wells"] = [];
 	plate["labels"] = [];		// plate level labels, should set these if available already !!!
 	for (var row in pModel["rows"]) {
@@ -658,6 +668,8 @@ function translateInputJsonToModel(plateJson) {
 	var pModel = {};
 	pModel["rows"] = {};
 	var plate = plateJson["plate"];
+	
+	pModel["name"] = plate["name"];			// should also copy expId and plateId at this point !!
 	
 	for (var i=0; i < plate["wells"].length; i++) {
 		var row = plate["wells"][i]["row"];

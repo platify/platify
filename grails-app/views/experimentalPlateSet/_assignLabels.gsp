@@ -62,7 +62,7 @@
 <div id="editLabelDialog" title="New Label Name">
 	<input type="text" id="editNewLabelValue"/>
 </div>
-
+<div>Plate Barcode:<input type="text" id="barcode"/></div>
 <button id="savePlate">Save Plate</button>
 <g:link controller="experimentalPlateSet" action="create" id="1">Copy Plate</g:link>
 

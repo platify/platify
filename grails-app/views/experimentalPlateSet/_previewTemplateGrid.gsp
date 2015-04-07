@@ -2,7 +2,7 @@
 
 
     <h2>Select Existing Template:</h2>
-	<div id="labelPanel" style="float:left;width:29%;">	
+	<div id="labelPanel" style="float:left;width:27%;">	
 		<h3>Plate Details: </h3>
 		<p>Experiment ID: ${experimentalPlateSetInstance.id}</p> 
 		<p>Plate ID: </p> <g:select id="plateSelect" name="plate.id" from="${edu.harvard.capstone.editor.PlateTemplate.list()}" optionValue="${{it.id + ' - ' + it.name}}" optionKey="id" required="" value="${plateSetInstance?.plate?.id}" class="many-to-one"/>
@@ -16,7 +16,7 @@
 		<div>Cell Range Selected:<span id="cellRange"></span></div>
 		<hr/>		
 	</div>
-	<div id="gridPanel" style="float:right; width: 70%">
+	<div id="gridPanel" style="float:right; width: 73%; padding-left: 30px">
 		<div id="myGrid" style="width:100%;height:650px;"></div>
 	</div>
 

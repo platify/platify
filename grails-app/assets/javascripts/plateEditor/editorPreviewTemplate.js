@@ -46,12 +46,26 @@ function createRandomData(){
  * Loads a json plate model and updates the grid and category legend
  */
 function loadJsonData(plateJson) {
-	
+	clearCurrentGridValues();
 	plateModel = translateInputJsonToModel(plateJson);
 	
 	for (var row in plateModel["rows"]) {
 		for (var column in plateModel["rows"][row]["columns"]) {
 			var newContents = plateModel["rows"][row]["columns"][column]["wellGroupName"];		// perhaps use return result, like random data instead !! ??
+			
+			grid.updateCellContents(row, column, newContents);
+		}
+	}
+}
+
+/**
+ * Replaces the values in the grid with blanks, for rows/columns in the current plateModel
+ */
+function clearCurrentGridValues() {
+	// for each existing value, overwrite with blank label
+	for (var row in plateModel["rows"]) {
+		for (var column in plateModel["rows"][row]["columns"]) {
+			var newContents = "-";
 			
 			grid.updateCellContents(row, column, newContents);
 		}
