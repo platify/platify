@@ -455,7 +455,10 @@ function createNewLabel(cat, label, color, applyToCells) {
 			plateModel["rows"][row]["columns"][column]["categories"] = {};
 		}
 		
-		plateModel["rows"][row]["columns"][column]["wellGroupName"] = data[row-1][column-1];
+		if (plateModel["rows"][row]["columns"][column]["wellGroupName"] == null) {
+			// shouldn't real be neccessary if json is loaded at init
+			plateModel["rows"][row]["columns"][column]["wellGroupName"] = data[row-1][column-1];
+		}
 		plateModel["rows"][row]["columns"][column]["categories"][cat] = {};
 		plateModel["rows"][row]["columns"][column]["categories"][cat][label] = color;
 		var newContents = plateModel["rows"][row]["columns"][column]["wellGroupName"];
@@ -466,7 +469,7 @@ function createNewLabel(cat, label, color, applyToCells) {
 			}
 		}
 		
-		grid.updateCellContents(row,column, newContents);
+		grid.updateCellContents(row, column, newContents);
 		
 		// update color legend cell reverse lookup
 		if (catLegend[cat][label]["cellref"] == null) {
