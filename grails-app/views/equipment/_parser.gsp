@@ -4,9 +4,14 @@
     <div class=" max-height no-overflow" id="content">
         <div class=" max-height">
 
+            <div>
+                <button id="saveConfig">save parsing configuration</button>
+                <button id="importResults">import results</button>
+            </div>
+
 			<!-- Highlight / Error -->
 			<div id="userMsgPanel" ></div>
-		
+
             <div class="col-xs-8" id="mainContent">
                 <div id="myGrid"></div>
             </div>
@@ -112,6 +117,17 @@
                                 </div>
                             </div>
                         </div>
+                        <div>
+                            <label for="valueType">Feature value type</label>
+                            <div id="valueType">
+                                <div>
+                                    <input type="radio" id="quantitative" name="valueType" value="quantitative" />quantitative<br/>
+                                </div>
+                                <div>
+                                    <input type="radio" id="qualitative" name="valueType" value="qualitative" />qualitative<br/>
+                                </div>
+                            </div>
+                        </div>
 
                         <div>
                             <label for="labelList">
@@ -133,6 +149,69 @@
 
                     </div>
                 </div>
+
+                <div id="plateIDSelection">
+                    <div>
+                        <div>
+                            <label for="experiment">experiment</label>
+                            <input type="text" id="experiment"/>
+                        </div>
+                        <label for="plateList">
+                            Plate List
+                        </label>
+
+                        <select name="plateList" id="plateList" size="5">
+                        </select>
+                    </div>
+                    <div>
+                        <label for="plateIDMatchMethod">Plate id match by</label>
+                        <div id="plateIDMatchMethod">
+                            <div>
+                                <input type="radio" id="byFeature" name="plateIDMatchMethod" value="byFeature" />plate level feature<br/>
+                            </div>
+                            <div>
+                                <input type="radio" id="byManualEntry" name="plateIDMatchMethod" value="byManualEntry" />manual entry<br/>
+                            </div>
+                        </div>
+                    </div>
+                    <br/>
+                    <br/>
+                    <div id="byFeatureMethod">
+                        <p>
+                            Select a plate level feature to serve as the plate identifier
+                            for matching with the plates defined in the plate editor
+                        </p>
+                        <label for="plateLevelFeatureList">
+                            plateLevelFeatureList
+                        </label>
+
+                        <select name="plateLevelFeatureList" id="plateLevelFeatureList" size="5">
+                        </select>
+
+                    </div>
+                    <div id="byManualEntryMethod">
+                        <p>
+                            Enter a plate ID for each plate by selecting the plate in the
+                            plate list above and then entering the plate id for that plate
+                            in the field below and hitting the "set plate id" button.
+                        </p>
+                        <div>
+                            <label for="plateID">plate identifier</label>
+                            <input type="text" id="plateID"/>
+                        </div>
+                        <div>
+                            <button id="setPlateID">set plate id</button>
+                        </div>
+                    </div>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <div>
+                        <button id="returnToConfig">Go back to parsing configuration</button>
+                        <button id="sendImportDataToServer">import and save the data</button>
+                    </div>
+                </div>
+
             </div>
 
         </div>
