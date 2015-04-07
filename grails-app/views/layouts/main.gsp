@@ -41,7 +41,7 @@
 			        <span class="icon-bar"></span>
 			        <span class="icon-bar"></span>
 			      </button>
-			      <a class="navbar-brand" href="#">SurNorte</a>
+			      <a class="navbar-brand" href="${createLink(uri: '/')}">SurNorte</a>
 			    </div>
 
 			    <!-- Collect the nav links, forms, and other content for toggling -->
