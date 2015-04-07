@@ -22,6 +22,7 @@
 
                     <div id="parsingTab">
                         <div>
+                        	<input type="text" id="parsingId" autocomplete="off"/>
                             <label for="parsingName">Parsing Name</label>
                             <input type="text" id="parsingName" autocomplete="off"/>
                         </div>

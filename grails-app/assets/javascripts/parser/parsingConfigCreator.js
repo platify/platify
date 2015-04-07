@@ -50,13 +50,16 @@ function loadParsingConfig(JSONparsingConfig){
     parsingNameElement.value = parsingConfig.name;
     machineNameElement.value = parsingConfig.machineName;
     parsingDescriptionElement.value = parsingConfig.description;
-    firstPlateCellRangeElement.value
-        = Grid.getRowLabel(parsingConfig.plate.topLeftCoords[0])
-            + parsingConfig.plate.topLeftCoords[1] + ":"
-            + Grid.getRowLabel(parsingConfig.plate.bottomRightCoords[0])
-            + parsingConfig.plate.bottomRightCoords[1];
-
-    reloadFeatureSelector();
+    
+    if (parsingConfig.plate!=null){
+	    firstPlateCellRangeElement.value
+	        = Grid.getRowLabel(parsingConfig.plate.topLeftCoords[0])
+	            + parsingConfig.plate.topLeftCoords[1] + ":"
+	            + Grid.getRowLabel(parsingConfig.plate.bottomRightCoords[0])
+	            + parsingConfig.plate.bottomRightCoords[1];
+	
+	    reloadFeatureSelector();
+    }    
 
     parseOnlyMode();
 }
@@ -327,14 +330,15 @@ function saveConfigToServer(){
     
 	createParsingConfig();
 	
+	var currentId = $('#parsingId').val();
 	var targetUrl;
 	var verb;
-	if (parsingConfig.id){
-		targetUrl = hostname+"/equipment/update/" + parsingConfig.id;
-		verb = "PUT";
-	}else{
+	if (currentId==""){
 		targetUrl = hostname+"/equipment/save"
 		verb = "POST";
+	}else{
+		targetUrl = hostname+"/equipment/update/" + parsingConfig.id;
+		verb = "PUT";
 	}
     
 	console.log(JSON.stringify(parsingConfig.getJSONString()));
@@ -348,7 +352,7 @@ function saveConfigToServer(){
     	}).done(function(resData) {
     		console.log( JSON.stringify(resData) );
     		if (!resData.error){
-    			parsingConfig.id = resData.equipment.id;
+    			$('#parsingId').val(resData.equipment.id);
     			console.log("parsingConfig.id " + parsingConfig.id);
     			showUserMsg("highlight","Parse configuration stored successfully " );
     		}else{
@@ -604,19 +608,21 @@ function clearSelectedCells(){
 }
 
 function createParsingConfig(){
-    var name = document.getElementById("parsingName").value;
-    var machine = document.getElementById("machineName").value;
-    var description = document.getElementById("parsingDescription").value;
+	var parseId = $('#parsingId').val();
+    var parseName = $('#parsingName').val(); // document.getElementById("parsingName").value;
+    var machine = $('#machineName').val(); // document.getElementById("machineName").value;
+    var description = $('#parsingDescription').val(); //document.getElementById("parsingDescription").value;
 
 
     if (parsingConfig){
-        parsingConfig.name = name;
+    	parsingConfig.id = parseId;
+        parsingConfig.name = parseName;
         parsingConfig.machineName = machine;
         parsingConfig.description = description;
         parsingConfig.delimiter = examiner.delimiter;
     } else {
-        parsingConfig = new ParsingConfig(null,
-            name,
+        parsingConfig = new ParsingConfig(
+        	parseName,
             machine,
             description,
             examiner.delimiter
@@ -711,7 +717,6 @@ function init(){
     addEvent("applyFirstPlate", "click", makePlate);
     addEvent("getFile", "click", handleGetFile);
     addEvent("delimiterList", "change", changeDelimiter);
-    //addEvent("saveConfig", "click", createParsingConfig);
     addEvent("saveFeature", "click", makeFeature);
     addEvent("applyFeatures", "click", applyFeatures);
     addEvent("saveConfigToServer", "click", saveConfigToServer);
@@ -720,7 +725,6 @@ function init(){
     addEvent("deleteFeature", "click", deleteFeature);
 
     if (typeof equipment != "undefined"){
-    	console.log("INIT " + equipment);
         loadParsingConfig(equipment);
     }
 }

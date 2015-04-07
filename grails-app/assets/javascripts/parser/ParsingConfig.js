@@ -31,13 +31,12 @@ var MAX_NUM_INVARIATES = 5;
  *                  format.
  * @constructor
  */
-function ParsingConfig(id,
-					   name,
+function ParsingConfig(name,
                        machineName,
                        description,
                        delimiter){
-	this.id = id;
-    this.name = name;
+	this.id;
+	this.name = name;
     this.machineName = machineName;
     this.description = description;
     this.delimiter = delimiter;
@@ -548,7 +547,6 @@ ParsingConfig.loadParsingConfig = function(JSONParsingConfig){
     var rawParsingConfig = JSON.parse(JSONParsingConfig);
 
     var config = new ParsingConfig(
-    	rawParsingConfig.id,
     	rawParsingConfig.name,
         rawParsingConfig.machineName,
         rawParsingConfig.description,
