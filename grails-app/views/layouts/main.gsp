@@ -64,7 +64,7 @@
 									<li><a href="#">Parse</a></li>
 								</ul>
 							</li>
-							<li class="results"><a href="#">Results</a></li>
+							<li class="result"><g:link controller="result" action="index">Results</g:link></li>
 							<sec:ifAnyGranted roles='ROLE_ADMIN, ROLE_SUPER_ADMIN'>
 								<li class="admin" class="dropdown">
 								  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Admin <span class="caret"></span></a>
