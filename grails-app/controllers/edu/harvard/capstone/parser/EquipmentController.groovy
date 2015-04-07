@@ -51,12 +51,15 @@ class EquipmentController {
         def equipmentInstance = Equipment.get(equipment)
         def experimentInstance = ExperimentalPlateSet.get(experiment)
 
+		System.out.println("equipmentInstance " + equipmentInstance.getMachineName() + " === " + experimentInstance + " > " + experimentInstance);
+		
         if (!equipmentInstance || !experimentInstance) {
             notFound()
             return
         }
 
         respond equipmentInstance, model:[equipmentInstance: equipmentInstance, experimentInstance: experimentInstance]
+		
     }
 
     
@@ -112,16 +115,16 @@ class EquipmentController {
             return
         }
 
-        def data = request.JSON        
-        
-        if (!data) {
-            render(contentType: "application/json") {
-                [error: "No data received"]
-            }
-            return
-        }
+//        def data = request.JSON        
+//        
+//        if (!data) {
+//            render(contentType: "application/json") {
+//                [error: "No data received"]
+//            }
+//            return
+//        }
 
-        equipmentInstance = parserService.updateEquipment(equipmentInstance, data.name, data.machineName, data.description, data.toString())
+        equipmentInstance = parserService.updateEquipment(equipmentInstance, equipmentInstance.name, equipmentInstance.machineName, equipmentInstance.description, equipmentInstance.toString())
 
         if (equipmentInstance.hasErrors()) {
             render(contentType: "application/json") {

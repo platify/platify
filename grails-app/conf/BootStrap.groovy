@@ -48,6 +48,7 @@ class BootStrap {
             //def config = '''{"name": "abc","machineName": "defg","description": "test6","exampleFileName": "envisionMultiPlate copy.txt","exampleFileContents": [],"delimiter": "tab","plate": {"featureLabel": "plate","description": "","topLeftCoords": [1,1],"bottomRightCoords": [21,26],"topLeftValue": "Barcode Assay: ","bottomRightValue": "1.184\r","relativeToLeftX": 1,"relativeToLeftY": 1,"color": 0,"typeOfFeature": "plate"},"experimentFeatures": [],"features": [{"featureLabel": "data plate","description": "","topLeftCoords": [6,3],"bottomRightCoords": [21,26],"topLeftValue": "1.2475","bottomRightValue": "1.184\r","relativeToLeftX": 2,"relativeToLeftY": 5,"color": 1,"typeOfFeature": "data","importData": true},{"featureLabel": "temperature","description": "","topLeftCoords": [6,2],"bottomRightCoords": [6,2],"topLeftValue": "22.7","bottomRightValue": "22.7","relativeToLeftX": 1,"relativeToLeftY": 5,"color": 2,"typeOfFeature": "unique","importData": true}],"multiplePlatesPerFile": true,"multipleValuesPerWell": false,"gridFormat": true}'''
             def config = '''
                 {
+				  "id":"2",	
                   "name": "abc",
                   "machineName": "defg",
                   "description": "test6",

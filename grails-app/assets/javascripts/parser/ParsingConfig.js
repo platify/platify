@@ -31,10 +31,12 @@ var MAX_NUM_INVARIATES = 5;
  *                  format.
  * @constructor
  */
-function ParsingConfig(name,
+function ParsingConfig(id,
+					   name,
                        machineName,
                        description,
                        delimiter){
+	this.id = id;
     this.name = name;
     this.machineName = machineName;
     this.description = description;
@@ -529,6 +531,7 @@ function ParsingConfig(name,
     this.getJSONString = function(){
         var JSONObject = {};
 
+        JSONObject["id"] = this.id;
         JSONObject["name"] = this.name;
         JSONObject["machineName"] = this.machineName;
         JSONObject["description"] = this.description;
@@ -544,7 +547,9 @@ function ParsingConfig(name,
 ParsingConfig.loadParsingConfig = function(JSONParsingConfig){
     var rawParsingConfig = JSON.parse(JSONParsingConfig);
 
-    var config = new ParsingConfig(rawParsingConfig.name,
+    var config = new ParsingConfig(
+    	rawParsingConfig.id,
+    	rawParsingConfig.name,
         rawParsingConfig.machineName,
         rawParsingConfig.description,
         rawParsingConfig.delimiter);

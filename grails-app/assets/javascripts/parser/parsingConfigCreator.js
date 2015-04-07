@@ -327,24 +327,36 @@ function saveConfigToServer(){
     
 	createParsingConfig();
 	
-	console.log(JSON.stringify(parsingConfig.getJSONString()));
+	var targetUrl;
+	var verb;
+	if (parsingConfig.id){
+		targetUrl = hostname+"/equipment/update/" + parsingConfig.id;
+		verb = "PUT";
+	}else{
+		targetUrl = hostname+"/equipment/save"
+		verb = "POST";
+	}
     
+	console.log(JSON.stringify(parsingConfig.getJSONString()));
+	
     var jqxhr = $.ajax({
-        url: hostname+"/equipment/save",
-        type: "POST",
+        url: targetUrl,
+        type: verb,
         data: JSON.stringify(parsingConfig.getJSONString()),
-        		processData: false,
+        processData: false,
         contentType: "application/json; charset=UTF-8"
     	}).done(function(resData) {
     		console.log( JSON.stringify(resData) );
     		if (!resData.error){
-    			showUserMsg("highlight","Parse configuration saved successfully");
+    			parsingConfig.id = resData.equipment.id;
+    			console.log("parsingConfig.id " + parsingConfig.id);
+    			showUserMsg("highlight","Parse configuration stored successfully " );
     		}else{
-    			showUserMsg("error","Error. when trying to save configuration => " + JSON.stringify(resData) );
+    			showUserMsg("error","Error. when trying to store configuration => " + JSON.stringify(resData) );
     		}	
 		}).fail(function(resData) {
 			console.log( "error "  + JSON.stringify(resData));
-			showUserMsg("error","Error. when trying to save configuration => " + JSON.stringify(resData) );
+			showUserMsg("error","Error. when trying to store configuration => " + JSON.stringify(resData) );
 		});
     
 }
@@ -603,7 +615,7 @@ function createParsingConfig(){
         parsingConfig.description = description;
         parsingConfig.delimiter = examiner.delimiter;
     } else {
-        parsingConfig = new ParsingConfig(
+        parsingConfig = new ParsingConfig(null,
             name,
             machine,
             description,
@@ -708,6 +720,7 @@ function init(){
     addEvent("deleteFeature", "click", deleteFeature);
 
     if (typeof equipment != "undefined"){
+    	console.log("INIT " + equipment);
         loadParsingConfig(equipment);
     }
 }
