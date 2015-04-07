@@ -23,8 +23,13 @@ var activeTab = 0;
 var examiner;
 var grid;
 var parsingConfig;
+var importData;
 var selectCells;  // a reference to the function to be used for handling cell selection,
                   // set by handleTabChange function
+
+// selectize elements
+var experimentIDSelectize;
+var plateIDSelectize;
 
 var colorPointer = 0;
 var colorPicker = new ColorPicker();
@@ -108,7 +113,8 @@ function handleExaminerLoad(examiner){
 function applyFeatures(){
     clearFeatureValues();
     removeAllHighlighting();
-    var colorKeys = parsingConfig.applyFeatures(1, examiner.rowsSize, grid);
+
+    var colorKeys = parsingConfig.highlightPlatesAndFeatures(colorPicker, grid);
     highlightKeys = highlightKeys.concat(colorKeys);
 }
 
@@ -144,12 +150,11 @@ function removeAllInvariateHighlightKeys(){
 }
 
 function makePlate(){
-    parsingConfig.addPlate(grid);
+    parsingConfig.addPlate(grid, examiner);
 
     // highlight the plates on the grid
-    var plates = parsingConfig.findPlates(1, examiner.rowsSize, grid);
     plateHighlightKeys = plateHighlightKeys.concat(
-        parsingConfig.highlightAllPlates(plates, colorPicker, grid)
+        parsingConfig.highlightAllPlates(colorPicker, grid)
     );
 }
 
@@ -195,9 +200,8 @@ function handleNewFeature(){
     removeAllHighlighting();
     // highlight plates if already specified
     if (parsingConfig && parsingConfig.plate && examiner && examiner.rowsSize){
-        plates = parsingConfig.findPlates(1, examiner.rowsSize, grid);
         plateHighlightKeys = plateHighlightKeys.concat(
-            parsingConfig.highlightAllPlates(plates, colorPicker, grid)
+            parsingConfig.highlightAllPlates(colorPicker, grid)
         );
     }
 }
@@ -269,15 +273,14 @@ function setFeatureSelect(featureName){
 
 
     if (parsingConfig && parsingConfig.plate && examiner && examiner.rowsSize){
-        var plates = parsingConfig.findPlates(1, examiner.rowsSize, grid);
 
         // highlight plates
         plateHighlightKeys = plateHighlightKeys.concat(
-            parsingConfig.highlightAllPlates(plates, colorPicker, grid)
+            parsingConfig.highlightAllPlates(colorPicker, grid)
         );
 
         // highlight the feature
-        var colorKey = parsingConfig.highlightFeature(featureName, plates, colorPicker, grid);
+        var colorKey = parsingConfig.highlightFeature(featureName, colorPicker, grid);
         highlightKeys.push(colorKey);
     }
 
@@ -288,13 +291,12 @@ function setFeatureSelect(featureName){
 
 function reloadLabelSelector(featureName){
     var labelSelectElement = document.getElementById("labelList");
-    var plates = parsingConfig.findPlates(1, examiner.rowsSize, grid);
 
     // clear the label selector
     labelSelectElement.innerHTML = "";
     labelSelectElement.scrollTop = 0;
     // load the label selector
-    var descriptors = parsingConfig.getFeatureValuesDescriptors(featureName, plates,grid);
+    var descriptors = parsingConfig.getFeatureValuesDescriptors(featureName, grid);
 
     for (var i=0; i<descriptors.length; i++){
         var value = descriptors[i].cell;
@@ -498,9 +500,8 @@ function selectCellsFeatures(startRow, startCol, endRow, endCol){
 
     // highlight plates if already specified
     if (parsingConfig && parsingConfig.plate && examiner && examiner.rowsSize){
-        plates = parsingConfig.findPlates(1, examiner.rowsSize, grid);
         plateHighlightKeys = plateHighlightKeys.concat(
-            parsingConfig.highlightAllPlates(plates, colorPicker, grid)
+            parsingConfig.highlightAllPlates(colorPicker, grid)
         );
     }
 
@@ -558,9 +559,7 @@ function handleTabChange(event, ui){
             return;
         }
 
-        if (!parsingConfig){
-            createParsingConfig();
-        }
+        createParsingConfig();
     } else if (oldTab === PLATES){
         if (!parsingConfig || !parsingConfig.plate){
             //alert("You must specify a plate to leave the plates tab");
@@ -581,9 +580,8 @@ function handleTabChange(event, ui){
 
         // highlight plates if already specified
         if (parsingConfig && parsingConfig.plate && examiner && examiner.rowsSize){
-            plates = parsingConfig.findPlates(1, examiner.rowsSize, grid);
             plateHighlightKeys = plateHighlightKeys.concat(
-                parsingConfig.highlightAllPlates(plates, colorPicker, grid)
+                parsingConfig.highlightAllPlates(colorPicker, grid)
             );
         }
     } else if (newTab === FEATURES){
@@ -591,9 +589,8 @@ function handleTabChange(event, ui){
 
         // highlight plates if already specified
         if (parsingConfig && parsingConfig.plate && examiner && examiner.rowsSize){
-            plates = parsingConfig.findPlates(1, examiner.rowsSize, grid);
             plateHighlightKeys = plateHighlightKeys.concat(
-                parsingConfig.highlightAllPlates(plates, colorPicker, grid)
+                parsingConfig.highlightAllPlates(colorPicker, grid)
             );
         }
     }
@@ -630,6 +627,139 @@ function createParsingConfig(){
     }
 
     console.log(parsingConfig);
+}
+
+function reloadPlatesList(){
+    var plateListElement = document.getElementById("plateList");
+
+    // clear feature selector
+    plateListElement.innerHTML = "";
+
+    // load feature selector
+    for (var plateIndex = 0; plateIndex<importData.plates.length; plateIndex++){
+        var plateID = importData.plates[plateIndex].plateID;
+        var option = document.createElement("option");
+        option.setAttribute("value", plateIndex);
+        option.innerHTML = "plate " + (plateIndex + 1) + " : " + plateID;
+        plateListElement.appendChild(option);
+    }
+}
+
+function handlePlateSelect(event){
+    var target = getTargetElement(event);
+    var plateIndex = target.value;
+
+    // highlight the selected plate
+    removeAllHighlighting();
+    highlightKeys.push(parsingConfig.highlightPlate(plateIndex, colorPicker, grid));
+}
+
+function handleImportResults(){
+    // create the initial importData object
+    var plateIDs = [];
+    for (var i=0; i<parsingConfig.plates.length; i++){
+        plateIDs.push("none");
+    }
+
+    importData = parsingConfig.createImportData(plateIDs, grid);
+
+
+    // fill the plates list
+    reloadPlatesList();
+
+    // show the plate ID selection div and hide the parsing config creation tabs div
+    var tabsDiv = document.getElementById("tabs");
+    var plateIDSelectionDiv = document.getElementById("plateIDSelection");
+
+    tabsDiv.style.display = "none";
+    plateIDSelectionDiv.style.display = "block";
+
+    // disable cell selection
+    grid.disableCellSelection();
+}
+
+function handleReturnToConfig(){
+    var tabsDiv = document.getElementById("tabs");
+    var plateIDSelectionDiv = document.getElementById("plateIDSelection");
+
+    $( "#tabs" ).tabs({ active: PARSING });
+
+    tabsDiv.style.display = "block";
+    plateIDSelectionDiv.style.display = "none";
+
+    // enable cell selection
+    grid.enableCellSelection();
+}
+
+function handleByFeature(){
+    var byFeatureDiv = document.getElementById("byFeatureMethod");
+    var byManuelEntryDiv = document.getElementById("byManualEntryMethod");
+
+    byFeatureDiv.style.display = "block";
+    byManuelEntryDiv.style.display = "none";
+
+    reloadPlateLevelFeatureList();
+}
+
+function reloadPlateLevelFeatureList(){
+    var featureSelectElement = document.getElementById("plateLevelFeatureList");
+
+    // clear feature selector
+    featureSelectElement.innerHTML = "";
+
+    // load feature selector
+    for (var featureName in parsingConfig.features){
+        var feature = parsingConfig.features[featureName];
+
+        if (feature.typeOfFeature == PLATE_LEVEL){
+            var option = document.createElement("option");
+            option.setAttribute("value", featureName);
+            option.innerHTML = featureName;
+            featureSelectElement.appendChild(option);
+        }
+    }
+}
+
+function handlePlateLevelFeatureSelect(event){
+    var target = getTargetElement(event);
+    var featureName= target.value;
+
+    // highlight the selected feature
+    removeAllHighlighting();
+    highlightKeys.push(parsingConfig.highlightFeature(featureName,colorPicker, grid));
+
+    // fill the importDate plate IDs with that feature value
+    for (var plateIndex = 0; plateIndex<importData.plates.length; plateIndex++){
+        importData.plates[plateIndex].plateID
+            = importData.plates[plateIndex].labels[featureName];
+    }
+
+    // reload the plate list showing the new plate IDs
+    reloadPlatesList();
+}
+
+function handleByManualEntry() {
+    var byFeatureDiv = document.getElementById("byFeatureMethod");
+    var byManuelEntryDiv = document.getElementById("byManualEntryMethod");
+
+    byFeatureDiv.style.display = "none";
+    byManuelEntryDiv.style.display = "block";
+}
+
+function handleSetPlateID(){
+    var plateID = plateIDSelectize.getValue();
+    var plateListElement = document.getElementById("plateList");
+    var plateIndex = plateListElement.options[plateListElement.selectedIndex].value;
+
+    importData.plates[plateIndex].plateID = plateID;
+
+    reloadPlatesList();
+}
+
+function sendImportDataToServer(){
+    importData.experimentID = experimentIDSelectize.getValue();
+
+    console.log(importData);
 }
 
 /**
@@ -708,6 +838,54 @@ function init(){
         beforeActivate: handleTabChange
     });
 
+    var $select1 = $("#experiment").selectize({
+        options: [
+            {text: "experiment1", value: 1},
+            {text: "experiment2", value: 2},
+            {text: "experiment3", value: 3},
+            {text: "experiment4", value: 4},
+            {text: "experiment5", value: 5},
+            {text: "experiment6", value: 6},
+            {text: "experiment7", value: 7}
+        ],
+        create: true
+    });
+
+    experimentIDSelectize = $select1[0].selectize;
+
+    var $select2 = $("#plateID").selectize({
+        options:[
+           {text: "A", value: "A"},
+           {text: "B", value: "B"},
+           {text: "C", value: "C"},
+           {text: "D", value: "D"},
+           {text: "E", value: "E"},
+           {text: "F", value: "F"},
+           {text: "G", value: "G"},
+           {text: "H", value: "H"},
+           {text: "I", value: "I"},
+           {text: "J", value: "J"},
+           {text: "K", value: "K"},
+           {text: "L", value: "L"},
+           {text: "M", value: "M"},
+           {text: "N", value: "N"},
+           {text: "O", value: "O"},
+           {text: "P", value: "P"},
+           {text: "Q", value: "Q"},
+           {text: "R", value: "R"},
+           {text: "S", value: "S"},
+           {text: "T", value: "T"},
+           {text: "U", value: "U"},
+           {text: "V", value: "V"},
+           {text: "W", value: "W"},
+           {text: "X", value: "X"},
+        ],
+        create: true
+
+    });
+
+    plateIDSelectize = $select2[0].selectize;
+
     selectCells = selectCellsParsing;
 
     examiner.registerAsLoadListener(handleExaminerLoad);
@@ -723,6 +901,14 @@ function init(){
     addEvent("featureList", "change", handleFeatureSelect);
     addEvent("newFeature", "click", handleNewFeature);
     addEvent("deleteFeature", "click", deleteFeature);
+    addEvent("importResults", "click", handleImportResults);
+    addEvent("returnToConfig", "click", handleReturnToConfig);
+    addEvent("byFeature", "click", handleByFeature);
+    addEvent("byManualEntry", "click", handleByManualEntry);
+    addEvent("plateList", "change", handlePlateSelect);
+    addEvent("plateLevelFeatureList", "change", handlePlateLevelFeatureSelect);
+    addEvent("sendImportDataToServer", "click", sendImportDataToServer);
+    addEvent("setPlateID", "click", handleSetPlateID);
 
     if (typeof equipment != "undefined"){
         loadParsingConfig(equipment);

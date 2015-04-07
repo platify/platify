@@ -10,11 +10,16 @@
 	<body>
 		<div class="content-fluid">
 			<div class="row">
+				<div class="col-sm-12">
+					<ol class="breadcrumb">
+						<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
+						<li><g:link controller="experimentalPlateSet" action="index">Experiments</g:link></li>
+					</ol>						
+				</div>
 				<!-- Left Column -->
 				<div class="col-sm-2">
 					<div class="nav" role="navigation">
 						<ul class="nav nav-pills nav-stacked">
-							<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
 							<li class="active"><g:link class="create" action="index">List</g:link></li>
 							<li><g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link></li>
 						</ul>			

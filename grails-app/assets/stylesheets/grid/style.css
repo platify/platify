@@ -25,3 +25,16 @@
 #files {
     display: none;
 }
+
+/* initial display of these divs is set to "none" */
+#plateIDSelection {
+    display: none;
+}
+
+#byManualEntryMethod{
+    display: none;
+}
+
+#byFeatureMethod {
+    display: none;
+}

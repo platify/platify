@@ -1,10 +1,15 @@
 /**
  * Created by zacharymartin on 3/22/15.
  */
+// type of feature values
 var PLATE = "plate";
 var WELL_LEVEL = "wellLevel";
 var PLATE_LEVEL = "plateLevel";
 var EXPERIMENT_LEVEL = "experimentLevel";
+
+// type of value values
+var QUANTITATIVE = "quantitative";
+var QUALITATIVE = "qualitative";
 
 var MAX_NUM_INVARIATES = 5;
 
@@ -43,6 +48,9 @@ function ParsingConfig(name,
     this.plate = null;
     this.plateInvariates = [];  // elements stored as [relativeRow, relativeColumn, value]
     this.features = {};  // keyed on feature name
+    this.plates = [];
+
+    var _self = this;
 
 
     function BioFeature(feaLabel){
@@ -74,25 +82,29 @@ function ParsingConfig(name,
         return true;
     };
 
-    this.findPlates = function(startRow, endRow, grid){
+    function findPlates(startRow, endRow, grid){
         var plateRanges = []; // elements of form [startRow, startCol, endRow, endCol]
                               // each represents a plate on the grid
 
         var plateHeight
-            = this.plate.bottomRightCoords[0] - this.plate.topLeftCoords[0] + 1;
+            = _self.plate.bottomRightCoords[0] - _self.plate.topLeftCoords[0] + 1;
         var plateWidth
-            = this.plate.bottomRightCoords[1] - this.plate.topLeftCoords[1] + 1;
+            = _self.plate.bottomRightCoords[1] - _self.plate.topLeftCoords[1] + 1;
 
         for (var row = startRow; row<=endRow; row++){
-            if (this.isPlateStartRow(row, grid)) {
+            if (_self.isPlateStartRow(row, grid)) {
                 plateRanges.push([row,
-                                  this.plate.topLeftCoords[1],
+                                  _self.plate.topLeftCoords[1],
                                   row + plateHeight - 1,
-                                  this.plate.bottomRightCoords[1]])
+                                  _self.plate.bottomRightCoords[1]])
             }
         }
 
         return plateRanges;
+    }
+
+    this.setPlates = function(startRow, endRow, grid){
+        this.plates = findPlates(startRow, endRow, grid);
     };
 
     this.findExperimentLevelFeatureCoords = function(featureName){
@@ -103,13 +115,13 @@ function ParsingConfig(name,
         return [row, col];
     };
 
-    this.findPlateLevelFeatureCoords = function(featureName, plates){
+    this.findPlateLevelFeatureCoords = function(featureName){
         var plateFeatures = [];
         var feature = this.features[featureName];
 
-        for (var j=0; j<plates.length; j++){
-            var plateTopLeftRow = plates[j][0];
-            var plateTopLeftCol = plates[j][1];
+        for (var j=0; j<this.plates.length; j++){
+            var plateTopLeftRow = this.plates[j][0];
+            var plateTopLeftCol = this.plates[j][1];
             var row = plateTopLeftRow + feature.topLeftCoords[0] - 1;
             var col = plateTopLeftCol + feature.topLeftCoords[1] - 1;
 
@@ -119,13 +131,13 @@ function ParsingConfig(name,
         return plateFeatures;
     };
 
-    this.findWellLevelFeatureCoords = function(featureName ,plates){
+    this.findWellLevelFeatureCoords = function(featureName){
         var wellFeatures = [];
         var feature = this.features[featureName];
 
-        for (var j=0; j<plates.length; j++){
-            var plateTopLeftRow = plates[j][0];
-            var plateTopLeftCol = plates[j][1];
+        for (var j=0; j<this.plates.length; j++){
+            var plateTopLeftRow = this.plates[j][0];
+            var plateTopLeftCol = this.plates[j][1];
             var wellCounter = 0;
             var width
                 = feature.bottomRightCoords[1] - feature.topLeftCoords[1] + 1;
@@ -151,14 +163,14 @@ function ParsingConfig(name,
         return wellFeatures;
     };
 
-    this.getFeatureCoords = function(featureName, plates){
+    this.getFeatureCoords = function(featureName){
         var feature = this.features[featureName];
         var coords = [];
         var plate;
         var coordinates;
 
         if (feature.typeOfFeature == WELL_LEVEL){
-            var wellFeatureCoords = this.findWellLevelFeatureCoords(featureName, plates);
+            var wellFeatureCoords = this.findWellLevelFeatureCoords(featureName);
 
             for (plate = 0; plate < wellFeatureCoords.length; plate++){
                 var plateCoords = wellFeatureCoords[plate];
@@ -170,7 +182,7 @@ function ParsingConfig(name,
                 }
             }
         } else if (feature.typeOfFeature == PLATE_LEVEL) {
-            var plateFeatureCoords = this.findPlateLevelFeatureCoords(featureName,plates);
+            var plateFeatureCoords = this.findPlateLevelFeatureCoords(featureName);
 
             for (plate = 0; plate < plateFeatureCoords.length; plate++){
                 coordinates = plateFeatureCoords[plate];
@@ -184,9 +196,9 @@ function ParsingConfig(name,
         return coords;
     };
 
-    this.getFeatureValuesDescriptors = function(featureName, plates, grid){
+    this.getFeatureValuesDescriptors = function(featureName, grid){
         var result = [];
-        var featureCoords = this.getFeatureCoords(featureName, plates);
+        var featureCoords = this.getFeatureCoords(featureName);
         var feature = this.features[featureName];
         var lastPlate = -1;
         var wellCounter = 0;
@@ -203,8 +215,8 @@ function ParsingConfig(name,
             var descriptor;
 
             if (feature.typeOfFeature != EXPERIMENT_LEVEL) {
-                for (var j=0; j<plates.length; j++){
-                    if (ParsingConfig.cellIsContainedInRange([row, col], plates[j])){
+                for (var j=0; j<this.plates.length; j++){
+                    if (ParsingConfig.cellIsContainedInRange([row, col], this.plates[j])){
                         plate = j;
                         break;
                     }
@@ -249,26 +261,24 @@ function ParsingConfig(name,
         return result;
     };
 
-    this.highlightPlatesAndFeatures = function(plates, colorPicker, grid){
+    this.highlightPlatesAndFeatures = function(colorPicker, grid){
         var colorKeys;
         var colorKey;
 
         // first highlight plates
-        colorKeys = this.highlightAllPlates(plates, colorPicker, grid);
+        colorKeys = this.highlightAllPlates(colorPicker, grid);
 
         // next highlight features
-        var featuresHighlightColorKeys = this.highlightAllFeatures(plates,
-                                                                   colorPicker,
-                                                                   grid);
+        var featuresHighlightColorKeys = this.highlightAllFeatures(colorPicker, grid);
         colorKeys = colorKeys.concat(featuresHighlightColorKeys);
 
         return colorKeys;
     };
 
-    this.highlightPlate = function(plateIndex, plates, colorPicker, grid){
+    this.highlightPlate = function(plateIndex,colorPicker, grid){
         var colorKey;
 
-        var plateRange = plates[plateIndex];
+        var plateRange = this.plates[plateIndex];
         var startRow = plateRange[0];
         var startCol = plateRange[1];
         var endRow = plateRange[2];
@@ -287,24 +297,24 @@ function ParsingConfig(name,
         return colorKey;
     };
 
-    this.highlightAllPlates = function(plates, colorPicker, grid){
+    this.highlightAllPlates = function(colorPicker, grid){
         var colorKeys = [];
         var colorKey;
 
         // first highlight plates
-        for (var plateIndex=0; plateIndex<plates.length; plateIndex++){
-            colorKey = this.highlightPlate(plateIndex, plates, colorPicker, grid);
+        for (var plateIndex=0; plateIndex<this.plates.length; plateIndex++){
+            colorKey = this.highlightPlate(plateIndex, colorPicker, grid);
             colorKeys.push(colorKey);
         }
 
         return colorKeys;
     };
 
-    this.highlightFeature = function(featureName, plates, colorPicker, grid){
+    this.highlightFeature = function(featureName, colorPicker, grid){
         var feature = this.features[featureName];
         var colorKey = colorPicker.getDistinctColorKey();
 
-        var coordsToHighlight = this.getFeatureCoords(featureName, plates);
+        var coordsToHighlight = this.getFeatureCoords(featureName);
 
         grid.setCellColors(coordsToHighlight,
             colorPicker.getColorByIndex(feature.color),
@@ -313,12 +323,12 @@ function ParsingConfig(name,
         return colorKey;
     };
 
-    this.highlightAllFeatures = function(plates, colorPicker, grid){
+    this.highlightAllFeatures = function(colorPicker, grid){
         var colorKeys = [];
         var colorKey;
 
         for(var featureName in this.features){
-            colorKey = this.highlightFeature(featureName, plates, colorPicker, grid);
+            colorKey = this.highlightFeature(featureName, colorPicker, grid);
             colorKeys.push(colorKey);
         }
 
@@ -326,8 +336,8 @@ function ParsingConfig(name,
     };
 
 
-    this.createImportData = function(plates, plateIDs, grid){
-        var importData = new ImportData("test identifier");
+    this.createImportData = function(plateIDs, grid){
+        var importData = new ImportData("none");
         var plate;
 
         for (var featureName in this.features){
@@ -335,7 +345,7 @@ function ParsingConfig(name,
             var category = feature.featureLabel;
 
             if (feature.typeOfFeature == WELL_LEVEL){
-                var wellFeatureCoords = this.findWellLevelFeatureCoords(featureName, plates);
+                var wellFeatureCoords = this.findWellLevelFeatureCoords(featureName);
 
                 for (plate = 0; plate < wellFeatureCoords.length; plate++){
                     var plateCoords = wellFeatureCoords[plate];
@@ -376,7 +386,7 @@ function ParsingConfig(name,
                     }
                 }
             } else if (feature.typeOfFeature == PLATE_LEVEL) {
-                var plateFeatureCoords = this.findPlateLevelFeatureCoords(featureName,plates);
+                var plateFeatureCoords = this.findPlateLevelFeatureCoords(featureName);
 
                 for (plate = 0; plate < plateFeatureCoords.length; plate++){
 
@@ -412,14 +422,12 @@ function ParsingConfig(name,
     };
 
     this.applyFeatures = function(startRow, endRow, grid){
-        var plates = this.findPlates(startRow, endRow, grid);
-
         var plateIDs = [];
-        for (var i=0; i<plates.length; i++){
+        for (var i=0; i<this.plates.length; i++){
             plateIDs.push("plate " + i);
         }
-        var colorKeys = this.highlightPlatesAndFeatures(plates, colorPicker, grid);
-        var data = this.createImportData(plates,plateIDs, grid);
+        var colorKeys = this.highlightPlatesAndFeatures(colorPicker, grid);
+        var data = this.createImportData(plateIDs, grid);
 
         console.log(data);
 
@@ -459,11 +467,16 @@ function ParsingConfig(name,
         delete this.features[nameOfFeatureToDelete];
     };
 
-    this.addPlate = function(grid){
+    this.addPlate = function(grid, examiner){
+        this.plateInvariates = [];
+        this.features = {};
+        this.plates = [];
+
         this.plate = this.addFeature("plate", grid, true, null, PLATE);
         this.plateInvariates.push([this.plate.topLeftCoords[0],
                                    this.plate.topLeftCoords[1],
                                    this.plate.topLeftValue]);
+        this.setPlates(1, examiner.rowsSize, grid);
         return this.plate
     };
 

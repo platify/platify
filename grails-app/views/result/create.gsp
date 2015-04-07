@@ -1,38 +1,52 @@
+<%@ page import="edu.harvard.capstone.result.Result" %>
 <!DOCTYPE html>
 <html>
 	<head>
 		<meta name="layout" content="main">
 		<g:set var="entityName" value="${message(code: 'result.label', default: 'Result')}" />
-		<title><g:message code="default.create.label" args="[entityName]" /></title>
+		<title><g:message code="default.show.label" args="[entityName]" /></title>
+		<asset:stylesheet href="jquery-ui.css"/>
+		<asset:stylesheet href="grid/style.css"/>
+		<asset:stylesheet href="grid/slick.grid.css"/>
+		<asset:stylesheet href="grid/slick-default-theme.css"/>
+		<asset:stylesheet href="grid/Grid.css"/>
+		<asset:stylesheet href="colorbrewer.css"/>
 	</head>
-	<body>
-		<a href="#create-result" class="skip" tabindex="-1"><g:message code="default.link.skip.label" default="Skip to content&hellip;"/></a>
-		<div class="nav" role="navigation">
-			<ul>
-				<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
-				<li><g:link class="list" action="index"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
-			</ul>
+	<body class="container">
+
+	<div class="content-fluid ">
+		<div class="row">
+			<!-- Left Column -->
+			<div class="col-sm-2">
+				<div class="nav" role="navigation">
+					<ul class="nav nav-pills nav-stacked">
+						<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
+						<li><g:link class="create" action="index">List</g:link></li>
+						<li class="active"><a href="#">Parse</a></li>
+					</ul>			
+				</div>					
+			</div> <!-- Left Column END -->
+			<!-- Right Column -->
+			<div class="col-sm-10 content-body" style="padding-right: 30px">
+				<div style="height: 50px;">
+					<div class="pull-left">
+						<h4>
+							Experiment: <span>${experimentInstance?.name}</span>	
+						</h4>
+					</div>
+					<div class="pull-right">
+						<h4>
+							Result: <span>${resultInstance?.name}</span>
+						</h4>
+					</div>
+				</div>			
+				<div id="grid"></div>
+			</div> <!-- Right Column END -->	
 		</div>
-		<div id="create-result" class="content scaffold-create" role="main">
-			<h1><g:message code="default.create.label" args="[entityName]" /></h1>
-			<g:if test="${flash.message}">
-			<div class="message" role="status">${flash.message}</div>
-			</g:if>
-			<g:hasErrors bean="${resultInstance}">
-			<ul class="errors" role="alert">
-				<g:eachError bean="${resultInstance}" var="error">
-				<li <g:if test="${error in org.springframework.validation.FieldError}">data-field-id="${error.field}"</g:if>><g:message error="${error}"/></li>
-				</g:eachError>
-			</ul>
-			</g:hasErrors>
-			<g:form url="[resource:resultInstance, action:'save']" >
-				<fieldset class="form">
-					<g:render template="form"/>
-				</fieldset>
-				<fieldset class="buttons">
-					<g:submitButton name="create" class="save" value="${message(code: 'default.button.create.label', default: 'Create')}" />
-				</fieldset>
-			</g:form>
-		</div>
-	</body>
+	</div>	
+	<g:javascript>
+	</g:javascript>
+	<asset:javascript src="d3.v3.min.js"/>
+	<asset:javascript src="colorbrewer.v1.min.js"/>
+</body>
 </html>

@@ -41,7 +41,7 @@
 			        <span class="icon-bar"></span>
 			        <span class="icon-bar"></span>
 			      </button>
-			      <a class="navbar-brand" href="#">SurNorte</a>
+			      <a class="navbar-brand" href="${createLink(uri: '/')}">SurNorte</a>
 			    </div>
 
 			    <!-- Collect the nav links, forms, and other content for toggling -->
@@ -64,7 +64,7 @@
 									<li><a href="#">Parse</a></li>
 								</ul>
 							</li>
-							<li class="results"><a href="#">Results</a></li>
+							<li class="result"><g:link controller="result" action="index">Results</g:link></li>
 							<sec:ifAnyGranted roles='ROLE_ADMIN, ROLE_SUPER_ADMIN'>
 								<li class="admin" class="dropdown">
 								  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Admin <span class="caret"></span></a>
