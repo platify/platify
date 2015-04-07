@@ -173,35 +173,68 @@ class EquipmentControllerSpec extends Specification {
             model.equipmentInstance == equipment
     }
 
-    void "Test the update action performs an update on a valid domain instance"() {
-        when:"Update is called for a domain instance that doesn't exist"
-            request.contentType = FORM_CONTENT_TYPE
-            controller.update(null)
+    void "Test update action with no equipment"(){
+        when:"Equipment is null"
+            controller.update()
 
-        then:"A 404 error is returned"
-            response.redirectedUrl == '/equipment/index'
-            flash.message != null
+        then:"An error is returned"
+            model.equipmentInstance == null
+            response.json.error != null 
+            response.json.error == "Equipment not found" 
+    }
 
-
-        when:"An invalid domain instance is passed to the update action"
-            response.reset()
-            def equipment = new Equipment()
-            equipment.validate()
-            controller.update(equipment)
-
-        then:"The edit view is rendered again with the invalid instance"
-            view == 'edit'
-            model.equipmentInstance == equipment
-
-        when:"A valid domain instance is passed to the update action"
-            response.reset()
+    void "Test update action with no data"(){
+        when:"The update action is executed with no data"
             populateValidParams(params)
-            equipment = new Equipment(params).save(flush: true)
+            def equipment = new Equipment(params)
+
+            request.contentType = FORM_CONTENT_TYPE
             controller.update(equipment)
 
-        then:"A redirect is issues to the show action"
-            response.redirectedUrl == "/equipment/show/$equipment.id"
-            flash.message != null
+        then:"An error is returned"
+            model.equipmentInstance == null
+            response.json.error != null 
+            response.json.error == "No data received" 
+    }
+
+    void "Test update action with incorrect data"(){
+        when:"Incorrect data"
+            def parserService = mockFor(ParserService)
+            parserService.demandExplicit.updateEquipment {Equipment e, String n, String d, String c, String f -> 
+                def eq = new Equipment()
+                eq.save()
+                eq
+            }
+            populateValidParams(params)
+            def equipment = new Equipment(params)
+            controller.parserService = parserService.createMock()
+            request.json = "{data: 'my data'}"
+            request.contentType = FORM_CONTENT_TYPE
+            controller.update(equipment)
+
+        then:"An error is returned"
+            model.equipmentInstance == null
+            response.json.error != null 
+            response.json.error == "Error updating the equipment" 
+    }
+
+    void "Test update action working"(){
+        when:"Correct data"
+            def parserService = mockFor(ParserService)
+            parserService.demandExplicit.updateEquipment {Equipment e, String n, String d, String c, String f  -> 
+                e
+            }
+            populateValidParams(params)
+            def equipment = new Equipment(params)
+            controller.parserService = parserService.createMock()
+            request.json = "{data: 'my data'}"
+            request.contentType = FORM_CONTENT_TYPE
+            controller.update(equipment)
+
+        then:"An error is returned"
+            model.equipmentInstance == null
+            response.json.error == null 
+            response.json.equipment.name == equipment.name
     }
 
     void "Test that the delete action deletes an instance if it exists"() {

@@ -51,12 +51,15 @@ class EquipmentController {
         def equipmentInstance = Equipment.get(equipment)
         def experimentInstance = ExperimentalPlateSet.get(experiment)
 
+		System.out.println("equipmentInstance " + equipmentInstance.getMachineName() + " === " + experimentInstance + " > " + experimentInstance);
+		
         if (!equipmentInstance || !experimentInstance) {
             notFound()
             return
         }
 
         respond equipmentInstance, model:[equipmentInstance: equipmentInstance, experimentInstance: experimentInstance]
+		
     }
 
     
@@ -106,23 +109,32 @@ class EquipmentController {
 
     def update(Equipment equipmentInstance) {
         if (equipmentInstance == null) {
-            notFound()
+            render(contentType: "application/json") {
+                [error: "Equipment not found"]
+            }
             return
         }
+
+//        def data = request.JSON        
+//        
+//        if (!data) {
+//            render(contentType: "application/json") {
+//                [error: "No data received"]
+//            }
+//            return
+//        }
+
+        equipmentInstance = parserService.updateEquipment(equipmentInstance, equipmentInstance.name, equipmentInstance.machineName, equipmentInstance.description, equipmentInstance.toString())
 
         if (equipmentInstance.hasErrors()) {
-            respond equipmentInstance.errors, view:'edit'
-            return
+            render(contentType: "application/json") {
+                [error: "Error updating the equipment", errors: equipmentInstance.errors]
+            }
+            return            
         }
 
-        equipmentInstance.save flush:true
-
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.updated.message', args: [message(code: 'Equipment.label', default: 'Equipment'), equipmentInstance.id])
-                redirect equipmentInstance
-            }
-            '*'{ respond equipmentInstance, [status: OK] }
+        render(contentType: "application/json") {
+            [equipment: equipmentInstance]
         }
     }
 

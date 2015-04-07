@@ -23,9 +23,9 @@
 		<div class="content-fluid ">
 			<div class="row">
 				<!-- Left Column -->
-				<div class="col-sm-2">
+				<div class="col-sm-12">
 					<div class="nav" role="navigation">
-						<ul class="nav nav-pills nav-stacked">
+						<ul class="nav nav-pills">
 							<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
 							<li><g:link class="create" action="index">List</g:link></li>
 							<li class="active"><g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link></li>
@@ -33,7 +33,7 @@
 					</div>					
 				</div> <!-- Left Column END -->
 				<!-- Right Column -->
-				<div class="col-sm-10 content-body" style="padding-right: 30px">
+				<div class="col-sm-12 content-body" style="padding-right: 30px">
 					<g:render template="assignLabels"/>
 				</div> <!-- Right Column END -->	
 			</div>
