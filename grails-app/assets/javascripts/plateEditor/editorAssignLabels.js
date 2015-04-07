@@ -1,7 +1,7 @@
 // constants
 var DIMENSION = 100;
-var CELL_HEIGHT = 50;
-var CELL_WIDTH = 150;
+var CELL_HEIGHT = 35;
+var CELL_WIDTH = 90;
 var data;
 var plateModel = {};
 var catLegend = {};
