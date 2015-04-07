@@ -1,5 +1,5 @@
 
-<h2>Create Plate: (step 3 of 3)</h2>
+<h2>Create Plate: </h2>
 <div id="gridPanel" style="float:left; width: 70%">
 	<div id="myGrid" style="width:100%;height:650px;"></div>
 </div>
