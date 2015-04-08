@@ -118,7 +118,9 @@
                                 </div>
                             </div>
                         </div>
-                        <div>
+
+                        <!-- implement after M2 -->
+                        <!--<div>
                             <label for="valueType">Feature value type</label>
                             <div id="valueType">
                                 <div>
@@ -128,7 +130,7 @@
                                     <input type="radio" id="qualitative" name="valueType" value="qualitative" />qualitative<br/>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
 
                         <div>
                             <label for="labelList">

@@ -760,8 +760,27 @@ function handleSetPlateID(){
 
 function sendImportDataToServer(){
     importData.experimentID = experimentIDSelectize.getValue();
+    importData.parsingID = $('#parsingId').val();
 
     console.log(importData);
+
+    var jqxhr = $.ajax({
+        url: hostname + "/rawData/save",
+        type: "POST",
+        data: JSON.stringify(importData),
+        processData: false,
+        contentType: "application/json; charset=UTF-8"
+    }).done(function(resData) {
+        console.log(resData);
+        if (!resData.error){
+            showUserMsg("highlight","Output file data stored successfully");
+        }else{
+            showUserMsg("error","Error when trying to store output file data");
+        }
+    }).fail(function(resData) {
+        console.log(resData);
+        showUserMsg("error","Error when trying to store output file data");
+    });
 }
 
 /**
@@ -860,7 +879,18 @@ function init(){
                 processData: false,
                 contentType: "application/json; charset=UTF-8"
             }).done(function(resData) {
-                console.log(resData );
+                var barcodes = resData.barcodes;
+                console.log(barcodes );
+
+                // load the barcodes into the plateID selectize element
+                plateIDSelectize.clearOptions();
+
+                for (var i=0; i<barcodes.length; i++){
+                    console.log("barcode = " + barcodes[i]);
+                    plateIDSelectize.addOption({text: barcodes[i], value: barcodes[i]});
+                }
+
+                plateIDSelectize.refreshOptions(true);
 
                 /*if (!resData.error){
                     $('#parsingId').val(resData.equipment.id);

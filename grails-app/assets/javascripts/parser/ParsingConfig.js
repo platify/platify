@@ -40,7 +40,7 @@ function ParsingConfig(name,
                        machineName,
                        description,
                        delimiter){
-	this.id;
+	this.id = null;
 	this.name = name;
     this.machineName = machineName;
     this.description = description;
