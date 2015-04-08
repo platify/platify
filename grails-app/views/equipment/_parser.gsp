@@ -156,12 +156,12 @@
                     <div>
                         <div>
                             <label for="experiment">experiment</label>
-                            <select id="experiment" name="experiment"></select>
+                            <select id="experiment" name="experiment">
                                 <option value="">Experiment</option>
-                                 <g:each var="experiment" in="${ExperimentalPlateSet.findAllByOwner(Scientist.get(sec?.loggedInUserInfo(field:'id'))
-                                )}">
+                                 <g:each var="experiment" in="${ExperimentalPlateSet.findAllByOwner(Scientist.get(sec?.loggedInUserInfo(field:'id')))}">
                                     <option value="${experiment.id}">${experiment.name}</option>
                                 </g:each>
+                            </select>
                         </div>
                         <label for="plateList">
                             Plate List

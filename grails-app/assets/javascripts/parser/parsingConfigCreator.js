@@ -839,7 +839,7 @@ function init(){
     });
 
     var $select1 = $("#experiment").selectize({
-        options: [
+        /*options: [
             {text: "experiment1", value: 1},
             {text: "experiment2", value: 2},
             {text: "experiment3", value: 3},
@@ -847,14 +847,38 @@ function init(){
             {text: "experiment5", value: 5},
             {text: "experiment6", value: 6},
             {text: "experiment7", value: 7}
-        ],
+        ],*/
+        onChange: function(value){
+            console.log("value = " + value);
+
+            var jqxhr = $.ajax({
+                url: hostname + '/experimentalPlateSet/barcodes/'+ value,
+                type: "POST",
+                data: value,
+                processData: false,
+                contentType: "application/json; charset=UTF-8"
+            }).done(function(resData) {
+                console.log(resData );
+
+                /*if (!resData.error){
+                    $('#parsingId').val(resData.equipment.id);
+                    console.log("parsingConfig.id " + parsingConfig.id);
+                    showUserMsg("highlight","Parse configuration stored successfully " );
+                }else{
+                    showUserMsg("error","Error. when trying to store configuration => " + JSON.stringify(resData) );
+                }*/
+            }).fail(function(resData) {
+                console.log( "error "  + JSON.stringify(resData));
+                showUserMsg("error","Error. when trying to store configuration => " + JSON.stringify(resData) );
+            });
+        },
         create: true
     });
 
     experimentIDSelectize = $select1[0].selectize;
 
     var $select2 = $("#plateID").selectize({
-        options:[
+        /*options:[
            {text: "A", value: "A"},
            {text: "B", value: "B"},
            {text: "C", value: "C"},
@@ -879,7 +903,7 @@ function init(){
            {text: "V", value: "V"},
            {text: "W", value: "W"},
            {text: "X", value: "X"},
-        ],
+        ],*/
         create: true
 
     });
