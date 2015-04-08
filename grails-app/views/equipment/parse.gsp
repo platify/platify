@@ -51,7 +51,8 @@
 	</div>	
 	<g:javascript>
 		$(function() {
-			var equipment = "${equipmentInstance?.config}";
+			$('#parsingId').val("${equipmentInstance?.id}");
+			equipment = "${equipmentInstance?.config}";
 			console.log(JSON.parse(equipment));
 		})
 	</g:javascript>

@@ -107,24 +107,28 @@ class EquipmentController {
     }
 
 
-    def update(Equipment equipmentInstance) {
-        if (equipmentInstance == null) {
+    def update(Long id) {
+		def equipmentInstance = Equipment.get(id)
+		
+		if (equipmentInstance == null) {
             render(contentType: "application/json") {
                 [error: "Equipment not found"]
             }
             return
         }
 
-//        def data = request.JSON        
-//        
-//        if (!data) {
-//            render(contentType: "application/json") {
-//                [error: "No data received"]
-//            }
-//            return
-//        }
+        def data = request.JSON        
+        
+        if (!data) {
+            render(contentType: "application/json") {
+                [error: "No data received"]
+            }
+            return
+        }
 
-        equipmentInstance = parserService.updateEquipment(equipmentInstance, equipmentInstance.name, equipmentInstance.machineName, equipmentInstance.description, equipmentInstance.toString())
+//		System.out.println("NAME " + equipmentInstance.name);
+//		System.out.println("Config " + equipmentInstance.config);
+		equipmentInstance = parserService.updateEquipment(equipmentInstance, data.name, data.machineName, data.description,data.toString())
 
         if (equipmentInstance.hasErrors()) {
             render(contentType: "application/json") {

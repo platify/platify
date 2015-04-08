@@ -22,16 +22,14 @@
 	
 		<div class="content-fluid ">
 			<div class="row">
-				<!-- Left Column -->
 				<div class="col-sm-12">
-					<div class="nav" role="navigation">
-						<ul class="nav nav-pills">
-							<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
-							<li><g:link class="create" action="index">List</g:link></li>
-							<li class="active"><g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link></li>
-						</ul>			
-					</div>					
-				</div> <!-- Left Column END -->
+					<ol class="breadcrumb">
+						<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
+						<li><g:link controller="experimentalPlateSet" action="index">Experiments</g:link></li>
+						<li><g:link controller="experimentalPlateSet" action="showactions" id="${expPlateSetInstance.id}">Show Experiment</g:link></li>
+						<li><g:link controller="plateTemplate" action="create" id="${expPlateSetInstance.id}">Create Template</g:link></li>
+					</ol>						
+				</div>
 				<!-- Right Column -->
 				<div class="col-sm-12 content-body" style="padding-right: 30px">
 					<g:render template="assignTemplateValues"/>
