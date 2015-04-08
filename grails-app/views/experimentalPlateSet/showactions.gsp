@@ -29,16 +29,48 @@
 				<!-- Right Column -->
 				<div class="col-sm-12 content-body" style="padding-left: 50px">
 					<h2>Selected Experiment:</h2>
-					<p> Experiment ID: ${experimentalPlateSetInstance.id}</p>
-					<p> Experiment Name: ${experimentalPlateSetInstance.name}</p>
-					<p> Experiment Description: ${experimentalPlateSetInstance.description}</p>
-					<p> Experiment Owner: ${experimentalPlateSetInstance.owner}</p>
-					
-					<p> Experiment Plates: !! List of plates for this Experiment !!</p>
+					<h4>Details:</h4>
+					<p style="font-size:14px"> 
+						<strong>Experiment ID:</strong> ${experimentalPlateSetInstance.id}<br/>
+						<strong>Experiment Name:</strong> ${experimentalPlateSetInstance.name}<br/>
+						<strong>Experiment Description:</strong> ${experimentalPlateSetInstance.description}<br/>
+						<strong>Experiment Owner:</strong> ${experimentalPlateSetInstance.owner}<br/>
+					</p>
 				
-					<h4>Add Plate to Experiment:</h4>
+					<h4>Add New Plate to Experiment:</h4>
 					<g:link id="${experimentalPlateSetInstance.id}" action="selectTemplate" class="btn btn-info">Select Existing Template</g:link>
 					<g:link id="${experimentalPlateSetInstance.id}" controller="plateTemplate" action="create" class="btn btn-info">Create New Template</g:link>
+					
+					<!--  Existing Plates -->
+					<div id="list-plateTemplate" class="content scaffold-list" role="main">
+						<h4>Experiment Plate List:</h4>
+						<g:if test="${flash.message}">
+							<div class="message" role="status">${flash.message}</div>
+						</g:if>
+						<table class="table table-striped table-hover">
+						<thead>
+								<tr>
+									<g:sortableColumn property="id" title="#" />
+									<g:sortableColumn property="name" title="${message(code: 'plateTemplate.name.label', default: 'Name')}" />
+									<g:sortableColumn property="owner" title="${message(code: 'plateTemplate.owner.label', default: 'Owner')}" />	
+									<g:sortableColumn property="dateCreated" title="${message(code: 'plateTemplate.date.label', default: 'Date')}" />																
+								</tr>
+							</thead>
+							<tbody>
+							<g:each in="${plateTemplatelist}" status="i" var="plateTemplateInstance">
+								<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+									<td>${plateTemplateInstance.id}</td>
+									<td>${fieldValue(bean: plateTemplateInstance, field: "name")}</td>
+									<td>${plateTemplateInstance.owner.firstName + ' ' + plateTemplateInstance.owner.lastName}</td>
+									<td>${fieldValue(bean: plateTemplateInstance, field: "dateCreated")}</td>
+								</tr>
+							</g:each>
+							</tbody>
+						</table>
+						<div class="pagination">
+							<g:paginate total="${plateTemplateInstanceCount ?: 0}" />
+						</div>
+					</div>
 				</div> <!-- Right Column END -->	
 			</div>
 		</div>

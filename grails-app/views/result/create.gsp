@@ -17,14 +17,10 @@
 	<div class="content-fluid ">
 		<div class="row">
 			<!-- Left Column -->
-			<div class="col-sm-2">
-				<div class="nav" role="navigation">
-					<ul class="nav nav-pills nav-stacked">
-						<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
-						<li><g:link class="create" action="index">List</g:link></li>
-						<li class="active"><a href="#">Parse</a></li>
-					</ul>			
-				</div>					
+			<div class="col-sm-2 content-body" style="padding-left: 20px">
+				<h4>QA/QC</h4>
+				<p>Z-factor:</p>
+				<p>Z'-factor:</p>
 			</div> <!-- Left Column END -->
 			<!-- Right Column -->
 			<div class="col-sm-10 content-body" style="padding-right: 30px">
@@ -39,14 +35,35 @@
 							Result: <span>${resultInstance?.name}</span>
 						</h4>
 					</div>
-				</div>			
-				<div id="grid"></div>
+				</div>
+				<div id="gridPanel">
+					<div id="grid" style="height: 600px"></div>
+				</div>
 			</div> <!-- Right Column END -->	
 		</div>
 	</div>	
-	<g:javascript>
-	</g:javascript>
 	<asset:javascript src="d3.v3.min.js"/>
 	<asset:javascript src="colorbrewer.v1.min.js"/>
+
+	<!-- TODO - pull these in from within Grid.js -->
+	<asset:javascript src="jquery-ui.js"/>
+	<asset:javascript src="jquery.event.drag-2.2.js"/>
+	<asset:javascript src="selectize.js"/>
+	<asset:javascript src="grid/slick.autotooltips.js"/>
+	<asset:javascript src="grid/slick.cellcopymanager.js"/>
+	<asset:javascript src="grid/slick.cellrangedecorator.js"/>
+	<asset:javascript src="grid/slick.cellrangeselector.js"/>
+	<asset:javascript src="grid/slick.cellselectionmodel.js"/>
+	<asset:javascript src="grid/slick.core.js"/>
+	<asset:javascript src="grid/slick.editors.js"/>
+	<asset:javascript src="grid/slick.grid.js"/>
+	<asset:javascript src="grid/Grid.js"/>
+	<asset:javascript src="grid/Grid2Merge.js"/>
+	<!-- END TODO -->
+
+	<asset:javascript src="result/create.js"/>
+	<g:javascript>
+	console.log("yup");
+	</g:javascript>
 </body>
 </html>

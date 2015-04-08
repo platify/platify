@@ -79,7 +79,6 @@ grails.project.dependency.resolution = {
         // To avoid caching issues
         compile ":cache-headers:1.1.7"
 
-        compile ":aws-sdk:1.9.0"
         compile ":spring-security-core:2.0-RC3"
 
         compile ":platform-core:1.0.RC6"

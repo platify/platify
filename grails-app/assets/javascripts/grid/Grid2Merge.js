@@ -70,8 +70,10 @@ function Grid(containerID){
 			colnum = Math.floor(colnum);
 			var rownum = Math.ceil((colorArray.length - 1) / colnum);
 			
-			var cellStr = "<table style='width:100%;height:100%'>";
-			cellStr += "<th rowspan='" + (rownum + 1) + "' style='width:20%;height:100%'>" + colorArray[0] +"</th>";
+			var cellStr = "<div style='width:100%;height:100%'>";
+			cellStr += "<div style='float:left; width:28%; height:100%'>" + colorArray[0] + "</div>";
+			cellStr += "<div style='float:right; width:72%; height:100%'>";
+			cellStr += "<table style='width:100%;height:100%'>";
 			var i, j = 0;
 			var colorIdx = 1;
 			for (i = 0; i < colnum; i++) {
@@ -83,6 +85,7 @@ function Grid(containerID){
 				cellStr += "</tr>";
 			}		
 			cellStr += "</table>";
+			cellStr += "</div></div>";
 			return cellStr;
 		} else {
 			return "<span style='width:100%'>-</span>";
