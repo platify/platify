@@ -50,8 +50,6 @@ class EquipmentController {
 
         def equipmentInstance = Equipment.get(equipment)
         def experimentInstance = ExperimentalPlateSet.get(experiment)
-
-		System.out.println("equipmentInstance " + equipmentInstance.getMachineName() + " === " + experimentInstance + " > " + experimentInstance);
 		
         if (!equipmentInstance || !experimentInstance) {
             notFound()
@@ -126,8 +124,6 @@ class EquipmentController {
             return
         }
 
-//		System.out.println("NAME " + equipmentInstance.name);
-//		System.out.println("Config " + equipmentInstance.config);
 		equipmentInstance = parserService.updateEquipment(equipmentInstance, data.name, data.machineName, data.description,data.toString())
 
         if (equipmentInstance.hasErrors()) {

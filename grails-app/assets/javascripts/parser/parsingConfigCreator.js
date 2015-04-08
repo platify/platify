@@ -87,7 +87,9 @@ function parseOnlyMode(){
     featureCellRangeElement.readOnly = true;
     featureCategoryElement.readOnly = true;
 
-    document.getElementById(parsingConfig.delimiter).selected = true;
+    if (parsingConfig.delimiter!=null){
+    	document.getElementById(parsingConfig.delimiter).selected = true;
+    }	
     document.getElementById("delimiterList").disabled = true;
     //document.getElementById("saveConfig").style.display = "none";
     document.getElementById("saveConfigToServer").style.display = "none";

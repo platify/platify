@@ -66,7 +66,6 @@
                         </div>
                         <div>
                             <button id="saveConfigToServer">Save</button>
-                            <button id="saveAsConfigToServer" disabled >Save as</button>
                         </div>
 
 
