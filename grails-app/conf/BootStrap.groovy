@@ -4,6 +4,8 @@ import edu.harvard.capstone.user.Role
 
 import edu.harvard.capstone.parser.Equipment
 import edu.harvard.capstone.editor.ExperimentalPlateSet
+import edu.harvard.capstone.editor.PlateTemplate
+import edu.harvard.capstone.editor.PlateSet
 
 class BootStrap {
 
@@ -126,10 +128,16 @@ class BootStrap {
             new Equipment(name: "First Equipment", machineName: "My machine", description: "This is my machine description", config: config).save(flush: true)
             new Equipment(name: "Second Equipment", machineName: "My greate machine", description: "This is my very long machine description", config: config).save(flush: true)            
 
-            new ExperimentalPlateSet(owner: andres, name: "First Experiment", description: "My experiment description").save(flush: true)
+            def experiment1 = new ExperimentalPlateSet(owner: andres, name: "First Experiment", description: "My experiment description").save(flush: true)
             new ExperimentalPlateSet(owner: scientist, name: "Scientist Experiment", description: "My experiment description").save(flush: true)
             new ExperimentalPlateSet(owner: admin, name: "Admin Experiment", description: "My experiment description").save(flush: true)
             new ExperimentalPlateSet(owner: andres, name: "Second Experiment", description: "My experiment description").save(flush: true)                                    
+
+            def template1 = new PlateTemplate(owner: andres, name: "first template").save(flush: true)
+
+            new PlateSet(plate: template1, experiment: experiment1, assay: "my assay", barcode: "10293").save(flush: true)
+            new PlateSet(plate: template1, experiment: experiment1, assay: "my assay", barcode: "3321").save(flush: true)
+            new PlateSet(plate: template1, experiment: experiment1, assay: "my assay", barcode: "2334").save(flush: true)
 
 		}
 		log.info "Users: " + Scientist.count()

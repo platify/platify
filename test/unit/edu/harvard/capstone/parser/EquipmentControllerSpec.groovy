@@ -187,9 +187,10 @@ class EquipmentControllerSpec extends Specification {
         when:"The update action is executed with no data"
             populateValidParams(params)
             def equipment = new Equipment(params)
+            equipment.save()
 
             request.contentType = FORM_CONTENT_TYPE
-            controller.update(equipment)
+            controller.update(equipment.id)
 
         then:"An error is returned"
             model.equipmentInstance == null
@@ -209,8 +210,10 @@ class EquipmentControllerSpec extends Specification {
             def equipment = new Equipment(params)
             controller.parserService = parserService.createMock()
             request.json = "{data: 'my data'}"
+            equipment.save()
+
             request.contentType = FORM_CONTENT_TYPE
-            controller.update(equipment)
+            controller.update(equipment.id)
 
         then:"An error is returned"
             model.equipmentInstance == null
@@ -228,8 +231,10 @@ class EquipmentControllerSpec extends Specification {
             def equipment = new Equipment(params)
             controller.parserService = parserService.createMock()
             request.json = "{data: 'my data'}"
+            equipment.save()
+
             request.contentType = FORM_CONTENT_TYPE
-            controller.update(equipment)
+            controller.update(equipment.id)
 
         then:"An error is returned"
             model.equipmentInstance == null

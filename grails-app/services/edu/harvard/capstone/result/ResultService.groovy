@@ -64,7 +64,7 @@ class ResultService {
 		
 		// create the experiment labels
 		data.experimentFeatures.labels.each{ key, value ->
-			def resultLabelInstance = new ResultLabel(name: key, value: value, labelType: ResultLabel.LabelType.RESULT, domainId: resultInstance.id)
+			def resultLabelInstance = new ResultLabel(name: key, value: value, labelType: ResultLabel.LabelType.LABEL, scope: ResultLabel.LabelScope.RESULT, domainId: resultInstance.id)
 			resultLabelInstance.save()
 			if (resultLabelInstance.hasErrors()){
     			throw new ValidationException("Experiment label is not valid", resultLabelInstance.errors)
@@ -72,13 +72,13 @@ class ResultService {
 		}
 
 		// create the result plates
-		data.plates.eachWithIndex{ plate, plateIndex ->
-			def numberOfRows = plate.rows?.size()
+		data.plates.eachWithIndex{ dataPlate, plateIndex ->
+			def numberOfRows = dataPlate.rows?.size()
 			def numberOfColumns = -1
-			if (plate.rows)
-				numberOfColumns = plate.rows[0]?.columns?.size()
+			if (dataPlate.rows)
+				numberOfColumns = dataPlate.rows[0]?.columns?.size()
 
-			def plateInstance = new ResultPlate(result: resultInstance, rows: numberOfRows, columns: numberOfColumns, barcode: plate.plateID)
+			def plateInstance = new ResultPlate(result: resultInstance, rows: numberOfRows, columns: numberOfColumns, barcode: dataPlate.plateID)
 			
 			plateInstance.save()
 			if (plateInstance.hasErrors()){
@@ -86,18 +86,25 @@ class ResultService {
     		}
 
     		// create the plate labels
-    		plate.labels.each{ key, value ->
-    			def plateLabelInstance = new ResultLabel(name: key, value: value, labelType: ResultLabel.LabelType.PLATE, domainId: plateInstance.id)
+    		dataPlate.labels.each{ key, value ->
+    			def plateLabelInstance = new ResultLabel(name: key, value: value, labelType: ResultLabel.LabelType.LABEL, scope: ResultLabel.LabelScope.PLATE, domainId: plateInstance.id)
     			plateLabelInstance.save()
     			if (plateLabelInstance.hasErrors()){
 	    			throw new ValidationException("Plate label is not valid", plateLabelInstance.errors)
 	    		}
     		}
 
-    		plate.rows.eachWithIndex{ row, rowIndex ->
+    		// well level
+    		dataPlate.rows.eachWithIndex{ row, rowIndex ->
     			row.columns.eachWithIndex{ well, columnIndex ->
     				//for each well
-    				def wellInstance = Well.findAllByPlateAndRowAndColumn(plateList[plateIndex], rowIndex, columnIndex)
+    				def wellInstance = Well.withCriteria{
+    					eq('row', rowIndex)
+    					eq('column', columnIndex)
+    					eq('plate', PlateSet.findByBarcodeAndExperiment(dataPlate.plateID, experimentInstance)?.plate)
+    				}
+
+
     				if (!wellInstance){
 						throw new RuntimeException("Well does not exist")
 					}
@@ -108,13 +115,23 @@ class ResultService {
 	    			if (wellResultInstance.hasErrors()){
 		    			throw new ValidationException("Well instance is not valid", wellResultInstance.errors)
 		    		}
-		    		well.labels.each{ key, value ->
-		    			def wellLabelInstance = new ResultLabel(name: key, value: value, labelType: ResultLabel.LabelType.WELL, domainId: wellResultInstance.id)
+		    		// labels
+		    		well.labels?.each{ key, value ->
+		    			def wellLabelInstance = new ResultLabel(name: key, value: value, labelType: ResultLabel.LabelType.LABEL, scope: ResultLabel.LabelScope.WELL, domainId: wellResultInstance.id)
 		    			wellLabelInstance.save()
 		    			if (wellLabelInstance.hasErrors()){
 			    			throw new ValidationException("Well label is not valid", wellLabelInstance.errors)
 			    		}		    			
 		    		}		    		
+		    		// raw data
+		    		well.rawData?.each{ key, value ->
+		    			def rawDataInstance = new ResultLabel(name: key, value: value, labelType: ResultLabel.LabelType.RAW_DATA, scope: ResultLabel.LabelScope.WELL, domainId: wellResultInstance.id)
+		    			rawDataInstance.save()
+		    			if (rawDataInstance.hasErrors()){
+			    			throw new ValidationException("Raw Data is not valid", rawDataInstance.errors)
+			    		}		    			
+		    		}		    		
+
     			}
     		}
 		}
@@ -123,6 +140,77 @@ class ResultService {
     	return resultInstance
 
     }
+
+	/**
+	*	Throws ValidationException if can't create a domain object
+	*/
+    def storeNormalizedData(Result resultInstance, JSONObject data) {
+
+    	//if no data of the template return, 
+    	if (!data || !data.experimentID || !data.parsingID){
+			throw new RuntimeException("Incorrect Data")
+		}		
+
+    	//get the owner of the results
+    	def scientistInstance = Scientist.get(springSecurityService.principal.id)
+    	if(!scientistInstance){
+			throw new RuntimeException("Scientist does not exist")
+		}	
+
+    	//get data from the experiment and the equipment used
+    	def experimentInstance = ExperimentalPlateSet.get(data.experimentID)
+    	def equipmentInstance = Equipment.get(data.parsingID)
+    	if (!experimentInstance || !equipmentInstance){
+			throw new RuntimeException("Either the equipment or the experiment does not exist")
+		}	
+
+    	//get the template
+    	def plateList = PlateSet.findAllByExperiment(experimentInstance).collect{ it.plate }
+    	if (!plateList){
+			throw new RuntimeException("No plates")
+		}	
+
+		//verify that the number of plates of the template are = to the result plates
+		if (plateList.size() != data.plates?.size()){
+			throw new RuntimeException("Plates of the JSON do not match with the template")
+		}	
+		
+		// create the result plates
+		data.plates.eachWithIndex{ dataPlate, plateIndex ->
+
+			def plateInstance = ResultPlate.findByResultAndBarcode(resultInstance, barcode: dataPlate.plateID)
+			
+    		// well level
+    		dataPlate.rows.eachWithIndex{ row, rowIndex ->
+    			row.columns.eachWithIndex{ well, columnIndex ->
+    				//for each well
+
+		    		def wellResultInstance = ResultWell.withCriteria {
+		    			well{
+	    					eq('row', rowIndex)
+	    					eq('column', columnIndex)
+	    					eq('plate', PlateSet.findByBarcodeAndExperiment(dataPlate.plateID, experimentInstance)?.plate)
+	    				}
+	    				eq('plate', plateInstance)
+		    		}			
+
+		    		// nomalized data
+		    		well.nomalizedData?.each{ key, value ->
+		    			def nomalizedData = new ResultLabel(name: key, value: value, labelType: ResultLabel.LabelType.NORMALIZED_DATA, scope: ResultLabel.LabelScope.WELL, domainId: wellResultInstance.id)
+		    			nomalizedData.save()
+		    			if (nomalizedData.hasErrors()){
+			    			throw new ValidationException("Normalized Data is not valid", nomalizedData.errors)
+			    		}		    			
+		    		}		    		
+
+    			}
+    		}
+		}
+
+
+    	return resultInstance
+
+    }    
 
     def getResults(Result resultInstance) {
 
@@ -134,9 +222,8 @@ class ResultService {
     	importData.experimentID = resultInstance.experiment.id
     	importData.parsingID = resultInstance.equipment.id
     	importData.experimentFeatures = [:]
-
     	def experimentLabels = [:]
-    	ResultLabel.findAllByDomainIdAndLabelType(resultInstance.id, ResultLabel.LabelType.RESULT).each{
+    	ResultLabel.findAllByDomainIdAndLabelTypeAndScope(resultInstance.id, ResultLabel.LabelType.LABEL, ResultLabel.LabelScope.RESULT).each{
     		experimentLabels[it.name] = it.value
     	}
 
@@ -146,7 +233,7 @@ class ResultService {
     	ResultPlate.findAllByResult(resultInstance).each{ plateResult ->
     		def plate = [:]
     		def plateLabels = [:]
-    		ResultLabel.findAllByDomainIdAndLabelType(plateResult.id, ResultLabel.LabelType.PLATE).each{
+    		ResultLabel.findAllByDomainIdAndLabelTypeAndScope(plateResult.id, ResultLabel.LabelType.LABEL, ResultLabel.LabelScope.PLATE).each{
     			plateLabels[it.name] = it.value
     		}
     		plate.labels = plateLabels
@@ -164,8 +251,6 @@ class ResultService {
     				def wellInstance = [:]
     				wellInstance.labels = [:]
 	
-		    		def wellLabels = [:]
-
 		    		def wellResult = ResultWell.withCriteria{
 		    			well{
 		    				eq("row", rowIndex)
@@ -173,11 +258,30 @@ class ResultService {
 		    			}
 		    			eq('plate', plateResult)		    			
 		    		}
-        
-		    		ResultLabel.findAllByDomainIdAndLabelType(wellResult.id, ResultLabel.LabelType.WELL).each{
+
+		    		def wellLabels = [:]
+		    		        
+		    		ResultLabel.findAllByDomainIdAndLabelTypeAndScope(wellResult.id, ResultLabel.LabelType.LABEL, ResultLabel.LabelScope.WELL)?.each{
 		    			wellLabels[it.name] = it.value
 		    		}
 		    		wellInstance.labels = wellLabels
+
+
+		    		def rawData = [:]
+		    		        
+		    		ResultLabel.findAllByDomainIdAndLabelTypeAndScope(wellResult.id, ResultLabel.LabelType.RAW_DATA, ResultLabel.LabelScope.WELL)?.each{
+		    			rawData[it.name] = it.value
+		    		}
+		    		wellInstance.rawData = rawData
+
+
+		    		def normalizedData = [:]
+		    		        
+		    		ResultLabel.findAllByDomainIdAndLabelTypeAndScope(wellResult.id, ResultLabel.LabelType.NORMALIZED_DATA, ResultLabel.LabelScope.WELL)?.each{
+		    			normalizedData[it.name] = it.value
+		    		}
+		    		wellInstance.normalizedData = normalizedData
+
 
     				row.columns << wellInstance
     			}
