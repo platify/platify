@@ -26,6 +26,22 @@ class ExperimentalPlateSetController {
         respond ExperimentalPlateSet.list(params), model:[experimentalPlateSetInstanceCount: ExperimentalPlateSet.count()]
     }
 
+    def barcodes(ExperimentalPlateSet experimentalPlateSetInstance){
+        if (!experimentalPlateSetInstance) {
+            render(contentType: "application/json") {
+                [error: "No data received"]
+            }
+            return
+        }
+
+        def plateIDs = PlateSet.findAllByExperiment(experimentalPlateSetInstance).collect{it.barcode}
+        render(contentType: "application/json") {
+            [barcodes: plateIDs]
+        }
+
+
+    }
+
     def show(ExperimentalPlateSet experimentalPlateSetInstance) {
         respond experimentalPlateSetInstance
     }

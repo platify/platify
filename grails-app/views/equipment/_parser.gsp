@@ -1,5 +1,6 @@
 <%@ page import="edu.harvard.capstone.parser.Equipment" %>
-
+<%@ page import="edu.harvard.capstone.editor.ExperimentalPlateSet" %>
+<%@ page import="edu.harvard.capstone.user.Scientist" %>
 
     <div class=" max-height no-overflow" id="content">
         <div class=" max-height">
@@ -156,6 +157,11 @@
                         <div>
                             <label for="experiment">experiment</label>
                             <select id="experiment" name="experiment"></select>
+                                <option value="">Experiment</option>
+                                 <g:each var="experiment" in="${ExperimentalPlateSet.findAllByOwner(Scientist.findByEmail(sec?.loggedInUserInfo(field:'email'))
+                                )}">
+                                    <option value="${experiment.id}">${experiment.name}</option>
+                                </g:each>
                         </div>
                         <label for="plateList">
                             Plate List
