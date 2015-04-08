@@ -71,7 +71,7 @@ function Grid(containerID){
 			var rownum = Math.ceil((colorArray.length - 1) / colnum);
 			
 			var cellStr = "<div style='width:100%;height:100%'>";
-			cellStr += "<div style='float:left; width:28%; height:100%'><h5>" + colorArray[0] + "</h5></div>";
+			cellStr += "<div style='float:left; width:28%; height:100%'>" + colorArray[0] + "</div>";
 			cellStr += "<div style='float:right; width:72%; height:100%'>";
 			cellStr += "<table style='width:100%;height:100%'>";
 			var i, j = 0;
