@@ -158,7 +158,7 @@
                             <label for="experiment">experiment</label>
                             <select id="experiment" name="experiment"></select>
                                 <option value="">Experiment</option>
-                                 <g:each var="experiment" in="${ExperimentalPlateSet.findAllByOwner(Scientist.findByEmail(sec?.loggedInUserInfo(field:'email'))
+                                 <g:each var="experiment" in="${ExperimentalPlateSet.findAllByOwner(Scientist.get(sec?.loggedInUserInfo(field:'id'))
                                 )}">
                                     <option value="${experiment.id}">${experiment.name}</option>
                                 </g:each>
