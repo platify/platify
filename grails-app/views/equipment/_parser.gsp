@@ -14,7 +14,7 @@
 			<div id="userMsgPanel" ></div>
 
             <div class="col-xs-8" id="mainContent">
-                <div id="myGrid"></div>
+                <div id="myGrid" style="width:100%;"></div>
             </div>
 
             <div class="col-xs-4" id="sidebar">
