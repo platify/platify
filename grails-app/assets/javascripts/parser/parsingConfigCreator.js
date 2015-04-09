@@ -110,6 +110,9 @@ function handleExaminerLoad(examiner){
     grid.setData(examiner.matrix);
     grid.fillUpGrid();
     grid.registerSelectedCellCallBack(handleSelectedCells);  // maybe move to init function
+
+    // reset the plates on the parsing config
+    parsingConfig.setPlates(1, examiner.rowsSize, grid);
 }
 
 function applyFeatures(){
@@ -381,9 +384,6 @@ function handleFileSelect(event) {
         // drag and drop case
         files = event.dataTransfer.files;
     }
-
-    // reset parser
-    colorPointer = 0;
 
     fileNameDisplayElement.innerHTML = files[0].name;
     examiner.setFile(files[0]);
@@ -886,7 +886,6 @@ function init(){
                 plateIDSelectize.clearOptions();
 
                 for (var i=0; i<barcodes.length; i++){
-                    console.log("barcode = " + barcodes[i]);
                     plateIDSelectize.addOption({text: barcodes[i], value: barcodes[i]});
                 }
 
