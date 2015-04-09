@@ -159,5 +159,6 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
     '/experimentalPlateSet/**':       ['permitAll'],
     '/result/**':                     ['permitAll'],
     '/rawData/**':                    ['permitAll'],
+    '/**':			      ['permitAll'],
 ]
 
