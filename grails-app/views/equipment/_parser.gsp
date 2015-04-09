@@ -6,8 +6,8 @@
         <div class=" max-height">
 
             <div>
-                <button id="saveConfig">save parsing configuration</button>
-                <button id="importResults">import results</button>
+                <button id="saveConfig">Save parsing configuration</button>
+                <button id="importResults">Import results</button>
             </div>
 
 			<!-- Highlight / Error -->
