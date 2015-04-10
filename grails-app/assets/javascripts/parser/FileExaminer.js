@@ -14,8 +14,10 @@ function FileExaminer(){
     };
 
     var _self = this;
-    this.file = null;
-    this.fileContents = null;
+    this.files = null;
+    this.numFiles = 0;
+    this.currentFileIndex = 0;
+    this.fileContents = "";
     this.delimiter = null;
     this.reader = new FileReader();
     this.colsSize = -1;
@@ -34,9 +36,33 @@ function FileExaminer(){
      * separates the file into the largest number of tokens.
      * @param file - the string contents of a delimiter separated value file
      */
-    this.setFile = function(file){
-        // Read the file as text which will trigger the reader's onload event.
-        this.reader.readAsText(file);
+    this.setFiles = function(files){
+        this.numFiles = files.length;
+        this.currentFileIndex = 0;
+        this.files = files;
+        this.fileContents = "";
+
+        // Read the 0th file as text which will trigger the reader's onload event.
+        this.reader.readAsText(this.files[0]);
+    };
+
+
+    this.setDelimiter = function(delimiter){
+
+        // determine if the given delimiter is recognized
+        var recognized = false;
+        for (var key in this.CELL_TERMINATORS){
+            if (delimiter == key || delimiter == null){
+                recognized = true;
+                break
+            }
+        }
+
+        if (recognized) {
+            this.delimiter = delimiter;
+        } else {
+            // error!
+        }
     };
 
     /**
@@ -77,18 +103,30 @@ function FileExaminer(){
      * @param e
      */
     this.reader.onload = function(e) {
-        _self.fileContents = e.target.result;
+        _self.currentFileIndex++;
 
-        // determine the delimiter
-        _self.delimiter = determineDelimiter(_self.fileContents);
+        _self.fileContents += e.target.result + "\n \n";
 
-        // call the parse function with the proper line terminator and cell terminator
-        //parseCSV(e.target.result, '\n', '\t');
-        _self.matrix
-            = file2grid(_self.fileContents,
-            _self.LINE_TERMINATOR,
-            _self.CELL_TERMINATORS[_self.delimiter]);
-        notifyLoadObservers();
+
+        if (_self.currentFileIndex >= _self.numFiles){   // we have read the last file
+            // determine the delimiter if necessary
+            if (!_self.delimiter){
+                _self.delimiter = determineDelimiter(_self.fileContents);
+            }
+
+
+            // call the parse function with the proper line terminator and cell terminator
+            //parseCSV(e.target.result, '\n', '\t');
+            _self.matrix
+                = file2grid(_self.fileContents,
+                _self.LINE_TERMINATOR,
+                _self.CELL_TERMINATORS[_self.delimiter]);
+            notifyLoadObservers();
+        } else {           // we have not read the last file, so read the next one
+            _self.reader.readAsText(_self.files[_self.currentFileIndex]);
+        }
+
+
     };
 
     /**

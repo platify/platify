@@ -105,16 +105,6 @@ function parseOnlyMode(){
 }
 
 
-function handleExaminerLoad(examiner){
-    setDelimiter(examiner.delimiter);
-    grid.setData(examiner.matrix);
-    grid.fillUpGrid();
-    grid.registerSelectedCellCallBack(handleSelectedCells);  // maybe move to init function
-
-    // reset the plates on the parsing config
-    parsingConfig.setPlates(1, examiner.rowsSize, grid);
-}
-
 function applyFeatures(){
     clearFeatureValues();
     removeAllHighlighting();
@@ -385,9 +375,24 @@ function handleFileSelect(event) {
         files = event.dataTransfer.files;
     }
 
-    fileNameDisplayElement.innerHTML = files[0].name;
-    examiner.setFile(files[0]);
+    console.log("number of files = " + files.length);
 
+    // TODO - display a list of all file names, not just the first one
+    fileNameDisplayElement.innerHTML = files[0].name;
+    examiner.setFiles(files);
+
+}
+
+function handleExaminerLoad(examiner){
+    setDelimiter(examiner.delimiter);
+    grid.setData(examiner.matrix);
+    grid.fillUpGrid();
+    grid.registerSelectedCellCallBack(handleSelectedCells);  // maybe move to init function
+
+    // reset the plates on the parsing config
+    if (parsingConfig && parsingConfig.plate){
+        parsingConfig.setPlates(1, examiner.rowsSize, grid);
+    }
 }
 
 function changeDelimiter(){
