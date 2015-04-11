@@ -272,10 +272,6 @@ function createColorPicker(cat, label) {
 
 function updateCategoryList() {
 	var newDiv = document.createElement("div");
-	var newH4 = document.createElement("h4");
-	var h4Text = document.createTextNode('Categories:');
-	newH4.appendChild(h4Text);
-	newDiv.appendChild(newH4);
 	for (var catKey in catLegend) {
 		var newUl = document.createElement("ul");
 		var newStrong = document.createElement("strong");

@@ -1,19 +1,27 @@
 
-<div id="gridPanel" style="float:left; width: 70%">
-	<div id="myGrid" style="width:100%;height:650px;"></div>
-</div>
-<div id="labelPanel" style="float:right;width:29%;">
-	<div id="tabs-1">
-		<ul>
-			<li><a href="#tabs-2">Well Grouping</a></li>
-			<li><a href="#tabs-3">Plate</a></li>
-			<li><a href="#tabs-4">Plate Set</a></li>
-		</ul>
-		<div id="tabs-2">
+<div class="col-sm-3">
+	<div id="labelPanel" class="panel panel-info">
+		<div class="panel-heading">
+			<h4>Add New Label</h4>
+		</div>
+		<div class="panel-body">
+			<label>Label Level:</label>
+            <div class="btn-group" data-toggle="buttons">
+                <label class="btn btn-default">
+                    <input type="radio" id="wellLevel" name="labellevel" value="well" checked/> well
+                </label>
+                <label class="btn btn-default">
+                    <input type="radio" id="plateLevel" name="labellevel" value="plate" /> plate
+                </label>
+                <label class="btn btn-default">
+                    <input type="radio" id="plateSetLevel" name="labellevel" value="plate-set" /> plate-set
+                </label>
+            </div>
+            
 			<h4>Well Grouping Labels:</h4>
-			<button id="addLabelButton" class="ui-state-default ui-corner-all">Add New Label</button>
-			<button id="addDoseStepButton" class="ui-state-default ui-corner-all">Add Dose Step</button>
-			<button id="importCmpListButton" class="ui-state-default ui-corner-all ui-state-disabled">Import Compound List</button>
+			<button id="addLabelButton" class="btn btn-default">Add New Label</button>
+			<button id="addDoseStepButton" class="btn btn-default">Add Dose Step</button>
+			<button id="importCmpListButton" class="btn btn-default ui-state-disabled">Import Compound List</button>
 			
 			<div class="toggler">
 				<div id="addLabelPanel" class="ui-widget-content ui-corner-all">
@@ -42,29 +50,40 @@
 					<div> <button id="clearLastSelectionD">Undo Last Selection</button><button id="clearAllSelectionD">Clear Selection</button></div>
 				</div>
 			</div>
-			
+		
+			<div id="editLabelDialog" title="New Label Name">
+				<input type="text" id="editNewLabelValue"/>
+			</div>
+			<hr/>
+			<div>Plate Barcode:<input type="text" id="barcode"/></div>
+			<div>Cell Range Selected:<span id="cellRange"></span></div>
+			<hr/>
+			<button id="savePlate" class="btn btn-info">Save Plate</button>
+			<button id="copyPlate" class="btn btn-info ui-state-disabled"><g:link controller="experimentalPlateSet" action="create" id="1">Copy Plate</g:link></button>
+		</div>
+	</div>
+	
+	<div id="categoryPanel" class="panel panel-info">
+		<div class="panel-heading">
+			<h4>Categories</h4>
+		</div>
+		<div class="panel-body">
 			<div id="categoryList"></div>
-			
-		</div>
-		<div id="tabs-3">
-			<h4>Plate Level Labels:</h4>
-			<p></p>
-		</div>
-		<div id="tabs-4">
-			<h4>Plate Set Labels:</h4>
-			<p></p>
 		</div>
 	</div>
 </div>
-<div id="editLabelDialog" title="New Label Name">
-	<input type="text" id="editNewLabelValue"/>
+
+<div class="col-sm-9">
+	<div id="gridPanel" class="panel panel-info">
+		<div class="panel-heading">
+			<h4>Plate Wells</h4>
+		</div>
+		<div class="panel-body">
+			<div id="myGrid" style="width:100%; height:650px;"></div>
+		</div>
+	</div>
 </div>
-<div><span id="spacer">_____________</span></div>
-<div>Plate Barcode:<input type="text" id="barcode"/></div>
-<div>Cell Range Selected:<span id="cellRange"></span></div>
-<div><span id="spacer">_____________</span></div>
-<button id="savePlate">Save Plate</button>
-<button id="copyPlate" class="ui-state-disabled"><g:link controller="experimentalPlateSet" action="create" id="1">Copy Plate</g:link></button>
+
 
 <div id="templateVals">${templateInstance}</div>
 
