@@ -8,21 +8,25 @@
 		<div class="panel-body">
 			<label>Label Level:</label>
             <div class="btn-group" data-toggle="buttons">
-                <label class="btn btn-default">
-                    <input type="radio" id="wellLevel" name="labellevel" value="well" checked/> well
+                <label class="btn btn-default btn-sm">
+                    <input checked="checked" type="radio" id="wellLevel" name="labellevel" value="well"/> well
                 </label>
-                <label class="btn btn-default">
+                <label class="btn btn-default btn-sm">
                     <input type="radio" id="plateLevel" name="labellevel" value="plate" /> plate
                 </label>
-                <label class="btn btn-default">
+                <label class="btn btn-default btn-sm">
                     <input type="radio" id="plateSetLevel" name="labellevel" value="plate-set" /> plate-set
                 </label>
             </div>
             
+         <!--    <button type="button" class="btn btn-default btn-sm glyphicon glyphicon-pencil"> -->
+	       
+	        </button>
+            
 			<h4>Well Grouping Labels:</h4>
-			<button id="addLabelButton" class="btn btn-default">Add New Label</button>
-			<button id="addDoseStepButton" class="btn btn-default">Add Dose Step</button>
-			<button id="importCmpListButton" class="btn btn-default ui-state-disabled">Import Compound List</button>
+			<button id="addLabelButton" class="btn btn-default btn-sm">Add New Label</button>
+			<button id="addDoseStepButton" class="btn btn-default btn-sm">Add Dose Step</button>
+			<button id="importCmpListButton" class="btn btn-default  btn-sm ui-state-disabled">Import Compound List</button>
 			
 			<div class="toggler">
 				<div id="addLabelPanel" class="ui-widget-content ui-corner-all">
@@ -59,8 +63,8 @@
 			<div>Plate Barcode:<input type="text" id="barcode"/></div>
 			<div>Cell Range Selected:<span id="cellRange"></span></div>
 			<hr/>
-			<button id="savePlate" class="btn btn-info">Save Plate</button>
-			<button id="copyPlate" class="btn btn-info ui-state-disabled"><g:link controller="experimentalPlateSet" action="create" id="1">Copy Plate</g:link></button>
+			<button id="savePlate" class="btn btn-info btn-sm">Save Plate</button>
+			<button id="copyPlate" class="btn btn-info btn-sm ui-state-disabled"><g:link controller="experimentalPlateSet" action="create" id="1">Copy Plate</g:link></button>
 		</div>
 	</div>
 	

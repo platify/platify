@@ -15,7 +15,7 @@
 				<hr/>
 				<div>Cell Range Selected:<span id="cellRange"></span></div>
 				<hr/>
-				<button class="btn btn-info" id="saveTemplate">Save Choice and Continue</button>				
+				<button class="btn btn-info btn-sm" id="saveTemplate">Save Choice and Continue</button>				
 			</div>
 		</div>
 		<div id="labelPanel" class="panel panel-info">

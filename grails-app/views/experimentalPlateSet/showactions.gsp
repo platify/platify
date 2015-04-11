@@ -45,8 +45,8 @@
 								<h4 class="panel-title">Add New Plate to Experiment:</h4>
 							</div>
 							<div class="panel-body">
-								<g:link id="${experimentalPlateSetInstance.id}" action="selectTemplate" class="btn btn-info">Select Existing Template</g:link>
-								<g:link id="${experimentalPlateSetInstance.id}" controller="plateTemplate" action="create" class="btn btn-info">Create New Template</g:link>
+								<g:link id="${experimentalPlateSetInstance.id}" action="selectTemplate" class="btn btn-info btn-sm">Select Existing Template</g:link>
+								<g:link id="${experimentalPlateSetInstance.id}" controller="plateTemplate" action="create" class="btn btn-info btn-sm">Create New Template</g:link>
 							</div>
 						</div>
 					</div>

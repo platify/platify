@@ -8,7 +8,7 @@
 			<div class="panel-body ">
 				<label>Template Value:</label>
 				<input type="text" id="newLabelValue"></input>
-				<button id="addTemplateValueBtn" class="btn btn-info">Add New Value</button>
+				<button id="addTemplateValueBtn" class="btn btn-info btn-sm">Add New Value</button>
 				
 				<hr/>
 				<label> Select Wells To Apply Labels To:</label>
@@ -18,13 +18,13 @@
 				<hr/>
 				<label>Template Name:</label>
 				<input type="text" id="templateName"/>
-				<button id="saveTemplate"  class="btn btn-info">Save Template and Continue</button>
+				<button id="saveTemplate"  class="btn btn-info btn-sm">Save Template and Continue</button>
 				
 				<hr/>
 				<div>Well Groupings:<span id="wellGroupSpan"></span></div>
 				<div>Cell Range Selected:<span id="cellRange"></span></div>
 				<hr/>
-				<button id="importTemplateValueListBtn" class="btn btn-info">
+				<button id="importTemplateValueListBtn" class="btn btn-info btn-sm">
 					Import Template Values
 				</button>
 			</div>

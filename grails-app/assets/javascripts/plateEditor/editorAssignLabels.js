@@ -247,20 +247,22 @@ function createColorPicker(cat, label) {
 	var newInput = document.createElement("input");
 	newInput.id = "color-" + cat + "-" + label;
 	newInput.type = "color";
+	newInput.className = "btn-default";
 	newInput.defaultValue = catLegend[cat][label]['color'];
 	newInput.value = catLegend[cat][label]['color'];
 	//newInput.onchange = onCatColorChange;
 	
-	var editLabelBtn = document.createElement("input");
+	var editLabelBtn = document.createElement("button");
 	editLabelBtn.id = "edit-" + cat + "-" + label;
 	editLabelBtn.type = "button";
-	editLabelBtn.value = "Edit Label"
+	editLabelBtn.className = "btn btn-default btn-sm glyphicon glyphicon-pencil";
 	//editLabelBtn.onclick = onEditLabelChange;
 	
-	var deleteLabelBtn = document.createElement("input");
+	var deleteLabelBtn = document.createElement("button");
 	deleteLabelBtn.id = "delete-" + cat + "-" + label;
 	deleteLabelBtn.type = "button";
 	deleteLabelBtn.value = "Delete Label"
+	deleteLabelBtn.className = "btn btn-default btn-sm glyphicon glyphicon-trash";
 	//deleteLabelBtn.onclick = onDeleteLabelChange;
 	
 	cpDiv.appendChild(newInput);
@@ -710,6 +712,8 @@ $(function() {
 	$("#addDoseStepButton").click(function() {
 		showDosePanel();
 	});
+	
+	$('[checked="checked"]').parent().addClass("active");
 
 	$("#editLabelDialog").dialog({
 		autoOpen: false,
