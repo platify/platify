@@ -4,8 +4,6 @@
 	<div id="myGrid" style="width:100%;height:650px;"></div>
 </div>
 <div id="labelPanel" style="float:right;width:29%;">
-	<div>Cell Range Selected:<span id="cellRange"></span></div>
-	<hr/>
 	<div id="tabs-1">
 		<ul>
 			<li><a href="#tabs-2">Well Grouping</a></li>
@@ -16,7 +14,7 @@
 			<h4>Well Grouping Labels:</h4>
 			<button id="addLabelButton" class="ui-state-default ui-corner-all">Add New Label</button>
 			<button id="addDoseStepButton" class="ui-state-default ui-corner-all">Add Dose Step</button>
-			<button id="importCmpListButton" class="ui-state-default ui-corner-all">Import Compound List??</button>
+			<button id="importCmpListButton" class="ui-state-default ui-corner-all ui-state-disabled">Import Compound List</button>
 			
 			<div class="toggler">
 				<div id="addLabelPanel" class="ui-widget-content ui-corner-all">
@@ -62,16 +60,19 @@
 <div id="editLabelDialog" title="New Label Name">
 	<input type="text" id="editNewLabelValue"/>
 </div>
+<div><span id="spacer">_____________</span></div>
 <div>Plate Barcode:<input type="text" id="barcode"/></div>
+<div>Cell Range Selected:<span id="cellRange"></span></div>
+<div><span id="spacer">_____________</span></div>
 <button id="savePlate">Save Plate</button>
-<g:link controller="experimentalPlateSet" action="create" id="1">Copy Plate</g:link>
+<button id="copyPlate" class="ui-state-disabled"><g:link controller="experimentalPlateSet" action="create" id="1">Copy Plate</g:link></button>
 
 <div id="templateVals">${templateInstance}</div>
 
 <g:if env="production">
     <!-- Markup to include ONLY when in production -->
     <g:javascript>
-        var hostname = "";      
+        var hostname = "";
     </g:javascript>
 </g:if>
 <g:else>

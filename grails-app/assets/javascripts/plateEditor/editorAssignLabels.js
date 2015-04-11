@@ -714,8 +714,7 @@ $(function() {
 	$("#addDoseStepButton").click(function() {
 		showDosePanel();
 	});
-	
-	
+
 	$("#editLabelDialog").dialog({
 		autoOpen: false,
 		resizable: false,
