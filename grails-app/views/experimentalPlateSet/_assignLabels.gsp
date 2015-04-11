@@ -1,8 +1,9 @@
 
 <div class="col-sm-3">
+
 	<div id="labelPanel" class="panel panel-info">
 		<div class="panel-heading">
-			<h4>Add New Label</h4>
+			<h4 class="panel-title">Add New Label</h4>
 		</div>
 		<div class="panel-body">
 			<label>Label Level:</label>
@@ -65,7 +66,7 @@
 	
 	<div id="categoryPanel" class="panel panel-info">
 		<div class="panel-heading">
-			<h4>Categories</h4>
+			<h4 class="panel-title">Categories</h4>
 		</div>
 		<div class="panel-body">
 			<div id="categoryList"></div>
@@ -76,7 +77,7 @@
 <div class="col-sm-9">
 	<div id="gridPanel" class="panel panel-info">
 		<div class="panel-heading">
-			<h4>Plate Wells</h4>
+			<h4 class="panel-title">Plate Wells</h4>
 		</div>
 		<div class="panel-body">
 			<div id="myGrid" style="width:100%; height:650px;"></div>

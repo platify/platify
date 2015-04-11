@@ -29,7 +29,7 @@
 					<div class="col-sm-6">
 						<div id="expDetailsPanel" class="panel panel-info">
 							<div class="panel-heading">
-								<h4>Experiment Details</h4>
+								<h4 class="panel-title">Experiment Details</h4>
 							</div>
 							<div class="panel-body ">
 								<label>Experiment ID:</label> ${experimentalPlateSetInstance.id}<br/>
@@ -42,7 +42,7 @@
 					<div class="col-sm-6">
 						<div id="expActionPanel" class="panel panel-info">
 							<div class="panel-heading">
-								<h4>Add New Plate to Experiment:</h4>
+								<h4 class="panel-title">Add New Plate to Experiment:</h4>
 							</div>
 							<div class="panel-body">
 								<g:link id="${experimentalPlateSetInstance.id}" action="selectTemplate" class="btn btn-info">Select Existing Template</g:link>
@@ -55,7 +55,7 @@
 					<div class="col-sm-12">
 						<div id="platePanel" class="panel panel-info">
 							<div class="panel-heading">
-								<h4>Experiment Plate List:</h4>
+								<h4 class="panel-title">Experiment Plate List:</h4>
 							</div>
 							<div class="panel-body ">
 								<g:if test="${flash.message}">

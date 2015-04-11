@@ -3,7 +3,7 @@
 	<div class="col-sm-3">
 		<div id="labelPanel" class="panel panel-info">
 			<div class="panel-heading">
-				<h4>Plate Details</h4>
+				<h4 class="panel-title">Plate Details</h4>
 			</div>
 			<div class="panel-body">
 				<label>Experiment ID:</label>
@@ -20,7 +20,7 @@
 		</div>
 		<div id="labelPanel" class="panel panel-info">
 			<div class="panel-heading">
-				<h4>Filter Templates</h4>
+				<h4 class="panel-title">Filter Templates</h4>
 			</div>
 			<div class="panel-body">
 				<p>Template Size:</p>
@@ -34,7 +34,7 @@
 	<div class="col-sm-9">
 		<div id="gridPanel" class="panel panel-info">
 			<div class="panel-heading">
-				<h4>Preview Grid</h4>
+				<h4 class="panel-title">Preview Grid</h4>
 			</div>
 			<div class="panel-body">
 				<div id="myGrid" style="width:100%; height:650px;"></div>

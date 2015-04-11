@@ -3,7 +3,7 @@
 	<div class="col-sm-3">
 		<div id="labelPanel" class="panel panel-info">
 			<div class="panel-heading">
-				<h4>Add Well Name</h4>
+				<h4 class="panel-title">Add Well Name</h4>
 			</div>
 			<div class="panel-body ">
 				<label>Template Value:</label>
@@ -34,7 +34,7 @@
 	<div class="col-sm-9">
 		<div id="gridPanel" class="panel panel-info">
 			<div class="panel-heading">
-				<h4>Plate Layout</h4>
+				<h4 class="panel-title">Plate Layout</h4>
 			</div>
 			<div class="panel-body">
 				<div id="myGrid" style="width:100%; height:650px;"></div>
