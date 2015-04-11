@@ -16,22 +16,18 @@
 		<link rel="apple-touch-icon" href="${resource(dir: 'images', file: 'apple-touch-icon.png')}">
 		<link rel="apple-touch-icon" sizes="114x114" href="${resource(dir: 'images', file: 'apple-touch-icon-retina.png')}">
 
-		
 		<asset:stylesheet href="font-awesome.min.css"/>
-		
 		<asset:stylesheet href="custom.css"/>
-
 		<asset:javascript src="jquery-1.11.2.min.js"/>
-		
 		<g:layoutHead/>
-		
 	</head>
 	<body>
 
 		<g:set var="userObject" value="${Scientist.findByEmail(sec?.loggedInUserInfo(field:'username'))}"/>
 
 		<header>
-			<nav class="navbar navbar-inverse">
+			<!--<nav class="navbar navbar-inverse"> -->
+			<nav class="navbar-inverse">
 			  <div class="container-fluid">
 			    <!-- Brand and toggle get grouped for better mobile display -->
 			    <div class="navbar-header">
