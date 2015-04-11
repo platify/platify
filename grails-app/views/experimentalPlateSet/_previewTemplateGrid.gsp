@@ -1,12 +1,11 @@
 <%@ page import="edu.harvard.capstone.parser.Equipment" %>
 
-	
 	<div class="col-sm-3">
 		<div id="labelPanel" class="panel panel-info">
 			<div class="panel-heading">
 				<h4>Plate Details</h4>
 			</div>
-			<div class="panel-body ">
+			<div class="panel-body">
 				<label>Experiment ID:</label>
 				<p">${experimentalPlateSetInstance.id}</p>
 				<label>Plate ID: </label> 
