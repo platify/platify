@@ -389,7 +389,7 @@ function shade(color, percent) {
 // replicates is realistically off by 1 probably as it should start at zero ??
 function addDoseStep() {
 	var selCells = highlightedCoords;
-	console.log(selCells);
+	console.log("selcells="+selCells);
 	var cat = "dosage";
 	
 	var topDose = document.getElementById("topDoseValue").value;
@@ -414,7 +414,8 @@ function addDoseStep() {
 				
 	updateCategoryList();
 	// disable selection of grid cells
-	hideDosePanel();
+	//hideDosePanel();
+	removeAllHighlightedCells();
 }
 
 function createNewLabel(cat, label, color, applyToCells) {
@@ -499,13 +500,14 @@ function addNewLabel() {
 	
 	updateCategoryList();
 	// disable selection of grid cells
-	hideLabelPanel();
+	//hideLabelPanel();
 	// output current object model to console
 	console.log("plateModel:" + JSON.stringify(plateModel));
 	console.log("catLegend:" + JSON.stringify(catLegend));
 	
 	var jsonplate = translateModelToOutputJson(plateModel);
 	console.log("jsonplate:" + JSON.stringify(jsonplate));
+	removeAllHighlightedCells();
 }
 
 
@@ -613,17 +615,18 @@ function init(){
 	//loadRandomData();
 	
 	addEvent("addNewLabel", "click", addNewLabel);
-	addEvent("cancelNewLabel", "click", cancelNewLabel);
-	addEvent("clearLastSelection", "click", removeHighlightedArea);
-	addEvent("clearAllSelection", "click", removeAllHighlightedCells);
 	addEvent("addDoseStep", "click", addDoseStep);
-	addEvent("cancelDoseStep", "click", cancelDoseStep);
-	addEvent("clearLastSelectionD", "click", removeHighlightedArea);	// duplication !!
-	addEvent("clearAllSelectionD", "click", removeAllHighlightedCells);	// duplication !!
+	addEvent("clearAllSelection", "click", removeAllHighlightedCells);
+	//addEvent("cancelNewLabel", "click", cancelNewLabel);
+	//addEvent("clearLastSelection", "click", removeHighlightedArea);
+	//addEvent("cancelDoseStep", "click", cancelDoseStep);
+	//addEvent("clearLastSelectionD", "click", removeHighlightedArea);	// duplication !!
+	//addEvent("clearAllSelectionD", "click", removeAllHighlightedCells);	// duplication !!
 	addEvent("savePlate", "click", saveConfigToServer);
 
 	// initially disable selection of grid cells
-	disableGridSelection();
+	//disableGridSelection();
+	enableGridSelection();
 }
 
 window.onload = init;
@@ -701,19 +704,25 @@ function translateInputJsonToModel(plateJson) {
 $(function() {
 	$( "#tabs-1" ).tabs();
 	
-	$("#addLabelPanel").hide();
+	//$("#addLabelPanel").hide();
 		
-	$("#addLabelButton").click(function() {
+	/*$("#addLabelButton").click(function() {
 		showLabelPanel();
-	});
+	});*/
 	
 	$("#addDosePanel").hide();
 		
-	$("#addDoseStepButton").click(function() {
+	/*$("#addDoseStepButton").click(function() {
 		showDosePanel();
-	});
+	});*/
 	
-	$('[checked="checked"]').parent().addClass("active");
+	$("input[name=labeltype]").on("change", function () {
+	    if ($(this).prop('id') == "catlabel") {
+	    	showLabelPanel();
+	    } else if ($(this).prop('id') == "dosageStep") {
+	    	showDosePanel();
+	    }
+	});
 
 	$("#editLabelDialog").dialog({
 		autoOpen: false,
@@ -738,22 +747,26 @@ $(function() {
 
 function showLabelPanel() {
 	hideDosePanel();
-	enableGridSelection();
-	$("#addLabelPanel").show("drop", {direction: "right"}, 500 );
+	//enableGridSelection();
+	//$("#addLabelPanel").show("drop", {direction: "right"}, 500 );
+	$("#addLabelPanel").show();
 };
 
 function hideLabelPanel() {
-	disableGridSelection();
-	$("#addLabelPanel").hide("drop", {direction: "right"}, 500 );
+	//disableGridSelection();
+	//$("#addLabelPanel").hide("drop", {direction: "right"}, 500 );
+	$("#addLabelPanel").hide();
 };
 
 function showDosePanel() {
 	hideLabelPanel();
-	enableGridSelection();
-	$("#addDosePanel").show("drop", {direction: "right"}, 500 );
+	//enableGridSelection();
+	//$("#addDosePanel").show("drop", {direction: "right"}, 500 );
+	$("#addDosePanel").show();
 };
 
 function hideDosePanel() {
-	disableGridSelection();
-	$("#addDosePanel").hide("drop", {direction: "right"}, 500 );
+	//disableGridSelection();
+	//$("#addDosePanel").hide("drop", {direction: "right"}, 500 );
+	$("#addDosePanel").hide();
 };
