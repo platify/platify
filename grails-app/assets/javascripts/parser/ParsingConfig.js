@@ -11,7 +11,7 @@ var EXPERIMENT_LEVEL = "experimentLevel";
 var QUANTITATIVE = "quantitative";
 var QUALITATIVE = "qualitative";
 
-var MAX_NUM_INVARIATES = 5;
+var MAX_NUM_ANCHORS = 5;
 
 /**
  * The constructor for ParsingConfig objects.
@@ -46,7 +46,7 @@ function ParsingConfig(name,
     this.description = description;
     this.delimiter = delimiter;
     this.plate = null;
-    this.plateInvariates = [];  // elements stored as [relativeRow, relativeColumn, value]
+    this.plateAnchors = [];  // elements stored as [relativeRow, relativeColumn, value]
     this.features = {};  // keyed on feature name
     this.plates = [];
 
@@ -62,19 +62,24 @@ function ParsingConfig(name,
         this.relativeToLeftY= null;
         this.color = null;
         this.typeOfFeature = null;  // PLATE, WELL_LEVEL, PLATE_LEVEL, EXPERIMENT_LEVEL
-
     }
 
 
-    this.isPlateStartRow = function(row, grid){
-        for(var i=0; i<this.plateInvariates.length; i++){
+    this.isPlateTopLeftCorner = function(row, column, grid){
+        if (!this.plateAnchors || !this.plateAnchors.length){
+            return false;
+        }
 
-            var invariateCol = this.plateInvariates[i][1];
-            var invariateValue = this.plateInvariates[i][2].trim();
+        for(var i=0; i<this.plateAnchors.length; i++){
 
-            var valueToCheck = grid.getDataPoint(row, invariateCol).trim();
+            var possibleAnchorRow = this.plateAnchors[i][0] + row;
+            var possibleAnchorCol = this.plateAnchors[i][1] + column;
+            var anchorValue = this.plateAnchors[i][2].trim();
 
-            if (valueToCheck != invariateValue){
+            var valueToCheck
+                = grid.getDataPoint(possibleAnchorRow, possibleAnchorCol).trim();
+
+            if (valueToCheck != anchorValue){
                 return false;
             }
         }
@@ -82,29 +87,34 @@ function ParsingConfig(name,
         return true;
     };
 
-    function findPlates(startRow, endRow, grid){
+    function findPlates(examiner, grid){
         var plateRanges = []; // elements of form [startRow, startCol, endRow, endCol]
                               // each represents a plate on the grid
-
         var plateHeight
             = _self.plate.bottomRightCoords[0] - _self.plate.topLeftCoords[0] + 1;
         var plateWidth
             = _self.plate.bottomRightCoords[1] - _self.plate.topLeftCoords[1] + 1;
 
-        for (var row = startRow; row<=endRow; row++){
-            if (_self.isPlateStartRow(row, grid)) {
-                plateRanges.push([row,
-                                  _self.plate.topLeftCoords[1],
-                                  row + plateHeight - 1,
-                                  _self.plate.bottomRightCoords[1]])
+        var lastRowToCheck = examiner.rowsSize - plateHeight + 1;
+        var lastColumnToCheck = examiner.colsSize - plateWidth + 1;
+
+        for (var row = 1; row<=lastRowToCheck; row++){
+            for (var col = 1; col<=lastColumnToCheck; col++){
+                if (_self.isPlateTopLeftCorner(row, col, grid)) {
+                    plateRanges.push([row,
+                                      col,
+                                      row + plateHeight - 1,
+                                      col + plateWidth - 1]);
+                }
             }
+
         }
 
         return plateRanges;
     }
 
-    this.setPlates = function(startRow, endRow, grid){
-        this.plates = findPlates(startRow, endRow, grid);
+    this.setPlates = function(examiner, grid){
+        this.plates = findPlates(examiner, grid);
     };
 
     this.findExperimentLevelFeatureCoords = function(featureName){
@@ -122,8 +132,8 @@ function ParsingConfig(name,
         for (var j=0; j<this.plates.length; j++){
             var plateTopLeftRow = this.plates[j][0];
             var plateTopLeftCol = this.plates[j][1];
-            var row = plateTopLeftRow + feature.topLeftCoords[0] - 1;
-            var col = plateTopLeftCol + feature.topLeftCoords[1] - 1;
+            var row = plateTopLeftRow + feature.relativeToLeftY;
+            var col = plateTopLeftCol + feature.relativeToLeftX;
 
             plateFeatures.push([row, col]);
         }
@@ -468,15 +478,16 @@ function ParsingConfig(name,
     };
 
     this.addPlate = function(grid, examiner){
-        this.plateInvariates = [];
+        this.plateAnchors = [];
         this.features = {};
         this.plates = [];
 
         this.plate = this.addFeature("plate", grid, true, null, PLATE);
-        this.plateInvariates.push([this.plate.topLeftCoords[0],
-                                   this.plate.topLeftCoords[1],
+
+        this.plateAnchors.push([this.plate.topLeftCoords[0] - this.plate.topLeftCoords[0],
+                                   this.plate.topLeftCoords[1] - this.plate.topLeftCoords[1],
                                    this.plate.topLeftValue]);
-        this.setPlates(1, examiner.rowsSize, grid);
+        this.setPlates(examiner, grid);
         return this.plate
     };
 
@@ -495,50 +506,94 @@ function ParsingConfig(name,
     /**
      * This function might be useful for more in depth pattern matching
      */
-    this.searchForPlateInvariates = function(numRows, grid){
-        var valueToLookFor;
-        var timesFound;
-        var possibleInvariateCoords = [];
+    this.searchForPlateAnchors = function(examiner, grid){
+        var possibleAnchors = [];
+
         var plateStartRow = this.plate.topLeftCoords[0];
         var plateEndRow = this.plate.bottomRightCoords[0];
         var plateStartCol = this.plate.topLeftCoords[1];
         var plateEndCol = this.plate.bottomRightCoords[1];
         var plateHeight = plateEndRow - plateStartRow +1;
-        var threshold
-            = Math.floor(numRows/(plateHeight*2));
-        var max = (threshold * 2) + 1;
+        var plateWidth = plateEndCol - plateStartCol + 1;
+        var plateCellNumber = plateHeight * plateWidth;
+        var totalCheckedCellNumber = examiner.colsSize * examiner.rowsSize;
+
+        var plateRelativeCoorCounts = ParsingConfig.createZeros2DArray(plateHeight,
+                                                                       plateWidth);
 
 
-        for(var row=plateStartRow; row<=plateEndRow; row++){
-            for(var col=plateStartCol; col<=plateEndCol; col++){
-                valueToLookFor = grid.getDataPoint(row, col).trim();
-                if (valueToLookFor){
-                    timesFound = 0;
-                    for(var obsRow = plateEndRow+1; obsRow<=numRows; obsRow++){
-                        var currentValue = grid.getDataPoint(obsRow, col);
-                        if (currentValue && currentValue.trim() == valueToLookFor){
-                            timesFound++;
-                        }
-                    }
-                    if (timesFound >= threshold && timesFound <= max) {
 
-                        possibleInvariateCoords.push([row,col]);
-                    }
+
+        for (var row = 1; row<= examiner.rowsSize-plateHeight+1; row++){
+            var currentMatchedRelativePlateCoords
+                = plateMatchCoordinates(row, plateStartCol, grid);
+
+            if (currentMatchedRelativePlateCoords.length >= Math.max(plateWidth, plateHeight)){
+                for (var i=0; i<currentMatchedRelativePlateCoords.length; i++){
+                    var rowToIncrement = currentMatchedRelativePlateCoords[i][0];
+                    var colToIncrement = currentMatchedRelativePlateCoords[i][1];
+
+                    plateRelativeCoorCounts[rowToIncrement][colToIncrement]++;
                 }
             }
         }
 
-        // trim the possible invariates to MAX_NUM_INVARIATES, taking some from beginning
-        // and some from end of original array
-        if (possibleInvariateCoords.length > MAX_NUM_INVARIATES){
-            var firstInvariates = possibleInvariateCoords.slice(0, MAX_NUM_INVARIATES-2);
-            var lastInvariates = possibleInvariateCoords.slice(-2);
 
-            possibleInvariateCoords = firstInvariates.concat(lastInvariates);
+        var maxCount = totalCheckedCellNumber/plateCellNumber;
+        var minCount = (3*maxCount)/4;
+
+        for(var countRowIndex=0; countRowIndex<plateHeight; countRowIndex++){
+            for (var countColIndex=0; countColIndex<plateWidth; countColIndex++){
+                var count = plateRelativeCoorCounts[countRowIndex][countColIndex];
+
+                if (count <= maxCount && count >= minCount){
+                    var anchorValue = grid.getDataPoint(plateStartRow + countRowIndex,
+                                                        plateStartCol + countColIndex);
+
+                    possibleAnchors.push([countRowIndex, countColIndex, anchorValue]);
+                }
+            }
         }
 
-        return possibleInvariateCoords;
+        if (possibleAnchors.length === 0){
+
+        }
+
+        return possibleAnchors;
     };
+
+    function plateMatchCoordinates(otherStartRow, otherStartCol ,grid){
+        var result = [];
+
+        var valueToLookFor;
+        var plateStartRow = _self.plate.topLeftCoords[0];
+        var plateEndRow = _self.plate.bottomRightCoords[0];
+        var plateStartCol = _self.plate.topLeftCoords[1];
+        var plateEndCol = _self.plate.bottomRightCoords[1];
+        var plateHeight = plateEndRow - plateStartRow +1;
+        var plateWidth = plateEndCol - plateStartCol + 1;
+
+
+        for (var obsRowIndex = 0; obsRowIndex<plateHeight; obsRowIndex++) {
+            for (var obsColIndex = 0; obsColIndex<plateWidth; obsColIndex++) {
+                var obsRow = otherStartRow + obsRowIndex;
+                var obsCol = otherStartCol + obsColIndex;
+                var plateRow = plateStartRow + obsRowIndex;
+                var plateCol = plateStartCol + obsColIndex;
+
+                valueToLookFor = grid.getDataPoint(plateRow, plateCol).trim();
+                var currentValue = grid.getDataPoint(obsRow, obsCol).trim();
+
+                if (currentValue == valueToLookFor){
+                    result.push([obsRowIndex, obsColIndex])
+                }
+            }
+        }
+
+
+
+        return result;
+    }
 
     this.getJSONString = function(){
         var JSONObject = {};
@@ -549,7 +604,7 @@ function ParsingConfig(name,
         JSONObject["description"] = this.description;
         JSONObject["delimiter"] = this.delimiter;
         JSONObject["plate"] = this.plate;
-        JSONObject["plateInvariates"] = this.plateInvariates;
+        JSONObject["plateAnchors"] = this.plateAnchors;
         JSONObject["features"] = this.features;
 
         return JSONObject;
@@ -566,7 +621,7 @@ ParsingConfig.loadParsingConfig = function(JSONParsingConfig){
         rawParsingConfig.delimiter);
 
     config.plate = rawParsingConfig.plate;
-    config.plateInvariates = rawParsingConfig.plateInvariates;
+    config.plateAnchors = rawParsingConfig.plateAnchors;
     config.features = rawParsingConfig.features;
 
     return config;
@@ -614,4 +669,17 @@ ParsingConfig.cellIsContainedInRange = function(cellCoords, range){
 
     return (cellRow >= rangeStartRow && cellRow <= rangeEndRow
         && cellCol >= rangeStartCol && cellCol <= rangeEndCol);
+};
+
+ParsingConfig.createZeros2DArray = function(rows, columns){
+    var result = [];
+
+    for (var i=0; i<rows; i++){
+        result[i] = [];
+        for (var j=0; j<columns; j++){
+            result[i][j] = 0;
+        }
+    }
+
+    return result;
 };

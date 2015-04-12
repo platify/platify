@@ -34,6 +34,8 @@ var plateIDSelectize;
 var colorPointer = 0;
 var colorPicker = new ColorPicker();
 
+var parseOnlyModeOn = false;
+
 
 
 // TODO - institute more complex highlighting behavior
@@ -80,6 +82,8 @@ function parseOnlyMode(){
     var featureCellRangeElement = document.getElementById("featureCellRange");
     var featureCategoryElement = document.getElementById("featureCategory");
 
+    parseOnlyModeOn = true;
+
     parsingNameElement.readOnly = true;
     machineNameElement.readOnly = true;
     parsingDescriptionElement.readOnly = true;
@@ -100,6 +104,12 @@ function parseOnlyMode(){
     document.getElementById("newFeature").style.display = "none";
     document.getElementById("saveFeature").style.display = "none";
     document.getElementById("deleteFeature").style.display = "none";
+
+    var delimiterOptions = document.getElementById("delimiterList").options;
+
+    for (var i=0; i<delimiterOptions.length; i++){
+        delimiterOptions[i].onclick = function(){return false};
+    }
 
     grid.disableCellSelection();
 }
@@ -234,7 +244,7 @@ function clearFeatureValues(){
     experimentLevelRadio.checked = false;
 
     // deselect all features
-    var featureOptions = featureSelectElement.options
+    var featureOptions = featureSelectElement.options;
 
     for (var i=0; i<featureOptions.length; i++){
         featureOptions[i].selected = false;
@@ -331,7 +341,7 @@ function saveConfigToServer(){
 	var targetUrl;
 	var verb;
 	if (currentId==""){
-		targetUrl = hostname+"/equipment/save"
+		targetUrl = hostname+"/equipment/save";
 		verb = "POST";
 	}else{
 		targetUrl = hostname+"/equipment/update/" + parsingConfig.id;
@@ -375,10 +385,14 @@ function handleFileSelect(event) {
         files = event.dataTransfer.files;
     }
 
-    console.log("number of files = " + files.length);
-
     // TODO - display a list of all file names, not just the first one
     fileNameDisplayElement.innerHTML = files[0].name;
+
+    if (parseOnlyModeOn && parsingConfig && parsingConfig.delimiter){
+        examiner.setDelimiter(parsingConfig.delimiter)
+    } else {
+        examiner.setDelimiter(null);
+    }
     examiner.setFiles(files);
 
 }
@@ -391,7 +405,7 @@ function handleExaminerLoad(examiner){
 
     // reset the plates on the parsing config
     if (parsingConfig && parsingConfig.plate){
-        parsingConfig.setPlates(1, examiner.rowsSize, grid);
+        parsingConfig.setPlates(examiner , grid);
     }
 }
 
@@ -410,6 +424,23 @@ function setDelimiter(delimiter){
     var element = document.getElementById("delimiterList");
     element.value = delimiter;
 
+}
+
+function loadDelimiterList(){
+    var delimiterListElement = document.getElementById("delimiterList");
+
+    // clear the delimiter list
+    delimiterListElement.innerHTML = "";
+    delimiterListElement.scrollTop = 0;
+
+    // load the delimiter list with delimiter options
+    for (var delimiter in examiner.CELL_TERMINATORS){
+        var option = document.createElement("option");
+        option.setAttribute("value", delimiter);
+        option.setAttribute("id", delimiter);
+        option.innerHTML = delimiter;
+        delimiterListElement.appendChild(option);
+    }
 }
 
 // Attach listener for when a file is first dragged onto the screen
@@ -560,7 +591,6 @@ function handleTabChange(event, ui){
 
     if (oldTab === PARSING){
         if (!examiner || !examiner.fileContents){
-            //alert("You must specify a file to leave the parsing tab");
             showUserMsg("error","You must specify a file to leave the parsing tab" );
             event.preventDefault();
             return;
@@ -568,12 +598,7 @@ function handleTabChange(event, ui){
 
         createParsingConfig();
     } else if (oldTab === PLATES){
-        if (!parsingConfig || !parsingConfig.plate){
-            //alert("You must specify a plate to leave the plates tab");
-            showUserMsg("error","You must specify a plate to leave the plates tab" );
-            event.preventDefault();
-            return;
-        }
+
     } else if (oldTab === FEATURES){
         clearFeatureValues();
     }
@@ -592,6 +617,12 @@ function handleTabChange(event, ui){
             );
         }
     } else if (newTab === FEATURES){
+        if (!parsingConfig || !parsingConfig.plate){
+            showUserMsg("error","You must specify a plate to go to the features tab" );
+            event.preventDefault();
+            return;
+        }
+
         selectCells = selectCellsFeatures;
 
         // highlight plates if already specified
@@ -864,16 +895,9 @@ function init(){
         beforeActivate: handleTabChange
     });
 
+    loadDelimiterList();
+
     var $select1 = $("#experiment").selectize({
-        /*options: [
-            {text: "experiment1", value: 1},
-            {text: "experiment2", value: 2},
-            {text: "experiment3", value: 3},
-            {text: "experiment4", value: 4},
-            {text: "experiment5", value: 5},
-            {text: "experiment6", value: 6},
-            {text: "experiment7", value: 7}
-        ],*/
         onChange: function(value){
             console.log("value = " + value);
 
@@ -885,7 +909,6 @@ function init(){
                 contentType: "application/json; charset=UTF-8"
             }).done(function(resData) {
                 var barcodes = resData.barcodes;
-                console.log(barcodes );
 
                 // load the barcodes into the plateID selectize element
                 plateIDSelectize.clearOptions();
@@ -914,34 +937,7 @@ function init(){
     experimentIDSelectize = $select1[0].selectize;
 
     var $select2 = $("#plateID").selectize({
-        /*options:[
-           {text: "A", value: "A"},
-           {text: "B", value: "B"},
-           {text: "C", value: "C"},
-           {text: "D", value: "D"},
-           {text: "E", value: "E"},
-           {text: "F", value: "F"},
-           {text: "G", value: "G"},
-           {text: "H", value: "H"},
-           {text: "I", value: "I"},
-           {text: "J", value: "J"},
-           {text: "K", value: "K"},
-           {text: "L", value: "L"},
-           {text: "M", value: "M"},
-           {text: "N", value: "N"},
-           {text: "O", value: "O"},
-           {text: "P", value: "P"},
-           {text: "Q", value: "Q"},
-           {text: "R", value: "R"},
-           {text: "S", value: "S"},
-           {text: "T", value: "T"},
-           {text: "U", value: "U"},
-           {text: "V", value: "V"},
-           {text: "W", value: "W"},
-           {text: "X", value: "X"},
-        ],*/
         create: true
-
     });
 
     plateIDSelectize = $select2[0].selectize;

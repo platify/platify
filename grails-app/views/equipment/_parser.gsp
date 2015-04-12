@@ -44,7 +44,7 @@
                             <div>
                                 <span>Drag and Drop example file or ...</span>
                                 <input type="file" id="files" name="files[]" multiple />
-                                <button id="getFile">choose file</button>
+                                <button id="getFile">choose file(s)</button>
                             </div>
                         </div>
                         <br/>
@@ -59,9 +59,6 @@
                             </label>
 
                             <select name="delimiterList" id="delimiterList" size="3">
-                                <option value="comma" id="comma">comma</option>
-                                <option value="semicolon" id="semicolon">semicolon</option>
-                                <option value="tab" id="tab">tab</option>
                             </select>
                         </div>
                         <div>
