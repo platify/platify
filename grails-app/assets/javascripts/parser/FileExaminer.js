@@ -6,10 +6,11 @@
  * An object for converting delimiter separated value files into a 2D array of values
  */
 function FileExaminer(){
-    this.LINE_TERMINATOR = /\n+/;
+    this.LINE_TERMINATOR = /\r\n|\n+|\r+/;
     this.CELL_TERMINATORS = {
         "comma" : /\s*,\s*/,
         "semicolon" : /\s*;\s*/,
+        "colon" : /\s*:\s*/,
         "tab": "\t"
     };
 
@@ -26,14 +27,16 @@ function FileExaminer(){
     this.loadObservers = [];
 
     /**
-     * This public public starts the file examining process for a given file content
-     * string. The results are ready and the fields of the FileExaminer object are
-     * completely set when a load event occurs. A callback function must be registered
-     * with the registerAsLoadListener function, to be called when the file contents have
-     * been completely examined and parsed into matrix form.
+     * This public public starts the file examining process for a given set of files in
+     * array form. The content string of each file is ready when a FileReader onload event
+     * occurs, and the onload handler appends those contents to the fileContents string
+     * field and call the readAsText function for the next file which then triggers the
+     * next FileReader onload event. When all files have been read and the fields of the
+     * FileExaminer object are completely set, the FileExaminer notifies all of the
+     * registered load listener callbacks. A callback function must be registered
+     * with the registerAsLoadListener function, to be called when all of the file
+     * contents have been completely examined and parsed into matrix form.
      *
-     * This function will perform the examining process by detecting the delimiter that
-     * separates the file into the largest number of tokens.
      * @param file - the string contents of a delimiter separated value file
      */
     this.setFiles = function(files){
@@ -46,7 +49,14 @@ function FileExaminer(){
         this.reader.readAsText(this.files[0]);
     };
 
-
+    /**
+     * This function sets the delimiter that should be used for parsing Delimiter
+     * Separated Value (DSV) files. The delimiter can be any of the property strings of
+     * the CELL_TERMINATORS field or null. If the set delimiter is null, then the
+     * FileExaminer will chose the delimiter that breaks the contents of the Files into
+     * the greatest number of tokens.
+     * @param delimiter
+     */
     this.setDelimiter = function(delimiter){
 
         // determine if the given delimiter is recognized
@@ -99,14 +109,22 @@ function FileExaminer(){
 
 
     /**
-     * This is a call back for the reader field's onload event.
-     * @param e
+     * This is a call back for the reader field's onload event. This function will
+     * append the current file's content string to the FileExaminer's fileContents string
+     * and then read the next file which when loaded will call this function again.
+     * When all the files have been read, this function, parses the fileContents field
+     * in to matrix form either using a specified delimiter or using the delimiter that
+     * breaks the content string into the greatest number of tokens and then notifies
+     * all of the registered load listener callbacks that the FileExaminer has examined
+     * all of the files
+     * @param e - the onload event object for the FileReader
      */
     this.reader.onload = function(e) {
+        var fileName = _self.files[_self.currentFileIndex].name;
+
+        _self.fileContents += e.target.result + "\n[ end of file: "+ fileName +"]\n";
+
         _self.currentFileIndex++;
-
-        _self.fileContents += e.target.result + "\n \n";
-
 
         if (_self.currentFileIndex >= _self.numFiles){   // we have read the last file
             // determine the delimiter if necessary
