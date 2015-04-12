@@ -1,31 +1,46 @@
 <%@ page import="edu.harvard.capstone.parser.Equipment" %>
 
-
-    <h2>Create New Template:</h2>
-	<div id="gridPanel" style="float:left; width: 70%">
-		<div id="myGrid" style="width:100%;height:650px;"></div>
-	</div>
-	<div id="labelPanel" style="float:right;width:29%;">
-		<div>Cell Range Selected:<span id="cellRange"></span></div>
-		<hr/>
-		<button id="importTemplateValueListBtn" class="ui-state-default ui-corner-all">Import Template Values</button>
-		
-		<hr/>
-		<h4>New Template Value:</h4>
-		<div>Template Value:<input type="text" id="newLabelValue"/></div>
-		<button id="addTemplateValueBtn">Add New Value</button>
-		<hr/>
-		<strong><-- Select Wells To Apply Labels To:</strong>
-		<div> <button id="clearLastSelection">Undo Last Selection</button><button id="clearAllSelection">Clear Selection</button></div>
-		<hr/>
-		<div></div>
-		<hr/>
-		<div>Well Groupings:<span id="wellGroupSpan"></span></div>
+	<div class="col-sm-3">
+		<div id="labelPanel" class="panel panel-info">
+			<div class="panel-heading">
+				<h4 class="panel-title">Add Well Name</h4>
+			</div>
+			<div class="panel-body ">
+				<label>Template Value:</label>
+				<input type="text" id="newLabelValue"></input>
+				<button id="addTemplateValueBtn" class="btn btn-info btn-sm">Add New Value</button>
+				
+				<hr/>
+				<label> Select Wells To Apply Labels To:</label>
+				<button id="clearLastSelection">Undo Last Selection</button>
+				<button id="clearAllSelection">Clear Selection</button>
+				
+				<hr/>
+				<label>Template Name:</label>
+				<input type="text" id="templateName"/>
+				<button id="saveTemplate"  class="btn btn-info btn-sm">Save Template and Continue</button>
+				
+				<hr/>
+				<div>Well Groupings:<span id="wellGroupSpan"></span></div>
+				<div>Cell Range Selected:<span id="cellRange"></span></div>
+				<hr/>
+				<button id="importTemplateValueListBtn" class="btn btn-info btn-sm">
+					Import Template Values
+				</button>
+			</div>
+		</div>
 	</div>
 	
-	<div>Template Name:<input type="text" id="templateName"/></div>
-	<button id="saveTemplate">Save Template and Continue</button>
-	<!--<g:link controller="experimentalPlateSet" action="createPlate" id="1">Continue To Next Step</g:link> -->
+	<div class="col-sm-9">
+		<div id="gridPanel" class="panel panel-info">
+			<div class="panel-heading">
+				<h4 class="panel-title">Plate Layout</h4>
+			</div>
+			<div class="panel-body">
+				<div id="myGrid" style="width:100%; height:650px;"></div>
+			</div>
+		</div>
+	</div>
 
     <g:if env="production">
         <!-- Markup to include ONLY when in production -->
@@ -51,5 +66,3 @@
     <asset:javascript src="grid/slick.editors.js"/>
     <asset:javascript src="grid/Grid2Merge.js"/>
     <asset:javascript src="plateEditor/editorCreateTemplate.js"/>
-
-

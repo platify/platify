@@ -298,9 +298,8 @@ function init(){
 }
 
 window.onload = init;
-/*
-$(function() {
-	var options = ['horse', 'cow'];
-	
-    $('#plateselect').selectize(options);
-});*/
+
+$('#plateSelect').selectize({
+    create: true,
+    sortField: 'text'
+});
