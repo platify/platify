@@ -126,6 +126,7 @@ function handleSelectedCells(startRow,startCol,endRow, endCol){
 	grid.setCellColors(coordinatesToHighlight,currentHighlightColor, key);
 	currentHighlightKeys.push(key);
 	highlightKeyCounter++;
+	txtFieldFocus();
 }
 
 /**
@@ -701,20 +702,8 @@ function translateInputJsonToModel(plateJson) {
 }
 
 // jQuery ui stuff
-$(function() {
-	$( "#tabs-1" ).tabs();
-	
-	//$("#addLabelPanel").hide();
-		
-	/*$("#addLabelButton").click(function() {
-		showLabelPanel();
-	});*/
-	
+$(function() {	
 	$("#addDosePanel").hide();
-		
-	/*$("#addDoseStepButton").click(function() {
-		showDosePanel();
-	});*/
 	
 	$("input[name=labeltype]").on("change", function () {
 	    if ($(this).prop('id') == "catlabel") {
@@ -745,28 +734,28 @@ $(function() {
 	});
 });
 
+function txtFieldFocus() {
+	if ($("#addLabelPanel").is(":visible")) {
+		$("#newCatValue").focus();
+	} else if ($("#addDosePanel").is(":visible")) {
+		$("#topDoseValue").focus();
+	}
+};
+
 function showLabelPanel() {
 	hideDosePanel();
-	//enableGridSelection();
-	//$("#addLabelPanel").show("drop", {direction: "right"}, 500 );
 	$("#addLabelPanel").show();
 };
 
 function hideLabelPanel() {
-	//disableGridSelection();
-	//$("#addLabelPanel").hide("drop", {direction: "right"}, 500 );
 	$("#addLabelPanel").hide();
 };
 
 function showDosePanel() {
 	hideLabelPanel();
-	//enableGridSelection();
-	//$("#addDosePanel").show("drop", {direction: "right"}, 500 );
 	$("#addDosePanel").show();
 };
 
 function hideDosePanel() {
-	//disableGridSelection();
-	//$("#addDosePanel").hide("drop", {direction: "right"}, 500 );
 	$("#addDosePanel").hide();
 };
