@@ -420,6 +420,9 @@ function addDoseStep() {
 }
 
 function createNewLabel(cat, label, color, applyToCells) {
+	cat = cat.split(' ').join('_');
+	label = label.split(' ').join('_');
+	
 	// update catLegend color
 	if (catLegend[cat] == null) {
 		catLegend[cat] = {};
@@ -652,7 +655,7 @@ function translateModelToOutputJson(pModel) {
 					var label = {};
 					label["category"] = catKey;
 					label["name"] = labKey;
-					label["color"] = pModel["rows"][row]["columns"][column]["categories"][catKey][labKey];
+					label["value"] = pModel["rows"][row]["columns"][column]["categories"][catKey][labKey];
 					labels.push(label);
 				}
 			}
@@ -694,7 +697,7 @@ function translateInputJsonToModel(plateJson) {
 			if (pModel["rows"][row]["columns"][column]["categories"][labels[j].category] == null) {
 				pModel["rows"][row]["columns"][column]["categories"][labels[j].category] = {};
 			}
-			pModel["rows"][row]["columns"][column]["categories"][labels[j].category][labels[j].name] = labels[j].color;
+			pModel["rows"][row]["columns"][column]["categories"][labels[j].category][labels[j].name] = labels[j].value;
 		}
 	}
 
