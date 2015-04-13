@@ -64,4 +64,10 @@ class RawDataController {
 
     }
 
+    def show(Result resultInstance) {
+        render(contentType: "application/json") {
+            [resultInstance: resultInstance]
+	}
+    }
+
 }

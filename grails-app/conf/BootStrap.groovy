@@ -6,6 +6,7 @@ import edu.harvard.capstone.parser.Equipment
 import edu.harvard.capstone.editor.ExperimentalPlateSet
 import edu.harvard.capstone.editor.PlateTemplate
 import edu.harvard.capstone.editor.PlateSet
+import edu.harvard.capstone.result.Result
 
 class BootStrap {
 
@@ -125,7 +126,7 @@ class BootStrap {
                   "gridFormat": true
                 }
             '''
-            new Equipment(name: "First Equipment", machineName: "My machine", description: "This is my machine description", config: config).save(flush: true)
+            def machine1 = new Equipment(name: "First Equipment", machineName: "My machine", description: "This is my machine description", config: config).save(flush: true)
             new Equipment(name: "Second Equipment", machineName: "My greate machine", description: "This is my very long machine description", config: config).save(flush: true)            
 
             def experiment1 = new ExperimentalPlateSet(owner: andres, name: "First Experiment", description: "My experiment description").save(flush: true)
@@ -165,6 +166,8 @@ class BootStrap {
             new PlateSet(plate: template2, experiment: experiment3, assay: "my assay", barcode: "022twenty-two").save(flush: true)
             new PlateSet(plate: template2, experiment: experiment3, assay: "my assay", barcode: "023twenty-three").save(flush: true)
             new PlateSet(plate: template2, experiment: experiment3, assay: "my assay", barcode: "024twenty-four").save(flush: true)
+
+            def result1 = new Result(owner: andres, equipment: machine1, experiment: experiment1, name: "Results 1", description: "Do we really need to name and describe results?").save(flush: true)
 
 		}
 		log.info "Users: " + Scientist.count()
