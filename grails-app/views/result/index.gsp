@@ -1,5 +1,6 @@
 
 <%@ page import="edu.harvard.capstone.result.Result" %>
+<%@ page import="edu.harvard.capstone.editor.ExperimentalPlateSet" %>
 <!DOCTYPE html>
 <html>
 	<head>
@@ -12,13 +13,6 @@
 			<div class="row">
 				<!-- Left Column -->
 				<div class="col-sm-2">
-					<div class="nav" role="navigation">
-						<ul class="nav nav-pills nav-stacked">
-							<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
-							<li class="active"><g:link class="create" action="index">List</g:link></li>
-							<li><g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link></li>
-						</ul>			
-					</div>					
 				</div> <!-- Left Column END -->
 				<!-- Right Column -->
 				<div class="col-sm-9">

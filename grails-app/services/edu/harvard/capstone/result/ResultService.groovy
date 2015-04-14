@@ -232,6 +232,7 @@ class ResultService {
 
     	ResultPlate.findAllByResult(resultInstance).each{ plateResult ->
     		def plate = [:]
+		plate.barcode = plateResult.barcode
     		def plateLabels = [:]
     		ResultLabel.findAllByDomainIdAndLabelTypeAndScope(plateResult.id, ResultLabel.LabelType.LABEL, ResultLabel.LabelScope.PLATE).each{
     			plateLabels[it.name] = it.value
@@ -258,6 +259,8 @@ class ResultService {
 		    			}
 		    			eq('plate', plateResult)		    			
 		    		}
+				// TODO - why the hell is control an array?
+				wellInstance.control = wellResult.well.control[0].toString()
 
 		    		def wellLabels = [:]
 		    		        
