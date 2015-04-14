@@ -66,6 +66,7 @@ function loadParsingConfig(JSONparsingConfig){
 	    reloadFeatureSelector();
     }    
 
+    alert("CanUpdate " + canUpdate);
     parseOnlyMode();
 }
 
@@ -321,6 +322,17 @@ function callBckFadeOut() {
   }, 5000 );
 }
 
+function selectTarget(){
+	
+}
+
+// TODO finish implementation
+function saveAsConfigToServer(){
+	
+	// ADD 'COPY' + content of equipment name field.
+	// call saveConfigToServer with saveas
+	
+}
 
 // TODO add the URI for the server call as a parameter
 function saveConfigToServer(){
@@ -958,6 +970,7 @@ function init(){
     addEvent("saveFeature", "click", makeFeature);
     addEvent("applyFeatures", "click", applyFeatures);
     addEvent("saveConfigToServer", "click", saveConfigToServer);
+    addEvent("saveAsConfigToServer", "click", saveAsConfigToServer);
     addEvent("featureList", "change", handleFeatureSelect);
     addEvent("newFeature", "click", handleNewFeature);
     addEvent("deleteFeature", "click", deleteFeature);
