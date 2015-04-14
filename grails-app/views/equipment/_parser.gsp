@@ -63,9 +63,7 @@
                         </div>
                         <div>
                             <button id="saveConfigToServer">Save</button>
-                            <g:if test="${!equipmentInstance?.canUpdate()}"> 
-                            	<button id="saveAsConfigToServer">Save As</button>
-                            </g:if>	
+                            <button id="saveAsConfigToServer">Save As</button>
                         </div>
 
 

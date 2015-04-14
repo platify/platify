@@ -58,8 +58,10 @@ function loadParsingConfig(JSONparsingConfig){
 	    reloadFeatureSelector();
     }    
 
-    alert("CanUpdate " + canUpdate);
-    parseOnlyMode();
+    //alert("CanUpdate " + canUpdate);
+    if (!canUpdate){
+    	parseOnlyMode();
+    }	
 }
 
 /**
@@ -283,7 +285,18 @@ function callBckFadeOut() {
   }, 5000 );
 }
 
-function selectTarget(){
+
+function selectTarget(saveType,currentId){
+	
+	if(saveType==="saveas"){
+		return hostname+"/equipment/save";
+	}
+	
+	if (currentId==""){
+		return hostname+"/equipment/save";
+	}else{
+		return hostname+"/equipment/update/" + currentId;
+	}
 	
 }
 
@@ -292,25 +305,39 @@ function saveAsConfigToServer(){
 	
 	// ADD 'COPY' + content of equipment name field.
 	// call saveConfigToServer with saveas
+	var tempParsingName = $('#parsingName').val();
+	var verb = "POST";
+	var currentId = $('#parsingId').val();
+	if (currentId==""){
+		showUserMsg("error","Error. need to save the configuration first." );
+		return;
+	}
 	
+	$('#parsingName').val("COPY of " + tempParsingName);
+	saveConfig(selectTarget("saveas",currentId),verb);
+	//$('#parsingName').val(tempParsingName);
 }
 
-// TODO add the URI for the server call as a parameter
+//TODO add the URI for the server call as a parameter
 function saveConfigToServer(){
+
+	var verb;
+	var currentId = $('#parsingId').val();
+	
+	if (currentId==""){
+		verb = "POST";
+	}else{
+		verb = "PUT";
+	}
+	saveConfig(selectTarget("save",currentId),verb);
+}	
+
+// TODO add the URI for the server call as a parameter
+function saveConfig(targetUrl,verb){
     
 	createParsingConfig();
 	
-	var currentId = $('#parsingId').val();
-	var targetUrl;
-	var verb;
-	if (currentId==""){
-		targetUrl = hostname+"/equipment/save";
-		verb = "POST";
-	}else{
-		targetUrl = hostname+"/equipment/update/" + parsingConfig.id;
-		verb = "PUT";
-	}
-    
+	console.log(targetUrl + " <==> " + verb);
 	console.log(JSON.stringify(parsingConfig.getJSONString()));
 	
     var jqxhr = $.ajax({
@@ -323,7 +350,7 @@ function saveConfigToServer(){
     		console.log( JSON.stringify(resData) );
     		if (!resData.error){
     			$('#parsingId').val(resData.equipment.id);
-    			console.log("parsingConfig.id " + parsingConfig.id);
+    			console.log("resData.equipment.id " + resData.equipment.id);
     			showUserMsg("highlight","Parse configuration stored successfully " );
     		}else{
     			showUserMsg("error","Error. when trying to store configuration => " + JSON.stringify(resData) );
@@ -332,6 +359,7 @@ function saveConfigToServer(){
 			console.log( "error "  + JSON.stringify(resData));
 			showUserMsg("error","Error. when trying to store configuration => " + JSON.stringify(resData) );
 		});
+    
     
 }
 
@@ -902,4 +930,3 @@ function init(){
 }
 
 window.onload = init;
-
