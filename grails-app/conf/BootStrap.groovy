@@ -178,7 +178,7 @@ class BootStrap {
 	    def plateLabel1 = new ResultLabel(name: "result plate label", value: "result plate label value", labelType: ResultLabel.LabelType.LABEL, scope: ResultLabel.LabelScope.PLATE, domainId: plate1.id).save(flush: true)
 	    def well1 = new Well(plate: template1, column: 0, row: 0, control: Well.WellControl.EMPTY).save(flush: true)
 	    def resultWell1 = new ResultWell(plate: plate1, well: well1).save(flush: true)
-	    def resultLabel1 = new ResultLabel(name: "result well label", value: "result well label value", labelType: ResultLabel.LabelType.RAW_DATA, scope: ResultLabel.LabelScope.RESULT).save(flush: true)
+	    def resultLabel1 = new ResultLabel(name: "result well label raw data", value: "1234", labelType: ResultLabel.LabelType.RAW_DATA, scope: ResultLabel.LabelScope.RESULT, domainId: resultWell1.id).save(flush: true)
 
 		}
 		log.info "Users: " + Scientist.count()
