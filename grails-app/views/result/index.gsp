@@ -13,6 +13,13 @@
 			<div class="row">
 				<!-- Left Column -->
 				<div class="col-sm-2">
+					<g:select
+						id="experimentSelect"
+						name="name"
+						from="${edu.harvard.capstone.editor.ExperimentalPlateSet.list()}"
+						optionKey="id"
+						optionValue="${{it.name + " - " + it.id}}"
+					/>
 				</div> <!-- Left Column END -->
 				<!-- Right Column -->
 				<div class="col-sm-9">
