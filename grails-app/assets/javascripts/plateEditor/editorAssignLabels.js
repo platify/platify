@@ -351,6 +351,14 @@ function removeLabel(cat, label) {
 
 // remove and cleanup references to cat and label
 function updateLabelName(cat, oldLabel, label) {	// should we allow for change of category also ??
+	// remove spaces from the names (replacing with '_')
+	cat = cat.split(' ').join('_');
+	label = label.split(' ').join('_');
+	
+	// remove decimal point from the names (replacing with '_|_')
+	cat = cat.split('.').join('__dot__');
+	label = label.split('.').join('__dot__');
+	
 	// update color legend cell reverse lookup				
 	if (catLegend[cat][label] == null) {
 		//catLegend[cat][label] = {};
@@ -420,8 +428,13 @@ function addDoseStep() {
 }
 
 function createNewLabel(cat, label, color, applyToCells) {
+	// remove spaces from the names (replacing with '_')
 	cat = cat.split(' ').join('_');
 	label = label.split(' ').join('_');
+	
+	// remove decimal point from the names (replacing with '_|_')
+	cat = cat.split('.').join('__dot__');
+	label = label.split('.').join('__dot__');
 	
 	// update catLegend color
 	if (catLegend[cat] == null) {
