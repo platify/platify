@@ -2,11 +2,15 @@ import edu.harvard.capstone.user.Scientist
 import edu.harvard.capstone.user.ScientistRole
 import edu.harvard.capstone.user.Role
 
-import edu.harvard.capstone.parser.Equipment
 import edu.harvard.capstone.editor.ExperimentalPlateSet
-import edu.harvard.capstone.editor.PlateTemplate
 import edu.harvard.capstone.editor.PlateSet
+import edu.harvard.capstone.editor.PlateTemplate
+import edu.harvard.capstone.editor.Well
+import edu.harvard.capstone.parser.Equipment
 import edu.harvard.capstone.result.Result
+import edu.harvard.capstone.result.ResultLabel
+import edu.harvard.capstone.result.ResultPlate
+import edu.harvard.capstone.result.ResultWell
 
 class BootStrap {
 
@@ -167,7 +171,14 @@ class BootStrap {
             new PlateSet(plate: template2, experiment: experiment3, assay: "my assay", barcode: "023twenty-three").save(flush: true)
             new PlateSet(plate: template2, experiment: experiment3, assay: "my assay", barcode: "024twenty-four").save(flush: true)
 
+	    // largely stolen from ResultService.save()
             def result1 = new Result(owner: andres, equipment: machine1, experiment: experiment1, name: "Results 1", description: "Do we really need to name and describe results?").save(flush: true)
+	    def label1 = new ResultLabel(name: "result label", value: "result label value", labelType: ResultLabel.LabelType.LABEL, scope: ResultLabel.LabelScope.RESULT, domainId: result1.id).save(flush: true)
+	    def plate1 = new ResultPlate(result: result1, rows: 4, columns: 4, barcode: "result plate 1").save(flush: true)
+	    def plateLabel1 = new ResultLabel(name: "result plate label", value: "result plate label value", labelType: ResultLabel.LabelType.LABEL, scope: ResultLabel.LabelScope.PLATE, domainId: plate1.id).save(flush: true)
+	    def well1 = new Well(plate: template1, column: 0, row: 0, control: Well.WellControl.EMPTY).save(flush: true)
+	    def resultWell1 = new ResultWell(plate: plate1, well: well1).save(flush: true)
+	    def resultLabel1 = new ResultLabel(name: "result well label", value: "result well label value", labelType: ResultLabel.LabelType.RAW_DATA, scope: ResultLabel.LabelScope.RESULT).save(flush: true)
 
 		}
 		log.info "Users: " + Scientist.count()
