@@ -7,76 +7,27 @@
  * @constructor
  */
 function ColorPicker(){
+    ColorPicker.PLATE_COLOR = "#777777";
+
     var colorPointer = 0;
-    var colorPointerPlate = 0;
-    var colorPointerFeature = 0;
-    var colorPointerInvariate = 0;
-    var colorKeyCounter = 0;
 
     var distinctColors = [
-        '#00FF00',
-        '#0000FF',
-        '#FF0000',
-        '#01FFFE',
-        '#FFA6FE',
-        '#FFDB66',
-        '#006401',
-        '#010067',
-        '#95003A',
-        '#007DB5',
-        '#FF00F6',
-        '#FFEEE8',
-        '#774D00',
-        '#90FB92',
-        '#0076FF',
-        '#D5FF00',
-        '#FF937E',
-        '#6A826C',
-        '#FF029D',
-        '#FE8900',
-        '#7A4782',
-        '#7E2DD2',
-        '#85A900',
-        '#FF0056',
-        '#A42400',
-        '#00AE7E',
-        '#683D3B',
-        '#BDC6FF',
-        '#263400',
-        '#BDD393',
-        '#00B917',
-        '#9E008E',
-        '#001544',
-        '#C28C9F',
-        '#FF74A3',
-        '#01D0FF',
-        '#004754',
-        '#E56FFE',
-        '#788231',
-        '#0E4CA1',
-        '#91D0CB',
-        '#BE9970',
-        '#968AE8',
-        '#BB8800',
-        '#43002C',
-        '#DEFF74',
-        '#00FFC6',
-        '#FFE502',
-        '#620E00',
-        '#008F9C',
-        '#98FF52',
-        '#7544B1',
-        '#B500FF',
-        '#00FF78',
-        '#FF6E41',
-        '#005F39',
-        '#6B6882',
-        '#5FAD4E',
-        '#A75740',
-        '#A5FFD2',
-        '#FFB167',
-        '#009BFF',
-        '#E85EBE'
+        // list of distinct colorblind and print safe colors taken from Paul Tol's
+        // web-page http://www.sron.nl/~pault/
+        "#882E72", // purple
+        "#1965B0", // blue
+        "#4EB265", // green
+        "#F7EE55", // yellow
+        "#E8601C", // orange
+        "#DC050C",  // red
+        "#B178A6", // light purple
+        "#5289C7", // light blue
+        "#90C987", // light green
+        "#F1932D", // light orange
+        "#D6C1DE", // very light purple
+        "#7BAFDE", // very light blue
+        "#CAE0AB", // greenish yellow
+        "#F6C141" // yellowish orange
     ];
 
     /**
@@ -85,7 +36,6 @@ function ColorPicker(){
      */
     this.getNextColor = function(){
         colorPointer = (colorPointer + 1) % distinctColors.length;
-        colorkeyCounter++;
         return distinctColors[colorPointer];
     };
 
@@ -98,7 +48,6 @@ function ColorPicker(){
         if (colorPointer < 0){
             colorPointer = colorPointer + distinctColors.length;
         }
-        colorKeyCounter++;
         return distinctColors[colorPointer];
     };
 
@@ -107,7 +56,6 @@ function ColorPicker(){
      * @returns {string}
      */
     this.getCurrentColor = function(){
-        colorKeyCounter++;
         return distinctColors[colorPointer];
     };
 
@@ -124,21 +72,7 @@ function ColorPicker(){
             index = index + distinctColors.length;
         }
 
-        colorKeyCounter++;
         return distinctColors[index];
-    };
-
-    this.getDistinctColorKey = function(){
-        colorKeyCounter++;
-        return this.getCurrentColorKey();
-    };
-
-    this.getCurrentColorKey = function(){
-        return "key" + colorKeyCounter;
-    };
-
-    this.getCurrentColorIndex = function(){
-        return colorPointer;
     };
 
     this.resetColorPicker = function(){

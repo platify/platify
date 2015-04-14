@@ -3,10 +3,6 @@
  * Modified by zacharymartin on 3/17/15.
  */
 
-// the JSON string variable def below is for testing ParsingConfig object loading along
-// with parse only mode
-//var equipment = '{"name":"Envision Parse Magic","machineName":"Envision Green Light Analyzer 3424","description":"A great little parsing configuration that you will just love to death","delimiter":"tab","plate":{"featureLabel":"plate","topLeftCoords":[1,1],"bottomRightCoords":[24,26],"topLeftValue":"Barcode Assay: ","relativeToLeftX":1,"relativeToLeftY":1,"color":0,"typeOfFeature":1},"plateInvariates":[[1,1,"Barcode Assay: "]],"features":{"Temperature":{"featureLabel":"Temperature","topLeftCoords":[6,2],"bottomRightCoords":[6,2],"topLeftValue":"22.7","relativeToLeftX":1,"relativeToLeftY":5,"color":1,"typeOfFeature":"plateLevel","importData":true},"green light emission":{"featureLabel":"green light emission","topLeftCoords":[6,3],"bottomRightCoords":[21,26],"topLeftValue":"1.2475","relativeToLeftX":2,"relativeToLeftY":5,"color":2,"typeOfFeature":"wellLevel","importData":true}}}';
-
 // Check for the various File API support.
 if (window.File && window.FileReader && window.FileList && window.Blob) {
     // Great success! All the File APIs are supported.
@@ -22,6 +18,7 @@ var activeTab = 0;
 
 var examiner;
 var grid;
+var gridHighlighter;
 var parsingConfig;
 var importData;
 var selectCells;  // a reference to the function to be used for handling cell selection,
@@ -36,13 +33,6 @@ var colorPicker = new ColorPicker();
 
 var parseOnlyModeOn = false;
 
-
-
-// TODO - institute more complex highlighting behavior
-var plateHighlightKeys = [];
-var featureHighlightKeys = [];
-var invariateHighlightKeys = [];
-var highlightKeys = [];
 
 function loadParsingConfig(JSONparsingConfig){
     parsingConfig = ParsingConfig.loadParsingConfig(JSONparsingConfig);
@@ -117,63 +107,29 @@ function parseOnlyMode(){
 
 function applyFeatures(){
     clearFeatureValues();
-    removeAllHighlighting();
+    gridHighlighter.removeAllHighlighting();
 
-    var colorKeys = parsingConfig.highlightPlatesAndFeatures(colorPicker, grid);
-    highlightKeys = highlightKeys.concat(colorKeys);
-}
-
-function removeAllHighlighting(){
-    removeHighlightKeys();
-    removeAllFeatureHighlightKeys();
-    removeAllPlateHighlightKeys();
-    removeAllInvariateHighlightKeys();
-}
-
-function removeHighlightKeys(){
-    for(var i=0; i<highlightKeys.length; i++){
-        grid.removeCellColors(highlightKeys[i]);
-    }
-}
-
-function removeAllPlateHighlightKeys(){
-    for(var i=0; i<plateHighlightKeys.length; i++){
-        grid.removeCellColors(plateHighlightKeys[i]);
-    }
-}
-
-function removeAllFeatureHighlightKeys(){
-    for(var i=0; i<featureHighlightKeys.length; i++){
-        grid.removeCellColors(featureHighlightKeys[i]);
-    }
-}
-
-function removeAllInvariateHighlightKeys(){
-    for(var i=0; i<invariateHighlightKeys.length; i++){
-        grid.removeCellColors(invariateHighlightKeys[i]);
-    }
+    gridHighlighter.highlightPlatesAndFeatures(parsingConfig);
 }
 
 function makePlate(){
-    parsingConfig.addPlate(grid, examiner);
+    parsingConfig.addPlate(grid, examiner, ColorPicker.PLATE_COLOR);
 
-    // highlight the plates on the grid
-    plateHighlightKeys = plateHighlightKeys.concat(
-        parsingConfig.highlightAllPlates(colorPicker, grid)
-    );
+    gridHighlighter.highlightAllPlates(parsingConfig);
 }
 
 function makeFeature(){
     var category = document.getElementById("featureCategory").value;
     var feature;
+    var color = colorPicker.getCurrentColor();
 
 
     if (document.getElementById("wellLevel").checked){
-        feature = parsingConfig.addWellLevelFeature(category, grid);
+        feature = parsingConfig.addWellLevelFeature(category, grid, color);
     } else if (document.getElementById("plateLevel").checked){
-        feature = parsingConfig.addPlateLevelFeature(category, grid);
+        feature = parsingConfig.addPlateLevelFeature(category, grid, color);
     } else if (document.getElementById("experimentLevel").checked){
-        feature = parsingConfig.addExperimentLevelFeature(category, grid);
+        feature = parsingConfig.addExperimentLevelFeature(category, grid, color);
     }
 
     parsingConfig.features[feature.featureLabel] = feature;
@@ -185,13 +141,16 @@ function makeFeature(){
     var featureSelectElement = document.getElementById("featureList");
     featureSelectElement.value = category;
     setFeatureSelect(category);
+
+    colorPicker.getNextColor();
 }
 
 function deleteFeature(){
     var featureSelectElement = document.getElementById("featureList");
     var nameOfFeatureToDelete = featureSelectElement.value;
 
-    removeAllHighlighting();
+    gridHighlighter.removeAllFeatureHighlightKeys();
+    gridHighlighter.removeSelectionHighlightKeys();
 
     if (nameOfFeatureToDelete){
         parsingConfig.deleteFeature(nameOfFeatureToDelete);
@@ -202,12 +161,10 @@ function deleteFeature(){
 
 function handleNewFeature(){
     clearFeatureValues();
-    removeAllHighlighting();
+    gridHighlighter.removeAllHighlighting();
     // highlight plates if already specified
     if (parsingConfig && parsingConfig.plate && examiner && examiner.rowsSize){
-        plateHighlightKeys = plateHighlightKeys.concat(
-            parsingConfig.highlightAllPlates(colorPicker, grid)
-        );
+        gridHighlighter.highlightAllPlates(parsingConfig);
     }
 }
 
@@ -274,23 +231,17 @@ function setFeatureSelect(featureName){
 
     reloadLabelSelector(featureName);
 
-    removeAllHighlighting();
+    gridHighlighter.removeAllHighlighting();
 
 
     if (parsingConfig && parsingConfig.plate && examiner && examiner.rowsSize){
 
         // highlight plates
-        plateHighlightKeys = plateHighlightKeys.concat(
-            parsingConfig.highlightAllPlates(colorPicker, grid)
-        );
+        gridHighlighter.highlightAllPlates(parsingConfig);
 
         // highlight the feature
-        var colorKey = parsingConfig.highlightFeature(featureName, colorPicker, grid);
-        highlightKeys.push(colorKey);
+        gridHighlighter.highlightFeature(featureName, parsingConfig);
     }
-
-
-
 
 }
 
@@ -407,6 +358,8 @@ function handleExaminerLoad(examiner){
     if (parsingConfig && parsingConfig.plate){
         parsingConfig.setPlates(examiner , grid);
     }
+
+    colorPicker.resetColorPicker();
 }
 
 function changeDelimiter(){
@@ -418,29 +371,6 @@ document.getElementById('files').addEventListener('change', handleFileSelect, fa
 
 function handleGetFile(){
     $("#files").click();
-}
-
-function setDelimiter(delimiter){
-    var element = document.getElementById("delimiterList");
-    element.value = delimiter;
-
-}
-
-function loadDelimiterList(){
-    var delimiterListElement = document.getElementById("delimiterList");
-
-    // clear the delimiter list
-    delimiterListElement.innerHTML = "";
-    delimiterListElement.scrollTop = 0;
-
-    // load the delimiter list with delimiter options
-    for (var delimiter in examiner.CELL_TERMINATORS){
-        var option = document.createElement("option");
-        option.setAttribute("value", delimiter);
-        option.setAttribute("id", delimiter);
-        option.innerHTML = delimiter;
-        delimiterListElement.appendChild(option);
-    }
 }
 
 // Attach listener for when a file is first dragged onto the screen
@@ -471,89 +401,77 @@ document.addEventListener('drop', function(e) {
 
 }, false);
 
-/**
- * replaces anonymous function starting on line 114 of original csvParser.html
- * @param startRow
- * @param startCol
- * @param endRow
- * @param endCol
- */
-function handleSelectedCells(startRow, startCol, endRow, endCol){
-    selectCells(startRow, startCol, endRow, endCol);
+function setDelimiter(delimiter){
+    var element = document.getElementById("delimiterList");
+    element.value = delimiter;
+
 }
 
-function selectCellsParsing(startRow, startCol, endRow, endCol){
+function loadDelimiterList(){
+    var delimiterListElement = document.getElementById("delimiterList");
+
+    // clear the delimiter list
+    delimiterListElement.innerHTML = "";
+    delimiterListElement.scrollTop = 0;
+
+    // load the delimiter list with delimiter options
+    for (var delimiter in examiner.CELL_TERMINATORS){
+        var option = document.createElement("option");
+        option.setAttribute("value", delimiter);
+        option.setAttribute("id", delimiter);
+        option.innerHTML = delimiter;
+        delimiterListElement.appendChild(option);
+    }
+}
+
+
+function handleSelectedCells(startRow, startCol, endRow, endCol){
+    var range = new Range(startRow, startCol, endRow, endCol);
+
+    selectCells(range);
+}
+
+function selectCellsParsing(range){
 
     // remove previous highlighting
-    removeAllHighlighting();
+    gridHighlighter.removeAllHighlighting();
 
-    // highlight those cells with the current color
-    var coordinatesToHighlight = [];
-    for (var i=startRow; i<=endRow; i++){
-        for (var j=startCol; j<=endCol; j++){
-            coordinatesToHighlight.push([i,j]);
-        }
-    }
-
-    var colorKey = colorPicker.getDistinctColorKey();
-    highlightKeys.push(colorKey);
-
-    grid.setCellColors(coordinatesToHighlight,
-        "#d3d3d3",
-        colorKey);
-    highlightKeys.push(colorPicker.getCurrentColorKey());
+    // highlight those cells with the plate color
+    gridHighlighter.selectCellsInRange(range, ColorPicker.PLATE_COLOR);
 }
 
-function selectCellsPlates(startRow, startCol, endRow, endCol){
+function selectCellsPlates(range){
     // plate range input on the plate page
     var plateRangeInput = document.getElementById("firstPlateCellRange");
-    plateRangeInput.value = Grid.getRowLabel(startRow)+startCol+":"
-    +Grid.getRowLabel(endRow)+endCol;
+    plateRangeInput.value = range.toString();
 
     // remove previous highlighting
-    removeAllHighlighting();
+    gridHighlighter.removeAllHighlighting();
 
 
-    // highlight those cells with the current color
-    var coordinatesToHighlight = [];
-    for (var i=startRow; i<=endRow; i++){
-        for (var j=startCol; j<=endCol; j++){
-            coordinatesToHighlight.push([i,j]);
-        }
-    }
-    grid.setCellColors(coordinatesToHighlight,
-        colorPicker.getColorByIndex(colorPointer),
-        colorPicker.getCurrentColorKey());
-    highlightKeys.push(colorPicker.getCurrentColorKey());
+    // highlight those cells with the plate color
+    gridHighlighter.selectCellsInRange(range, ColorPicker.PLATE_COLOR);
 }
 
-function selectCellsFeatures(startRow, startCol, endRow, endCol){
+function selectCellsFeatures(range){
+    // clear and reload the feature selector
+    clearFeatureValues();
+    reloadFeatureSelector();
+
     // feature range input on the feature page
     var featureRangeInput = document.getElementById("featureCellRange");
-    featureRangeInput.value = Grid.getRowLabel(startRow)+startCol+":"
-    +Grid.getRowLabel(endRow)+endCol;
+    featureRangeInput.value = range.toString();
 
     // remove previous highlighting
-    removeAllHighlighting();
+    gridHighlighter.removeAllHighlighting();
 
     // highlight plates if already specified
     if (parsingConfig && parsingConfig.plate && examiner && examiner.rowsSize){
-        plateHighlightKeys = plateHighlightKeys.concat(
-            parsingConfig.highlightAllPlates(colorPicker, grid)
-        );
+        gridHighlighter.highlightAllPlates(parsingConfig);
     }
 
     // highlight selected cells with the current color
-    var coordinatesToHighlight = [];
-    for (var i=startRow; i<=endRow; i++){
-        for (var j=startCol; j<=endCol; j++){
-            coordinatesToHighlight.push([i,j]);
-        }
-    }
-    grid.setCellColors(coordinatesToHighlight,
-        colorPicker.getColorByIndex(colorPointer),
-        colorPicker.getCurrentColorKey());
-    highlightKeys.push(colorPicker.getCurrentColorKey());
+    gridHighlighter.selectCellsInRange(range, colorPicker.getCurrentColor());
 }
 
 function firstPlateCellRangeChange(){
@@ -577,7 +495,9 @@ function cellRangeChange(inputElement){
     grid.selectedStartCol = start[1];
     grid.selectedEndRow = end[0];
     grid.selectedEndCol = end[1];
-    selectCells(start[0], start[1], end[0], end[1]);
+
+    var selectedRange = new Range(start[0], start[1], end[0], end[1]);
+    selectCells(selectedRange);
 }
 
 function handleTabChange(event, ui){
@@ -586,7 +506,7 @@ function handleTabChange(event, ui){
     var plates;
     activeTab = newTab;
 
-    removeAllHighlighting();
+    gridHighlighter.removeAllHighlighting();
     clearSelectedCells();
 
     if (oldTab === PARSING){
@@ -612,9 +532,7 @@ function handleTabChange(event, ui){
 
         // highlight plates if already specified
         if (parsingConfig && parsingConfig.plate && examiner && examiner.rowsSize){
-            plateHighlightKeys = plateHighlightKeys.concat(
-                parsingConfig.highlightAllPlates(colorPicker, grid)
-            );
+            gridHighlighter.highlightAllPlates(parsingConfig);
         }
     } else if (newTab === FEATURES){
         if (!parsingConfig || !parsingConfig.plate){
@@ -627,9 +545,7 @@ function handleTabChange(event, ui){
 
         // highlight plates if already specified
         if (parsingConfig && parsingConfig.plate && examiner && examiner.rowsSize){
-            plateHighlightKeys = plateHighlightKeys.concat(
-                parsingConfig.highlightAllPlates(colorPicker, grid)
-            );
+            gridHighlighter.highlightAllPlates(parsingConfig);
         }
     }
 
@@ -688,8 +604,8 @@ function handlePlateSelect(event){
     var plateIndex = target.value;
 
     // highlight the selected plate
-    removeAllHighlighting();
-    highlightKeys.push(parsingConfig.highlightPlate(plateIndex, colorPicker, grid));
+    gridHighlighter.removeAllHighlighting()
+    gridHighlighter.highlightPlate(plateIndex, parsingConfig);
 }
 
 function handleImportResults(){
@@ -763,8 +679,8 @@ function handlePlateLevelFeatureSelect(event){
     var featureName= target.value;
 
     // highlight the selected feature
-    removeAllHighlighting();
-    highlightKeys.push(parsingConfig.highlightFeature(featureName,colorPicker, grid));
+    gridHighlighter.removeAllHighlighting();
+    gridHighlighter.highlightFeature(featureName, parsingConfig);
 
     // fill the importDate plate IDs with that feature value
     for (var plateIndex = 0; plateIndex<importData.plates.length; plateIndex++){
@@ -885,6 +801,7 @@ function addEvent(elementId, eventType, handlerFunction) {
 function init(){
     examiner = new FileExaminer();
     grid = new Grid("myGrid");
+    gridHighlighter = new GridHighlighter(grid);
 
     // to get jQuery-UI tab functionality working
     $( "#tabs" ).tabs({

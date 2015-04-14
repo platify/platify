@@ -11,8 +11,6 @@ var EXPERIMENT_LEVEL = "experimentLevel";
 var QUANTITATIVE = "quantitative";
 var QUALITATIVE = "qualitative";
 
-var MAX_NUM_ANCHORS = 5;
-
 /**
  * The constructor for ParsingConfig objects.
  * @param name - a unique string name for the parsing configuration
@@ -26,14 +24,8 @@ var MAX_NUM_ANCHORS = 5;
  *                  delimiter separated value file format. The acceptable values are:
  *                      "comma"
  *                      "semicolon"
+ *                      "colon"
  *                      "tab"
- * @param multiplePlatesPerFile - a boolean for whether or not the assay machine places
- *                          the results from multiple plates in a single file
- * @param multipleValuesPerWell - a boolean for whether or not multiple values per well
- *                          are given in the output files of the specified assay machine
- * @param gridFormat - a boolean for whether or not the file gives per well values in grid
- *                  format. If false this indicates that results are given in row per well
- *                  format.
  * @constructor
  */
 function ParsingConfig(name,
@@ -208,59 +200,66 @@ function ParsingConfig(name,
 
     this.getFeatureValuesDescriptors = function(featureName, grid){
         var result = [];
-        var featureCoords = this.getFeatureCoords(featureName);
+        var featureCoords;
         var feature = this.features[featureName];
-        var lastPlate = -1;
-        var wellCounter = 0;
+        var plateIndex;
+        var gridRow;
+        var gridCol;
+        var cell;
+        var value;
+        var descriptor;
 
+        if (feature.typeOfFeature == WELL_LEVEL){
+            featureCoords = this.findWellLevelFeatureCoords(featureName);
 
-        for (var i=0; i<featureCoords.length; i++){
-            var currentCoordinates = featureCoords[i];
-            var row = currentCoordinates[0];
-            var col = currentCoordinates[1];
-            var rowLetter = Grid.getRowLabel(row);
-            var cell = rowLetter + col;
-            var value = grid.getDataPoint(row, col);
-            var plate;
-            var descriptor;
+            for (plateIndex = 0; plateIndex < featureCoords.length; plateIndex++){
+                var plate = featureCoords[plateIndex];
 
-            if (feature.typeOfFeature != EXPERIMENT_LEVEL) {
-                for (var j=0; j<this.plates.length; j++){
-                    if (ParsingConfig.cellIsContainedInRange([row, col], this.plates[j])){
-                        plate = j;
-                        break;
-                    }
-                }
+                for (var wellIndex = 0; wellIndex < plate.length; wellIndex++){
+                    gridRow = plate[wellIndex][0];
+                    gridCol = plate[wellIndex][1];
+                    cell = Grid.getRowLabel(gridRow) + gridCol;
+                    value = grid.getDataPoint(gridRow, gridCol);
 
-                if (lastPlate != plate) {
-                    lastPlate = plate;
-                    wellCounter = 0;
+                    var coordsOnPlate = ParsingConfig.wellNumberToPlateCoords(wellIndex,
+                                                                              plate.length,
+                                                                              2,
+                                                                              3);
+                    var plateRow = Grid.getRowLabel(coordsOnPlate[0] + 1);
+                    var plateCol = coordsOnPlate[1] + 1;
+                    descriptor = "plate: " + (plateIndex + 1) + ", well: " + plateRow
+                                    + plateCol + ", value: " + value;
+                    result.push({
+                        descriptor: descriptor,
+                        cell: cell
+                    });
                 }
             }
+        } else if (feature.typeOfFeature == PLATE_LEVEL) {
+            featureCoords = this.findPlateLevelFeatureCoords(featureName);
 
-            if (feature.typeOfFeature == WELL_LEVEL){
-                var numberOfWellsOnAPlate
-                    = ParsingConfig.getNumberOfWellsFromFeatureBounds(
-                                                            feature.topLeftCoords[0],
-                                                            feature.topLeftCoords[1],
-                                                            feature.bottomRightCoords[0],
-                                                            feature.bottomRightCoords[1]);
-                var plateCoords = ParsingConfig.wellNumberToPlateCoords(wellCounter,
-                                                                    numberOfWellsOnAPlate,
-                                                                    2,
-                                                                    3);
-                var plateRow = Grid.getRowLabel(plateCoords[0] + 1);
-                var plateWellIdentifier = plateRow + (plateCoords[1] + 1);
+            for (plateIndex = 0; plateIndex < featureCoords.length; plateIndex++){
+                var plate = featureCoords[plateIndex];
 
-                descriptor = "plate: " + (plate + 1) + ", well: " + plateWellIdentifier
-                                + ", value: " + value;
+                gridRow = plate[0];
+                gridCol = plate[1];
+                cell = Grid.getRowLabel(gridRow) + gridCol;
+                value = grid.getDataPoint(gridRow, gridCol);
+                descriptor = "plate: " + (plateIndex + 1) + ", value: " + value;
 
-                wellCounter++;
-            } else if (feature.typeOfFeature == PLATE_LEVEL) {
-                descriptor = "plate: " + (plate + 1) + ", value: " + value;
-            } else if (feature.typeOfFeature == EXPERIMENT_LEVEL){
-                descriptor = "value: " + value;
+                result.push({
+                    descriptor: descriptor,
+                    cell: cell
+                });
             }
+        } else if (feature.typeOfFeature == EXPERIMENT_LEVEL){
+            featureCoords = this.findExperimentLevelFeatureCoords(featureName);
+
+            gridRow = featureCoords[0];
+            gridCol = featureCoords[1];
+            cell = Grid.getRowLabel(gridRow) + gridCol;
+            value = grid.getDataPoint(gridRow, gridCol);
+            descriptor = "value: " + value;
 
             result.push({
                 descriptor: descriptor,
@@ -269,80 +268,6 @@ function ParsingConfig(name,
         }
 
         return result;
-    };
-
-    this.highlightPlatesAndFeatures = function(colorPicker, grid){
-        var colorKeys;
-        var colorKey;
-
-        // first highlight plates
-        colorKeys = this.highlightAllPlates(colorPicker, grid);
-
-        // next highlight features
-        var featuresHighlightColorKeys = this.highlightAllFeatures(colorPicker, grid);
-        colorKeys = colorKeys.concat(featuresHighlightColorKeys);
-
-        return colorKeys;
-    };
-
-    this.highlightPlate = function(plateIndex,colorPicker, grid){
-        var colorKey;
-
-        var plateRange = this.plates[plateIndex];
-        var startRow = plateRange[0];
-        var startCol = plateRange[1];
-        var endRow = plateRange[2];
-        var endCol = plateRange[3];
-        colorKey = colorPicker.getDistinctColorKey();
-
-        var coordsToHighlight = ParsingConfig.getCoordsInARange(startRow,
-            startCol,
-            endRow,
-            endCol);
-
-        grid.setCellColors(coordsToHighlight,
-            colorPicker.getColorByIndex(this.plate.color),
-            colorKey);
-
-        return colorKey;
-    };
-
-    this.highlightAllPlates = function(colorPicker, grid){
-        var colorKeys = [];
-        var colorKey;
-
-        // first highlight plates
-        for (var plateIndex=0; plateIndex<this.plates.length; plateIndex++){
-            colorKey = this.highlightPlate(plateIndex, colorPicker, grid);
-            colorKeys.push(colorKey);
-        }
-
-        return colorKeys;
-    };
-
-    this.highlightFeature = function(featureName, colorPicker, grid){
-        var feature = this.features[featureName];
-        var colorKey = colorPicker.getDistinctColorKey();
-
-        var coordsToHighlight = this.getFeatureCoords(featureName);
-
-        grid.setCellColors(coordsToHighlight,
-            colorPicker.getColorByIndex(feature.color),
-            colorKey);
-
-        return colorKey;
-    };
-
-    this.highlightAllFeatures = function(colorPicker, grid){
-        var colorKeys = [];
-        var colorKey;
-
-        for(var featureName in this.features){
-            colorKey = this.highlightFeature(featureName, colorPicker, grid);
-            colorKeys.push(colorKey);
-        }
-
-        return colorKeys;
     };
 
 
@@ -431,21 +356,8 @@ function ParsingConfig(name,
         return importData;
     };
 
-    this.applyFeatures = function(startRow, endRow, grid){
-        var plateIDs = [];
-        for (var i=0; i<this.plates.length; i++){
-            plateIDs.push("plate " + i);
-        }
-        var colorKeys = this.highlightPlatesAndFeatures(colorPicker, grid);
-        var data = this.createImportData(plateIDs, grid);
 
-        console.log(data);
-
-        return colorKeys;
-    };
-
-
-    this.addFeature = function(name, grid, isParent, parent, typeOfFeature){
+    this.addFeature = function(name, grid, isParent, parent, typeOfFeature, color){
         var newFeature = new BioFeature(name);
         newFeature.topLeftCoords= [grid.selectedStartRow, grid.selectedStartCol];
         newFeature.topLeftValue=grid.getDataPoint(grid.selectedStartRow, grid.selectedStartCol);
@@ -453,9 +365,8 @@ function ParsingConfig(name,
         newFeature.relativeToLeftX = grid.selectedStartCol;
         newFeature.relativeToLeftY = grid.selectedStartRow;
         newFeature.typeOfFeature = typeOfFeature;
+        newFeature.color = color;
         if (!isParent) {
-            newFeature.typeOfFeature = typeOfFeature;
-
             // When it is one value set both top and bottom properties to
             // the same value.
             if(newFeature.typeOfFeature== PLATE_LEVEL
@@ -466,8 +377,6 @@ function ParsingConfig(name,
             newFeature.relativeToLeftY = newFeature.topLeftCoords[0] - parent.topLeftCoords[0];
             newFeature.importData = true;
         }
-        newFeature.color=colorPointer;
-        colorPointer++;
 
         console.log(newFeature);
         return newFeature;
@@ -477,12 +386,12 @@ function ParsingConfig(name,
         delete this.features[nameOfFeatureToDelete];
     };
 
-    this.addPlate = function(grid, examiner){
+    this.addPlate = function(grid, examiner, color){
         this.plateAnchors = [];
         this.features = {};
         this.plates = [];
 
-        this.plate = this.addFeature("plate", grid, true, null, PLATE);
+        this.plate = this.addFeature("plate", grid, true, null, PLATE, color);
 
         this.plateAnchors.push([this.plate.topLeftCoords[0] - this.plate.topLeftCoords[0],
                                    this.plate.topLeftCoords[1] - this.plate.topLeftCoords[1],
@@ -491,109 +400,17 @@ function ParsingConfig(name,
         return this.plate
     };
 
-    this.addExperimentLevelFeature = function(name, grid){
-        return this.addFeature(name, grid, true, null, EXPERIMENT_LEVEL);
+    this.addExperimentLevelFeature = function(name, grid, color){
+        return this.addFeature(name, grid, true, null, EXPERIMENT_LEVEL, color);
     };
 
-    this.addPlateLevelFeature = function(name, grid){
-        return this.addFeature(name, grid, false, this.plate, PLATE_LEVEL);
+    this.addPlateLevelFeature = function(name, grid, color){
+        return this.addFeature(name, grid, false, this.plate, PLATE_LEVEL, color);
     };
 
-    this.addWellLevelFeature = function(name, grid){
-        return this.addFeature(name, grid, false, this.plate, WELL_LEVEL);
+    this.addWellLevelFeature = function(name, grid, color){
+        return this.addFeature(name, grid, false, this.plate, WELL_LEVEL, color);
     };
-
-    /**
-     * This function might be useful for more in depth pattern matching
-     */
-    this.searchForPlateAnchors = function(examiner, grid){
-        var possibleAnchors = [];
-
-        var plateStartRow = this.plate.topLeftCoords[0];
-        var plateEndRow = this.plate.bottomRightCoords[0];
-        var plateStartCol = this.plate.topLeftCoords[1];
-        var plateEndCol = this.plate.bottomRightCoords[1];
-        var plateHeight = plateEndRow - plateStartRow +1;
-        var plateWidth = plateEndCol - plateStartCol + 1;
-        var plateCellNumber = plateHeight * plateWidth;
-        var totalCheckedCellNumber = examiner.colsSize * examiner.rowsSize;
-
-        var plateRelativeCoorCounts = ParsingConfig.createZeros2DArray(plateHeight,
-                                                                       plateWidth);
-
-
-
-
-        for (var row = 1; row<= examiner.rowsSize-plateHeight+1; row++){
-            var currentMatchedRelativePlateCoords
-                = plateMatchCoordinates(row, plateStartCol, grid);
-
-            if (currentMatchedRelativePlateCoords.length >= Math.max(plateWidth, plateHeight)){
-                for (var i=0; i<currentMatchedRelativePlateCoords.length; i++){
-                    var rowToIncrement = currentMatchedRelativePlateCoords[i][0];
-                    var colToIncrement = currentMatchedRelativePlateCoords[i][1];
-
-                    plateRelativeCoorCounts[rowToIncrement][colToIncrement]++;
-                }
-            }
-        }
-
-
-        var maxCount = totalCheckedCellNumber/plateCellNumber;
-        var minCount = (3*maxCount)/4;
-
-        for(var countRowIndex=0; countRowIndex<plateHeight; countRowIndex++){
-            for (var countColIndex=0; countColIndex<plateWidth; countColIndex++){
-                var count = plateRelativeCoorCounts[countRowIndex][countColIndex];
-
-                if (count <= maxCount && count >= minCount){
-                    var anchorValue = grid.getDataPoint(plateStartRow + countRowIndex,
-                                                        plateStartCol + countColIndex);
-
-                    possibleAnchors.push([countRowIndex, countColIndex, anchorValue]);
-                }
-            }
-        }
-
-        if (possibleAnchors.length === 0){
-
-        }
-
-        return possibleAnchors;
-    };
-
-    function plateMatchCoordinates(otherStartRow, otherStartCol ,grid){
-        var result = [];
-
-        var valueToLookFor;
-        var plateStartRow = _self.plate.topLeftCoords[0];
-        var plateEndRow = _self.plate.bottomRightCoords[0];
-        var plateStartCol = _self.plate.topLeftCoords[1];
-        var plateEndCol = _self.plate.bottomRightCoords[1];
-        var plateHeight = plateEndRow - plateStartRow +1;
-        var plateWidth = plateEndCol - plateStartCol + 1;
-
-
-        for (var obsRowIndex = 0; obsRowIndex<plateHeight; obsRowIndex++) {
-            for (var obsColIndex = 0; obsColIndex<plateWidth; obsColIndex++) {
-                var obsRow = otherStartRow + obsRowIndex;
-                var obsCol = otherStartCol + obsColIndex;
-                var plateRow = plateStartRow + obsRowIndex;
-                var plateCol = plateStartCol + obsColIndex;
-
-                valueToLookFor = grid.getDataPoint(plateRow, plateCol).trim();
-                var currentValue = grid.getDataPoint(obsRow, obsCol).trim();
-
-                if (currentValue == valueToLookFor){
-                    result.push([obsRowIndex, obsColIndex])
-                }
-            }
-        }
-
-
-
-        return result;
-    }
 
     this.getJSONString = function(){
         var JSONObject = {};
