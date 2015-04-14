@@ -1,13 +1,14 @@
 
 
 function updatePlateList(experimentId) {
-    var select = $('#plateSelect')[0];
     // TODO - don't hardcode this
     var url = 'http://localhost:8080/capstone/experimentalPlateSet/barcodes/' + experimentId;
     $.getJSON(url, function(result) {
+        var select = $('#plateSelect');
+	select.children('option').remove();
         $.each(result.barcodes, function() {
             console.log('adding option for experiment ' + experimentId + ' plate ' + this);
-            $('<option />').text(this).appendTo(select);
+            $('<option />').text(this).appendTo(select[0]);
         });
     });
 }

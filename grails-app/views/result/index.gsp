@@ -20,6 +20,7 @@
 						from="${edu.harvard.capstone.editor.ExperimentalPlateSet.list()}"
 						optionKey="id"
 						optionValue="${{it.name + " - " + it.id}}"
+						onchange="updatePlateList(this.value)"
 					/>
 					</div>
 					<div>
