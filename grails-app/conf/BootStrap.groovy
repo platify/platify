@@ -1,3 +1,5 @@
+import java.util.Random
+
 import edu.harvard.capstone.user.Scientist
 import edu.harvard.capstone.user.ScientistRole
 import edu.harvard.capstone.user.Role
@@ -176,10 +178,35 @@ class BootStrap {
 	    def label1 = new ResultLabel(name: "result label", value: "result label value", labelType: ResultLabel.LabelType.LABEL, scope: ResultLabel.LabelScope.RESULT, domainId: result1.id).save(flush: true)
 	    def plate1 = new ResultPlate(result: result1, rows: 4, columns: 4, barcode: "result plate 1").save(flush: true)
 	    def plateLabel1 = new ResultLabel(name: "result plate label", value: "result plate label value", labelType: ResultLabel.LabelType.LABEL, scope: ResultLabel.LabelScope.PLATE, domainId: plate1.id).save(flush: true)
-	    def well1 = new Well(plate: template1, column: 0, row: 0, control: Well.WellControl.EMPTY).save(flush: true)
-	    def resultWell1 = new ResultWell(plate: plate1, well: well1).save(flush: true)
-	    def resultLabel1 = new ResultLabel(name: "result well label raw data", value: "1234", labelType: ResultLabel.LabelType.RAW_DATA, scope: ResultLabel.LabelScope.RESULT, domainId: resultWell1.id).save(flush: true)
-
+	    def random = new Random()
+	    def controlWells = []
+	    def controlLabels = []
+	    for (x in 0 .. plate1.rows-1) {
+		for (y in 0 .. plate1.columns-1) {
+		    def well = new Well(plate: template1, column: x, row: y,
+					control: Well.WellControl.EMPTY).save(flush:true)
+		    if ((x < 4) && (y == 0)) { controlWells << well }
+		    def resultWell = new ResultWell(plate: plate1, well: well).save(flush: true)
+		    def resultLabel = new ResultLabel(name: "smoots",
+						      value: random.nextFloat() * 100,
+						      labelType: ResultLabel.LabelType.RAW_DATA,
+						      scope: ResultLabel.LabelScope.WELL,
+						      domainId: resultWell.id).save(flush: true)
+		    if ((x < 4) && (y == 0)) { controlLabels << resultLabel }
+		}
+	    }
+	    for (i in 0 .. 1) {
+		controlWells[i].control = Well.WellControl.NEGATIVE
+		controlWells[i].save(flush: true)
+		controlLabels[i].value = "0"
+		controlLabels[i].save(flush: true)
+	    }
+	    for (i in 2 .. 3) {
+		controlWells[i].control = Well.WellControl.POSITIVE
+		controlWells[i].save(flush: true)
+		controlLabels[i].value = "100"
+		controlLabels[i].save(flush: true)
+	    }
 		}
 		log.info "Users: " + Scientist.count()
 		log.info "Roles: " + Role.count()
