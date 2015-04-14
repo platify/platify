@@ -7,12 +7,14 @@
     "test": "test"
   },
   "scripts": {
-    "test": "qunit-cli test/*.js"
+    "test": "qunit-cli test/*.js",
+    "cover": "istanbul cover test/*.js"
   },
   "author": "Dave Bonner <dbonner@gmail.com>",
   "license": "GPLv3",
   "devDependencies": {
     "d3": "^3.5.5",
+    "istanbul": "^0.3.13",
     "qunit-cli": "^0.2.0",
     "qunitjs": "^1.17.1"
   }
