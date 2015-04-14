@@ -13,6 +13,7 @@
 			<div class="row">
 				<!-- Left Column -->
 				<div class="col-sm-2">
+					<div>
 					<g:select
 						id="experimentSelect"
 						name="name"
@@ -20,6 +21,9 @@
 						optionKey="id"
 						optionValue="${{it.name + " - " + it.id}}"
 					/>
+					</div>
+					<div>
+					<select id="plateSelect"></select>
 				</div> <!-- Left Column END -->
 				<!-- Right Column -->
 				<div class="col-sm-9">
@@ -72,5 +76,6 @@
 				</div> <!-- Right Column END -->	
 			</div>
 		</div>
+	<asset:javascript src="result/index.js" />
 	</body>
 </html>
