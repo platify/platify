@@ -6,10 +6,8 @@ var d3 = require('d3');
  * will normalize the values for that label against the controls,
  * returning the results as a 2d array.
  */
-exports.normalize = function (importData, plateNum, label,
+exports.normalize = function (plate, label,
                               negativeControls, positiveControls) {
-    var plate = importData.plates[plateNum];
-
     var negativeMean = d3.mean(negativeControls.map(function (a) {
         return plate.rows[a[0]].columns[a[1]].rawData[label];
     }));
@@ -35,10 +33,8 @@ exports.normalize = function (importData, plateNum, label,
  * Calculates the Z' factor for a plate, according to the formula at
  *   https://support.collaborativedrug.com/entries/21220276-Plate-Quality-Control
  */
-exports.zPrimeFactor = function (importData, plateNum, label,
+exports.zPrimeFactor = function (plate, label,
 			         negativeControls, positiveControls) {
-    var plate = importData.plates[plateNum];
-
     var positiveStdDev = d3.deviation(positiveControls.map(function (a) {
         return plate.rows[a[0]].columns[a[1]].rawData[label];
     }));
@@ -61,10 +57,8 @@ exports.zPrimeFactor = function (importData, plateNum, label,
  * Calculates the Z factor for a plate, according to the formula at
  *   https://support.collaborativedrug.com/entries/21220276-Plate-Quality-Control
  */
-exports.zFactor = function (importData, plateNum, label,
+exports.zFactor = function (plate, label,
 			    negativeControls, positiveControls) {
-    var plate = importData.plates[plateNum];
-
     var positiveStdDev = d3.deviation(positiveControls.map(function (a) {
         return plate.rows[a[0]].columns[a[1]].rawData[label];
     }));
@@ -95,9 +89,8 @@ exports.zFactor = function (importData, plateNum, label,
  *
  * TODO - implement variant where no controls are available.
  */
-exports.zScore = function (importData, plateNum, label,
+exports.zScore = function (plate, label,
 		           negativeControls, positiveControls) {
-    var plate = importData.plates[plateNum];
     var negativeStdDev = d3.deviation(negativeControls.map(function (a) {
         return plate.rows[a[0]].columns[a[1]].rawData[label];
     }));
