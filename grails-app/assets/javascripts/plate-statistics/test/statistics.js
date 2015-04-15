@@ -14,8 +14,8 @@ var arrayToImportData = function (rawData, label) {
         for (var c=0; c<rawData[r].length; c++) {
             // NOTE: ugly two-line initializer thanks to javascript not
             //       accepting variables as keys in object literals.
-            plate.rows[r].columns[c] = {'labels': {}};
-            plate.rows[r].columns[c].labels[label] = rawData[r][c];
+            plate.rows[r].columns[c] = {'rawData': {}};
+            plate.rows[r].columns[c].rawData[label] = rawData[r][c];
         }
     }
     return {'plates': [plate]};

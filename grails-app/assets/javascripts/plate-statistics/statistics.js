@@ -11,10 +11,10 @@ exports.normalize = function (importData, plateNum, label,
     var plate = importData.plates[plateNum];
 
     var negativeMean = d3.mean(negativeControls.map(function (a) {
-        return plate.rows[a[0]].columns[a[1]].labels[label];
+        return plate.rows[a[0]].columns[a[1]].rawData[label];
     }));
     var positiveMean = d3.mean(positiveControls.map(function (a) {
-        return plate.rows[a[0]].columns[a[1]].labels[label];
+        return plate.rows[a[0]].columns[a[1]].rawData[label];
     }));
     var scale = d3.scale.linear().domain([negativeMean, positiveMean])
 	    	    .range([0, 1]);
@@ -23,7 +23,7 @@ exports.normalize = function (importData, plateNum, label,
     for (var i=0; i<plate.rows.length; i++) {
         normalized[i] = []
 	for (var j=0; j<plate.rows[i].columns.length; j++) {
-            var raw_value = plate.rows[i].columns[j].labels[label];
+            var raw_value = plate.rows[i].columns[j].rawData[label];
             normalized[i][j] = scale(raw_value);
         }
     }
@@ -40,17 +40,17 @@ exports.zPrimeFactor = function (importData, plateNum, label,
     var plate = importData.plates[plateNum];
 
     var positiveStdDev = d3.deviation(positiveControls.map(function (a) {
-        return plate.rows[a[0]].columns[a[1]].labels[label];
+        return plate.rows[a[0]].columns[a[1]].rawData[label];
     }));
     var positiveMean = d3.mean(positiveControls.map(function (a) {
-        return plate.rows[a[0]].columns[a[1]].labels[label];
+        return plate.rows[a[0]].columns[a[1]].rawData[label];
     }));
 
     var negativeStdDev = d3.deviation(negativeControls.map(function (a) {
-        return plate.rows[a[0]].columns[a[1]].labels[label];
+        return plate.rows[a[0]].columns[a[1]].rawData[label];
     }));
     var negativeMean = d3.mean(negativeControls.map(function (a) {
-        return plate.rows[a[0]].columns[a[1]].labels[label];
+        return plate.rows[a[0]].columns[a[1]].rawData[label];
     }));
 
     return 1 - (3 * (positiveStdDev + negativeStdDev)
@@ -66,10 +66,10 @@ exports.zFactor = function (importData, plateNum, label,
     var plate = importData.plates[plateNum];
 
     var positiveStdDev = d3.deviation(positiveControls.map(function (a) {
-        return plate.rows[a[0]].columns[a[1]].labels[label];
+        return plate.rows[a[0]].columns[a[1]].rawData[label];
     }));
     var positiveMean = d3.mean(positiveControls.map(function (a) {
-        return plate.rows[a[0]].columns[a[1]].labels[label];
+        return plate.rows[a[0]].columns[a[1]].rawData[label];
     }));
 
     // there *has* to be a cleaner way than this
@@ -78,7 +78,7 @@ exports.zFactor = function (importData, plateNum, label,
     for (var i=0; i<plate.rows.length; i++) {
         for (var j=0; j<plate.rows[i].columns.length; j++) {
             if (!controls.has([i,j])) {
-                nonControlValues.push(plate.rows[i].columns[j].labels[label]);
+                nonControlValues.push(plate.rows[i].columns[j].rawData[label]);
             }
         }
     }
@@ -99,10 +99,10 @@ exports.zScore = function (importData, plateNum, label,
 		           negativeControls, positiveControls) {
     var plate = importData.plates[plateNum];
     var negativeStdDev = d3.deviation(negativeControls.map(function (a) {
-        return plate.rows[a[0]].columns[a[1]].labels[label];
+        return plate.rows[a[0]].columns[a[1]].rawData[label];
     }));
     var negativeMean = d3.mean(negativeControls.map(function (a) {
-        return plate.rows[a[0]].columns[a[1]].labels[label];
+        return plate.rows[a[0]].columns[a[1]].rawData[label];
     }));
 
     var controls = d3.set(d3.merge([negativeControls, positiveControls]))
@@ -114,7 +114,7 @@ exports.zScore = function (importData, plateNum, label,
                 zScores[i][j] = null;
             } else {
                 zScores[i][j] = 
-                    (plate.rows[i].columns[j].labels[label] - negativeMean)
+                    (plate.rows[i].columns[j].rawData[label] - negativeMean)
                     / negativeStdDev;
             }
         }
