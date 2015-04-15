@@ -5,6 +5,7 @@ var CELL_WIDTH = 75;
 var data;
 var plateModel = {};
 var catLegend = {};
+var groupNames = {};
 var grid;
 var currentHighlightKeys = [];
 var highlightKeyCounter = 0;
@@ -52,15 +53,18 @@ function createRandomData() {
 function loadJsonData(plateJson) {
 	
 	plateModel = translateInputJsonToModel(plateJson);
-	
+
 	for (var row in plateModel["rows"]) {
 		for (var column in plateModel["rows"][row]["columns"]) {
 		
-			var newContents = plateModel["rows"][row]["columns"][column]["wellGroupName"];
+			var wellgrp = plateModel["rows"][row]["columns"][column]["wellGroupName"];
+			groupNames[wellgrp] = "SOME_COMPOUND";
+		
+			var newContents = wellgrp;
 
 			for (var catKey in plateModel["rows"][row]["columns"][column]["categories"]) {
 				for (var labKey in plateModel["rows"][row]["columns"][column]["categories"][catKey]) {
-					var color = plateModel["rows"][row]["columns"][column]["categories"][catKey][labKey];
+					var color = plateModel["rows"][row]["columns"][column]["categories"][catKey][labKey]["color"];
 					newContents += "," + color;
 					
 					// cat legend part !! --> only needed for assignlabels page ??
@@ -98,6 +102,7 @@ function loadJsonData(plateJson) {
 	}
 	
 	updateCategoryList();
+	updateCompoundList();
 }
 
 /**
@@ -227,7 +232,8 @@ function updateCellColors(cat, label, color) {
 			var row = cellRefArr[0];
 			var column = cellRefArr[1];
 			plateModel["rows"][row]["columns"][column]["categories"][cat] = {};
-			plateModel["rows"][row]["columns"][column]["categories"][cat][label] = color;
+			plateModel["rows"][row]["columns"][column]["categories"][cat][label] = {};
+			plateModel["rows"][row]["columns"][column]["categories"][cat][label]["color"] = color;
 			
 			catLegend[cat][label]['color'] = color;
 			
@@ -235,12 +241,21 @@ function updateCellColors(cat, label, color) {
 			var newContents = plateModel["rows"][row]["columns"][column]["wellGroupName"];
 			for (var catKey in plateModel["rows"][row]["columns"][column]["categories"]) {
 				for (var labKey in plateModel["rows"][row]["columns"][column]["categories"][catKey]) {
-					newContents += "," + plateModel["rows"][row]["columns"][column]["categories"][catKey][labKey];
+					newContents += "," + plateModel["rows"][row]["columns"][column]["categories"][catKey][labKey]["color"];
 				}
 			}
 			grid.updateCellContents(row, column, newContents);
 		}
 	}
+}
+
+function createCompoundInput(wellGroup) {
+	var newInput = document.createElement("input");
+	newInput.id = "wellGroup-" + wellGroup;
+	newInput.type = "text";
+	//newInput.className = "btn-default";
+	
+	return newInput;
 }
 
 function createColorPicker(cat, label) {
@@ -271,6 +286,22 @@ function createColorPicker(cat, label) {
 	cpDiv.appendChild(deleteLabelBtn);
 	
 	return cpDiv;
+}
+
+function updateCompoundList() {
+	var newDiv = document.createElement("div");
+	for (var wellGroup in groupNames) {
+		var innerDiv = document.createElement("div");
+		innerDiv.className = "col-xs-12";
+		var newLabel = document.createElement("label");
+		newLabel.appendChild(document.createTextNode(wellGroup));
+		
+		var newInput = createCompoundInput(wellGroup);
+		innerDiv.appendChild(newLabel);
+		innerDiv.appendChild(newInput);
+		newDiv.appendChild(innerDiv);
+	}
+	document.getElementById("compoundList").innerHTML = newDiv.innerHTML;
 }
 
 function updateCategoryList() {
@@ -336,7 +367,7 @@ function removeLabel(cat, label) {
 		var newContents = plateModel["rows"][row]["columns"][column]["wellGroupName"];
 		for (var catKey in plateModel["rows"][row]["columns"][column]["categories"]) {
 			for (var labKey in plateModel["rows"][row]["columns"][column]["categories"][catKey]) {
-				newContents += "," + plateModel["rows"][row]["columns"][column]["categories"][catKey][labKey];
+				newContents += "," + plateModel["rows"][row]["columns"][column]["categories"][catKey][labKey]["color"];
 			}
 		}
 		grid.updateCellContents(row, column, newContents);
@@ -402,6 +433,7 @@ function addDoseStep() {
 	var cat = "dosage";
 	
 	var topDose = document.getElementById("topDoseValue").value;
+	var units = document.getElementById("doseStepUnits").value;
 	var dilution = document.getElementById("stepDilutionValue").value;
 	var replicates = document.getElementById("replicatesValue").value;
 	var topColor = document.getElementById("tDoseColorValue").value;
@@ -414,7 +446,7 @@ function addDoseStep() {
 	for (var i = 0; i < wellGroupLength; i++) {
 		for (var j = 0; j < replicates; j++) {
 			console.log("i+j:" + (i+j));
-			createNewLabel(cat, currentDose, currentColor, [selCells[i+j]]);
+			createNewLabel(cat, currentDose, units, currentColor, [selCells[i+j]]);
 		}
 		i += (replicates-1);
 		currentColor = shade(currentColor, 0.2); // should we use 1/dilution instead ?? (might be too dramatic a difference !!
@@ -427,7 +459,7 @@ function addDoseStep() {
 	removeAllHighlightedCells();
 }
 
-function createNewLabel(cat, label, color, applyToCells) {
+function createNewLabel(cat, label, units, color, applyToCells) {
 	// remove spaces from the names (replacing with '_')
 	cat = cat.split(' ').join('_');
 	label = label.split(' ').join('_');
@@ -477,12 +509,14 @@ function createNewLabel(cat, label, color, applyToCells) {
 			plateModel["rows"][row]["columns"][column]["wellGroupName"] = "-";
 		}
 		plateModel["rows"][row]["columns"][column]["categories"][cat] = {};
-		plateModel["rows"][row]["columns"][column]["categories"][cat][label] = color;
+		plateModel["rows"][row]["columns"][column]["categories"][cat][label] = {};
+		plateModel["rows"][row]["columns"][column]["categories"][cat][label]["color"] = color;
+		plateModel["rows"][row]["columns"][column]["categories"][cat][label]["units"] = units;
 		var newContents = plateModel["rows"][row]["columns"][column]["wellGroupName"];
 
 		for (var catKey in plateModel["rows"][row]["columns"][column]["categories"]) {
 			for (var labKey in plateModel["rows"][row]["columns"][column]["categories"][catKey]) {
-				newContents += "," + plateModel["rows"][row]["columns"][column]["categories"][catKey][labKey];
+				newContents += "," + plateModel["rows"][row]["columns"][column]["categories"][catKey][labKey]["color"];
 			}
 		}
 		
@@ -513,11 +547,35 @@ function addNewLabel() {
 	var label = document.getElementById("newLabelValue").value;
 	var color = document.getElementById("newColorValue").value;
 	
-	createNewLabel(cat, label, color, selCells);
+	createNewLabel(cat, label, "", color, selCells);
 	
 	updateCategoryList();
 	// disable selection of grid cells
 	//hideLabelPanel();
+	// output current object model to console
+	console.log("plateModel:" + JSON.stringify(plateModel));
+	console.log("catLegend:" + JSON.stringify(catLegend));
+	
+	var jsonplate = translateModelToOutputJson(plateModel);
+	console.log("jsonplate:" + JSON.stringify(jsonplate));
+	removeAllHighlightedCells();
+}
+
+/**
+ * This function changes the style of a particular cell
+ */
+function addNewDose() {
+	var selCells = highlightedCoords;
+	console.log(selCells);
+	var cat = "dosage";
+	var label = document.getElementById("newDoseValue").value;
+	var units = document.getElementById("newDoseUnits").value;
+	var color = document.getElementById("newDoseColorValue").value;
+	
+	createNewLabel(cat, label, units, color, selCells);
+	
+	updateCategoryList();
+
 	// output current object model to console
 	console.log("plateModel:" + JSON.stringify(plateModel));
 	console.log("catLegend:" + JSON.stringify(catLegend));
@@ -585,7 +643,7 @@ function saveConfigToServer(){
 			// use less hacky method !!
 			window.location.href = hostname + "/experimentalPlateSet/showactions/1"; // need to add correct experimentID !!!
 		} else {
-			alert("An error while saving the template: " + storedTemplate);
+			alert("An error while saving the template!");
 		}
 	});
 }
@@ -632,17 +690,11 @@ function init(){
 	//loadRandomData();
 	
 	addEvent("addNewLabel", "click", addNewLabel);
+	addEvent("addNewDose", "click", addNewDose);
 	addEvent("addDoseStep", "click", addDoseStep);
 	addEvent("clearAllSelection", "click", removeAllHighlightedCells);
-	//addEvent("cancelNewLabel", "click", cancelNewLabel);
-	//addEvent("clearLastSelection", "click", removeHighlightedArea);
-	//addEvent("cancelDoseStep", "click", cancelDoseStep);
-	//addEvent("clearLastSelectionD", "click", removeHighlightedArea);	// duplication !!
-	//addEvent("clearAllSelectionD", "click", removeAllHighlightedCells);	// duplication !!
 	addEvent("savePlate", "click", saveConfigToServer);
 
-	// initially disable selection of grid cells
-	//disableGridSelection();
 	enableGridSelection();
 }
 
@@ -661,19 +713,31 @@ function translateModelToOutputJson(pModel) {
 			var well = {};
 			well["row"] = row;
 			well["column"] = column;
-			well["control"] = null;
+			
+			well["groupName"] = pModel["rows"][row]["columns"][column]["wellGroupName"];
 			var labels = [];
 			for (var catKey in pModel["rows"][row]["columns"][column]["categories"]) {
 				for (var labKey in pModel["rows"][row]["columns"][column]["categories"][catKey]) {
 					var label = {};
 					label["category"] = catKey;
 					label["name"] = labKey;
-					label["value"] = pModel["rows"][row]["columns"][column]["categories"][catKey][labKey];
+					label["value"] = pModel["rows"][row]["columns"][column]["categories"][catKey][labKey]["color"];
+					label["units"] = pModel["rows"][row]["columns"][column]["categories"][catKey][labKey]["units"];
 					labels.push(label);
 				}
 			}
+			
+			if (well["groupName"] != null) {
+				var label = {};
+				label["category"] = "compound";
+				label["name"] = groupNames[well["groupName"]];
+				labels.push(label);
+				
+				well["control"] = "compound";		// could also be a control !!!
+			} else {
+				well["control"] = "empty";
+			}			
 			well["labels"] = labels;
-			well["groupName"] = pModel["rows"][row]["columns"][column]["wellGroupName"];
 			plate["wells"].push(well);
 		}
 	}
@@ -709,8 +773,10 @@ function translateInputJsonToModel(plateJson) {
 		for (var j=0; j < labels.length; j++) {
 			if (pModel["rows"][row]["columns"][column]["categories"][labels[j].category] == null) {
 				pModel["rows"][row]["columns"][column]["categories"][labels[j].category] = {};
+				pModel["rows"][row]["columns"][column]["categories"][labels[j].category][labels[j].name] = {};
 			}
-			pModel["rows"][row]["columns"][column]["categories"][labels[j].category][labels[j].name] = labels[j].value;
+			pModel["rows"][row]["columns"][column]["categories"][labels[j].category][labels[j].name]["color"] = labels[j].value;
+			pModel["rows"][row]["columns"][column]["categories"][labels[j].category][labels[j].name]["units"] = labels[j].units;
 		}
 	}
 
@@ -720,12 +786,15 @@ function translateInputJsonToModel(plateJson) {
 // jQuery ui stuff
 $(function() {	
 	$("#addDosePanel").hide();
+	$("#addDoseStepPanel").hide();
 	
 	$("input[name=labeltype]").on("change", function () {
-	    if ($(this).prop('id') == "catlabel") {
+	    if ($(this).prop('id') == "catLabType") {
 	    	showLabelPanel();
-	    } else if ($(this).prop('id') == "dosageStep") {
+	    } else if ($(this).prop('id') == "doseLabType") {
 	    	showDosePanel();
+	    } else if ($(this).prop('id') == "doseStepLabType") {
+	    	showDoseStepPanel();
 	    }
 	});
 
@@ -760,18 +829,30 @@ function txtFieldFocus() {
 
 function showLabelPanel() {
 	hideDosePanel();
+	hideDoseStepPanel();
 	$("#addLabelPanel").show();
+};
+
+function showDosePanel() {
+	hideLabelPanel();
+	hideDoseStepPanel();
+	$("#addDosePanel").show();
+};
+
+function showDoseStepPanel() {
+	hideLabelPanel();
+	hideDosePanel();
+	$("#addDoseStepPanel").show();
 };
 
 function hideLabelPanel() {
 	$("#addLabelPanel").hide();
 };
 
-function showDosePanel() {
-	hideLabelPanel();
-	$("#addDosePanel").show();
-};
-
 function hideDosePanel() {
 	$("#addDosePanel").hide();
+};
+
+function hideDoseStepPanel() {
+	$("#addDoseStepPanel").hide();
 };
