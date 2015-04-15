@@ -1,6 +1,7 @@
 package edu.harvard.capstone.result
 
 import grails.plugin.springsecurity.annotation.Secured
+import edu.harvard.capstone.editor.ExperimentalPlateSet
 
 import static org.springframework.http.HttpStatus.*
 import grails.validation.ValidationException
@@ -24,6 +25,33 @@ class ResultController {
     def create() {
         respond new Result(params)
     }
+
+    def readExperiment(ExperimentalPlateSet experiment) {
+        if (!springSecurityService.isLoggedIn()){
+            render(contentType: "application/json") {
+                [error: "User not logged in"]
+            }
+            return
+        } 
+
+        if (experiment == null) {
+            render(contentType: "application/json") {
+                [error: "Result not found"]
+            }
+            return
+        }
+
+        if (experiment.hasErrors()) {
+            render(contentType: "application/json") {
+                [error: experiment.errors]
+            }
+            return   
+        }
+
+	def resultInstance = Result.findByExperiment(experiment)
+        return read(resultInstance)
+    }
+
 
     def read(Result resultInstance){
         if (!springSecurityService.isLoggedIn()){
