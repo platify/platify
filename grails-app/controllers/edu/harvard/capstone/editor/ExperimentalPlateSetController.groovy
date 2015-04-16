@@ -4,6 +4,7 @@ package edu.harvard.capstone.editor
 import static org.springframework.http.HttpStatus.*
 import edu.harvard.capstone.parser.Equipment;
 import grails.plugin.springsecurity.annotation.Secured
+import grails.converters.JSON
 
 class ExperimentalPlateSetController {
 
@@ -44,6 +45,21 @@ class ExperimentalPlateSetController {
 
     def show(ExperimentalPlateSet experimentalPlateSetInstance) {
         respond experimentalPlateSetInstance
+    }
+
+    def showWithTemplate(ExperimentalPlateSet experimentalPlateSetInstance) {
+        def result = []
+        if (!experimentalPlateSetInstance) {
+            result = [error: "No such experiment"]
+        }
+        else {
+            def plateSet = PlateSet.findAllByExperiment(experimentalPlateSetInstance)
+            def templateInstance = plateSet ? plateSet[0].plate : null
+            def template = templateInstance ? editorService.getTemplate(templateInstance) : null
+            result = [experiment: experimentalPlateSetInstance,
+                      plateTemplate: template]
+        }
+        render result as JSON
     }
 
     def create() {
