@@ -1,37 +1,29 @@
 <%@ page import="edu.harvard.capstone.parser.Equipment" %>
 
-	<div class="col-sm-3">
+	<div class="col-sm-8">
 		<div id="labelPanel" class="panel panel-info">
 			<div class="panel-heading">
 				<h4 class="panel-title">Plate Details</h4>
 			</div>
 			<div class="panel-body">
-				<label>Experiment ID:</label>
-				<p">${experimentalPlateSetInstance.id}</p>
+				<label>Experiment ID:</label>${experimentalPlateSetInstance.id}
 				<label>Plate ID: </label> 
-				<g:select id="plateSelect" name="plate.id" from="${edu.harvard.capstone.editor.PlateTemplate.list()}" 
-					optionValue="${{it.name + ' - ' + it.id}}" optionKey="id" required="" value="${plateSetInstance?.plate?.id}" class="many-to-one"/>
-				
-				<hr/>
-				<div>Cell Range Selected:<span id="cellRange"></span></div>
-				<hr/>
-				<button class="btn btn-info btn-sm" id="saveTemplate">Save Choice and Continue</button>				
+				<g:select id="plateSelect" name="plate.id" from="${edu.harvard.capstone.editor.PlateTemplate.list()}" optionValue="${{it.name + ' - ' + it.id}}"
+					 optionKey="id" required="" onchange="onPlateSelectChange(this)"  value="${plateSetInstance?.plate?.id}" class="many-to-one"/>
 			</div>
 		</div>
-		<div id="labelPanel" class="panel panel-info">
+	</div>
+	<div class="col-sm-4">
+		<div id="filterPanel" class="panel panel-info">
 			<div class="panel-heading">
 				<h4 class="panel-title">Filter Templates</h4>
 			</div>
 			<div class="panel-body">
-				<p>Template Size:</p>
-				<p>Template Type: </p>
-				<hr/>
-				<div>Cell Range Selected:<span id="cellRange"></span></div>
-				<hr/>
+				<p>Template Size:   Template Type: </p>
 			</div>
 		</div>
 	</div>
-	<div class="col-sm-9">
+	<div class="col-sm-12">
 		<div id="gridPanel" class="panel panel-info">
 			<div class="panel-heading">
 				<h4 class="panel-title">Preview Grid</h4>
@@ -41,7 +33,9 @@
 			</div>
 		</div>
 	</div>
-
+	
+	<div style="display: none;">Cell Range Selected:<span id="cellRange"></span></div>
+	
     <g:if env="production">
         <!-- Markup to include ONLY when in production -->
         <g:javascript>
