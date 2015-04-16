@@ -500,3 +500,161 @@ ParsingConfig.createZeros2DArray = function(rows, columns){
 
     return result;
 };
+
+ParsingConfig.createImportDataMatrix = function(importData){
+    var result = [];
+    var wellLevelCategories = [];
+    var plateLevelCategories = [];
+    var experimentLevelCategories = [];
+
+
+    // empty result if no data is provided
+    if (!importData){
+        return [];
+    }
+
+    // first find all the label category names
+    if (importData.experimentFeatures && importData.experimentFeatures.labels) {
+        for (var category in importData.experimentFeatures.labels){
+            experimentLevelCategories.push(category);
+        }
+    }
+
+    if (importData.plates && importData.plates.length && importData.plates[0].labels) {
+        for (category in importData.plates[0].labels){
+            plateLevelCategories.push(category);
+        }
+    }
+
+    if (importData.plates
+            && importData.plates.length
+            && importData.plates[0].rows
+            && importData.plates[0].rows.length
+            && importData.plates[0].rows[0].columns
+            && importData.plates[0].rows[0].columns.length
+            && importData.plates[0].rows[0].columns[0].labels
+    ) {
+        for (category in importData.plates[0].rows[0].columns[0].labels){
+            wellLevelCategories.push(category);
+        }
+    } else {
+        // no well data means an empty result
+        return [];
+    }
+
+    // create the header row
+    var headerIndex = 0;
+    result[0] = [];
+    result[0][headerIndex++] = "Plate/Barcode";
+    result[0][headerIndex++] = "Well";
+
+    for (var i = 0; i<wellLevelCategories.length; i++){
+        result[0][headerIndex++] = wellLevelCategories[i];
+    }
+
+    result[0][headerIndex++] = "";
+    result[0][headerIndex++] = "";
+
+    for (var j=0; j<plateLevelCategories.length; j++){
+        result[0][headerIndex++] = plateLevelCategories[j];
+    }
+
+    for (var k=0; k<experimentLevelCategories; k++){
+        result[0][headerIndex++] = experimentLevelCategories[k];
+    }
+
+    // fill in all other rows
+    var matrixRowIndex = 1;
+    for(var plateIndex = 0; plateIndex < importData.plates.length; plateIndex++){
+        var plateID;
+        var plate = importData.plates[plateIndex];
+
+        if (importData.plates[plateIndex].plateID){
+            plateID = importData.plates[plateIndex].plateID;
+        } else {
+            plateID = "plate " + (plateIndex + 1);
+        }
+
+        for (var rowIndex = 0; rowIndex < plate.rows.length; rowIndex++){
+            var row = plate.rows[rowIndex];
+            var rowLabel = Grid.getRowLabel(rowIndex + 1);
+
+            for (var columnIndex = 0; columnIndex < row.columns.length; columnIndex++){
+                var well = row.columns[columnIndex];
+                var wellID = rowLabel + (columnIndex + 1);
+
+                var matrixColumnIndex = 0;
+                result[matrixRowIndex] = [];
+
+                // fill in the plate ID and Well ID
+                result[matrixRowIndex][matrixColumnIndex++] = plateID;
+                result[matrixRowIndex][matrixColumnIndex++] = wellID;
+
+                // fill in the well level labels
+                for(var p = 0; p < wellLevelCategories.length; p++){
+                    result[matrixRowIndex][matrixColumnIndex++]
+                        = well.labels[wellLevelCategories[p]];
+                }
+
+                // two blank spaces
+                result[matrixRowIndex][matrixColumnIndex++] = "";
+                result[matrixRowIndex][matrixColumnIndex++] = "";
+
+                // fill in the plate level labels
+                for(var l = 0; l < plateLevelCategories.length; l++){
+                    result[matrixRowIndex][matrixColumnIndex++]
+                        = plate.labels[plateLevelCategories[l]];
+                }
+
+                // fill in the experiment level labels
+                for(var q = 0; q < experimentLevelCategories; q++){
+                    result[matrixRowIndex][matrixColumnIndex++]
+                        = importData.experimentFeatures.labels[q];
+                }
+
+                matrixRowIndex++;
+            }
+        }
+    }
+
+    return result;
+};
+
+ParsingConfig.convertMatrix2TSV = function(matrix){
+    var result = "";
+
+    var numRows;
+
+    if (matrix && matrix.length){
+        numRows = matrix.length
+    } else {
+        numRows = 0;
+        return "";
+    }
+
+    var numColumns = 0;
+
+    for (var i=0; i<matrix.length; i++){
+        if (matrix[i].length > numColumns){
+            numColumns = matrix[i].length;
+        }
+    }
+
+    for (var row = 0; row<numRows; row++){
+        for (var col = 0; col<numColumns; col++){
+            if (typeof matrix[row][col] != "undefined"){
+                result += matrix[row][col]
+            }
+
+            if (col != numColumns - 1){
+                result += "\t";
+            } else {
+                result += "\n";
+            }
+        }
+    }
+
+    return result;
+
+    // find the number of columns
+};

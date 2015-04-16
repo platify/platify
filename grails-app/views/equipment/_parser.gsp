@@ -214,6 +214,7 @@
                     <div>
                         <button id="returnToConfig">Go back to parsing configuration</button>
                         <button id="sendImportDataToServer">import and save the data</button>
+                        <button id="downloadFileImport">Download file import</button>
                     </div>
                 </div>
 

@@ -715,6 +715,7 @@ function sendImportDataToServer(){
     importData.parsingID = $('#parsingId').val();
 
     console.log(importData);
+    console.log(ParsingConfig.createImportDataMatrix(importData));
 
     var jqxhr = $.ajax({
         url: hostname + "/rawData/save",
@@ -733,6 +734,35 @@ function sendImportDataToServer(){
         console.log(resData);
         showUserMsg("error","Error when trying to store output file data");
     });
+}
+
+function startDownload(){
+    var matrix = ParsingConfig.createImportDataMatrix(importData);
+    var fileContents = ParsingConfig.convertMatrix2TSV(matrix);
+
+    createDownloadFile("test.txt", fileContents);
+}
+
+/**
+ * This method is based on a suggestion from stackoverflow thread:
+ *
+ * http://stackoverflow.com/questions/3665115/create-a-file-in-memory-for-user-to-download-not-through-server
+ *
+ * for downloading a browser generated file to the client machine.
+ */
+function createDownloadFile(fileName, fileContents){
+    var downloadLinkElement = document.createElement("a");
+
+    downloadLinkElement.href = window.URL.createObjectURL(new Blob([fileContents],
+                                                    {type: 'text/plain'}));
+    downloadLinkElement.download = fileName;
+
+// Append anchor to body.
+    document.body.appendChild(downloadLinkElement);
+    downloadLinkElement.click();
+
+// Remove anchor from body
+    document.body.removeChild(downloadLinkElement);
 }
 
 /**
@@ -882,6 +912,7 @@ function init(){
     addEvent("plateLevelFeatureList", "change", handlePlateLevelFeatureSelect);
     addEvent("sendImportDataToServer", "click", sendImportDataToServer);
     addEvent("setPlateID", "click", handleSetPlateID);
+    addEvent("downloadFileImport", "click", startDownload);
 
     if (typeof equipment != "undefined"){
         loadParsingConfig(equipment);
