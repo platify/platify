@@ -1,7 +1,10 @@
-if (typeof QUnit == 'undefined') // if your tests also run in the browser...
-    QUnit = require('qunit-cli');
+if (typeof QUnit === 'undefined') {
+    var QUnit = require('qunit-cli');
+}
+if (typeof d3 === 'undefined') {
+    var d3 = require('d3');
+}
 var stats = require('../statistics.js');
-var d3 = require('d3');
 
 
 /**

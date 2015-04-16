@@ -64,6 +64,7 @@
 	<g:javascript>
 	var READ_EXPERIMENT_URL = "${createLink(action: 'readExperiment', experimentInstance: null)}";
 	</g:javascript>
+	<asset:javascript src="plate-statistics/statistics.js" />
 	<asset:javascript src="result/index.js" />
 	</body>
 </html>

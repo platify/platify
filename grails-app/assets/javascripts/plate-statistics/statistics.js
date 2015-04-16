@@ -1,4 +1,6 @@
-var d3 = require('d3');
+if (typeof d3 === 'undefined') {
+    var d3 = require('d3');
+}
 
 /*
  * Given an importData structure, a plate number, a label category,
@@ -6,7 +8,7 @@ var d3 = require('d3');
  * will normalize the values for that label against the controls,
  * returning the results as a 2d array.
  */
-exports.normalize = function (plate, label,
+var normalize = function (plate, label,
                               negativeControls, positiveControls) {
     var negativeMean = d3.mean(negativeControls.map(function (a) {
         return plate.rows[a[0]].columns[a[1]].rawData[label];
@@ -19,7 +21,7 @@ exports.normalize = function (plate, label,
 
     var normalized = [];
     for (var i=0; i<plate.rows.length; i++) {
-        normalized[i] = []
+        normalized[i] = [];
 	for (var j=0; j<plate.rows[i].columns.length; j++) {
             var raw_value = plate.rows[i].columns[j].rawData[label];
             normalized[i][j] = scale(raw_value);
@@ -33,7 +35,7 @@ exports.normalize = function (plate, label,
  * Calculates the Z' factor for a plate, according to the formula at
  *   https://support.collaborativedrug.com/entries/21220276-Plate-Quality-Control
  */
-exports.zPrimeFactor = function (plate, label,
+var zPrimeFactor = function (plate, label,
 			         negativeControls, positiveControls) {
     var positiveStdDev = d3.deviation(positiveControls.map(function (a) {
         return plate.rows[a[0]].columns[a[1]].rawData[label];
@@ -57,7 +59,7 @@ exports.zPrimeFactor = function (plate, label,
  * Calculates the Z factor for a plate, according to the formula at
  *   https://support.collaborativedrug.com/entries/21220276-Plate-Quality-Control
  */
-exports.zFactor = function (plate, label,
+var zFactor = function (plate, label,
 			    negativeControls, positiveControls) {
     var positiveStdDev = d3.deviation(positiveControls.map(function (a) {
         return plate.rows[a[0]].columns[a[1]].rawData[label];
@@ -89,7 +91,7 @@ exports.zFactor = function (plate, label,
  *
  * TODO - implement variant where no controls are available.
  */
-exports.zScore = function (plate, label,
+var zScore = function (plate, label,
 		           negativeControls, positiveControls) {
     var negativeStdDev = d3.deviation(negativeControls.map(function (a) {
         return plate.rows[a[0]].columns[a[1]].rawData[label];
@@ -114,4 +116,13 @@ exports.zScore = function (plate, label,
     }
 
     return zScores;
+}
+
+if (typeof module !== 'undefined') {
+    module.exports = {
+        normalize: normalize,
+        zPrimeFactor: zPrimeFactor,
+        zFactor: zFactor,
+        zScore: zScore,
+    }
 }
