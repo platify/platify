@@ -30,6 +30,10 @@
 					/>
 					</div>
 					<select id="plateSelect" onChange="updateResults(this.value)" size="5" style="width: 90%"></select>
+					<div>
+					<label>Raw: <input type="radio" name="rawOrNorm" value="raw" onClick="toggleRawOrNorm(this)" checked /></label>
+					<label>Normalized: <input type="radio" name="rawOrNorm" value="norm" onClick="toggleRawOrNorm(this)" /></label>
+					</div>
 					<dl>
 						<dt>Z-Factor</dt>
 						<dd id="zFactor"></dd>
