@@ -559,9 +559,11 @@ ParsingConfig.createImportDataMatrix = function(importData){
         result[0][headerIndex++] = plateLevelCategories[j];
     }
 
-    for (var k=0; k<experimentLevelCategories; k++){
+    for (var k=0; k<experimentLevelCategories.length; k++){
         result[0][headerIndex++] = experimentLevelCategories[k];
     }
+
+    console.log("experiment level categories = " + experimentLevelCategories);
 
     // fill in all other rows
     var matrixRowIndex = 1;
@@ -607,9 +609,9 @@ ParsingConfig.createImportDataMatrix = function(importData){
                 }
 
                 // fill in the experiment level labels
-                for(var q = 0; q < experimentLevelCategories; q++){
+                for(var q = 0; q < experimentLevelCategories.length; q++){
                     result[matrixRowIndex][matrixColumnIndex++]
-                        = importData.experimentFeatures.labels[q];
+                        = importData.experimentFeatures.labels[experimentLevelCategories[q]];
                 }
 
                 matrixRowIndex++;
