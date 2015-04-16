@@ -3,30 +3,32 @@
 	<div id="labelPanel" class="panel panel-info">
 		<div class="panel-heading">
 			<div class="panel-title">Add New Label: 
-				<label>Type:</label>
-				<div class="btn-group" data-toggle="buttons">
-	                <label class="btn btn-default btn-sm active">
-	                    <input type="radio" name="labeltype" id="catLabType"/>Label
-	                </label>
-	                <label class="btn btn-default btn-sm">
-	                    <input type="radio" name="labeltype" id="doseLabType"/>Dose
-	                </label>
-	                <label class="btn btn-default btn-sm">
-	                    <input type="radio" name="labeltype" id="doseStepLabType"/>Dose Step
-	                </label>
-	            </div>
-				<label>Level:</label>
-				<div class="btn-group" data-toggle="buttons">
-	                <label class="btn btn-default btn-sm active">
-	                    <input type="radio" name="labellevel" id="wellLevel"/> well
-	                </label>
-	                <label class="btn btn-default btn-sm">
-	                    <input type="radio" name="labellevel" id="plateLevel"/> plate
-	                </label>
-	                <label class="btn btn-default btn-sm">
-	                    <input type="radio" name="labellevel" id="plateSetLevel"/> plate-set
-	                </label>
-	            </div>
+				<span class="pull-right">
+					<label>Type:</label>
+					<div class="btn-group" data-toggle="buttons">
+		                <label class="btn btn-default btn-sm active">
+		                    <input type="radio" name="labeltype" id="catLabType"/>Label
+		                </label>
+		                <label class="btn btn-default btn-sm">
+		                    <input type="radio" name="labeltype" id="doseLabType"/>Dose
+		                </label>
+		                <label class="btn btn-default btn-sm">
+		                    <input type="radio" name="labeltype" id="doseStepLabType"/>Dose Step
+		                </label>
+		            </div>
+					<label>Level:</label>
+					<div class="btn-group" data-toggle="buttons">
+		                <label class="btn btn-default btn-sm active">
+		                    <input type="radio" name="labellevel" id="wellLevel"/> well
+		                </label>
+		                <label class="btn btn-default btn-sm">
+		                    <input type="radio" name="labellevel" id="plateLevel"/> plate
+		                </label>
+		                <label class="btn btn-default btn-sm">
+		                    <input type="radio" name="labellevel" id="plateSetLevel"/> plate-set
+		                </label>
+		            </div>
+				</span>
             </div>
 		</div>
 		<div class="panel-body">
@@ -66,24 +68,10 @@
 			</div>
 		</div>
 	</div>
-	
-	
-	<!-- <div class="col-xs-4">
-		<div id="otherPanel" class="panel panel-info">
-			<div class="panel-heading">
-				<h4 class="panel-title">Other Actions</h4>
-			</div>
-			<div class="panel-body">
-				<div>Plate Barcode:<input type="text" id="barcode"/></div>
-				<div>Cell Range Selected:<span id="cellRange"></span></div>
-			</div>
-		</div>
-	</div> -->
-	
 
 	<div id="gridPanel" class="panel panel-info">
 		<div class="panel-heading">
-			<h4 class="panel-title">Plate Wells:<button id="clearAllSelection" >Clear Selection</button></h4>
+			<h4 class="panel-title">Plate Wells:<span class="pull-right"><button id="clearAllSelection" >Clear Selection</button></span></h4>
 		</div>
 		<div class="panel-body">
 			<div id="myGrid" style="width:100%; height:650px;"></div>
@@ -105,14 +93,13 @@
 <div class="col-xs-2">
 	<div id="compoundPanel" class="panel panel-info">
 		<div class="panel-heading">
-			<h4 class="panel-title">Compounds</h4>
+			<h4 class="panel-title">Compounds<span class="pull-right"><button id="importCmpListButton" class="btn btn-info btn-sm ui-state-disabled">Import</button></span></h4>
 		</div>
 		<div class="panel-body">
 			<div id="compoundList"></div>
 		</div>
 	</div>
 </div>
-
 
 <div id="templateVals">${templateInstance}</div>
 
@@ -140,5 +127,3 @@
 <asset:javascript src="grid/slick.editors.js"/>
 <asset:javascript src="grid/Grid2Merge.js"/>
 <asset:javascript src="plateEditor/editorAssignLabels.js"/>
-
-

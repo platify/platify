@@ -32,6 +32,8 @@
 					<div>
 					<select id="plateSelect" onChange="updateResults(this.value)"></select>
 					</div>
+					<div><h2>Z-Factor</h2><div id="zFactor"></div></div>
+					<div><h2>Z'-Factor</h2><div id="zPrimeFactor"></div></div>
 				</div> <!-- Left Column END -->
 				<!-- Right Column -->
 				<div class="col-sm-10">
@@ -64,6 +66,7 @@
 	<g:javascript>
 	var READ_EXPERIMENT_URL = "${createLink(action: 'readExperiment', experimentInstance: null)}";
 	</g:javascript>
+	<asset:javascript src="plate-statistics/statistics.js" />
 	<asset:javascript src="result/index.js" />
 	</body>
 </html>
