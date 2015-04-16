@@ -601,7 +601,7 @@ function addEvent(elementId, eventType, handlerFunction) {
 
 	var element;
 
-	if (typeof(elementId) === "string"){
+	if (typeof(elementId) === "string") {
 		element = document.getElementById(elementId);
 	} else {
 		element = elementId;
@@ -615,7 +615,7 @@ function addEvent(elementId, eventType, handlerFunction) {
 } // end of function addEvent
 
 // ajax save object call
-function saveConfigToServer(){
+function saveConfigToServer() {
 	var plateJson = translateModelToOutputJson(plateModel);
 	console.log(JSON.stringify(plateJson));
    

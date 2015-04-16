@@ -1,5 +1,7 @@
 // constants
 var DIMENSION = 100;
+var GRID_HEIGHT = 100;
+var GRID_WIDTH = 100;
 var CELL_HEIGHT = 25;
 var CELL_WIDTH = 40;
 var data;
@@ -18,9 +20,9 @@ var highlightedCoords = [];
 function createBlankData(){
 	var result = [];
 
-	for (var i=0; i<DIMENSION; i++){
+	for (var i=0; i < GRID_HEIGHT; i++){
 		result[i] = [];
-		for (var j=0; j<DIMENSION; j++){
+		for (var j=0; j < GRID_WIDTH; j++){
 			result[i][j] = null;
 		}
 	}
@@ -33,9 +35,9 @@ function createBlankData(){
  */
 function createRandomData(){
 	var result = [];
-	for (var i=0; i<DIMENSION; i++){
+	for (var i=0; i < GRID_HEIGHT; i++){
 		result[i] = [];
-		for (var j=0; j<DIMENSION; j++){
+		for (var j=0; j < GRID_WIDTH; j++){
 			result[i][j] = "L" + Math.floor(Math.random()*100);
 		}
 	}
@@ -85,6 +87,7 @@ function handleSelectedCells(startRow,startCol,endRow, endCol){
 	grid.setCellColors(coordinatesToHighlight,currentHighlightColor, key);
 	currentHighlightKeys.push(key);
 	highlightKeyCounter++;
+	txtFieldFocus();
 }
 
 /**
@@ -234,7 +237,7 @@ function addEvent(elementId, eventType, handlerFunction) {
 function translateModelToOutputJson(pModel) {
 	var plateJson = {};
 	var plate = {};
-	plate["name"] = document.getElementById("templateName").value;
+	plate["name"] = window.tName;			// should do null check ???
 	plate["experimentID"] = window.expId;
 	plate["labels"] = [];		// plate level labels, should set these if available already !!!
 	plate["wells"] = [];
@@ -341,6 +344,15 @@ function saveConfigToServer(){
  * grid with blank data and sets up the event handlers on the
  */
 function init(){
+
+	if (window.tWidth != null) {
+		GRID_WIDTH = window.tWidth;
+	}
+	
+	if (window.tHeight != null) {
+		GRID_HEIGHT = window.tHeight;
+	}	
+
 	createGrid();
 	
 	// allows for passing input Json, but it not used here. Perhaps refactor!
@@ -348,7 +360,6 @@ function init(){
 	//loadJsonData(testInputJson);
 	
 	addEvent("addTemplateValueBtn", "click", addTemplateValue);
-	addEvent("clearLastSelection", "click", removeHighlightedArea);
 	addEvent("clearAllSelection", "click", removeAllHighlightedCells);
 	addEvent("saveTemplate", "click", saveConfigToServer);
 
@@ -357,3 +368,8 @@ function init(){
 }
 
 window.onload = init;
+
+// jQuery ui stuff
+function txtFieldFocus() {
+	$("#newLabelValue").focus();
+};

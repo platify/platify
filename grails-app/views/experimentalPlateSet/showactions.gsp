@@ -11,16 +11,21 @@
 	    <asset:stylesheet href="grid/slick-default-theme.css"/>
 	    <asset:stylesheet href="grid/Grid.css"/>
 	    
+	    <script type="text/javascript" charset="utf-8">
+			function goToCreateTemplate() {
+				window.location.href = hostname + "/plateTemplate/create/"
+					+ ${experimentalPlateSetInstance.id}
+					+ '?name=' + document.getElementById("templateName").value
+			    	+ '&width=' + document.getElementById("templateWidth").value
+			    	+ '&heigth=' + document.getElementById("templateHeight").value;
+			}
+		</script>
 	</head>
 	<body>
-		<div class="">
-			
-		</div>
-	
 		<div class="content-fluid ">
 			<div class="row">
 				<div class="col-sm-12 content-body">
-					<h1>Selected Experiment:</h1>
+					<h2>Selected Experiment:</h2>
 					<ol class="breadcrumb">
 						<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
 						<li><g:link controller="experimentalPlateSet" action="index">Experiments</g:link></li>
@@ -46,7 +51,7 @@
 							</div>
 							<div class="panel-body">
 								<g:link id="${experimentalPlateSetInstance.id}" action="selectTemplate" class="btn btn-info btn-sm">Select Existing Template</g:link>
-								<g:link id="${experimentalPlateSetInstance.id}" controller="plateTemplate" action="create" class="btn btn-info btn-sm">Create New Template</g:link>
+								<button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#createTemplateModal">Create New Template</button>
 							</div>
 						</div>
 					</div>
@@ -89,6 +94,38 @@
 					</div>
 				</div>
 			</div>
+		</div>
+
+		<!-- Modal -->
+		<div class="modal fade" id="createTemplateModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		  <div class="modal-dialog">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		        <h4 class="modal-title" id="myModalLabel">New Template Details</h4>
+		      </div>
+		      <div class="modal-body">
+		      		<div class="container-fluid">
+				      	<div class="col-sm-12">
+					        <label>Name:</label>
+							<input type="text" id="templateName"/>
+						</div>
+						<div class="col-sm-6">
+							<label>Width:</label>
+							<input type="text" id="templateWidth"/>
+						</div>
+						<div class="col-sm-6">
+							<label>Height:</label>
+							<input type="text" id="templateHeight"/>
+						</div>
+		      		</div>
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+		        <button type="button" class="btn btn-default" onclick="goToCreateTemplate()" data-dismiss="modal">Create Template</button>
+		      </div>
+		    </div>
+		  </div>
 		</div>
 	</body>
 </html>
