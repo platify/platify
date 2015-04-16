@@ -9,7 +9,7 @@ if (typeof d3 === 'undefined') {
  * returning the results as a 2d array.
  */
 var normalize = function (plate, label,
-                              negativeControls, positiveControls) {
+                          negativeControls, positiveControls) {
     var negativeMean = d3.mean(negativeControls.map(function (a) {
         return plate.rows[a[0]].columns[a[1]].rawData[label];
     }));
