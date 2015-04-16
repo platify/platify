@@ -1,75 +1,69 @@
 
 <%@ page import="edu.harvard.capstone.result.Result" %>
+<%@ page import="edu.harvard.capstone.editor.ExperimentalPlateSet" %>
 <!DOCTYPE html>
 <html>
 	<head>
 		<meta name="layout" content="main">
 		<g:set var="entityName" value="${message(code: 'result.label', default: 'Result')}" />
 		<title><g:message code="default.list.label" args="[entityName]" /></title>
+
+		<asset:stylesheet href="jquery-ui.css"/>
+		<asset:stylesheet href="grid/style.css"/>
+		<asset:stylesheet href="grid/slick.grid.css"/>
+		<asset:stylesheet href="grid/slick-default-theme.css"/>
+		<asset:stylesheet href="grid/Grid.css"/>
 	</head>
 	<body>
 		<div class="content-fluid">
 			<div class="row">
 				<!-- Left Column -->
 				<div class="col-sm-2">
-					<div class="nav" role="navigation">
-						<ul class="nav nav-pills nav-stacked">
-							<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
-							<li class="active"><g:link class="create" action="index">List</g:link></li>
-							<li><g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link></li>
-						</ul>			
-					</div>					
+					<div>
+					<g:select
+						id="experimentSelect"
+						name="name"
+						from="${edu.harvard.capstone.editor.ExperimentalPlateSet.list()}"
+						optionKey="id"
+						optionValue="${{it.name + " - " + it.id}}"
+						onChange="updatePlateList(this.value)"
+					/>
+					</div>
+					<div>
+					<select id="plateSelect" onChange="updateResults(this.value)"></select>
+					</div>
 				</div> <!-- Left Column END -->
 				<!-- Right Column -->
-				<div class="col-sm-9">
-					<div id="list-result" class="content scaffold-list" role="main">
-						<h1><g:message code="default.list.label" args="[entityName]" /></h1>
-						<g:if test="${flash.message}">
-							<div class="message" role="status">${flash.message}</div>
-						</g:if>
-						<table class="table table-striped table-hover">
-						<thead>
-								<tr>
-								
-									<g:sortableColumn property="description" title="${message(code: 'result.description.label', default: 'Description')}" />
-								
-									<g:sortableColumn property="equipment" title="${message(code: 'result.equipment.label', default: 'Equipment')}" />
-								
-									<g:sortableColumn property="experiment" title="${message(code: 'result.experiment.label', default: 'Experiment')}" />
-								
-									<g:sortableColumn property="name" title="${message(code: 'result.name.label', default: 'Name')}" />
-								
-									<g:sortableColumn property="owner" title="${message(code: 'result.owner.label', default: 'Owner')}" />
-
-									<th>View</th>
-								</tr>
-							</thead>
-							<tbody>
-							<g:each in="${resultInstanceList}" status="i" var="resultInstance">
-								<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
-								
-									<td>${fieldValue(bean: resultInstance, field: "description")}</td>
-								
-									<td>${fieldValue(bean: resultInstance, field: "equipment")}</td>
-								
-									<td>${fieldValue(bean: resultInstance, field: "experiment")}</td>
-								
-									<td>${fieldValue(bean: resultInstance, field: "name")}</td>
-								
-									<td>${fieldValue(bean: resultInstance, field: "owner")}</td>
-									<td>
-										<g:link id="${resultInstance.id}" action="show"><i class="fa fa=check parse-btn"></i></g:link>
-									</td>
-								</tr>
-							</g:each>
-							</tbody>
-						</table>
-						<ul class="pagination">
-							<li><g:paginate total="${resultInstanceCount ?: 0}" /></li>
-						</ul>
-					</div>	
+				<div class="col-sm-10">
+				<div id="resultGrid" style="width:100%;height:650px;"></div>
+				<pre id="dump"></pre>
 				</div> <!-- Right Column END -->	
 			</div>
 		</div>
+
+	<!-- library scripts, for using Slickgrid -->
+	<asset:javascript src="jquery-ui.js" />
+	<asset:javascript src="jquery.event.drag-2.2.js" />
+	<asset:javascript src="grid/slick.autotooltips.js" />
+	<asset:javascript src="grid/slick.cellcopymanager.js" />
+	<asset:javascript src="grid/slick.cellrangedecorator.js" />
+	<asset:javascript src="grid/slick.cellrangeselector.js" />
+	<asset:javascript src="grid/slick.cellselectionmodel.js" />
+	<asset:javascript src="grid/slick.core.js" />
+	<asset:javascript src="grid/slick.editors.js" />
+	<asset:javascript src="grid/slick.grid.js" />
+
+	<!-- The SlickGrid wrapper script -->
+	<asset:javascript src="grid/Grid.js" />
+	<asset:javascript src="grid/Grid2Merge.js" />
+
+	<!-- d3 -->
+	<asset:javascript src="d3.v3.min.js" />
+
+	<!-- results-specific js -->
+	<g:javascript>
+	var READ_EXPERIMENT_URL = "${createLink(action: 'readExperiment', experimentInstance: null)}";
+	</g:javascript>
+	<asset:javascript src="result/index.js" />
 	</body>
 </html>

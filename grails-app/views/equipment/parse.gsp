@@ -51,6 +51,7 @@
 	</div>	
 	<g:javascript>
 		$(function() {
+			canUpdate = ${equipmentInstance?.canUpdate()};
 			$('#parsingId').val("${equipmentInstance?.id}");
 			equipment = "${equipmentInstance?.config}";
 			console.log(JSON.parse(equipment));

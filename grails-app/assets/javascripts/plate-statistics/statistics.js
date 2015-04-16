@@ -6,15 +6,13 @@ var d3 = require('d3');
  * will normalize the values for that label against the controls,
  * returning the results as a 2d array.
  */
-exports.normalize = function (importData, plateNum, label,
+exports.normalize = function (plate, label,
                               negativeControls, positiveControls) {
-    var plate = importData.plates[plateNum];
-
     var negativeMean = d3.mean(negativeControls.map(function (a) {
-        return plate.rows[a[0]].columns[a[1]].labels[label];
+        return plate.rows[a[0]].columns[a[1]].rawData[label];
     }));
     var positiveMean = d3.mean(positiveControls.map(function (a) {
-        return plate.rows[a[0]].columns[a[1]].labels[label];
+        return plate.rows[a[0]].columns[a[1]].rawData[label];
     }));
     var scale = d3.scale.linear().domain([negativeMean, positiveMean])
 	    	    .range([0, 1]);
@@ -23,7 +21,7 @@ exports.normalize = function (importData, plateNum, label,
     for (var i=0; i<plate.rows.length; i++) {
         normalized[i] = []
 	for (var j=0; j<plate.rows[i].columns.length; j++) {
-            var raw_value = plate.rows[i].columns[j].labels[label];
+            var raw_value = plate.rows[i].columns[j].rawData[label];
             normalized[i][j] = scale(raw_value);
         }
     }
@@ -35,22 +33,20 @@ exports.normalize = function (importData, plateNum, label,
  * Calculates the Z' factor for a plate, according to the formula at
  *   https://support.collaborativedrug.com/entries/21220276-Plate-Quality-Control
  */
-exports.zPrimeFactor = function (importData, plateNum, label,
+exports.zPrimeFactor = function (plate, label,
 			         negativeControls, positiveControls) {
-    var plate = importData.plates[plateNum];
-
     var positiveStdDev = d3.deviation(positiveControls.map(function (a) {
-        return plate.rows[a[0]].columns[a[1]].labels[label];
+        return plate.rows[a[0]].columns[a[1]].rawData[label];
     }));
     var positiveMean = d3.mean(positiveControls.map(function (a) {
-        return plate.rows[a[0]].columns[a[1]].labels[label];
+        return plate.rows[a[0]].columns[a[1]].rawData[label];
     }));
 
     var negativeStdDev = d3.deviation(negativeControls.map(function (a) {
-        return plate.rows[a[0]].columns[a[1]].labels[label];
+        return plate.rows[a[0]].columns[a[1]].rawData[label];
     }));
     var negativeMean = d3.mean(negativeControls.map(function (a) {
-        return plate.rows[a[0]].columns[a[1]].labels[label];
+        return plate.rows[a[0]].columns[a[1]].rawData[label];
     }));
 
     return 1 - (3 * (positiveStdDev + negativeStdDev)
@@ -61,15 +57,13 @@ exports.zPrimeFactor = function (importData, plateNum, label,
  * Calculates the Z factor for a plate, according to the formula at
  *   https://support.collaborativedrug.com/entries/21220276-Plate-Quality-Control
  */
-exports.zFactor = function (importData, plateNum, label,
+exports.zFactor = function (plate, label,
 			    negativeControls, positiveControls) {
-    var plate = importData.plates[plateNum];
-
     var positiveStdDev = d3.deviation(positiveControls.map(function (a) {
-        return plate.rows[a[0]].columns[a[1]].labels[label];
+        return plate.rows[a[0]].columns[a[1]].rawData[label];
     }));
     var positiveMean = d3.mean(positiveControls.map(function (a) {
-        return plate.rows[a[0]].columns[a[1]].labels[label];
+        return plate.rows[a[0]].columns[a[1]].rawData[label];
     }));
 
     // there *has* to be a cleaner way than this
@@ -78,7 +72,7 @@ exports.zFactor = function (importData, plateNum, label,
     for (var i=0; i<plate.rows.length; i++) {
         for (var j=0; j<plate.rows[i].columns.length; j++) {
             if (!controls.has([i,j])) {
-                nonControlValues.push(plate.rows[i].columns[j].labels[label]);
+                nonControlValues.push(plate.rows[i].columns[j].rawData[label]);
             }
         }
     }
@@ -95,14 +89,13 @@ exports.zFactor = function (importData, plateNum, label,
  *
  * TODO - implement variant where no controls are available.
  */
-exports.zScore = function (importData, plateNum, label,
+exports.zScore = function (plate, label,
 		           negativeControls, positiveControls) {
-    var plate = importData.plates[plateNum];
     var negativeStdDev = d3.deviation(negativeControls.map(function (a) {
-        return plate.rows[a[0]].columns[a[1]].labels[label];
+        return plate.rows[a[0]].columns[a[1]].rawData[label];
     }));
     var negativeMean = d3.mean(negativeControls.map(function (a) {
-        return plate.rows[a[0]].columns[a[1]].labels[label];
+        return plate.rows[a[0]].columns[a[1]].rawData[label];
     }));
 
     var controls = d3.set(d3.merge([negativeControls, positiveControls]))
@@ -114,7 +107,7 @@ exports.zScore = function (importData, plateNum, label,
                 zScores[i][j] = null;
             } else {
                 zScores[i][j] = 
-                    (plate.rows[i].columns[j].labels[label] - negativeMean)
+                    (plate.rows[i].columns[j].rawData[label] - negativeMean)
                     / negativeStdDev;
             }
         }

@@ -5,28 +5,27 @@ var d3 = require('d3');
 
 
 /**
- * helper method that turns a 2d array into an importData format
+ * helper method that turns a 2d array into an importData plate format
  */
-var arrayToImportData = function (rawData, label) {
+var arrayToPlate = function (rawData, label) {
     var plate = {'rows': []};
     for (var r=0; r<rawData.length; r++) {
         plate.rows[r] = {'columns': []};
         for (var c=0; c<rawData[r].length; c++) {
             // NOTE: ugly two-line initializer thanks to javascript not
             //       accepting variables as keys in object literals.
-            plate.rows[r].columns[c] = {'labels': {}};
-            plate.rows[r].columns[c].labels[label] = rawData[r][c];
+            plate.rows[r].columns[c] = {'rawData': {}};
+            plate.rows[r].columns[c].rawData[label] = rawData[r][c];
         }
     }
-    return {'plates': [plate]};
+    return plate;
 };
 
 
 /**
  * helper for normalize/zScore, checks the shape of the returned data
  */
-var assertShape = function(importData, result, plateNum, assert) {
-    var plate = importData.plates[plateNum];
+var assertShape = function(plate, result, assert) {
     assert.equal(plate.rows.length, result.length,
 		 'Results have an incorrect number of rows');
     for (var i=0; i<result.length; i++) {
@@ -39,7 +38,7 @@ var assertShape = function(importData, result, plateNum, assert) {
 /**
  * Helper for normalize, verifies that control wells are mapped to 0 and 1.
  */
-var assertNormalizedControls = function (importData, normalized, plateNum,
+var assertNormalizedControls = function (plate, normalized,
                                          negativeControls, positiveControls,
                                          assert) {
     // check controls
@@ -63,8 +62,8 @@ QUnit.module('normalize', {
         this.positiveControls = [[1,0], [1,1]];
     },
     'afterEach': function () {
-        assertShape(this.importData, this.normalized, 0, this.assert);
-        assertNormalizedControls(this.importData, this.normalized, 0,
+        assertShape(this.plate, this.normalized, this.assert);
+        assertNormalizedControls(this.plate, this.normalized,
                                  this.negativeControls, this.positiveControls,
                                  this.assert);
     }
@@ -74,28 +73,28 @@ QUnit.test('All values between controls', function (assert) {
     var rawData = [[0, 0, 50],
                    [100, 100, 90],
                    [12, 34, 56]];
-    this.importData = arrayToImportData(rawData, this.label);
-    this.normalized = stats.normalize(this.importData, 0, this.label,
-                                     this.negativeControls,
-                                     this.positiveControls);
+    this.plate = arrayToPlate(rawData, this.label);
+    this.normalized = stats.normalize(this.plate, this.label,
+                                      this.negativeControls,
+                                      this.positiveControls);
     // verify range
-    assert.ok(d3.merge(this.normalized).every(
-                  function (n) { return (0 <= n) && (n <= 1); }),
-              'Normalized values fall outside range of 0,1');
+    this.assert.ok(d3.merge(this.normalized).every(
+                       function (n) { return (0 <= n) && (n <= 1); }),
+                   'Normalized values fall outside range of 0,1');
 });
 QUnit.test('Some values outside controls', function (assert) {
     this.assert = assert;
     var rawData = [[0, 0, 50],
                    [100, 100, 90],
                    [112, -34, 56]];
-    this.importData = arrayToImportData(rawData, this.label);
-    this.normalized = stats.normalize(this.importData, 0, this.label,
+    this.plate = arrayToPlate(rawData, this.label);
+    this.normalized = stats.normalize(this.plate, this.label,
                                       this.negativeControls,
                                       this.positiveControls);
     // verify range
-    assert.ok(!d3.merge(this.normalized).every(
-                  function (n) { return (0 <= n) && (n <= 1) }),
-              'No normalized values fall outside range of 0,1');
+    this.assert.ok(!d3.merge(this.normalized).every(
+                       function (n) { return (0 <= n) && (n <= 1) }),
+                   'No normalized values fall outside range of 0,1');
 });
 
 
@@ -107,8 +106,8 @@ QUnit.test('No deviation', function (assert) {
     var rawData = [[0, 0],
                    [100, 100],
                    [50, 50]];
-    var importData = arrayToImportData(rawData, label);
-    var zPrime = stats.zPrimeFactor(importData, 0, label,
+    var plate = arrayToPlate(rawData, label);
+    var zPrime = stats.zPrimeFactor(plate, label,
                                     negativeControls, positiveControls);
     assert.equal(zPrime, 1, "Z' factor not 1");
 });
@@ -122,8 +121,8 @@ QUnit.test('No deviation', function (assert) {
     var rawData = [[0, 0],
                    [100, 100],
                    [50, 50]];
-    var importData = arrayToImportData(rawData, label);
-    var z = stats.zFactor(importData, 0, label,
+    var plate = arrayToPlate(rawData, label);
+    var z = stats.zFactor(plate, label,
                           negativeControls, positiveControls);
     assert.equal(z, 1, 'Z factor not 1');
 });
@@ -137,8 +136,8 @@ QUnit.test('No deviation', function (assert) {
     var rawData = [[0, 0],
                    [100, 100],
                    [50, 50]];
-    var importData = arrayToImportData(rawData, label);
-    var zScores = stats.zScore(importData, 0, label,
+    var plate = arrayToPlate(rawData, label);
+    var zScores = stats.zScore(plate, label,
                                negativeControls, positiveControls);
     assert.deepEqual(zScores, [[null, null], [null, null], [Infinity, Infinity]]);
 });
