@@ -89,7 +89,9 @@ function updatePlateList(experimentId) {
 	    return $('<option />').text(p.barcode);
 	});
 	select.append(options);
-
+	if (experimentResult) {
+	    select[0].firstChild.selected = true;
+        }
 	var barcode = (plates.length > 0) ? plates[0].barcode : "";
 	updateResults(barcode);
     });

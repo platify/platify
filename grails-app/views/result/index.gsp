@@ -29,11 +29,14 @@
 						onChange="updatePlateList(this.value)"
 					/>
 					</div>
-					<div>
-					<select id="plateSelect" onChange="updateResults(this.value)"></select>
-					</div>
-					<div><h2>Z-Factor</h2><div id="zFactor"></div></div>
-					<div><h2>Z'-Factor</h2><div id="zPrimeFactor"></div></div>
+					<select id="plateSelect" onChange="updateResults(this.value)" size="5" style="width: 90%"></select>
+					<dl>
+						<dt>Z-Factor</dt>
+						<dd id="zFactor"></dd>
+
+					        <dt>Z'-Factor</dt>
+						<dd id="zPrimeFactor"></dd>
+					</dl>
 				</div> <!-- Left Column END -->
 				<!-- Right Column -->
 				<div class="col-sm-10">
