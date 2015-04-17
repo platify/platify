@@ -6,25 +6,25 @@
 				<span class="pull-right">
 					<label>Type:</label>
 					<div class="btn-group" data-toggle="buttons">
-		                <label class="btn btn-default btn-sm active">
+		                <label class="btn btn-default btn-xs active">
 		                    <input type="radio" name="labeltype" id="catLabType"/>Label
 		                </label>
-		                <label class="btn btn-default btn-sm">
+		                <label class="btn btn-default btn-xs">
 		                    <input type="radio" name="labeltype" id="doseLabType"/>Dose
 		                </label>
-		                <label class="btn btn-default btn-sm">
+		                <label class="btn btn-default btn-xs">
 		                    <input type="radio" name="labeltype" id="doseStepLabType"/>Dose Step
 		                </label>
 		            </div>
 					<label>Level:</label>
 					<div class="btn-group" data-toggle="buttons">
-		                <label class="btn btn-default btn-sm active">
+		                <label class="btn btn-default btn-xs active">
 		                    <input type="radio" name="labellevel" id="wellLevel"/> well
 		                </label>
-		                <label class="btn btn-default btn-sm">
+		                <label class="btn btn-default btn-xs">
 		                    <input type="radio" name="labellevel" id="plateLevel"/> plate
 		                </label>
-		                <label class="btn btn-default btn-sm">
+		                <label class="btn btn-default btn-xs">
 		                    <input type="radio" name="labellevel" id="plateSetLevel"/> plate-set
 		                </label>
 		            </div>
@@ -37,7 +37,7 @@
 		            <label>Category:</label> <input type="text" id="newCatValue"/>
 					<label>Label:</label><input type="text" id="newLabelValue"/>
 					<label>Color:</label><input type="color" class="btn-default" id="newColorValue" value="#FFFF00"/>
-					<button id="addNewLabel" class="btn btn-default btn-sm glyphicon glyphicon-plus"></button>
+					<button id="addNewLabel" class="btn btn-default btn-xs glyphicon glyphicon-plus"></button>
 				</div>
 			</div>
 			
@@ -47,7 +47,7 @@
 					<label>Dosage:</label><input type="text" id="newDoseValue"/>
 					<label>Units:</label><input type="text" id="newDoseUnits"/>
 					<label>Color:</label><input type="color" class="btn-default" id="newDoseColorValue" value="#FFFF00"/>
-					<button id="addNewDose" class="btn btn-default btn-sm glyphicon glyphicon-plus"></button>
+					<button id="addNewDose" class="btn btn-default btn-xs glyphicon glyphicon-plus"></button>
 				</div>
 			</div>
 			
@@ -59,10 +59,10 @@
 					<label>Step Dilution:</label><input type="text" id="stepDilutionValue"/>
 					<label># of Replicates:</label><input type="text" id="replicatesValue" value="1"/>
 					<label>Top Dose Color:</label><input type="color" class="btn-default" id="tDoseColorValue" value="#FFFF00"/>
-					<button id="addDoseStep" class="btn btn-default btn-sm glyphicon glyphicon-plus"></button>
+					<button id="addDoseStep" class="btn btn-default btn-xs glyphicon glyphicon-plus"></button>
 				</div>
 			</div>
-		
+		    
 			<div id="editLabelDialog" title="New Label Name">
 				<input type="text" id="editNewLabelValue"/>
 			</div>
@@ -71,7 +71,7 @@
 
 	<div id="gridPanel" class="panel panel-info">
 		<div class="panel-heading">
-			<h4 class="panel-title">Plate Wells:<span class="pull-right"><button id="clearAllSelection" >Clear Selection</button></span></h4>
+			<h4 class="panel-title">Plate Wells:<span class="pull-right"><button id="clearAllSelection" class="btn btn-default btn-xs">Clear Selection</button></span></h4>
 		</div>
 		<div class="panel-body">
 			<div id="myGrid" style="width:100%; height:650px;"></div>
@@ -93,7 +93,7 @@
 <div class="col-xs-2">
 	<div id="compoundPanel" class="panel panel-info">
 		<div class="panel-heading">
-			<h4 class="panel-title">Compounds<span class="pull-right"><button id="importCmpListButton" class="btn btn-info btn-sm ui-state-disabled">Import</button></span></h4>
+			<h4 class="panel-title">Compounds<span class="pull-right"><button id="importCmpListButton" class="btn btn-info btn-xs ui-state-disabled">Import</button></span></h4>
 		</div>
 		<div class="panel-body">
 			<div id="compoundList"></div>

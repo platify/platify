@@ -10,6 +10,7 @@ var currentHighlightKeys = [];
 var highlightKeyCounter = 0;
 var currentHighlightColor = "#D5E3E3";
 var highlightedCoords = [];
+var BLANK_CHAR = "-"
 
 /**
  * A function that creates a blank data set for initializing the grid example
@@ -52,8 +53,10 @@ function loadJsonData(plateJson) {
 	for (var row in plateModel["rows"]) {
 		for (var column in plateModel["rows"][row]["columns"]) {
 			var newContents = plateModel["rows"][row]["columns"][column]["wellGroupName"];		// perhaps use return result, like random data instead !! ??
-			
-			grid.updateCellContents(row, column, newContents);
+			if (newContents != null) {
+				// can't pass 0 index !!! , does this throw off the layout ??
+				grid.updateCellContents(row, column, newContents);
+			}
 		}
 	}
 }
@@ -65,9 +68,8 @@ function clearCurrentGridValues() {
 	// for each existing value, overwrite with blank label
 	for (var row in plateModel["rows"]) {
 		for (var column in plateModel["rows"][row]["columns"]) {
-			var newContents = "-";
-			
-			grid.updateCellContents(row, column, newContents);
+			// can't pass 0 index !!! , does this throw off the layout ??
+			grid.updateCellContents(row + 1, column, BLANK_CHAR);
 		}
 	}
 }
@@ -265,11 +267,9 @@ function fetchTemplateData(tId){
 	});
 }
 
-function onPlateSelectChange(){
-	// NEED TO CLEAR Grid DATA HERE, or pass a template with all values !!??
-	// in theory if template has value for all cells this is not needed. plateModel needs to change to ensure this ??!!
-
-	var tId = this.value;
+function onPlateSelectChange(selectEl){
+	var tId = selectEl.value;
+	console.log("selectEvent!:" + tId);
 	fetchTemplateData(tId);
 }
 
@@ -286,7 +286,7 @@ function init(){
 	//loadJsonData(testInputJson);
 	
 	addEvent("saveTemplate", "click", selectAndContinue);
-	addEvent("plateSelect", "change", onPlateSelectChange);
+	//addEvent("plateSelect", "change", onPlateSelectChange);
 
 	// initially disable selection of grid cells
 	disableGridSelection();

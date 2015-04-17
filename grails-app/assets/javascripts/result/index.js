@@ -1,4 +1,5 @@
 var data;
+var normalizedData;
 var experimentResult;
 var grid;
 var plate;
@@ -22,7 +23,8 @@ function createGrid() {
 
     // set the data to be displayed which must be in 2D array form
     data = createBlankData(100, 100);
-    reloadGrid();
+    normalizedData = createBlankData(100, 100);
+    reloadGrid(data);
 }
 
 function getControls() {
@@ -50,6 +52,11 @@ function getLabel() {
     return Object.keys(plate.rows[0].columns[0].rawData).sort()[0];
 }
 
+function getNormalizedData() {
+    var normd = normalize(plate, label, controls[0], controls[1]);
+    return $.map(normd, function(row) { return [$.map(row, function(val) { return val.toString(); })] });
+}
+
 function plateToArray(plate, label) {
     if (label === undefined) {
         label = getLabel(plate);
@@ -65,9 +72,18 @@ function plateToArray(plate, label) {
     return result;
 }
 
-function reloadGrid() {
-    grid.setData(data);
+function reloadGrid(dataSet) {
+    grid.setData(dataSet);
     grid.fillUpGrid();
+}
+
+function toggleRawOrNorm(input) {
+    if (input.value === 'norm' && input) {
+	reloadGrid(normalizedData);
+    }
+    else {
+	reloadGrid(data);
+    }
 }
 
 function updatePlateList(experimentId) {
@@ -89,7 +105,9 @@ function updatePlateList(experimentId) {
 	    return $('<option />').text(p.barcode);
 	});
 	select.append(options);
-
+	if (experimentResult) {
+	    select[0].firstChild.selected = true;
+        }
 	var barcode = (plates.length > 0) ? plates[0].barcode : "";
 	updateResults(barcode);
     });
@@ -106,6 +124,7 @@ function updateResults(barcode) {
         label = getLabel();
         controls = getControls();
         data = plateToArray(plate);
+	normalizedData = getNormalizedData();
         $('#zFactor').text(zFactor(plate, label, controls[0], controls[1]));
         $('#zPrimeFactor').text(zPrimeFactor(plate, label, controls[0], controls[1]));
     }
@@ -114,7 +133,7 @@ function updateResults(barcode) {
         $('#zFactor').text('');
         $('#zPrimeFactor').text('');
     }
-    reloadGrid();
+    reloadGrid(data);
     $('#dump').text(JSON.stringify(plate, null, 4));
 }
 

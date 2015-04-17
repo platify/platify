@@ -29,11 +29,18 @@
 						onChange="updatePlateList(this.value)"
 					/>
 					</div>
+					<select id="plateSelect" onChange="updateResults(this.value)" size="5" style="width: 90%"></select>
 					<div>
-					<select id="plateSelect" onChange="updateResults(this.value)"></select>
+					<label>Raw: <input type="radio" name="rawOrNorm" value="raw" onClick="toggleRawOrNorm(this)" checked /></label>
+					<label>Normalized: <input type="radio" name="rawOrNorm" value="norm" onClick="toggleRawOrNorm(this)" /></label>
 					</div>
-					<div><h2>Z-Factor</h2><div id="zFactor"></div></div>
-					<div><h2>Z'-Factor</h2><div id="zPrimeFactor"></div></div>
+					<dl>
+						<dt>Z-Factor</dt>
+						<dd id="zFactor"></dd>
+
+					        <dt>Z'-Factor</dt>
+						<dd id="zPrimeFactor"></dd>
+					</dl>
 				</div> <!-- Left Column END -->
 				<!-- Right Column -->
 				<div class="col-sm-10">

@@ -8,7 +8,7 @@
 			<div class="panel-body ">
 				<label>Template Value:</label>
 				<input type="text" id="newLabelValue"></input>
-				<button id="addTemplateValueBtn" class="btn btn-default btn-sm glyphicon glyphicon-plus"></button>
+				<button id="addTemplateValueBtn" class="btn btn-default btn-xs glyphicon glyphicon-plus"></button>
 			</div>
 		</div>
 	</div>
@@ -19,8 +19,8 @@
 				<h4 class="panel-title">Other Actions<span class="pull-right"></span></h4>
 			</div>
 			<div class="panel-body ">
-				<button id="importTemplateValueListBtn" class="btn btn-info btn-sm ui-state-disabled">Import Template Values</button>
-				<button id="resetTemplateBtn" class="btn btn-info btn-sm ui-state-disabled">Reset Template</button>
+				<button id="importTemplateValueListBtn" class="btn btn-info btn-xs ui-state-disabled">Import Template Values</button>
+				<button id="resetTemplateBtn" class="btn btn-info btn-xs ui-state-disabled">Reset Template</button>
 			</div>
 		</div>
 	</div>
@@ -28,7 +28,7 @@
 	<div class="col-sm-12">
 		<div id="gridPanel" class="panel panel-info">
 			<div class="panel-heading">
-				<h4 class="panel-title">Plate Layout<span class="pull-right"><button id="clearAllSelection">Clear Selection</button></span></h4>
+				<h4 class="panel-title">Plate Layout<span class="pull-right"><button id="clearAllSelection" class="btn btn-info btn-xs">Clear Selection</button></span></h4>
 			</div>
 			<div class="panel-body">
 				<div id="myGrid" style="width:100%; height:650px;"></div>
