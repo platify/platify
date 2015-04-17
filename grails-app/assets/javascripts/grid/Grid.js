@@ -34,8 +34,8 @@ function Grid(containerID){
     this.container = containerID;
 
     // cell formatting fields;
-    this.cellCSS = DEFAULT_CELL_CSS
-    this.formatter = DEFAULT_FORMATTER
+    this.cellCSS = DEFAULT_CELL_CSS;
+    this.formatter = DEFAULT_FORMATTER;
     this.cellWidth = DEFAULT_CELL_WIDTH;
     this.cellHeight = DEFAULT_CELL_HEIGHT;
     this.resizable = DEFAULT_RESIZABILITY;
@@ -55,7 +55,7 @@ function Grid(containerID){
 
 
     /**
-     * A setter for the dataset to display in the grid. The underlying SlickGrid object
+     * A setter for the data-set to display in the grid. The underlying SlickGrid object
      * will keep a reference to this data object after the fillUpGrid method is called, so
      * to reset the entire displayed data set, you must call fillUpGrid after using this
      * method, in order to
@@ -480,14 +480,17 @@ function Grid(containerID){
         if (mouseButton == 1){
 
             if (distToLeftBorder < DRAG_SCROLL_BORDER_THRESHOLD_PX) {
-                jqueryViewport.scrollLeft(jqueryViewport.scrollLeft() - DRAG_SCROLL_AMOUNT);
+                jqueryViewport.scrollLeft(jqueryViewport.scrollLeft()
+                                          - DRAG_SCROLL_AMOUNT);
             }
 
             if (distToRightBorder < DRAG_SCROLL_BORDER_THRESHOLD_PX) {
-                jqueryViewport.scrollLeft(jqueryViewport.scrollLeft() + DRAG_SCROLL_AMOUNT);
+                jqueryViewport.scrollLeft(jqueryViewport.scrollLeft()
+                                          + DRAG_SCROLL_AMOUNT);
             }
 
-            if (distToTopBorder < DRAG_SCROLL_BORDER_THRESHOLD_PX) {
+            if (_self.cellHeight < distToTopBorder
+                    && distToTopBorder < (DRAG_SCROLL_BORDER_THRESHOLD_PX * 2)) {
                 jqueryViewport.scrollTop(jqueryViewport.scrollTop() - DRAG_SCROLL_AMOUNT);
             }
 

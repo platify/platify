@@ -777,32 +777,16 @@ function sendImportDataToServer(){
 }
 
 function startDownload(){
-    var matrix = ParsingConfig.createImportDataMatrix(importData);
-    var fileContents = ParsingConfig.convertMatrix2TSV(matrix);
+    var importFileDataGenerator = new ImportDataFileGenerator(importData);
+    var filename;
+    var experimentName =experimentIDSelectize.getOption(experimentIDSelectize.getValue()).html();
+    if (experimentName){
+        filename = experimentName + "_results.txt";
+    } else {
+        filename = "experiment_results.txt"
+    }
 
-    createDownloadFile("test.txt", fileContents);
-}
-
-/**
- * This method is based on a suggestion from stackoverflow thread:
- *
- * http://stackoverflow.com/questions/3665115/create-a-file-in-memory-for-user-to-download-not-through-server
- *
- * for downloading a browser generated file to the client machine.
- */
-function createDownloadFile(fileName, fileContents){
-    var downloadLinkElement = document.createElement("a");
-
-    downloadLinkElement.href = window.URL.createObjectURL(new Blob([fileContents],
-                                                    {type: 'text/plain'}));
-    downloadLinkElement.download = fileName;
-
-// Append anchor to body.
-    document.body.appendChild(downloadLinkElement);
-    downloadLinkElement.click();
-
-// Remove anchor from body
-    document.body.removeChild(downloadLinkElement);
+    importFileDataGenerator.forceTSVDownload(filename);
 }
 
 /**
@@ -886,7 +870,6 @@ function init(){
 
     var $select1 = $("#experiment").selectize({
         onChange: function(value){
-            console.log("value = " + value);
 
             var jqxhr = $.ajax({
                 url: hostname + '/experimentalPlateSet/barcodes/'+ value,

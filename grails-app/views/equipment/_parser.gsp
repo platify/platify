@@ -249,6 +249,7 @@
     <asset:javascript src="selectize.js"/>
     <asset:javascript src="parser/Range.js"/>
     <asset:javascript src="grid/Grid.js"/>
+    <asset:javascript src="parser/ImportDataFileGenerator.js"/>
     <asset:javascript src="parser/GridHighlighter.js"/>
     <asset:javascript src="parser/FileExaminer.js"/>
     <asset:javascript src="parser/ColorPicker.js"/>
