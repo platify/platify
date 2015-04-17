@@ -71,25 +71,27 @@ function loadJsonData(plateJson) {
 					// update catLegend color
 					if (catLegend[catKey] == null) {
 						catLegend[catKey] = {};
+						catLegend[catKey]['labels'] = {};
+						catLegend[catKey]['visible'] = true;
 					}
 
-					if (catLegend[catKey][labKey] == null) {
-						catLegend[catKey][labKey] = {};
-						catLegend[catKey][labKey]['color'] = color;
+					if (catLegend[catKey]['labels'][labKey] == null) {
+						catLegend[catKey]['labels'][labKey] = {};
+						catLegend[catKey]['labels'][labKey]['color'] = color;
 					} else {
-						catLegend[catKey][labKey]['color'] = color;
+						catLegend[catKey]['labels'][labKey]['color'] = color;
 						// category and label already exist, just changing color,
 						// in this case cells which already have this label need their color updated also!!
 						updateCellColors(catKey, labKey, color);
 					}
 					
 					// update color legend cell reverse lookup
-					if (catLegend[catKey][labKey]["cellref"] == null) {
-						catLegend[catKey][labKey]["cellref"] = [];
-						catLegend[catKey][labKey]["cellref"].push(row + "-" + column);
+					if (catLegend[catKey]['labels'][labKey]["cellref"] == null) {
+						catLegend[catKey]['labels'][labKey]["cellref"] = [];
+						catLegend[catKey]['labels'][labKey]["cellref"].push(row + "-" + column);
 					} else {
-						if (catLegend[catKey][labKey]["cellref"].indexOf(row + "-" + column) == -1) {
-							catLegend[catKey][labKey]["cellref"].push(row + "-" + column);
+						if (catLegend[catKey]['labels'][labKey]["cellref"].indexOf(row + "-" + column) == -1) {
+							catLegend[catKey]['labels'][labKey]["cellref"].push(row + "-" + column);
 						} else {
 							console.log("already there");
 						}
@@ -112,7 +114,7 @@ function loadJsonData(plateJson) {
  * Class. This function changes the background color of all selected cells
  * to the currentHighlightColor.
  */
-function handleSelectedCells(startRow,startCol,endRow, endCol){
+function handleSelectedCells(startRow,startCol,endRow, endCol) {
 	// write to the selected cells div, the cells that are selected
 	var out = document.getElementById("cellRange");
 	out.innerHTML = Grid.getRowLabel(startRow)+startCol+":"
@@ -141,7 +143,7 @@ function handleSelectedCells(startRow,startCol,endRow, endCol){
  * the most key used to create the most recent background color change as
  * stored in the currentHighlightKeys array.
  */
-function removeHighlightedArea(){
+function removeHighlightedArea() {
 	if (currentHighlightKeys.length > 0) {
 		grid.removeCellColors(currentHighlightKeys.pop());
 		
@@ -158,7 +160,7 @@ function removeHighlightedArea(){
  * the most key used to create the most recent background color change as
  * stored in the currentHighlightKeys array.
  */
-function removeAllHighlightedCells(){
+function removeAllHighlightedCells() {
 	while (currentHighlightKeys.length > 0) {
 		grid.removeCellColors(currentHighlightKeys.pop());
 	}
@@ -172,7 +174,7 @@ function removeAllHighlightedCells(){
  * It also registers the handleSelectedCells function as a listener for
  * the event that user selected cell ranges in the grid change.
  */
-function createGrid(){
+function createGrid() {
 	// construct the Grid object with the id of the html container element
 	// where it should be placed (probably a div) as an argument
 	grid = new Grid("myGrid");
@@ -194,20 +196,27 @@ function createGrid(){
  * displayed Grid. It is a handler for the event that the "loadData" button
  * is clicked.
  */
-function loadRandomData(){
+function loadRandomData() {
 	data = createRandomData();
 	grid.setData(data);
 	grid.fillUpGrid(CELL_WIDTH, CELL_HEIGHT);
 }
 
-function onCatColorChange(){
+function onCatColorChange() {
 	var idArr = this.id.split("-");
 	var cat = idArr[1];
 	var label = idArr[2];
 	updateCellColors(cat, label, this.value);	
 }
 
-function onEditLabelChange(){		// some issues here !! (when editing 1st label in cat, it actually changes 2nd !!)
+function onCatVisCheck() {
+	var idArr = this.id.split("-");
+	var cat = idArr[1];
+	catLegend[cat]['visible'] = this.checked;
+	updateCatVisibility(cat);
+}
+
+function onEditLabelChange() {		// some issues here !! (when editing 1st label in cat, it actually changes 2nd !!)
 	var idArr = this.id.split("-");
 	tmpEditCat = idArr[1];
 	tmpEditOldLabel = idArr[2];
@@ -215,7 +224,7 @@ function onEditLabelChange(){		// some issues here !! (when editing 1st label in
 	$("#editLabelDialog").dialog("open");
 }
 
-function onDeleteLabelChange(){
+function onDeleteLabelChange() {
 	var idArr = this.id.split("-");
 	var cat = idArr[1];
 	var label = idArr[2];
@@ -225,17 +234,17 @@ function onDeleteLabelChange(){
 
 function updateCellColors(cat, label, color) {
 	// update all cells with cat and label (messy?)
-	if (catLegend[cat] != undefined && catLegend[cat][label] != undefined) {
-		for (var cellRef in catLegend[cat][label]["cellref"]) {			//change iteration method !!!
+	if (catLegend[cat] != undefined && catLegend[cat]['labels'][label] != undefined) {
+		for (var cellRef in catLegend[cat]['labels'][label]["cellref"]) {			//change iteration method !!!
 			// what are you doing here ??, define some sort of structure !!!
-			var cellRefArr = catLegend[cat][label]["cellref"][cellRef].split("-");
+			var cellRefArr = catLegend[cat]['labels'][label]["cellref"][cellRef].split("-");
 			var row = cellRefArr[0];
 			var column = cellRefArr[1];
 			plateModel["rows"][row]["columns"][column]["categories"][cat] = {};
 			plateModel["rows"][row]["columns"][column]["categories"][cat][label] = {};
 			plateModel["rows"][row]["columns"][column]["categories"][cat][label]["color"] = color;
 			
-			catLegend[cat][label]['color'] = color;
+			catLegend[cat]['labels'][label]['color'] = color;
 			
 			// update actual grid cell
 			var newContents = plateModel["rows"][row]["columns"][column]["wellGroupName"];
@@ -245,6 +254,31 @@ function updateCellColors(cat, label, color) {
 				}
 			}
 			grid.updateCellContents(row, column, newContents);
+		}
+	}
+}
+
+function updateCatVisibility(cat) {
+	// update all cells with cat
+	if (catLegend[cat] != undefined) {
+		for (var legLab in catLegend[cat]['labels']) {
+			for (var cellRef in catLegend[cat]['labels'][legLab]["cellref"]) {
+				
+				var cellRefArr = catLegend[cat]['labels'][legLab]["cellref"][cellRef].split("-");
+				var row = cellRefArr[0];
+				var column = cellRefArr[1];
+				
+				// update actual grid cell
+				var newContents = plateModel["rows"][row]["columns"][column]["wellGroupName"];
+				for (var catKey in plateModel["rows"][row]["columns"][column]["categories"]) {
+					if (catLegend[catKey]['visible'] == true) {
+						for (var labKey in plateModel["rows"][row]["columns"][column]["categories"][catKey]) {
+							newContents += "," + plateModel["rows"][row]["columns"][column]["categories"][catKey][labKey]["color"];
+						}
+					}
+				}
+				grid.updateCellContents(row, column, newContents);
+			}
 		}
 	}
 }
@@ -264,21 +298,21 @@ function createColorPicker(cat, label) {
 	newInput.id = "color-" + cat + "-" + label;
 	newInput.type = "color";
 	newInput.className = "btn-default";
-	newInput.defaultValue = catLegend[cat][label]['color'];
-	newInput.value = catLegend[cat][label]['color'];
+	newInput.defaultValue = catLegend[cat]['labels'][label]['color'];
+	newInput.value = catLegend[cat]['labels'][label]['color'];
 	//newInput.onchange = onCatColorChange;
 	
 	var editLabelBtn = document.createElement("button");
 	editLabelBtn.id = "edit-" + cat + "-" + label;
 	editLabelBtn.type = "button";
-	editLabelBtn.className = "btn btn-default btn-sm glyphicon glyphicon-pencil";
+	editLabelBtn.className = "btn btn-default btn-xs glyphicon glyphicon-pencil";
 	//editLabelBtn.onclick = onEditLabelChange;
 	
 	var deleteLabelBtn = document.createElement("button");
 	deleteLabelBtn.id = "delete-" + cat + "-" + label;
 	deleteLabelBtn.type = "button";
 	deleteLabelBtn.value = "Delete Label"
-	deleteLabelBtn.className = "btn btn-default btn-sm glyphicon glyphicon-trash";
+	deleteLabelBtn.className = "btn btn-default btn-xs glyphicon glyphicon-trash";
 	//deleteLabelBtn.onclick = onDeleteLabelChange;
 	
 	cpDiv.appendChild(newInput);
@@ -308,12 +342,13 @@ function updateCategoryList() {
 	var newDiv = document.createElement("div");
 	for (var catKey in catLegend) {
 		var newUl = document.createElement("ul");
-		var newStrong = document.createElement("strong");
-		newStrong.appendChild(document.createTextNode(catKey));
-		newDiv.appendChild(newStrong);
-		for (var labelKey in catLegend[catKey]) {
+		
+		newDiv.appendChild(createCatLabel(catKey));
+		
+		for (var labelKey in catLegend[catKey]['labels']) {
 			var newLi = document.createElement("li");
 			newLi.appendChild(document.createTextNode(labelKey));
+			
 			var newInput = createColorPicker(catKey, labelKey);
 			newLi.appendChild(newInput);
 			newUl.appendChild(newLi);
@@ -324,12 +359,27 @@ function updateCategoryList() {
 	
 	// apply events with a redundant nested loop. only seems to work when part of dom. fix!!(remove loop)
 	for (var catKey in catLegend) {
-		for (var labelKey in catLegend[catKey]) {
+		$("#vischeck-" + catKey).attr('checked', 'checked');
+		$("#vischeck-" + catKey).change(onCatVisCheck);
+		for (var labelKey in catLegend[catKey]['labels']) {
 			$("#color-" + catKey + "-" + labelKey).change(onCatColorChange);
 			$("#edit-" + catKey + "-" + labelKey).click(onEditLabelChange);
 			$("#delete-" + catKey + "-" + labelKey).click(onDeleteLabelChange);
 		}
 	}
+}
+
+
+function createCatLabel(catKey) {
+	var newStrong = document.createElement("strong");
+	var newCheckbox = document.createElement("input");
+	newCheckbox.type = "checkbox";
+	newCheckbox.checked = true;
+	newCheckbox.id = "vischeck-" + catKey;
+	newStrong.appendChild(newCheckbox);
+	newStrong.appendChild(document.createTextNode(catKey));
+	
+	return newStrong;
 }
 
 function enableGridSelection() {
@@ -352,12 +402,12 @@ function cancelDoseStep() {
 
 // remove and cleanup references to cat and label
 function removeLabel(cat, label) {
-	delete catLegend[cat][label]['color'];
+	delete catLegend[cat]['labels'][label]['color'];
 	
 	// remove all cells with cat and label (messy?)
-	for (var cellRef in catLegend[cat][label]["cellref"]) {			//change iteration method !!!
+	for (var cellRef in catLegend[cat]['labels'][label]["cellref"]) {			//change iteration method !!!
 		// what are you doing here ??, define some sort of structure !!!
-		var cellRefArr = catLegend[cat][label]["cellref"][cellRef].split("-");
+		var cellRefArr = catLegend[cat]['labels'][label]["cellref"][cellRef].split("-");
 		var row = cellRefArr[0];
 		var column = cellRefArr[1];
 
@@ -374,7 +424,7 @@ function removeLabel(cat, label) {
 	}
 	
 	// remove from color legend cell reverse lookup
-	delete catLegend[cat][label];
+	delete catLegend[cat]['labels'][label];
 	
 	// referesh category elements
 	updateCategoryList();
@@ -391,15 +441,15 @@ function updateLabelName(cat, oldLabel, label) {	// should we allow for change o
 	label = label.split('.').join('__dot__');
 	
 	// update color legend cell reverse lookup				
-	if (catLegend[cat][label] == null) {
+	if (catLegend[cat]['labels'][label] == null) {
 		//catLegend[cat][label] = {};
 		//catLegend[cat][label]["cellref"] = [];
-		catLegend[cat][label] = catLegend[cat][oldLabel];
+		catLegend[cat]['labels'][label] = catLegend[cat]['labels'][oldLabel];
 
-		console.log("Old color:"+catLegend[cat][oldLabel]['color']);
-		console.log("New color:"+catLegend[cat][label]['color']);
+		console.log("Old color:"+catLegend[cat]['labels'][oldLabel]['color']);
+		console.log("New color:"+catLegend[cat]['labels'][label]['color']);
 		// remove old label
-		delete catLegend[cat][oldLabel];
+		delete catLegend[cat]['labels'][oldLabel];
 		
 		// referesh category elements
 		updateCategoryList();
@@ -471,13 +521,15 @@ function createNewLabel(cat, label, units, color, applyToCells) {
 	// update catLegend color
 	if (catLegend[cat] == null) {
 		catLegend[cat] = {};
+		catLegend[cat]['labels'] = {};
+		catLegend[cat]['visible'] = true;
 	}
 	
-	if (catLegend[cat][label] == null) {
-		catLegend[cat][label] = {};
-		catLegend[cat][label]['color'] = color;
+	if (catLegend[cat]['labels'][label] == null) {
+		catLegend[cat]['labels'][label] = {};
+		catLegend[cat]['labels'][label]['color'] = color;
 	} else {
-		catLegend[cat][label]['color'] = color;
+		catLegend[cat]['labels'][label]['color'] = color;
 		// category and label already exist, just changing color,
 		// in this case cells which already have this label need their color updated also!!
 		updateCellColors(cat, label, color);
@@ -523,12 +575,12 @@ function createNewLabel(cat, label, units, color, applyToCells) {
 		grid.updateCellContents(row, column, newContents);
 		
 		// update color legend cell reverse lookup
-		if (catLegend[cat][label]["cellref"] == null) {
-			catLegend[cat][label]["cellref"] = [];
-			catLegend[cat][label]["cellref"].push(row + "-" + column);
+		if (catLegend[cat]['labels'][label]["cellref"] == null) {
+			catLegend[cat]['labels'][label]["cellref"] = [];
+			catLegend[cat]['labels'][label]["cellref"].push(row + "-" + column);
 		} else {
-			if (catLegend[cat][label]["cellref"].indexOf(row + "-" + column) == -1) {
-				catLegend[cat][label]["cellref"].push(row + "-" + column);
+			if (catLegend[cat]['labels'][label]["cellref"].indexOf(row + "-" + column) == -1) {
+				catLegend[cat]['labels'][label]["cellref"].push(row + "-" + column);
 			} else {
 				console.log("already there");
 			}
@@ -796,6 +848,11 @@ $(function() {
 	    } else if ($(this).prop('id') == "doseStepLabType") {
 	    	showDoseStepPanel();
 	    }
+	});
+	
+	$('[data-toggle="popover"]').popover({
+		trigger: 'hover',
+			'placement': 'top'
 	});
 
 	$("#editLabelDialog").dialog({
