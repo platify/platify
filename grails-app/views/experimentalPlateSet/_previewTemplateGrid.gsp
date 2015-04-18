@@ -1,25 +1,53 @@
 <%@ page import="edu.harvard.capstone.parser.Equipment" %>
 
-	<div class="col-sm-8">
+	<div class="col-sm-6">
 		<div id="labelPanel" class="panel panel-info">
 			<div class="panel-heading">
-				<h4 class="panel-title">Plate Details</h4>
+				<h4 class="panel-title">Choose Template (for experiment with id: ${experimentalPlateSetInstance.id})</h4>
 			</div>
-			<div class="panel-body">
-				<label>Experiment ID:</label>${experimentalPlateSetInstance.id}
-				<label>Plate ID: </label> 
-				<g:select id="plateSelect" name="plate.id" from="${edu.harvard.capstone.editor.PlateTemplate.list()}" optionValue="${{it.name + ' - ' + it.id}}"
-					 optionKey="id" required="" onchange="onPlateSelectChange(this)"  value="${plateSetInstance?.plate?.id}" class="many-to-one"/>
+			<div class="panel-body" style="padding:2px">
+				<form class="form-horizontal">
+			      	<div class="form-group" style="margin-bottom:0px">
+						<h4><label class="control-label col-sm-2" for="plateSelect">Templates: </label></h4>
+					    <div class="col-sm-9">
+							<g:select id="plateSelect" name="plate.id" from="${edu.harvard.capstone.editor.PlateTemplate.list()}" optionValue="${{it.name + ' - ' + it.id}}"
+							 optionKey="id" required="" onchange="onPlateSelectChange(this)"  value="${plateSetInstance?.plate?.id}" class="many-to-one"/>
+						</div>						
+			      	</div>
+				</form>
 			</div>
 		</div>
 	</div>
-	<div class="col-sm-4">
+	<div class="col-sm-6">
 		<div id="filterPanel" class="panel panel-info">
 			<div class="panel-heading">
-				<h4 class="panel-title">Filter Templates</h4>
+				<h4 class="panel-title">Filter Template Choices</h4>
 			</div>
-			<div class="panel-body">
-				<p>Template Size:   Template Type: </p>
+			<div class="panel-body" style="padding:5px">
+				<form class="form-horizontal">
+			      	<div class="form-group" style="margin-bottom:0px">
+			      		<h4><label class="control-label col-sm-2" for="tSizeFilter">Size: </label></h4>
+					    <div class="col-sm-3">
+							<select class="form-control" id="weltSizeFilterlCount">
+							  <option>96 wells</option>
+							  <option>386 wells</option>
+							  <option>1536 wells</option>
+							  <option>3456 wells</option>
+							  <option>9600 wells</option>
+							</select>
+						</div>
+						<h4><label class="control-label col-sm-2" for="tTypeFilter">Type: </label></h4>
+					    <div class="col-sm-3">
+							<select class="form-control" id="tTypeFilter">
+							  <option>96 wells</option>
+							  <option>386 wells</option>
+							  <option>1536 wells</option>
+							  <option>3456 wells</option>
+							  <option>9600 wells</option>
+							</select>
+						</div>						
+			      	</div>
+				</form>
 			</div>
 		</div>
 	</div>

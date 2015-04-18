@@ -19,6 +19,41 @@
 			    	+ '&width=' + document.getElementById("templateWidth").value
 			    	+ '&heigth=' + document.getElementById("templateHeight").value;
 			}
+
+			function updateWellCountFields(sel) {
+				switch(sel.value) {
+				    case "96 wells":
+				    	document.getElementById("templateWidth").value = "12";
+				    	document.getElementById("templateHeight").value = "8";
+				        break;
+				    case "386 wells":
+				    	document.getElementById("templateWidth").value = "24";
+				    	document.getElementById("templateHeight").value = "16";
+				        break;
+				    case "1536 wells":
+				    	document.getElementById("templateWidth").value = "48";
+				    	document.getElementById("templateHeight").value = "32";
+				        break;
+				    case "3456 wells":
+				    	document.getElementById("templateWidth").value = "72";
+				    	document.getElementById("templateHeight").value = "48";
+				        break;
+				    case "9600 wells":
+				    	document.getElementById("templateWidth").value = "120";
+				    	document.getElementById("templateHeight").value = "80";
+				        break;
+				    case "custom":
+				    	document.getElementById("templateWidth").value = "";
+				    	document.getElementById("templateHeight").value = "";
+				    	// should enable the text fields here !!!
+				        break;
+				    default:
+					    // default to 96 well
+				    	document.getElementById("templateWidth").value = "12";
+			    		document.getElementById("templateHeight").value = "8";
+			    		break;
+				}
+			}
 		</script>
 	</head>
 	<body>
@@ -37,10 +72,10 @@
 								<h4 class="panel-title">Experiment Details</h4>
 							</div>
 							<div class="panel-body ">
-								<label>Experiment ID:</label> ${experimentalPlateSetInstance.id}<br/>
-								<label>Experiment Name:</label> ${experimentalPlateSetInstance.name}<br/>
-								<label>Experiment Description:</label> ${experimentalPlateSetInstance.description}<br/>
-								<label>Experiment Owner:</label> ${experimentalPlateSetInstance.owner}<br/>
+								<h4><span style="font-weight:bold">Experiment ID: </span> ${experimentalPlateSetInstance.id}</h4>
+								<h4><span style="font-weight:bold">Experiment Name: </span> ${experimentalPlateSetInstance.name}</h4>
+								<h4><span style="font-weight:bold">Experiment Description: </span> ${experimentalPlateSetInstance.description}</h4>
+								<h4><span style="font-weight:bold">Experiment Owner: </span> ${experimentalPlateSetInstance.owner}</h4>
 							</div>
 						</div>
 					</div>
@@ -78,10 +113,10 @@
 									<tbody>
 									<g:each in="${plateTemplatelist}" status="i" var="plateTemplateInstance">
 										<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
-											<td>${plateTemplateInstance.id}</td>
-											<td>${fieldValue(bean: plateTemplateInstance, field: "name")}</td>
-											<td>${plateTemplateInstance.owner.firstName + ' ' + plateTemplateInstance.owner.lastName}</td>
-											<td>${fieldValue(bean: plateTemplateInstance, field: "dateCreated")}</td>
+											<td><h5>${plateTemplateInstance.id}</h5></td>
+											<td><h5>${fieldValue(bean: plateTemplateInstance, field: "name")}</h5></td>
+											<td><h5>${plateTemplateInstance.owner.firstName + ' ' + plateTemplateInstance.owner.lastName}</h5></td>
+											<td><h5>${fieldValue(bean: plateTemplateInstance, field: "dateCreated")}</h5></td>
 										</tr>
 									</g:each>
 									</tbody>
@@ -106,18 +141,37 @@
 		      </div>
 		      <div class="modal-body">
 		      		<div class="container-fluid">
-				      	<div class="col-sm-12">
-					        <label>Name:</label>
-							<input type="text" id="templateName"/>
-						</div>
-						<div class="col-sm-6">
-							<label>Width:</label>
-							<input type="text" id="templateWidth"/>
-						</div>
-						<div class="col-sm-6">
-							<label>Height:</label>
-							<input type="text" id="templateHeight"/>
-						</div>
+		      			<form class="form-horizontal">
+		      				<div class="form-group">
+							    <label class="control-label col-sm-3" for="templateName">Name:</label>
+							    <div class="col-sm-9">
+									<input type="text" class="form-control" id="templateName"/>
+								</div>
+							</div>
+							<div class="form-group">
+		  						<label class="control-label col-sm-3" for="wellCount">Well Count:</label>
+		  						<div class="col-sm-9">
+		  							<select class="form-control" id="wellCount" onchange="updateWellCountFields(this)">
+									  <option>96 wells</option>
+									  <option>386 wells</option>
+									  <option>1536 wells</option>
+									  <option>3456 wells</option>
+									  <option>9600 wells</option>
+									 <!--  <option>custom</option> -->
+									</select>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="control-label col-sm-2" for="templateWidth">Horizontal-Wells:</label>
+								<div class="col-sm-4">
+									<input type="text" class="form-control" id="templateWidth" value="12" disabled/>
+								</div>
+								<label class="control-label col-sm-2" for="templateHeight">Vertical-Wells:</label>
+								<div class="col-sm-4">
+									<input type="text" class="form-control" id="templateHeight" value="8" disabled/>
+								</div>
+							</div>
+						</form>
 		      		</div>
 		      </div>
 		      <div class="modal-footer">
