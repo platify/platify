@@ -342,12 +342,13 @@ function updateCategoryList() {
 	var newDiv = document.createElement("div");
 	for (var catKey in catLegend) {
 		var newUl = document.createElement("ul");
-		
 		newDiv.appendChild(createCatLabel(catKey));
 		
 		for (var labelKey in catLegend[catKey]['labels']) {
 			var newLi = document.createElement("li");
-			newLi.appendChild(document.createTextNode(labelKey));
+			// if label has been converted from a decimal, then convert it back for display!!
+			var convLab = labelKey.toString().split('__dot__').join('.');
+			newLi.appendChild(document.createTextNode(convLab));
 			
 			var newInput = createColorPicker(catKey, labelKey);
 			newLi.appendChild(newInput);
@@ -377,7 +378,9 @@ function createCatLabel(catKey) {
 	newCheckbox.checked = true;
 	newCheckbox.id = "vischeck-" + catKey;
 	newStrong.appendChild(newCheckbox);
-	newStrong.appendChild(document.createTextNode(catKey));
+	// if category has been converted from a decimal, then convert it back for display!!
+	var convCat = catKey.toString().split('__dot__').join('.');
+	newStrong.appendChild(document.createTextNode(convCat));
 	
 	return newStrong;
 }
@@ -390,14 +393,6 @@ function enableGridSelection() {
 function disableGridSelection() {
 	removeAllHighlightedCells();
 	grid.disableCellSelection();
-}
-
-function cancelNewLabel() {
-	hideLabelPanel();
-}
-
-function cancelDoseStep() {
-	hideDosePanel();
 }
 
 // remove and cleanup references to cat and label
@@ -433,12 +428,12 @@ function removeLabel(cat, label) {
 // remove and cleanup references to cat and label
 function updateLabelName(cat, oldLabel, label) {	// should we allow for change of category also ??
 	// remove spaces from the names (replacing with '_')
-	cat = cat.split(' ').join('_');
-	label = label.split(' ').join('_');
+	cat = cat.toString().split(' ').join('_');
+	label = label.toString().split(' ').join('_');
 	
 	// remove decimal point from the names (replacing with '_|_')
-	cat = cat.split('.').join('__dot__');
-	label = label.split('.').join('__dot__');
+	cat = cat.toString().split('.').join('__dot__');
+	label = label.toString().split('.').join('__dot__');
 	
 	// update color legend cell reverse lookup				
 	if (catLegend[cat]['labels'][label] == null) {
@@ -504,19 +499,17 @@ function addDoseStep() {
 	}
 				
 	updateCategoryList();
-	// disable selection of grid cells
-	//hideDosePanel();
 	removeAllHighlightedCells();
 }
 
 function createNewLabel(cat, label, units, color, applyToCells) {
 	// remove spaces from the names (replacing with '_')
-	cat = cat.split(' ').join('_');
-	label = label.split(' ').join('_');
+	cat = cat.toString().split(' ').join('_');
+	label = label.toString().split(' ').join('_');
 	
 	// remove decimal point from the names (replacing with '_|_')
-	cat = cat.split('.').join('__dot__');
-	label = label.split('.').join('__dot__');
+	cat = cat.toString().split('.').join('__dot__');
+	label = label.toString().split('.').join('__dot__');
 	
 	// update catLegend color
 	if (catLegend[cat] == null) {
@@ -637,8 +630,6 @@ function addNewDose() {
 	removeAllHighlightedCells();
 }
 
-
-
 /**
  * addEvent - This function adds an event handler to an html element in
  * a way that covers many browser types.
@@ -745,7 +736,7 @@ function init(){
 	addEvent("addNewDose", "click", addNewDose);
 	addEvent("addDoseStep", "click", addDoseStep);
 	addEvent("clearAllSelection", "click", removeAllHighlightedCells);
-	addEvent("savePlate", "click", saveConfigToServer);
+	//addEvent("savePlate", "click", saveConfigToServer);
 
 	enableGridSelection();
 }
@@ -771,8 +762,11 @@ function translateModelToOutputJson(pModel) {
 			for (var catKey in pModel["rows"][row]["columns"][column]["categories"]) {
 				for (var labKey in pModel["rows"][row]["columns"][column]["categories"][catKey]) {
 					var label = {};
-					label["category"] = catKey;
-					label["name"] = labKey;
+					// if catKey, or labKey have been converted from a decimal, convert them back for output!
+					var convCat = catKey.toString().split('__dot__').join('.');
+					var convLab = labKey.toString().split('__dot__').join('.');
+					label["category"] = convCat;
+					label["name"] = convLab;
 					label["value"] = pModel["rows"][row]["columns"][column]["categories"][catKey][labKey]["color"];
 					label["units"] = pModel["rows"][row]["columns"][column]["categories"][catKey][labKey]["units"];
 					labels.push(label);
@@ -823,12 +817,16 @@ function translateInputJsonToModel(plateJson) {
 		}
 
 		for (var j=0; j < labels.length; j++) {
-			if (pModel["rows"][row]["columns"][column]["categories"][labels[j].category] == null) {
-				pModel["rows"][row]["columns"][column]["categories"][labels[j].category] = {};
-				pModel["rows"][row]["columns"][column]["categories"][labels[j].category][labels[j].name] = {};
+			// convert possible disruptive input to safer format !
+			var convCat = labels[j].category.toString().split('.').join('__dot__');
+			var convLab = labels[j].name.toString().split('.').join('__dot__');
+		
+			if (pModel["rows"][row]["columns"][column]["categories"][convCat] == null) {
+				pModel["rows"][row]["columns"][column]["categories"][convCat] = {};
+				pModel["rows"][row]["columns"][column]["categories"][convCat][convLab] = {};
 			}
-			pModel["rows"][row]["columns"][column]["categories"][labels[j].category][labels[j].name]["color"] = labels[j].value;
-			pModel["rows"][row]["columns"][column]["categories"][labels[j].category][labels[j].name]["units"] = labels[j].units;
+			pModel["rows"][row]["columns"][column]["categories"][convCat][convLab]["color"] = labels[j].value;
+			pModel["rows"][row]["columns"][column]["categories"][convCat][convLab]["units"] = labels[j].units;
 		}
 	}
 

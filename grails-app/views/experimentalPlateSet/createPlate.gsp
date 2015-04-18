@@ -23,12 +23,10 @@
 					    <small>
 					        <span class="btn-group pull-right">
 								<button id="copyPlate" class="btn btn-info btn-sm ui-state-disabled">Copy Plate</button>
-								<button id="savePlate" class="btn btn-info btn-sm">Save Plate</button>
+								<button id="savePlate" type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#savePlateModal">Save Plate</button>
 					        </span>
 					    </small>
 					</h2>
-					<div>Plate Barcode:<input type="text" id="barcode"/></div>
-				<div style="display: none;">Cell Range Selected:<span id="cellRange"></span></div>
 					<ol class="breadcrumb">
 						<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
 						<li><g:link controller="experimentalPlateSet" action="index">Experiments</g:link></li>

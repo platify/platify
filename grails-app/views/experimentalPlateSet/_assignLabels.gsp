@@ -101,7 +101,36 @@
 	</div>
 </div>
 
+<!-- Modal -->
+<div class="modal fade" id="savePlateModal" tabindex="-1" role="dialog" aria-labelledby="modalHeaderLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="modalHeaderLabel">Save Plate As...</h4>
+      </div>
+      <div class="modal-body">
+      		<div class="container-fluid">
+      			<form class="form-horizontal">
+      				<div class="form-group">
+					    <label class="control-label col-sm-3" for="templateName">Plate Barcode:</label>
+					    <div class="col-sm-9">
+							<input type="text" class="form-control" id="barcode"/>
+						</div>
+					</div>
+				</form>
+      		</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-default" onclick="saveConfigToServer()" data-dismiss="modal">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="templateVals">${templateInstance}</div>
+<div style="display: none;">Cell Range Selected:<span id="cellRange"></span></div>
 
 <g:if env="production">
     <!-- Markup to include ONLY when in production -->
