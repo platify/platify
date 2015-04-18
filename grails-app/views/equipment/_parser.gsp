@@ -7,7 +7,7 @@
 	<div class="col-sm-12">
 			<!-- TABS -->				
 				<div id="tabs" >
-                    <ul>
+                    <ul style="background-color:#d9edf7;" >
                         <li><a href="#parsingTab">Parsing</a></li>
                         <li><a href="#plateTab">Plate</a></li>
                         <li><a href="#featuresTab">Features</a></li>
@@ -15,67 +15,87 @@
 
                     <div id="parsingTab">
                     	<div>
-                        	<input type="hidden" id="parsingId" autocomplete="off"/>
-                            <label for="parsingName">Parsing Name</label>
-                            <input type="text" id="parsingName" autocomplete="off"/>
-                            <label for="machineName">Machine</label>
-                            <input type="text" id="machineName" autocomplete="off"/>
-                            <label for="selectedFile">Example File</label>
-                             <span id="selectedFile">no file selected</span>
-                             <span>Drag and Drop example file or ...</span>
-                             <input type="file" id="files" name="files[]" multiple />
-                             <button id="getFile">choose file(s)</button>
-                             <label for="parsingDescription">Parsing Description</label>
-                             <input type="text" id="parsingDescription" autocomplete="off" />
-                    		 <label for="delimiterList">delimiter</label>	
-                            <select name="delimiterList" id="delimiterList" size="3"></select>
-                        </div>
+                    		<h4>
+	                    		<table style="border:0px solid black;width:99%;"  >
+								  <tr >
+								    <th style="padding-bottom:7px;width:50%;" colspan="2">
+								    	<input type="hidden" id="parsingId" autocomplete="off"/>
+										<label for="selectedFile">Example File</label>
+										<span id="selectedFile"> no file selected. Drag and drop file or ... </span>
+			                            <input type="file" id="files" name="files[]" multiple />
+			                            <button id="getFile">choose file(s)</button>
+								    </th>
+								    <th >
+								    	<label for="delimiterList">Delimiter</label>	
+								    </th>
+								    <th >
+	                            		<select name="delimiterList" id="delimiterList" size="1"></select>
+								    </th>
+								  </tr>
+								  <tr>
+								    <td  ><label for="parsingName">Parsing Name</label></td>
+								    <td  ><input type="text" id="parsingName" autocomplete="off"/></td>
+								    <td  ><label for="machineName">Machine</label></td>
+								    <td ><input type="text" id="machineName" autocomplete="off"/></td>
+								  </tr>
+								  <tr>
+								    <td ><label for="parsingDescription">Parsing Description</label></td>
+								    <td  colspan="3"><textarea rows="2" cols="100" id="parsingDescription" ></textarea> </td>
+								  </tr>
+								</table>
+                    		</h4>
+                    	</div>
                     </div>
                     <div id="plateTab">
-                        <p>
-                            Indicate the cell range that covers data for the first plate
-                            in the example file either by highlighting the relevant cells
-                            in the table to the left or by indicating the cell range in
-                            the field below.
-                        </p>
-                        <div>
-                            <label for="firstPlateCellRange">first plate cell range</label>
-                            <input type="text" id="firstPlateCellRange" autocomplete="off"/>
-                            <button id="applyFirstPlate">Apply</button>
-                        </div>
-
+                    	<h5>
+	                        <label>
+	                            Indicate the cell range that covers data for the first plate
+	                            in the example file either by highlighting the relevant cells
+	                            in the table to the left or by indicating the cell range in
+	                            the field below.
+	                        </label>
+	                        <div>
+	                            <label for="firstPlateCellRange">first plate cell range</label>
+	                            <input type="text" id="firstPlateCellRange" autocomplete="off"/>
+	                            <button id="applyFirstPlate">Apply</button>
+	                        </div>
+						</h5>
                     </div>
 
 
                     <div id="featuresTab">
                         <div>
-                            <label for="featureList">Feature List</label>
-                            <select name="featureList" id="featureList" size="5"></select>
-                            <label for="featureCellRange">Cell Range</label>
-                            <input type="text" id="featureCellRange" autocomplete="off"/>
-                            <label for="featureCategory">Category</label>
-                            <input type="text" id="featureCategory" autocomplete="off"/>
-                            <label for="featureLevel">Apply to</label>
-                            <div>
-                                <input type="radio" id="wellLevel" name="featureLevel" value="well" />well<br/>
-                            </div>
-                            <div>
-                                <input type="radio" id="plateLevel" name="featureLevel" value="plate" />plate<br/>
-                            </div>
-                            <div>
-                                <input type="radio" id="experimentLevel" name="featureLevel" value="experiment" />experiment<br/>
-                            </div>
-                            <label for="labelList">label List</label>
-                            <select name="labelList" id="labelList" size="5"></select>
+                        	<h4>
+                        		<table style="width:99%;"  >
+								  <tr >
+								    <th colspan="8">
+								    	<button class="btn btn-info btn-sm" id="newFeature">New feature</button>
+			                            <button class="btn btn-info btn-sm" id="saveFeature">Add feature</button>
+			                            <button class="btn btn-info btn-sm" id="deleteFeature">Delete feature</button>
+			                            <button class="btn btn-info btn-sm" id="applyFeatures">Apply</button>
+								    </th>
+								  </tr>
+								  <tr>
+								    <td colspan="8">&nbsp;</td>
+								  <td>  
+								  <tr style="border: 1px solid gray;">
+								   	<td ><label for="featureCellRange"> Cell Range</label></td>
+								    <td ><input type="text" id="featureCellRange" autocomplete="off"/></td>
+								    <td ><label for="featureLevel">Apply to</label></td>
+								    <td >
+								    	<input type="radio" id="wellLevel" name="featureLevel" value="well" /> Well<br>
+		                                <input type="radio" id="plateLevel" name="featureLevel" value="plate" /> Plate<br>
+		                                <input type="radio" id="experimentLevel" name="featureLevel" value="experiment" /> Experiment
+								    </td>
+								    <td ><label for="featureCategory">Category</label></td>
+								    <td ><input type="text" id="featureCategory" autocomplete="off"/></td>
+								    <td style="border: 1px solid gray;" ><select name="featureList" id="featureList" size="5"><option>--features--</option></select></td>
+								    <td style="border: 1px solid gray;" ><select name="labelList" id="labelList" size="5"><option>---labels---</option></select></td>
+								  </tr>
+								</table>	  
+                        	</h4>
                         </div>
-
-                        <div>
-                            <button id="newFeature">new feature</button>
-                            <button id="saveFeature">save feature</button>
-                            <button id="deleteFeature">delete feature</button>
-                            <button id="applyFeatures">apply</button>
-                        </div>
-
+                        
                     </div>
                 </div>
 

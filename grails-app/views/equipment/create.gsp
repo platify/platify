@@ -20,14 +20,14 @@
 	<div class="content-fluid">
 			<div class="row">
 				<div class="col-sm-12 content-body">
-				<h2>
-					Output Parse Configuration <span class="pull-right"><button
-							id="importResults" class="btn btn-info btn-sm">Import
-							results</button>&nbsp;
-						<button class="btn btn-info btn-sm" id="saveConfigToServer">Save</button>
-						<button class="btn btn-info btn-sm" id="saveAsConfigToServer">Save As</button></span>
-				</h2>
-				<g:render template="parser"/>
+					<h2>
+						Output Parse Configuration <span class="pull-right"><button
+								id="importResults" class="btn btn-info btn-sm">Import
+								results</button>&nbsp;
+							<button class="btn btn-info btn-sm" id="saveConfigToServer">Save</button>
+							<button class="btn btn-info btn-sm" id="saveAsConfigToServer">Save As</button></span>
+					</h2>
+					<g:render template="parser"/>
 				</div> 
 			</div>
 		</div>	
