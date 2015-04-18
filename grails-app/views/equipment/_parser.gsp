@@ -11,8 +11,8 @@
                         <li><a href="#parsingTab">Parsing</a></li>
                         <li><a href="#plateTab">Plate</a></li>
                         <li><a href="#featuresTab">Features</a></li>
+                        <li><a href="#plateIDSelection">Experiment</a></li>
                     </ul>
-
                     <div id="parsingTab">
                     	<div>
                     		<h4>
@@ -61,8 +61,6 @@
 	                        </div>
 						</h5>
                     </div>
-
-
                     <div id="featuresTab">
                         <div>
                         	<h4>
@@ -77,7 +75,7 @@
 								  </tr>
 								  <tr>
 								    <td colspan="8">&nbsp;</td>
-								  <td>  
+								  </tr>  
 								  <tr style="border: 1px solid gray;">
 								   	<td ><label for="featureCellRange"> Cell Range</label></td>
 								    <td ><input type="text" id="featureCellRange" autocomplete="off"/></td>
@@ -95,79 +93,72 @@
 								</table>	  
                         	</h4>
                         </div>
-                        
                     </div>
+                    
+                    <div id="plateIDSelection">
+	                    <div>
+	                    	<h5>
+                        		<table style="width:99%;"  >
+								  <tr >
+								    <th colspan="8">
+								    	<%--<button id="returnToConfig">Go back to parsing configuration</button>--%>
+								    	<button class="btn btn-info btn-sm" id="sendImportDataToServer">Import and save the data</button>
+	                    				<button class="btn btn-info btn-sm" id="downloadFileImport">Download file import</button>
+								    </th>
+								  </tr>
+								  <tr  >
+								    <td ><label for="experiment">Experiment</label></td>
+								    <td colspan="3">
+								    	<select id="experiment" name="experiment">
+			                                <option value="">Experiment</option>
+			                                 <g:each var="experiment" in="${ExperimentalPlateSet.findAllByOwner(Scientist.get(sec?.loggedInUserInfo(field:'id')))}">
+			                                    <option value="${experiment.id}">${experiment.name}</option>
+			                                </g:each>
+			                            </select>
+								    </td>
+								    <td colspan="2" >&nbsp;</td>
+								    <td colspan="2" ><select name="plateList" id="plateList" size="5"><option>--Plate List ---</option></select></td>
+								  </tr>
+								  <tr >
+								  	<td colspan="8" >&nbsp;</td>
+								  </tr>	
+								  <tr >
+								  	<td style="border: 1px solid gray;margin: 5px;" colspan="8">
+								  		<label for="plateIDMatchMethod">Plate ID match by &nbsp;&nbsp;&nbsp;  </label>
+								    	<input type="radio" id="byFeature" name="plateIDMatchMethod" value="byFeature" /> Plate level feature &nbsp;&nbsp;&nbsp; 
+	                                	<input type="radio" id="byManualEntry" name="plateIDMatchMethod" value="byManualEntry" /> Manual entry
+								    </td>
+								  </tr>  
+								  <tr >
+								  	<td  >&nbsp;</td>
+								    <td colspan="6" >
+								    	<br>
+					                    <div id="byFeatureMethod">
+					                        <p>
+					                            Select a plate level feature to serve as the plate identifier
+					                            for matching with the plates defined in the plate editor
+					                        </p>
+					                        <select name="plateLevelFeatureList" id="plateLevelFeatureList" size="4"><option>--Plate Level Feature List--<option></select>
+					                    </div>
+								    	<div id="byManualEntryMethod">
+								    		<p>
+					                            Enter a plate ID for each plate by selecting the plate in the
+					                            plate list above and then entering the plate id for that plate
+					                            in the field below and hitting the "set plate id" button.
+					                        </p>    
+					                        <select id="plateID" name="plateID"><option>--Plate ID--<option></select>
+					                        <button class="btn btn-info btn-sm" id="setPlateID">Set Plate Id</button>
+					                    </div>									    
+								    </td>
+								    <td >&nbsp;</td>
+								  </tr>
+								</table>	  
+                        	</h5>
+	                </div>
                 </div>
-
-                <div id="plateIDSelection">
-                    <div>
-                        <div>
-                            <label for="experiment">experiment</label>
-                            <select id="experiment" name="experiment">
-                                <option value="">Experiment</option>
-                                 <g:each var="experiment" in="${ExperimentalPlateSet.findAllByOwner(Scientist.get(sec?.loggedInUserInfo(field:'id')))}">
-                                    <option value="${experiment.id}">${experiment.name}</option>
-                                </g:each>
-                            </select>
-                        </div>
-                        <label for="plateList">
-                            Plate List
-                        </label>
-
-                        <select name="plateList" id="plateList" size="5">
-                        </select>
-                    </div>
-                    <div>
-                        <label for="plateIDMatchMethod">Plate id match by</label>
-                        <div id="plateIDMatchMethod">
-                            <div>
-                                <input type="radio" id="byFeature" name="plateIDMatchMethod" value="byFeature" />plate level feature<br/>
-                            </div>
-                            <div>
-                                <input type="radio" id="byManualEntry" name="plateIDMatchMethod" value="byManualEntry" />manual entry<br/>
-                            </div>
-                        </div>
-                    </div>
-                    <br/>
-                    <br/>
-                    <div id="byFeatureMethod">
-                        <p>
-                            Select a plate level feature to serve as the plate identifier
-                            for matching with the plates defined in the plate editor
-                        </p>
-                        <label for="plateLevelFeatureList">
-                            plateLevelFeatureList
-                        </label>
-
-                        <select name="plateLevelFeatureList" id="plateLevelFeatureList" size="5">
-                        </select>
-
-                    </div>
-                    <div id="byManualEntryMethod">
-                        <p>
-                            Enter a plate ID for each plate by selecting the plate in the
-                            plate list above and then entering the plate id for that plate
-                            in the field below and hitting the "set plate id" button.
-                        </p>
-                        <div>
-                            <label for="plateID">plate identifier</label>
-                            <select id="plateID" name="plateID"></select>
-                        </div>
-                        <div>
-                            <button id="setPlateID">set plate id</button>
-                        </div>
-                    </div>
-                    <br/>
-                    <div>
-                        <button id="returnToConfig">Go back to parsing configuration</button>
-                        <button id="sendImportDataToServer">import and save the data</button>
-                        <button id="downloadFileImport">Download file import</button>
-                    </div>
-                </div>
-
-				<!--  END TABS -->
-				
-	</div> 
+          </div>      
+	</div> <!--  END TABS -->
+	
 	
 	<div class="col-sm-12"><div class="panel-body"></div></div>
 
