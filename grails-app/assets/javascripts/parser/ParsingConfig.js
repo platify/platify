@@ -41,6 +41,8 @@ function ParsingConfig(name,
     this.plateAnchors = [];  // elements stored as [relativeRow, relativeColumn, value]
     this.features = {};  // keyed on feature name
     this.plates = [];
+    this.numPlateRows = 0;
+    this.numPlateCols = 0;
 
     var _self = this;
 
@@ -270,9 +272,29 @@ function ParsingConfig(name,
         return result;
     };
 
+    this.featureIsNumeric = function(featureName, grid){
+        result = true;
+        featureCoords = this.getFeatureCoords(featureName);
+
+        for (var i = 0; i<featureCoords.length; i++){
+            var value = grid.getDataPoint(featureCoords[i][0], featureCoords[i][1]);
+
+            if (!$.isNumeric(value) && value !== ""){
+                result = false;
+                break
+            }
+        }
+
+        return result;
+    };
+
 
     this.createImportData = function(plateIDs, grid){
-        var importData = new ImportData("none");
+        var importData = new ImportData(ImportData.NO_ID,
+                                        ImportData.NO_ID,
+                                        this.plates.length,
+                                        this.numPlateRows,
+                                        this.numPlateCols);
         var plate;
 
         for (var featureName in this.features){
@@ -281,17 +303,11 @@ function ParsingConfig(name,
 
             if (feature.typeOfFeature == WELL_LEVEL){
                 var wellFeatureCoords = this.findWellLevelFeatureCoords(featureName);
+                var isNumeric = this.featureIsNumeric(category, grid);
+                importData.addWellLevelCategory(category, isNumeric);
 
                 for (plate = 0; plate < wellFeatureCoords.length; plate++){
                     var plateCoords = wellFeatureCoords[plate];
-
-                    if (!importData.plates[plate]){
-                        importData.plates[plate] = {
-                            plateID: plateIDs[plate],
-                            labels : {},
-                            rows: []
-                        };
-                    }
 
                     for (var i=0; i<plateCoords.length; i++){
                         var gridCoordinates = plateCoords[i];
@@ -303,53 +319,34 @@ function ParsingConfig(name,
 
                         var value = grid.getDataPoint(gridRow, gridColumn);
 
-                        if (!importData.plates[plate].rows[plateRow]){
-                            importData.plates[plate].rows[plateRow] = {
-                                columns: []
-                            };
-                        }
-
-                        if (!importData.plates[plate].rows[plateRow].columns[plateColumn]){
-                            importData.plates[plate].rows[plateRow].columns[plateColumn]
-                                = {
-                                    labels: {}
-                                  };
-                        }
-
-                        importData.plates[plate].rows[plateRow].columns[plateColumn].labels[category]
-                            = value;
+                        importData.setWellLevelLabel(plate,
+                                                     plateRow,
+                                                     plateColumn,
+                                                     category,
+                                                     value);
                     }
                 }
             } else if (feature.typeOfFeature == PLATE_LEVEL) {
                 var plateFeatureCoords = this.findPlateLevelFeatureCoords(featureName);
+                importData.addPlateLevelCategory(category);
 
                 for (plate = 0; plate < plateFeatureCoords.length; plate++){
-
-
-                    if (!importData.plates[plate]){
-                        importData.plates[plate] = {
-                            plateID: plateIDs[plate],
-                            labels : {},
-                            rows: []
-                        };
-                    }
-
                     var gridCoordinates = plateFeatureCoords[plate];
                     var gridRow = gridCoordinates[0];
                     var gridColumn = gridCoordinates[1];
                     var value = grid.getDataPoint(gridRow, gridColumn);
 
-
-                    importData.plates[plate].labels[category]
-                        = value;
+                    importData.setPlateLevelLabel(plate, category, value);
                 }
             } else if (feature.typeOfFeature == EXPERIMENT_LEVEL){
+                importData.addExperimentLevelCategory(category);
+
                 var gridCoordinates = this.findExperimentLevelFeatureCoords(featureName);
                 var gridRow = gridCoordinates[0];
                 var gridColumn = gridCoordinates[1];
                 var value = grid.getDataPoint(gridRow, gridColumn);
 
-                importData.experimentFeatures.labels[category] = value;
+                importData.setExperimentLevelLabel(category, value);
             }
         }
 
@@ -409,6 +406,22 @@ function ParsingConfig(name,
     };
 
     this.addWellLevelFeature = function(name, grid, color){
+        var numPlateWells = ParsingConfig.getNumberOfWellsFromFeatureBounds(
+                                                                    grid.selectedStartRow,
+                                                                    grid.selectedStartCol,
+                                                                    grid.selectedEndRow,
+                                                                    grid.selectedEndCol);
+        var plateDimensions = ParsingConfig.wellNumberToPlateDimension(numPlateWells,
+                                                                       2,
+                                                                       3);
+        if (plateDimensions[0] > this.numPlateRows){
+            this.numPlateRows = plateDimensions[0];
+        }
+
+        if (plateDimensions[1] > this.numPlateCols){
+            this.numPlateCols = plateDimensions[1];
+        }
+
         return this.addFeature(name, grid, false, this.plate, WELL_LEVEL, color);
     };
 
@@ -442,6 +455,14 @@ ParsingConfig.loadParsingConfig = function(JSONParsingConfig){
     config.features = rawParsingConfig.features;
 
     return config;
+};
+
+ParsingConfig.wellNumberToPlateDimension = function(numberOfWells, rowProportion, colProportion){
+    var base = Math.sqrt(numberOfWells/(rowProportion * colProportion));
+    var numColumns = base * colProportion;
+    var numRows = base * rowProportion;
+
+    return [numRows, numColumns];
 };
 
 ParsingConfig.wellNumberToPlateCoords = function(index, numberOfWells, rowProportion, colProportion){

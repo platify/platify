@@ -64,7 +64,7 @@ function ImportDataFileGenerator(importDataObject){
                         for (var columnIndex=0;
                              columnIndex<row.columns.length;
                              columnIndex++){
-                            var well = row.columns[columnIndex]
+                            var well = row.columns[columnIndex];
 
                             if (well.labels){
                                 for (var category in well.labels){
@@ -74,6 +74,30 @@ function ImportDataFileGenerator(importDataObject){
                                     }
                                 }
                             }
+                        }
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+    function findNumberOfPlateRowsAndColumns(dataObject){
+        var result = [0,0];
+
+        if (dataObject && dataObject.plates && dataObject.plates.length) {
+            for (var plateIndex = 0; plateIndex < dataObject.plates.length; plateIndex++){
+                var plate = dataObject.plates[plateIndex];
+
+                if (plate.rows && plate.rows.length){
+                    for(var rowIndex = 0; rowIndex < plate.rows.length ; rowIndex++){
+                        var row = plate.rows[rowIndex];
+
+                        result[0]++;
+
+                        if (row.columns && row.columns.length && row.columns.length > result[1]){
+                            result[1] = row.columns.length;
                         }
                     }
                 }
