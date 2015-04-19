@@ -14,6 +14,7 @@ if (window.File && window.FileReader && window.FileList && window.Blob) {
 var PARSING = 0;
 var PLATES = 1;
 var FEATURES = 2;
+var EXPERIMENT = 3;
 var activeTab = 0;
 
 var examiner;
@@ -587,6 +588,8 @@ function handleTabChange(event, ui){
         if (parsingConfig && parsingConfig.plate && examiner && examiner.rowsSize){
             gridHighlighter.highlightAllPlates(parsingConfig);
         }
+    } else if (newTab === EXPERIMENT){
+        handleImportResults();
     }
 
 }
@@ -662,11 +665,11 @@ function handleImportResults(){
     reloadPlatesList();
 
     // show the plate ID selection div and hide the parsing config creation tabs div
-    var tabsDiv = document.getElementById("tabs");
+    /*var tabsDiv = document.getElementById("tabs");
     var plateIDSelectionDiv = document.getElementById("plateIDSelection");
 
     tabsDiv.style.display = "none";
-    plateIDSelectionDiv.style.display = "block";
+    plateIDSelectionDiv.style.display = "block";*/
 
     // disable cell selection
     grid.disableCellSelection();
