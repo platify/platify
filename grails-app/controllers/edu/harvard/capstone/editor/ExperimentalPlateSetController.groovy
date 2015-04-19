@@ -72,8 +72,8 @@ class ExperimentalPlateSetController {
 		respond experimentalPlateSetInstance, model:[plateTemplatelist: plateList]
 	}
 	
-	def createPlate(PlateTemplate templateInstance) {
-		[templateId: templateInstance.id]
+	def createPlate() {
+		respond new PlateTemplate(params), model:[expId: params.expid, templateId: params.tmpid]
 	}
 	
 	def selectTemplate(ExperimentalPlateSet experimentalPlateSetInstance) {

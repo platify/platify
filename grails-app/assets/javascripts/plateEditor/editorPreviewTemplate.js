@@ -215,7 +215,8 @@ function selectAndContinue() {
 	var pSelect = document.getElementById("plateSelect");
 	if (pSelect.value != null) {
 		// use less hacky method !!
-		window.location.href = hostname + "/experimentalPlateSet/createPlate/" + pSelect.value;
+		window.location.href = hostname + "/experimentalPlateSet/createPlate"
+			+ '?expid=' + expId + '&tmpid=' + pSelect.value;
 	} else {
 		alert("An error while selecting the template. TemplateId is null");
 	}

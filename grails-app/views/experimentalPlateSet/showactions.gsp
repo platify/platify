@@ -13,9 +13,9 @@
 	    
 	    <script type="text/javascript" charset="utf-8">
 			function goToCreateTemplate() {
-				window.location.href = hostname + "/plateTemplate/create/"
-					+ ${experimentalPlateSetInstance.id}
-					+ '?name=' + document.getElementById("templateName").value
+				window.location.href = hostname + "/plateTemplate/create"
+					+ '?expid=' + ${experimentalPlateSetInstance.id}
+					+ '&name=' + document.getElementById("templateName").value
 			    	+ '&width=' + document.getElementById("templateWidth").value
 			    	+ '&heigth=' + document.getElementById("templateHeight").value;
 			}
@@ -60,7 +60,7 @@
 		<div class="content-fluid ">
 			<div class="row">
 				<div class="col-sm-12 content-body">
-					<h2>Selected Experiment:</h2>
+					<h2 style="margin-left:15px">${experimentalPlateSetInstance.name}</h2>
 					<ol class="breadcrumb">
 						<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
 						<li><g:link controller="experimentalPlateSet" action="index">Experiments</g:link></li>
@@ -73,7 +73,7 @@
 							</div>
 							<div class="panel-body ">
 								<h4><span style="font-weight:bold">Experiment ID: </span> ${experimentalPlateSetInstance.id}</h4>
-								<h4><span style="font-weight:bold">Experiment Name: </span> ${experimentalPlateSetInstance.name}</h4>
+								<!-- <h4><span style="font-weight:bold">Experiment Name: </span> ${experimentalPlateSetInstance.name}</h4> -->
 								<h4><span style="font-weight:bold">Experiment Description: </span> ${experimentalPlateSetInstance.description}</h4>
 								<h4><span style="font-weight:bold">Experiment Owner: </span> ${experimentalPlateSetInstance.owner}</h4>
 							</div>

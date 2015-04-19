@@ -29,6 +29,7 @@
 			      		<h4><label class="control-label col-sm-2" for="tSizeFilter">Size: </label></h4>
 					    <div class="col-sm-3">
 							<select class="form-control" id="weltSizeFilterlCount">
+							  <option>Any</option>
 							  <option>96 wells</option>
 							  <option>386 wells</option>
 							  <option>1536 wells</option>
@@ -39,11 +40,9 @@
 						<h4><label class="control-label col-sm-2" for="tTypeFilter">Type: </label></h4>
 					    <div class="col-sm-3">
 							<select class="form-control" id="tTypeFilter">
-							  <option>96 wells</option>
-							  <option>386 wells</option>
-							  <option>1536 wells</option>
-							  <option>3456 wells</option>
-							  <option>9600 wells</option>
+							  <option>Any</option>
+							  <option>Bio-plate</option>
+							  <option>Chem-plate</option>
 							</select>
 						</div>						
 			      	</div>
