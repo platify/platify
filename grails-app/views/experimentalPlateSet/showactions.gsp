@@ -4,12 +4,6 @@
 		<meta name="layout" content="main">
 		<g:set var="entityName" value="${message(code: 'experimentalPlateSet.label', default: 'ExperimentalPlateSet')}" />
 		<title><g:message code="default.create.label" args="[entityName]" /></title>
-		
-		<asset:stylesheet href="jquery-ui.css"/>
-	    <asset:stylesheet href="grid/style.css"/>
-	    <asset:stylesheet href="grid/slick.grid.css"/>
-	    <asset:stylesheet href="grid/slick-default-theme.css"/>
-	    <asset:stylesheet href="grid/Grid.css"/>
 	    
 	    <script type="text/javascript" charset="utf-8">
 			function goToCreateTemplate() {
@@ -73,7 +67,6 @@
 							</div>
 							<div class="panel-body ">
 								<h4><span style="font-weight:bold">Experiment ID: </span> ${experimentalPlateSetInstance.id}</h4>
-								<!-- <h4><span style="font-weight:bold">Experiment Name: </span> ${experimentalPlateSetInstance.name}</h4> -->
 								<h4><span style="font-weight:bold">Experiment Description: </span> ${experimentalPlateSetInstance.description}</h4>
 								<h4><span style="font-weight:bold">Experiment Owner: </span> ${experimentalPlateSetInstance.owner}</h4>
 							</div>
@@ -113,10 +106,10 @@
 									<tbody>
 									<g:each in="${plateTemplatelist}" status="i" var="plateTemplateInstance">
 										<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
-											<td><h5>${plateTemplateInstance.id}</h5></td>
-											<td><h5>${fieldValue(bean: plateTemplateInstance, field: "name")}</h5></td>
-											<td><h5>${plateTemplateInstance.owner.firstName + ' ' + plateTemplateInstance.owner.lastName}</h5></td>
-											<td><h5>${fieldValue(bean: plateTemplateInstance, field: "dateCreated")}</h5></td>
+											<td>${plateTemplateInstance.id}</td>
+											<td>${fieldValue(bean: plateTemplateInstance, field: "name")}</td>
+											<td>${plateTemplateInstance.owner.firstName + ' ' + plateTemplateInstance.owner.lastName}</td>
+											<td>${fieldValue(bean: plateTemplateInstance, field: "dateCreated")}</td>
 										</tr>
 									</g:each>
 									</tbody>
