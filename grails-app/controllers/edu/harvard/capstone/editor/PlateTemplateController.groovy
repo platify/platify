@@ -21,10 +21,9 @@ class PlateTemplateController {
         respond plateTemplateInstance
     }
 
-    def create(ExperimentalPlateSet experimentalPlateSetInstance) {
-		
-        respond new PlateTemplate(params), model:[expPlateSetInstance: experimentalPlateSetInstance, 
-			templateName: params.name, gridWidth: params.width, gridHeigth: params.heigth]
+	def create() {
+        respond new PlateTemplate(params), model:[expId: params.expid, templateName: params.name, 
+			gridWidth: params.width, gridHeigth: params.heigth]
     }
 
     def getPlate(PlateTemplate plateTemplateInstance){

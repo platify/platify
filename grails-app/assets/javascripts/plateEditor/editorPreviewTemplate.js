@@ -2,7 +2,7 @@
 var DIMENSION = 100;
 var CELL_HEIGHT = 25;
 var CELL_WIDTH = 40;
-var data;
+// var data;
 var plateModel = {};
 var wellGroupings = [];
 var grid;
@@ -16,28 +16,13 @@ var BLANK_CHAR = "-"
  * A function that creates a blank data set for initializing the grid example
  * page. The data set is of dimension DIMENSION x DIMENSION.
  */
-function createBlankData(){
+function createBlankData() {
 	var result = [];
 
-	for (var i=0; i<DIMENSION; i++){
+	for (var i=0; i < DIMENSION; i++){
 		result[i] = [];
-		for (var j=0; j<DIMENSION; j++){
+		for (var j=0; j < DIMENSION; j++){
 			result[i][j] = null;
-		}
-	}
-	return result;
-}
-
-/**
- * A function that creates a random data set for displaying in the grid example
- * page. The data set is of dimension DIMENSION x DIMENSION.
- */
-function createRandomData(){
-	var result = [];
-	for (var i=0; i<DIMENSION; i++){
-		result[i] = [];
-		for (var j=0; j<DIMENSION; j++){
-			result[i][j] = "L" + Math.floor(Math.random()*100);
 		}
 	}
 	return result;
@@ -47,31 +32,25 @@ function createRandomData(){
  * Loads a json plate model and updates the grid and category legend
  */
 function loadJsonData(plateJson) {
-	clearCurrentGridValues();
+	var newData = createBlankData();		// TMP	--> should only load plateModel instead, 
+	// assuming plate model has all empty rows ??
+	
 	plateModel = translateInputJsonToModel(plateJson);
 	
 	for (var row in plateModel["rows"]) {
 		for (var column in plateModel["rows"][row]["columns"]) {
-			var newContents = plateModel["rows"][row]["columns"][column]["wellGroupName"];		// perhaps use return result, like random data instead !! ??
+			var newContents = plateModel["rows"][row]["columns"][column]["wellGroupName"]; 
+			
 			if (newContents != null) {
-				// can't pass 0 index !!! , does this throw off the layout ??
-				grid.updateCellContents(row, column, newContents);
+				newData[row - 1][column - 1] = newContents;
 			}
 		}
 	}
-}
+	
+	grid.setData(newData);
 
-/**
- * Replaces the values in the grid with blanks, for rows/columns in the current plateModel
- */
-function clearCurrentGridValues() {
-	// for each existing value, overwrite with blank label
-	for (var row in plateModel["rows"]) {
-		for (var column in plateModel["rows"][row]["columns"]) {
-			// can't pass 0 index !!! , does this throw off the layout ??
-			grid.updateCellContents(row + 1, column, BLANK_CHAR);
-		}
-	}
+	// display the data
+	grid.fillUpGrid(CELL_WIDTH, CELL_HEIGHT);
 }
 
 /**
@@ -116,7 +95,7 @@ function createGrid(){
 	grid  = new Grid("myGrid");
 
 	// set the data to be displayed which must be in 2D array form
-	data = createBlankData();
+	var data = createBlankData();
 	grid.setData(data);
 
 	// display the data
@@ -236,7 +215,8 @@ function selectAndContinue() {
 	var pSelect = document.getElementById("plateSelect");
 	if (pSelect.value != null) {
 		// use less hacky method !!
-		window.location.href = hostname + "/experimentalPlateSet/createPlate/" + pSelect.value;
+		window.location.href = hostname + "/experimentalPlateSet/createPlate"
+			+ '?expid=' + expId + '&tmpid=' + pSelect.value;
 	} else {
 		alert("An error while selecting the template. TemplateId is null");
 	}

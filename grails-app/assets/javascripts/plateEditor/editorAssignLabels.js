@@ -336,18 +336,26 @@ function updateCompoundList() {
 		newDiv.appendChild(innerDiv);
 	}
 	document.getElementById("compoundList").innerHTML = newDiv.innerHTML;
+	
+	// won't seem to take value for input until created ??
+	for (var wellGroup in groupNames) {
+		if (groupNames[wellGroup] != null) {
+			document.getElementById("wellGroup-" + wellGroup).value = groupNames[wellGroup];
+		}
+	}
 }
 
 function updateCategoryList() {
 	var newDiv = document.createElement("div");
 	for (var catKey in catLegend) {
 		var newUl = document.createElement("ul");
-		
 		newDiv.appendChild(createCatLabel(catKey));
 		
 		for (var labelKey in catLegend[catKey]['labels']) {
 			var newLi = document.createElement("li");
-			newLi.appendChild(document.createTextNode(labelKey));
+			// if label has been converted from a decimal, then convert it back for display!!
+			var convLab = labelKey.toString().split('__dot__').join('.');
+			newLi.appendChild(document.createTextNode(convLab));
 			
 			var newInput = createColorPicker(catKey, labelKey);
 			newLi.appendChild(newInput);
@@ -369,6 +377,20 @@ function updateCategoryList() {
 	}
 }
 
+function updatePlateLabelList() {
+	var pLabels = plateModel["labels"];
+	var newDiv = document.createElement("div");
+	
+	for (var i = 0; i < pLabels.length; i++) {
+		var newH = document.createElement("H5");
+		newH.appendChild(document.createTextNode(pLabels[i].category + ": "));	// should null check !
+		newH.appendChild(document.createTextNode(pLabels[i].name));
+		newDiv.appendChild(newH);
+	}
+
+	document.getElementById("plateLabelList").innerHTML = newDiv.innerHTML;
+}
+
 
 function createCatLabel(catKey) {
 	var newStrong = document.createElement("strong");
@@ -377,27 +399,21 @@ function createCatLabel(catKey) {
 	newCheckbox.checked = true;
 	newCheckbox.id = "vischeck-" + catKey;
 	newStrong.appendChild(newCheckbox);
-	newStrong.appendChild(document.createTextNode(catKey));
+	// if category has been converted from a decimal, then convert it back for display!!
+	var convCat = catKey.toString().split('__dot__').join('.');
+	newStrong.appendChild(document.createTextNode(convCat));
 	
 	return newStrong;
 }
 
 function enableGridSelection() {
-	removeAllHighlightedCells();
+	//removeAllHighlightedCells();
 	grid.enableCellSelection();
 }
 
 function disableGridSelection() {
 	removeAllHighlightedCells();
 	grid.disableCellSelection();
-}
-
-function cancelNewLabel() {
-	hideLabelPanel();
-}
-
-function cancelDoseStep() {
-	hideDosePanel();
 }
 
 // remove and cleanup references to cat and label
@@ -426,6 +442,10 @@ function removeLabel(cat, label) {
 	// remove from color legend cell reverse lookup
 	delete catLegend[cat]['labels'][label];
 	
+	if (Object.keys(catLegend[cat]['labels']).length == 0) {
+		delete catLegend[cat];
+	}
+	
 	// referesh category elements
 	updateCategoryList();
 }
@@ -433,12 +453,12 @@ function removeLabel(cat, label) {
 // remove and cleanup references to cat and label
 function updateLabelName(cat, oldLabel, label) {	// should we allow for change of category also ??
 	// remove spaces from the names (replacing with '_')
-	cat = cat.split(' ').join('_');
-	label = label.split(' ').join('_');
+	cat = cat.toString().split(' ').join('_');
+	label = label.toString().split(' ').join('_');
 	
 	// remove decimal point from the names (replacing with '_|_')
-	cat = cat.split('.').join('__dot__');
-	label = label.split('.').join('__dot__');
+	cat = cat.toString().split('.').join('__dot__');
+	label = label.toString().split('.').join('__dot__');
 	
 	// update color legend cell reverse lookup				
 	if (catLegend[cat]['labels'][label] == null) {
@@ -504,19 +524,17 @@ function addDoseStep() {
 	}
 				
 	updateCategoryList();
-	// disable selection of grid cells
-	//hideDosePanel();
 	removeAllHighlightedCells();
 }
 
 function createNewLabel(cat, label, units, color, applyToCells) {
 	// remove spaces from the names (replacing with '_')
-	cat = cat.split(' ').join('_');
-	label = label.split(' ').join('_');
+	cat = cat.toString().split(' ').join('_');
+	label = label.toString().split(' ').join('_');
 	
 	// remove decimal point from the names (replacing with '_|_')
-	cat = cat.split('.').join('__dot__');
-	label = label.split('.').join('__dot__');
+	cat = cat.toString().split('.').join('__dot__');
+	label = label.toString().split('.').join('__dot__');
 	
 	// update catLegend color
 	if (catLegend[cat] == null) {
@@ -613,6 +631,23 @@ function addNewLabel() {
 	removeAllHighlightedCells();
 }
 
+function addNewPlateLabel() {
+	var cat = document.getElementById("newPlateCatValue").value;
+	var label = document.getElementById("newPlateLabelValue").value;
+	
+	if (plateModel["labels"] == null) {
+		plateModel["labels"] = [];
+	}
+	
+	var pLabel = {};
+	pLabel.category = cat;
+	pLabel.name = label;
+	
+	plateModel["labels"].push(pLabel);
+	
+	updatePlateLabelList();
+}
+
 /**
  * This function changes the style of a particular cell
  */
@@ -636,8 +671,6 @@ function addNewDose() {
 	console.log("jsonplate:" + JSON.stringify(jsonplate));
 	removeAllHighlightedCells();
 }
-
-
 
 /**
  * addEvent - This function adds an event handler to an html element in
@@ -731,9 +764,13 @@ function fetchTemplateData(tId){
  * grid with blank data and sets up the event handlers on the
  */
 function init(){
-	createGrid();		// maybe need template size before creating grid !!
+	hidePlateLabelCatPanel();
+	hideDosePanel();
+	hideDoseStepPanel();
+	hidePlateLabelPanel();
 	
-	//var testInputJson = {"plate":{"wells":[{"row":"2","column":"2","control":null,"labels":[{"category":"c1","name":"l1","color":"#ffff00"}],"groupName":"L67"},{"row":"2","column":"3","control":null,"labels":[{"category":"c1","name":"l2","color":"#4780b8"}],"groupName":"L5"},{"row":"3","column":"2","control":null,"labels":[{"category":"c1","name":"l1","color":"#ffff00"},{"category":"c2","name":"l3","color":"#8d7278"}],"groupName":"L51"},{"row":"3","column":"3","control":null,"labels":[{"category":"c1","name":"l2","color":"#4780b8"},{"category":"c2","name":"l3","color":"#8d7278"}],"groupName":"L17"},{"row":"4","column":"2","control":null,"labels":[{"category":"c2","name":"l3","color":"#8d7278"}],"groupName":"L2"},{"row":"4","column":"3","control":null,"labels":[{"category":"c2","name":"l3","color":"#8d7278"}],"groupName":"L47"}],"labels":[]}};
+	createGrid();		// maybe need template size before creating grid !!
+
 	// fetch templateJson
 	console.log("templateId:" + window.templateId);
 	//fetchTemplateData(window.templateId);
@@ -744,8 +781,9 @@ function init(){
 	addEvent("addNewLabel", "click", addNewLabel);
 	addEvent("addNewDose", "click", addNewDose);
 	addEvent("addDoseStep", "click", addDoseStep);
+	addEvent("addNewPlateLabel", "click", addNewPlateLabel);
+	
 	addEvent("clearAllSelection", "click", removeAllHighlightedCells);
-	addEvent("savePlate", "click", saveConfigToServer);
 
 	enableGridSelection();
 }
@@ -759,7 +797,13 @@ function translateModelToOutputJson(pModel) {
 	plate["name"] = pModel["name"];
 	plate["plateID"] = document.getElementById("barcode").value;
 	plate["wells"] = [];
-	plate["labels"] = [];		// plate level labels, should set these if available already !!!
+	
+	if (pModel["labels"] != null) {
+		plate["labels"] = pModel["labels"];
+	} else {
+		plate["labels"] = [];
+	}
+	
 	for (var row in pModel["rows"]) {
 		for (var column in pModel["rows"][row]["columns"]) {
 			var well = {};
@@ -771,8 +815,11 @@ function translateModelToOutputJson(pModel) {
 			for (var catKey in pModel["rows"][row]["columns"][column]["categories"]) {
 				for (var labKey in pModel["rows"][row]["columns"][column]["categories"][catKey]) {
 					var label = {};
-					label["category"] = catKey;
-					label["name"] = labKey;
+					// if catKey, or labKey have been converted from a decimal, convert them back for output!
+					var convCat = catKey.toString().split('__dot__').join('.');
+					var convLab = labKey.toString().split('__dot__').join('.');
+					label["category"] = convCat;
+					label["name"] = convLab;
 					label["value"] = pModel["rows"][row]["columns"][column]["categories"][catKey][labKey]["color"];
 					label["units"] = pModel["rows"][row]["columns"][column]["categories"][catKey][labKey]["units"];
 					labels.push(label);
@@ -800,8 +847,15 @@ function translateModelToOutputJson(pModel) {
 // data format translation
 function translateInputJsonToModel(plateJson) {
 	var pModel = {};
+	groupNames = {};
 	pModel["rows"] = {};
 	var plate = plateJson["plate"];
+	
+	if (plateJson["labels"] != null) {
+		pModel["labels"] = plateJson["labels"];
+	} else {
+		pModel["labels"] = [];
+	}
 	
 	pModel["name"] = plate["name"];			// should also copy expId and plateId at this point !!
 	
@@ -823,23 +877,36 @@ function translateInputJsonToModel(plateJson) {
 		}
 
 		for (var j=0; j < labels.length; j++) {
-			if (pModel["rows"][row]["columns"][column]["categories"][labels[j].category] == null) {
-				pModel["rows"][row]["columns"][column]["categories"][labels[j].category] = {};
-				pModel["rows"][row]["columns"][column]["categories"][labels[j].category][labels[j].name] = {};
+			// convert possible disruptive input to safer format !
+			var convCat = labels[j].category.toString().split('.').join('__dot__');
+			var convLab = labels[j].name.toString().split('.').join('__dot__');
+			
+			if (convCat == "compound") {
+				// deal with special 'compound' category !
+				groupNames[groupName] = convLab;		// should do null check ??
+				
+			} else {
+				// other labels
+				if (pModel["rows"][row]["columns"][column]["categories"][convCat] == null) {
+					pModel["rows"][row]["columns"][column]["categories"][convCat] = {};
+				}
+				
+				if (pModel["rows"][row]["columns"][column]["categories"][convCat][convLab] == null) {
+					pModel["rows"][row]["columns"][column]["categories"][convCat][convLab] = {};
+				}
+				pModel["rows"][row]["columns"][column]["categories"][convCat][convLab]["color"] = labels[j].value;
+				pModel["rows"][row]["columns"][column]["categories"][convCat][convLab]["units"] = labels[j].units;
 			}
-			pModel["rows"][row]["columns"][column]["categories"][labels[j].category][labels[j].name]["color"] = labels[j].value;
-			pModel["rows"][row]["columns"][column]["categories"][labels[j].category][labels[j].name]["units"] = labels[j].units;
 		}
 	}
 
 	return pModel;
 }
 
+
 // jQuery ui stuff
 $(function() {	
-	$("#addDosePanel").hide();
-	$("#addDoseStepPanel").hide();
-	
+
 	$("input[name=labeltype]").on("change", function () {
 	    if ($(this).prop('id') == "catLabType") {
 	    	showLabelPanel();
@@ -847,7 +914,9 @@ $(function() {
 	    	showDosePanel();
 	    } else if ($(this).prop('id') == "doseStepLabType") {
 	    	showDoseStepPanel();
-	    }
+	    } else if ($(this).prop('id') == "plateLabType") {
+	    	showPlateLabelPanel();
+	    } 
 	});
 	
 	$('[data-toggle="popover"]').popover({
@@ -887,19 +956,51 @@ function txtFieldFocus() {
 function showLabelPanel() {
 	hideDosePanel();
 	hideDoseStepPanel();
+	hidePlateLabelPanel();
+	hidePlateLabelCatPanel();
 	$("#addLabelPanel").show();
+	enableGridSelection();
+	showCategoryPanel();
 };
 
 function showDosePanel() {
 	hideLabelPanel();
 	hideDoseStepPanel();
+	hidePlateLabelPanel();
+	hidePlateLabelCatPanel();
 	$("#addDosePanel").show();
+	enableGridSelection();
+	showCategoryPanel();
 };
 
 function showDoseStepPanel() {
 	hideLabelPanel();
 	hideDosePanel();
+	hidePlateLabelPanel();
+	hidePlateLabelCatPanel();
 	$("#addDoseStepPanel").show();
+	enableGridSelection();
+	showCategoryPanel();
+};
+
+function showPlateLabelPanel() {
+	hideLabelPanel();
+	hideDosePanel();
+	hideDoseStepPanel();
+	hideCategoryPanel();
+	$("#addPlateLabelPanel").show();
+	
+	// disable grid selection !! (labels only apply to plate level)
+	disableGridSelection();
+	showPlateLabelCatPanel();
+};
+
+function showCategoryPanel() {
+	$("#categoryPanel").show();
+};
+
+function showPlateLabelCatPanel() {
+	$("#plateLabelCatPanel").show();
 };
 
 function hideLabelPanel() {
@@ -912,4 +1013,16 @@ function hideDosePanel() {
 
 function hideDoseStepPanel() {
 	$("#addDoseStepPanel").hide();
+};
+
+function hidePlateLabelPanel() {
+	$("#addPlateLabelPanel").hide();
+};
+
+function hideCategoryPanel() {
+	$("#categoryPanel").hide();
+};
+
+function hidePlateLabelCatPanel() {
+	$("#plateLabelCatPanel").hide();
 };

@@ -929,7 +929,7 @@ function init(){
     addEvent("newFeature", "click", handleNewFeature);
     addEvent("deleteFeature", "click", deleteFeature);
     addEvent("importResults", "click", handleImportResults);
-    addEvent("returnToConfig", "click", handleReturnToConfig);
+  //  addEvent("returnToConfig", "click", handleReturnToConfig);
     addEvent("byFeature", "click", handleByFeature);
     addEvent("byManualEntry", "click", handleByManualEntry);
     addEvent("plateList", "change", handlePlateSelect);

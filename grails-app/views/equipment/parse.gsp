@@ -15,34 +15,25 @@
 
 </head>
 <body class="container">
-	<div class="">
-		
-	</div>
+	<div class=""></div>
 
 	<div class="content-fluid ">
 		<div class="row">
-			<!-- Left Column -->
-			<div class="col-sm-2">
-				<div class="nav" role="navigation">
-					<ul class="nav nav-pills nav-stacked">
-						<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
-						<li><g:link class="create" action="index">List</g:link></li>
-						<li class="active"><a href="#">Parse</a></li>
-					</ul>			
-				</div>					
-			</div> <!-- Left Column END -->
-			<!-- Right Column -->
-			<div class="col-sm-10 content-body" style="padding-right: 30px">
-				<div style="height: 50px;">
+			<div class="col-sm-12 content-body">
+				<div>
 					<div class="pull-left">
-						<h4>
-							Experiment: <span>${experimentInstance?.name}</span>	
-						</h4>
+						<h2>
+							Experiment: <span>${experimentInstance?.name}</span> -- 
+							Equipment: <span>${equipmentInstance?.name}</span>	
+						</h2>
 					</div>
 					<div class="pull-right">
-						<h4>
-							Equipment: <span>${equipmentInstance?.name}</span>
-						</h4>
+						<h2>
+							<button	id="importResults" class="btn btn-info btn-sm">Import
+							results</button>&nbsp;
+							<button class="btn btn-info btn-sm" id="saveConfigToServer">Save</button>
+							<button class="btn btn-info btn-sm" id="saveAsConfigToServer">Save As</button>
+						</h2>
 					</div>
 				</div>			
 				<g:render template="parser"/>
