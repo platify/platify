@@ -4,7 +4,7 @@ class Label {
 
 	String category
 	String name
-	String value
+	String value // color
 
     static constraints = {
     	value blank: true, nullable: true
