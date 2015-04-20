@@ -391,7 +391,7 @@ class EditorService {
    		}
    		
 
-    	return plate    	
+    	return experiment    	
     }
 }
 	
