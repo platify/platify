@@ -54,28 +54,28 @@
 		<div class="content-fluid ">
 			<div class="row">
 				<div class="col-sm-12 content-body">
-					<h2 style="margin-left:15px">${experimentalPlateSetInstance.name}</h2>
+					<h3 style="margin-left:15px">${experimentalPlateSetInstance.name}</h3>
 					<ol class="breadcrumb">
 						<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
-						<li><g:link controller="experimentalPlateSet" action="index">Experiments</g:link></li>
-						<li><g:link controller="experimentalPlateSet" action="showactions" id="${experimentalPlateSetInstance.id}">Show Experiment</g:link></li>
+						<li><g:link controller="experimentalPlateSet" action="index">Assays</g:link></li>
+						<li><g:link controller="experimentalPlateSet" action="showactions" id="${experimentalPlateSetInstance.id}">Show Assay</g:link></li>
 					</ol>
 					<div class="col-sm-6">
-						<div id="expDetailsPanel" class="panel panel-info">
+						<div id="expDetailsPanel" class="panel panel-default">
 							<div class="panel-heading">
-								<h4 class="panel-title">Experiment Details</h4>
+								<h4 class="panel-title">Assay Details</h4>
 							</div>
 							<div class="panel-body ">
-								<h4><span style="font-weight:bold">Experiment ID: </span> ${experimentalPlateSetInstance.id}</h4>
-								<h4><span style="font-weight:bold">Experiment Description: </span> ${experimentalPlateSetInstance.description}</h4>
-								<h4><span style="font-weight:bold">Experiment Owner: </span> ${experimentalPlateSetInstance.owner}</h4>
+								<h4>Assay ID: ${experimentalPlateSetInstance.id}</h4>
+								<h4>Assay Description: ${experimentalPlateSetInstance.description}</h4>
+								<h4>Assay Owner: ${experimentalPlateSetInstance.owner}</h4>
 							</div>
 						</div>
 					</div>
 					<div class="col-sm-6">
-						<div id="expActionPanel" class="panel panel-info">
+						<div id="expActionPanel" class="panel panel-default">
 							<div class="panel-heading">
-								<h4 class="panel-title">Add New Plate to Experiment:</h4>
+								<h4 class="panel-title">Add New Plate to Assay:</h4>
 							</div>
 							<div class="panel-body">
 								<g:link id="${experimentalPlateSetInstance.id}" action="selectTemplate" class="btn btn-info btn-sm">Select Existing Template</g:link>
@@ -86,9 +86,9 @@
 				
 					<!--  Existing Plates -->
 					<div class="col-sm-12">
-						<div id="platePanel" class="panel panel-info">
+						<div id="platePanel" class="panel panel-default">
 							<div class="panel-heading">
-								<h4 class="panel-title">Experiment Plate List:</h4>
+								<h4 class="panel-title">Assay Plate List:</h4>
 							</div>
 							<div class="panel-body ">
 								<g:if test="${flash.message}">

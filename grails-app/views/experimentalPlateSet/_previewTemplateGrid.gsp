@@ -1,9 +1,9 @@
 <%@ page import="edu.harvard.capstone.parser.Equipment" %>
 
 	<div class="col-sm-6">
-		<div id="labelPanel" class="panel panel-info">
+		<div id="labelPanel" class="panel panel-default">
 			<div class="panel-heading">
-				<h4 class="panel-title">Choose Template (for experiment with id: ${experimentalPlateSetInstance.id})</h4>
+				<h4 class="panel-title">Choose Template (for assay with id: ${experimentalPlateSetInstance.id})</h4>
 			</div>
 			<div class="panel-body" style="padding:2px">
 				<form class="form-horizontal">
@@ -19,7 +19,7 @@
 		</div>
 	</div>
 	<div class="col-sm-6">
-		<div id="filterPanel" class="panel panel-info">
+		<div id="filterPanel" class="panel panel-default">
 			<div class="panel-heading">
 				<h4 class="panel-title">Filter Template Choices</h4>
 			</div>
@@ -51,7 +51,7 @@
 		</div>
 	</div>
 	<div class="col-sm-12">
-		<div id="gridPanel" class="panel panel-info">
+		<div id="gridPanel" class="panel panel-default">
 			<div class="panel-heading">
 				<h4 class="panel-title">Preview Grid</h4>
 			</div>

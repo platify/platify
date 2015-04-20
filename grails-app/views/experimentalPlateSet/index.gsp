@@ -11,15 +11,15 @@
 		<div class="content-fluid">
 			<div class="row">
 				<div class="col-sm-12 content-body">
-					<h2 style="margin-left:15px">Experiments</h2>
+					<h3 style="margin-left:15px">Assays</h3>
 					<ol class="breadcrumb">
 						<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
-						<li><g:link controller="experimentalPlateSet" action="index">Experiments</g:link></li>
+						<li><g:link controller="experimentalPlateSet" action="index">Assays</g:link></li>
 					</ol>
 					<div class="col-sm-12">
-						<div id="expDetailsPanel" class="panel panel-info">
+						<div id="expDetailsPanel" class="panel panel-default">
 							<div class="panel-heading">
-								<h4 class="panel-title">Experiment List<span class="pull-right"><g:link class="btn btn-default btn-xs" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link></span></h4>
+								<h4 class="panel-title">Assay List<span class="pull-right"><g:link class="btn btn-info btn-xs" action="create">Create Assay</g:link></span></h4>
 							</div>
 							<div class="panel-body ">
 								<div id="list-scientist" class="content scaffold-list" role="main">

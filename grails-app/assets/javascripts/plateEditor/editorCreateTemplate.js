@@ -303,7 +303,7 @@ function translateInputJsonToModel(plateJson) {
 // ajax save object call
 function saveConfigToServer(){
 	var plateJson = translateModelToOutputJson(plateModel);
-	console.log(JSON.stringify(plateJson));
+	console.log("SendingToServer:" + JSON.stringify(plateJson));
    
 	var jqxhr = $.ajax({
 		url: hostname + "/plateTemplate/save",

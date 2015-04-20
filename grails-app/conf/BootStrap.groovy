@@ -135,11 +135,11 @@ class BootStrap {
             def machine1 = new Equipment(name: "First Equipment", machineName: "My machine", description: "This is my machine description", config: config).save(flush: true)
             new Equipment(name: "Second Equipment", machineName: "My greate machine", description: "This is my very long machine description", config: config).save(flush: true)            
 
-            def experiment1 = new ExperimentalPlateSet(owner: andres, name: "First Experiment", description: "My experiment description").save(flush: true)
-            new ExperimentalPlateSet(owner: scientist, name: "Scientist Experiment", description: "My experiment description").save(flush: true)
-            new ExperimentalPlateSet(owner: admin, name: "Admin Experiment", description: "My experiment description").save(flush: true)
-            new ExperimentalPlateSet(owner: andres, name: "Second Experiment", description: "My experiment description").save(flush: true)
-            def experiment3 = new ExperimentalPlateSet(owner: zach, name: "envision", description: "My envision experiment description").save(flush: true)
+            def experiment1 = new ExperimentalPlateSet(owner: andres, name: "Inhibitor Assay", description: "Assay with inihibitors description").save(flush: true)
+            new ExperimentalPlateSet(owner: scientist, name: "Scientist Assay", description: "Scientist assay description").save(flush: true)
+            new ExperimentalPlateSet(owner: admin, name: "Admin Assay", description: "Admin assay description").save(flush: true)
+            new ExperimentalPlateSet(owner: andres, name: "Zero Assay", description: "Zero assay description").save(flush: true)
+            def experiment3 = new ExperimentalPlateSet(owner: zach, name: "envision", description: "Envision assay description").save(flush: true)
 
             def template1 = new PlateTemplate(owner: andres, name: "first template").save(flush: true)
             def template2 = new PlateTemplate(owner: zach, name: "envision template").save(flush: true)

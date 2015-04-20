@@ -58,7 +58,8 @@ function loadJsonData(plateJson) {
 		for (var column in plateModel["rows"][row]["columns"]) {
 		
 			var wellgrp = plateModel["rows"][row]["columns"][column]["wellGroupName"];
-			groupNames[wellgrp] = "SOME_COMPOUND";
+			//groupNames[wellgrp] = "SOME_COMPOUND";
+			groupNames[wellgrp] = "";
 		
 			var newContents = wellgrp;
 
@@ -702,7 +703,7 @@ function addEvent(elementId, eventType, handlerFunction) {
 // ajax save object call
 function saveConfigToServer() {
 	var plateJson = translateModelToOutputJson(plateModel);
-	console.log(JSON.stringify(plateJson));
+	console.log("SendingToServer: " + JSON.stringify(plateJson));
    
 	var jqxhr = $.ajax({		// need to update to save plate instead of template
 		url: hostname + "/plateTemplate/save",
@@ -753,7 +754,7 @@ function fetchTemplateData(tId){
 	// Set another completion function for the request above
 	jqxhr.always(function(resData) {
 		console.log( "second complete" );
-		console.log("templateJson=" + JSON.stringify(resData));
+		console.log("recievedFromServer:  " + JSON.stringify(resData));
 		loadJsonData(resData);
 	});
 }

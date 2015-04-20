@@ -1,7 +1,7 @@
 <%@ page import="edu.harvard.capstone.parser.Equipment" %>
 
 	<div class="col-sm-6">
-		<div id="labelPanel" class="panel panel-info">
+		<div id="labelPanel" class="panel panel-default">
 			<div class="panel-heading">
 				<h4 class="panel-title">Add Well Group</h4>
 			</div>
@@ -14,7 +14,7 @@
 	</div>
 	
 	<div class="col-sm-6">
-		<div id="labelPanel" class="panel panel-info">
+		<div id="labelPanel" class="panel panel-default">
 			<div class="panel-heading">
 				<h4 class="panel-title">Other Actions<span class="pull-right"></span></h4>
 			</div>
@@ -26,7 +26,7 @@
 	</div>
 	
 	<div class="col-sm-12">
-		<div id="gridPanel" class="panel panel-info">
+		<div id="gridPanel" class="panel panel-default">
 			<div class="panel-heading">
 				<h4 class="panel-title">Plate Layout<span class="pull-right"><button id="clearAllSelection" class="btn btn-info btn-xs">Clear Selection</button></span></h4>
 			</div>

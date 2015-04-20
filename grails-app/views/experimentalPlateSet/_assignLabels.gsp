@@ -1,6 +1,6 @@
 
 <div class="col-xs-8">
-	<div id="labelPanel" class="panel panel-info">
+	<div id="labelPanel" class="panel panel-default">
 		<div class="panel-heading">
 			<div class="panel-title">Add New Label: 
 				<span class="pull-right">
@@ -66,9 +66,9 @@
 		</div>
 	</div>
 
-	<div id="gridPanel" class="panel panel-info">
+	<div id="gridPanel" class="panel panel-default">
 		<div class="panel-heading">
-			<h4 class="panel-title">Plate Wells:<span class="pull-right"><button id="clearAllSelection" class="btn btn-default btn-xs">Clear Selection</button></span></h4>
+			<h4 class="panel-title">Plate Wells:<span class="pull-right"><button id="clearAllSelection" class="btn btn-info btn-xs">Clear Selection</button></span></h4>
 		</div>
 		<div class="panel-body">
 			<div id="myGrid" style="width:100%; height:650px;"></div>
@@ -78,7 +78,7 @@
 
 <div class="col-xs-2">
 	<div class="toggler">
-		<div id="categoryPanel" class="panel panel-info">
+		<div id="categoryPanel" class="panel panel-default">
 			<div class="panel-heading">
 				<h4 class="panel-title">Well Labels</h4>
 			</div>
@@ -89,7 +89,7 @@
 	</div>
 	
 	<div class="toggler">
-		<div id="plateLabelCatPanel" class="panel panel-info">
+		<div id="plateLabelCatPanel" class="panel panel-default">
 			<div class="panel-heading">
 				<h4 class="panel-title">Plate Labels</h4>
 			</div>
@@ -101,7 +101,7 @@
 </div>
 
 <div class="col-xs-2">
-	<div id="compoundPanel" class="panel panel-info">
+	<div id="compoundPanel" class="panel panel-default">
 		<div class="panel-heading">
 			<h4 class="panel-title">Compounds<span class="pull-right"><button id="importCmpListButton" class="btn btn-info btn-xs ui-state-disabled">Import</button></span></h4>
 		</div>
