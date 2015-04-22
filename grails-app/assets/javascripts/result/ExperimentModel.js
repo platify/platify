@@ -8,7 +8,7 @@
 function ExperimentModel(experimentId) {
     // experiment-wide data
     this.experimentId = experimentId;
-    this.plates = null; // keyed by barcode
+    this.plates = null; // keyed by plateID
 
     // updated every time we change plates
     this.controls = {'negative': null, 'positive': null};
@@ -24,7 +24,7 @@ function ExperimentModel(experimentId) {
      */
     this.getData = function() {
         var that = this; // blegh, js binding hack
-        var url = RESULT_READ_EXPERIMENT_URL + '/' + this.experimentId;
+        var url = RESULT_KITCHEN_SINK_URL + '/' + this.experimentId;
         return $.getJSON(url, function(result) {
             that.plates = {};
             try {
@@ -39,9 +39,9 @@ function ExperimentModel(experimentId) {
             if (Object.keys(that.experiment.plates).length > 0) {
                 for (var i=0; i<that.experiment.plates.length; i++) {
                     var plate = that.experiment.plates[i];
-                    that.plates[plate.barcode] = plate;
+                    that.plates[plate.plateID] = plate;
                 }
-                that.selectPlate(that.experiment.plates[0].barcode);
+                that.selectPlate(that.experiment.plates[0].plateID);
             }
         });
     }
@@ -109,7 +109,7 @@ function ExperimentModel(experimentId) {
 
 
     /**
-     * Marks the plate with barcode barcode as the active one.  Copies data
+     * Marks the plate with plateID plateID as the active one.  Copies data
      * from that plate into a 2d array we can feed to slickgrid.  Locates the
      * control wells for the plate.  Calculates and stores normalized data 
      * into a 2d array we can feed to slickgrid.
@@ -117,9 +117,9 @@ function ExperimentModel(experimentId) {
      * TODO - put call to normalize and store normalized data into output
      * 	      parser.
      */
-    this.selectPlate = function(barcode) {
-        this.currentPlateBarcode = barcode;
-        this.currentPlate = this.plates[barcode];
+    this.selectPlate = function(plateID) {
+        this.currentPlateBarcode = plateID;
+        this.currentPlate = this.plates[plateID];
         this.locateControls();
         this.loadDataForGrid();
         this.loadNormalizedDataForGrid();

@@ -17,8 +17,8 @@ function experimentSelected(experimentId) {
         select.children('option').remove();
         if (Object.keys(experiment.plates).length > 0) {
             var options = $.map(experiment.plates, function(p) {
-                var option = $('<option />').text(p.barcode);
-                if (p.barcode === experiment.currentPlateBarcode) {
+                var option = $('<option />').text(p.plateID);
+                if (p.plateID === experiment.currentPlateBarcode) {
                     option[0].selected = true;
                 }
                 return option;
@@ -30,8 +30,8 @@ function experimentSelected(experimentId) {
 }
 
 
-function plateSelected(barcode) {
-    experiment.selectPlate(barcode);
+function plateSelected(plateID) {
+    experiment.selectPlate(plateID);
     loadGrid(experiment.data);
     $('input[name="rawOrNorm"][value="raw"]')[0].checked = true;
     $('#zFactor').text(experiment.zFactor());

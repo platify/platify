@@ -346,6 +346,9 @@ class ResultService {
                         if (well) {
                             plate.rows[x].columns[y] = [:]
 
+			    // control or not?
+			    plate.rows[x].columns[y].control = (well.control == Well.WellControl.EMPTY) ? null : well.control.toString()
+
                             // plate labels
                             def wellPlateLabels = DomainLabel.findAllByDomainIdAndLabelTypeAndPlate(well.id, DomainLabel.LabelType.WELL, plateSet)
                             plate.rows[x].columns[y].labels = wellPlateLabels.collectEntries {wellLabel -> [wellLabel.label.category, wellLabel.label.name]}

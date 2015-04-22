@@ -71,7 +71,7 @@
 
 	<!-- results-specific js -->
 	<g:javascript>
-	var RESULT_READ_EXPERIMENT_URL = "${createLink(action: 'readExperiment', experimentInstance: null)}";
+	var RESULT_KITCHEN_SINK_URL = "${createLink(action: 'kitchenSink', experimentInstance: null)}";
 	</g:javascript>
 	<asset:javascript src="plate-statistics/statistics.js" />
 	<asset:javascript src="result/ExperimentModel.js" />
