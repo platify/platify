@@ -4,7 +4,9 @@ import edu.harvard.capstone.user.Scientist
 import edu.harvard.capstone.user.ScientistRole
 import edu.harvard.capstone.user.Role
 
+import edu.harvard.capstone.editor.DomainLabel
 import edu.harvard.capstone.editor.ExperimentalPlateSet
+import edu.harvard.capstone.editor.Label
 import edu.harvard.capstone.editor.PlateSet
 import edu.harvard.capstone.editor.PlateTemplate
 import edu.harvard.capstone.editor.Well
@@ -144,9 +146,9 @@ class BootStrap {
             def template1 = new PlateTemplate(owner: andres, name: "first template").save(flush: true)
             def template2 = new PlateTemplate(owner: zach, name: "envision template").save(flush: true)
 
-            new PlateSet(plate: template1, experiment: experiment1, assay: "my assay", barcode: "10293").save(flush: true)
-            new PlateSet(plate: template1, experiment: experiment1, assay: "my assay", barcode: "3321").save(flush: true)
-            new PlateSet(plate: template1, experiment: experiment1, assay: "my assay", barcode: "2334").save(flush: true)
+            def plateSet1 = new PlateSet(plate: template1, experiment: experiment1, assay: "my assay", barcode: "10293").save(flush: true)
+            def plateSet2 = new PlateSet(plate: template1, experiment: experiment1, assay: "my assay", barcode: "3321").save(flush: true)
+            def plateSet3 = new PlateSet(plate: template1, experiment: experiment1, assay: "my assay", barcode: "2334").save(flush: true)
 
             new PlateSet(plate: template2, experiment: experiment3, assay: "my assay", barcode: "001one").save(flush: true)
             new PlateSet(plate: template2, experiment: experiment3, assay: "my assay", barcode: "002two").save(flush: true)
@@ -173,20 +175,34 @@ class BootStrap {
             new PlateSet(plate: template2, experiment: experiment3, assay: "my assay", barcode: "023twenty-three").save(flush: true)
             new PlateSet(plate: template2, experiment: experiment3, assay: "my assay", barcode: "024twenty-four").save(flush: true)
 
-	    // largely stolen from ResultService.save()
+	    // largely stolen from ResultService.save(), let's set up a plate including results
             def result1 = new Result(owner: andres, equipment: machine1, experiment: experiment1, name: "Results 1", description: "Do we really need to name and describe results?").save(flush: true)
-	    def label1 = new ResultLabel(name: "result label", value: "result label value", labelType: ResultLabel.LabelType.LABEL, scope: ResultLabel.LabelScope.RESULT, domainId: result1.id).save(flush: true)
-	    def plate1 = new ResultPlate(result: result1, rows: 4, columns: 4, barcode: "result plate 1").save(flush: true)
-	    def plateLabel1 = new ResultLabel(name: "result plate label", value: "result plate label value", labelType: ResultLabel.LabelType.LABEL, scope: ResultLabel.LabelScope.PLATE, domainId: plate1.id).save(flush: true)
+	    def resultLabel1 = new ResultLabel(name: "result label", value: "result label value", labelType: ResultLabel.LabelType.LABEL, scope: ResultLabel.LabelScope.RESULT, domainId: result1.id).save(flush: true)
+	    def resultPlate1 = new ResultPlate(result: result1, rows: 4, columns: 4, barcode: plateSet1.barcode).save(flush: true)
+	    def resultPlateLabel = new ResultLabel(name: "result plate label", value: "result plate label value", labelType: ResultLabel.LabelType.LABEL, scope: ResultLabel.LabelScope.PLATE, domainId: resultPlate1.id).save(flush: true)
+
+            // pick some labels to apply to the wells
+            def foo = new Label(category: "foo", name: "foo").save(flush: true)
+            def bar = new Label(category: "foo", name: "bar").save(flush: true)
+            def baz = new Label(category: "foo", name: "baz").save(flush: true)
+
 	    def random = new Random()
 	    def controlWells = []
 	    def controlLabels = []
-	    for (x in 0 .. plate1.rows-1) {
-		for (y in 0 .. plate1.columns-1) {
+	    for (x in 0 .. resultPlate1.rows-1) {
+		for (y in 0 .. resultPlate1.columns-1) {
 		    def well = new Well(plate: template1, column: x, row: y,
-					control: Well.WellControl.EMPTY).save(flush:true)
-		    if ((x < 4) && (y == 0)) { controlWells << well }
-		    def resultWell = new ResultWell(plate: plate1, well: well).save(flush: true)
+					control: Well.WellControl.EMPTY).save(flush: true)
+		    if ((x < 4) && (y == 0)) {
+                        controlWells << well
+                        def domainLabel = new DomainLabel(label: foo, domainId: well.id, labelType: DomainLabel.LabelType.WELL).save(flush: true)
+			System.out.format("Assigning label %s:%s to (%d,%d)", foo.category, foo.name, x, y)
+                    }
+                    else {
+                        def thisLabel = ((x % 2) == 1) ? bar : baz;
+                        def domainLabel = new DomainLabel(label: thisLabel, domainId: well.id, labelType: DomainLabel.LabelType.WELL).save(flush: true)
+                    }
+		    def resultWell = new ResultWell(plate: resultPlate1, well: well).save(flush: true)
 		    def resultLabel = new ResultLabel(name: "smoots",
 						      value: random.nextFloat() * 100,
 						      labelType: ResultLabel.LabelType.RAW_DATA,
