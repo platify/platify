@@ -49,7 +49,8 @@ class ResultController {
             return   
         }
 
-        render resultService.getKitchenSink(experiment) as JSON
+	def result = [ImportData: resultService.getKitchenSink(experiment)]
+        render result as JSON
     }
 
 

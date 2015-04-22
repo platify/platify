@@ -233,7 +233,7 @@ class ResultService {
 
     	ResultPlate.findAllByResult(resultInstance).each{ plateResult ->
     		def plate = [:]
-		plate.barcode = plateResult.barcode
+		plate.plateID = plateResult.barcode
     		def plateLabels = [:]
     		ResultLabel.findAllByDomainIdAndLabelTypeAndScope(plateResult.id, ResultLabel.LabelType.LABEL, ResultLabel.LabelScope.PLATE).each{
     			plateLabels[it.name] = it.value
@@ -321,14 +321,10 @@ class ResultService {
             // first the template and plate
             def plateSet = plateSetsByBarcode[barcode]
             if (plateSet) {
-                plate.assay = plateSet.assay
-                plate.plateID = barcode
-                plate.templateID = plateSet.plate.id
-                
                 plate.labels = [:]
 
                 // plate labels
-                def plateLabels = DomainLabel.findAllByDomainIdAndLabelTypeAndPlate(plateSet.plate.id, DomainLabel.LabelType.PLATE, plateSet)
+                def plateLabels = DomainLabel.findAllByDomainIdAndLabelTypeAndPlate(plateSet.id, DomainLabel.LabelType.PLATE, plateSet)
                 plate.labels << plateLabels.collectEntries {plateLabel -> [plateLabel.label.category, plateLabel.label.name]}
 
                 // template labels
@@ -340,7 +336,6 @@ class ResultService {
                 def numRows = wells[-1].row + 1
                 def numColumns = wells[-1].column + 1
                 def wellsByCoords = wells.collectEntries {well -> [[well.row, well.column], well]}
-                println(numRows + " rows, " + numColumns + " columns")
 
                 // now find the well-level labels and results
                 for (x in 0 .. numRows-1) {
@@ -368,24 +363,24 @@ class ResultService {
             if (resultPlate) {
                 def resultWells = ResultWell.findAllByPlate(resultPlate)
                 def resultWellsByCoords = resultWells.collectEntries {resultWell -> [[resultWell.well.row, resultWell.well.column], resultWell]}
-                for (int i=0; i<resultPlate.rows; i++) {
-                    if (!plate.rows[i]) {
-                        plate.rows[i] = [columns: []]
+                for (x in 0 .. resultPlate.rows-1) {
+                    if (!plate.rows[x]) {
+                        plate.rows[x] = [columns: []]
                     }
-                    for (int j=0; j<resultPlate.columns; j++) {
-                        if (!plate.rows[i].columns[j]) {
-                            plate.rows[i].columns[j] = [:]
+                    for (y in 0 .. resultPlate.columns-1) {
+                        if (!plate.rows[x].columns[y]) {
+                            plate.rows[x].columns[y] = [:]
                         }
-                        def resultWell = resultWellsByCoords[[i,j]]
+                        def resultWell = resultWellsByCoords[[x,y]]
                         if (resultWell) {
                             def resultLabels = ResultLabel.findAllByDomainIdAndLabelTypeAndScope(resultWell.id, ResultLabel.LabelType.LABEL, ResultLabel.LabelScope.WELL)
-                            plate.rows[i].columns[j].labels << resultLabels.collectEntries {resultLabel -> [resultLabel.name, resultLabel.value]}
+                            plate.rows[x].columns[y].labels << resultLabels.collectEntries {resultLabel -> [resultLabel.name, resultLabel.value]}
 
                             def rawDataLabels = ResultLabel.findAllByDomainIdAndLabelTypeAndScope(resultWell.id, ResultLabel.LabelType.RAW_DATA, ResultLabel.LabelScope.WELL)
-                            plate.rows[i].columns[j].rawData = rawDataLabels.collectEntries {rawDataLabel -> [rawDataLabel.name, rawDataLabel.value]}
+                            plate.rows[x].columns[y].rawData = rawDataLabels.collectEntries {rawDataLabel -> [rawDataLabel.name, rawDataLabel.value]}
 
                             def normDataLabels = ResultLabel.findAllByDomainIdAndLabelTypeAndScope(resultWell.id, ResultLabel.LabelType.NORMALIZED_DATA, ResultLabel.LabelScope.WELL)
-                            plate.rows[i].columns[j].normalizedData = normDataLabels.collectEntries {normDataLabel -> [normDataLabel.name, normDataLabel.value]}
+                            plate.rows[x].columns[y].normalizedData = normDataLabels.collectEntries {normDataLabel -> [normDataLabel.name, normDataLabel.value]}
                         }
                     }
                 }
@@ -393,6 +388,15 @@ class ResultService {
 
             experiment.plates << plate
         }
+
+        experiment.experimentID = experimentInstance.id
+        experiment.parsingID = result.equipment.id
+
+        def resultExperimentLabels = ResultLabel.findAllByDomainIdAndLabelTypeAndScope(result.id, ResultLabel.LabelType.LABEL, ResultLabel.LabelScope.RESULT)
+        def experimentFeatureLabels = resultExperimentLabels.collectEntries{resultExperimentLabel -> [resultExperimentLabel.name, resultExperimentLabel.value]}
+        experiment.experimentFeatures = [labels: experimentFeatureLabels]
+
+
         return experiment
     }
 }
