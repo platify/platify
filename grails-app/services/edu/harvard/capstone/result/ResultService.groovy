@@ -324,7 +324,7 @@ class ResultService {
                 plate.labels = [:]
 
                 // plate labels
-                def plateLabels = DomainLabel.findAllByDomainIdAndLabelTypeAndPlate(plateSet.id, DomainLabel.LabelType.PLATE, plateSet)
+                def plateLabels = DomainLabel.findAllByDomainIdAndLabelTypeAndPlate(plateSet.plate.id, DomainLabel.LabelType.PLATE, plateSet)
                 plate.labels << plateLabels.collectEntries {plateLabel -> [plateLabel.label.category, plateLabel.label.name]}
 
                 // template labels
