@@ -149,7 +149,7 @@ class EditorService {
     		well.column = it.column
     		well.groupName = it.groupName
     		String c = it.control
-    		well.control = c.toLowerString()
+    		well.control = c.toString().toLowerCase()
     		well.labels = []
 	    	
 	    	def wellLabels = DomainLabel.findAllByDomainIdAndLabelTypeAndPlateIsNull(it.id, DomainLabel.LabelType.WELL).collect{it.label}
@@ -293,7 +293,7 @@ class EditorService {
     		well.column = it.column
     		well.groupName = it.groupName
     		String c = it.control
-    		well.control = c.toLowerString()
+    		well.control = c.toString().toLowerCase()
     		well.labels = []
 	    	
 	    	def wellLabels = DomainLabel.findAllByDomainIdAndLabelTypeAndPlate(it.id, DomainLabel.LabelType.WELL, plateInstance).collect{it.label}
@@ -433,7 +433,7 @@ class EditorService {
 	    		well.column = it.column
 	    		well.groupName = it.groupName
 	    		String c = it.control
-	    		well.control = c.toLowerString()
+	    		well.control = c.toString().toLowerCase()
 	    		well.labels = []
 		    	
 		    	// experiment labels
