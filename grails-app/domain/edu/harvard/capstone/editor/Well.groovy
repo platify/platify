@@ -8,10 +8,22 @@ class Well {
 	String groupName
 	WellControl control = WellControl.EMPTY
 
-	enum WellControl{
-		POSITIVE, NEGATIVE, EMPTY
+	enum WellControl {
+	    POSITIVE ("POS"),
+	    NEGATIVE ("NEG"),
+	    EMPTY ("EMPTY"),
+	    COMPOUND ("COMP");
+    
+	  	WellControl(String value) { this.value = value }
+	    
+	  	private final String value
+	    
+	  	public String value() { return value }
+
 	}
-	
+
+
+
 	Date lastUpdated
 	Date dateCreated
 

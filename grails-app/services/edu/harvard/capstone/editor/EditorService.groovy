@@ -78,12 +78,12 @@ class EditorService {
 		data.plate.wells.each{ well ->
 			if (well){
 				def controlType
-				if (well.control && well.control.toLowerCase().contains("positive"))
-					controlType = Well.WellControl.POSITIVE
-				else if (well.control && well.control.toLowerCase().contains("negative"))
-					controlType = Well.WellControl.NEGATIVE
-				else
+				try {
+					controlType = Well.WellControl[well.control.toUpperCase()]
+				}
+				catch(Exception e) {
 					controlType = Well.WellControl.EMPTY
+				}
 				
 				def wellInstance = new Well(plate: plateInstance, row: well.row, column: well.column, groupName: well.groupName, control: controlType)
 				wellInstance.save()
@@ -148,7 +148,8 @@ class EditorService {
     		well.row = it.row
     		well.column = it.column
     		well.groupName = it.groupName
-    		well.control = it.control
+    		String c = it.control
+    		well.control = c.toLowerString()
     		well.labels = []
 	    	
 	    	def wellLabels = DomainLabel.findAllByDomainIdAndLabelTypeAndPlateIsNull(it.id, DomainLabel.LabelType.WELL).collect{it.label}
@@ -235,7 +236,7 @@ class EditorService {
 	    		well.labels.each{ label ->
 	    			def labelInstance = Label.get(label.id)
 	    			if (!labelInstance){
-	    				labelInstance = new Label(category: label.category, name: label.name, value: label.value)
+	    				labelInstance = new Label(category: label.category, name: label.name, value: label.value, units: label.units)
 	    				labelInstance.save()
 	    				if (labelInstance.hasErrors()){
 	    					throw new ValidationException("Label for well is not valid", labelInstance.errors)	
@@ -291,7 +292,8 @@ class EditorService {
     		well.row = it.row
     		well.column = it.column
     		well.groupName = it.groupName
-    		well.control = it.control
+    		String c = it.control
+    		well.control = c.toLowerString()
     		well.labels = []
 	    	
 	    	def wellLabels = DomainLabel.findAllByDomainIdAndLabelTypeAndPlate(it.id, DomainLabel.LabelType.WELL, plateInstance).collect{it.label}
@@ -300,7 +302,8 @@ class EditorService {
 	    		label.category = it.category
 	    		label.name = it.name
 	    		label.value = it.value
-    			label.id = it.id	    		
+    			label.id = it.id	 
+    			label.units = it.units   		
 	    		well.labels << label
 	    	}  
 
@@ -310,6 +313,76 @@ class EditorService {
     	return plate
 
     }
+
+    File exportTemplate(PlateTemplate templateInstance){
+    	if (!templateInstance)
+    		return
+
+    	def wells = Well.findAllByPlate(templateInstance)
+
+    	if (!wells)
+    		return
+
+        File file = File.createTempFile("template",".csv")
+
+    	wells.each{ well ->
+    		def row = ""
+    		row = row + well.row +","
+    		row = row + well.column +","
+    		row = row + well.control +","
+    		row = row + "compound," + well.groupName + ","
+			file.append("\r\n"+row+"\r\n")
+
+			row = well.row +","+well.column + "," + well.control +","
+    		
+    		def labels = DomainLabel.findAllByDomainIdAndLabelTypeAndPlateIsNull(well.id, DomainLabel.LabelType.WELL).collect{it.label}
+
+    		labels.each{ label ->
+    			row = row + label.category + ","
+    			row = row + label.name
+    			file.append("\r\n"+row+"\r\n")
+    		}
+
+    	}
+
+    	return file
+    }
+
+    File exportPlate(PlateSet plateInstance){
+    	if (!plateInstance)
+    		return
+
+    	def templateInstance = plateInstance.plate
+
+    	def wells = Well.findAllByPlate(templateInstance)
+
+    	if (!wells)
+    		return
+
+        File file = File.createTempFile("template",".csv")
+
+    	wells.each{ well ->
+    		def row = ""
+    		row = row + well.row +","
+    		row = row + well.column +","
+    		row = row + well.control +","
+    		row = row + "compound," + well.groupName + ","
+			file.append("\r\n"+row+"\r\n")
+
+			row = well.row +","+well.column + "," + well.control +","
+    		
+    		def labels = DomainLabel.findAllByDomainIdAndLabelTypeAndPlateIsNull(well.id, DomainLabel.LabelType.WELL).collect{it.label}
+
+    		labels.each{ label ->
+    			row = row + label.category + ","
+    			row = row + label.name
+    			file.append("\r\n"+row+"\r\n")
+    		}
+
+    	}
+
+    	return file
+    }    
 
     def getExperimentData(ExperimentalPlateSet experimentInstance){
    		if (!experimentInstance)
@@ -359,7 +432,8 @@ class EditorService {
 	    		well.row = it.row
 	    		well.column = it.column
 	    		well.groupName = it.groupName
-	    		well.control = it.control
+	    		String c = it.control
+	    		well.control = c.toLowerString()
 	    		well.labels = []
 		    	
 		    	// experiment labels
