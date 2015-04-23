@@ -2,12 +2,22 @@ var experiment;
 var grid;
 
 
-function init() {
-    createGrid();
-    var experimentId = $('#experimentSelect option:selected')[0].value;
-    experimentSelected(experimentId); // calls plateSelected for us
+function createBlankData(width, height) {
+    var result = [];
+    for (var i=0; i<width; i++) {
+        result[i] = [];
+        for (var j=0; j<height; j++) {
+            result[i][j] = null;
+        }
+    }
+    return result;
 }
-window.onload = init;
+
+
+function createGrid() {
+    grid  = new Grid("resultGrid");
+    loadGrid(createBlankData(100,100));
+}
 
 
 function experimentSelected(experimentId) {
@@ -30,6 +40,19 @@ function experimentSelected(experimentId) {
 }
 
 
+function init() {
+    createGrid();
+    var experimentId = $('#experimentSelect option:selected')[0].value;
+    experimentSelected(experimentId); // calls plateSelected for us
+}
+
+
+function loadGrid(dataSet) {
+    grid.setData(dataSet);
+    grid.fillUpGrid();
+}
+
+
 function plateSelected(plateID) {
     experiment.selectPlate(plateID);
     loadGrid(experiment.data);
@@ -37,30 +60,6 @@ function plateSelected(plateID) {
     $('#zFactor').text(experiment.zFactor());
     $('#zPrimeFactor').text(experiment.zPrimeFactor());
     $('#dump').text(JSON.stringify(experiment.currentPlate, null, 4));
-}
-
-
-function createBlankData(width, height) {
-    var result = [];
-    for (var i=0; i<width; i++) {
-        result[i] = [];
-        for (var j=0; j<height; j++) {
-            result[i][j] = null;
-        }
-    }
-    return result;
-}
-
-
-function createGrid() {
-    grid  = new Grid("resultGrid");
-    loadGrid(createBlankData(100,100));
-}
-
-
-function loadGrid(dataSet) {
-    grid.setData(dataSet);
-    grid.fillUpGrid();
 }
 
 
@@ -72,3 +71,5 @@ function toggleRawOrNorm(input) {
         loadGrid(experiment.data);
     }
 }
+
+window.onload = init;
