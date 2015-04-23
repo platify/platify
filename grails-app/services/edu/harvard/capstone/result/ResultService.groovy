@@ -304,12 +304,21 @@ class ResultService {
             return
 
         def experiment = [:]
+        experiment.experimentID = experimentInstance.id
         experiment.plates = []
 
 	def plateSetsByBarcode = PlateSet.findAllByExperiment(experimentInstance).collectEntries{plateSet -> [plateSet.barcode, plateSet]}
 
 	def result = Result.findByExperiment(experimentInstance)
-	def resultPlatesByBarcode = ResultPlate.findAllByResult(result).collectEntries{resultPlate -> [resultPlate.barcode, resultPlate]}
+        def resultPlatesByBarcode = [:]
+	if (result) {
+            resultPlatesByBarcode = ResultPlate.findAllByResult(result).collectEntries{resultPlate -> [resultPlate.barcode, resultPlate]}
+
+            def resultExperimentLabels = ResultLabel.findAllByDomainIdAndLabelTypeAndScope(result.id, ResultLabel.LabelType.LABEL, ResultLabel.LabelScope.RESULT)
+            def experimentFeatureLabels = resultExperimentLabels.collectEntries{resultExperimentLabel -> [resultExperimentLabel.name, resultExperimentLabel.value]}
+            experiment.experimentFeatures = [labels: experimentFeatureLabels]
+	    experiment.parsingID = result.equipment.id
+        }
 
 	def allBarcodes = plateSetsByBarcode.keySet() + resultPlatesByBarcode.keySet()
 
@@ -391,15 +400,6 @@ class ResultService {
 
             experiment.plates << plate
         }
-
-        experiment.experimentID = experimentInstance.id
-        experiment.parsingID = result.equipment.id
-
-        def resultExperimentLabels = ResultLabel.findAllByDomainIdAndLabelTypeAndScope(result.id, ResultLabel.LabelType.LABEL, ResultLabel.LabelScope.RESULT)
-        def experimentFeatureLabels = resultExperimentLabels.collectEntries{resultExperimentLabel -> [resultExperimentLabel.name, resultExperimentLabel.value]}
-        experiment.experimentFeatures = [labels: experimentFeatureLabels]
-
-
         return experiment
     }
 }
