@@ -28,18 +28,18 @@ function GridHighlighter(grid){
     };
 
 
-    this.highlightPlatesAndFeatures = function(parsingConfig){
+    this.highlightPlatesAndFeatures = function(parsingConfig, plates){
         // first highlight plates
-        this.highlightAllPlates(parsingConfig);
+        this.highlightAllPlates(plates);
 
         // next highlight features
-        this.highlightAllFeatures(parsingConfig);
+        this.highlightAllFeatures(parsingConfig, plates);
     };
 
-    this.highlightPlate = function(plateIndex, parsingConfig){
+    this.highlightPlate = function(plateIndex, plates){
         var colorKey;
 
-        var plateRange = parsingConfig.plates[plateIndex];
+        var plateRange =plates[plateIndex];
         var startRow = plateRange[0];
         var startCol = plateRange[1];
         var endRow = plateRange[2];
@@ -47,31 +47,33 @@ function GridHighlighter(grid){
         colorKey = getDistinctColorKey();
 
         var coordsToHighlight = ParsingConfig.getCoordsInARange(startRow,
-            startCol,
-            endRow,
-            endCol);
+                                                                startCol,
+                                                                endRow,
+                                                                endCol);
 
         this.grid.setCellColors(coordsToHighlight,
-                            parsingConfig.plate.color,
-                            colorKey);
+                                ColorPicker.PLATE_COLOR,
+                                colorKey);
 
         plateHighlightKeys.push(colorKey);
     };
 
-    this.highlightAllPlates = function(parsingConfig){
+    this.highlightAllPlates = function(plates){
 
         // highlight all plates
-        for (var plateIndex = 0; plateIndex < parsingConfig.plates.length; plateIndex++){
-            this.highlightPlate(plateIndex, parsingConfig);
+        for (var plateIndex = 0; plateIndex < plates.length; plateIndex++){
+            this.highlightPlate(plateIndex, plates);
         }
 
     };
 
-    this.highlightFeature = function(featureName, parsingConfig){
+    this.highlightFeature = function(featureName, parsingConfig, plates){
         var feature = parsingConfig.features[featureName];
         var colorKey = getDistinctColorKey();
 
-        var coordsToHighlight = parsingConfig.getFeatureCoords(featureName);
+        var coordsToHighlight = DataExtractor.getFeatureCoords(featureName,
+                                                               plates,
+                                                               parsingConfig);
 
         grid.setCellColors(coordsToHighlight,
             feature.color,
@@ -80,10 +82,10 @@ function GridHighlighter(grid){
         featureHighlightKeys.push(colorKey);
     };
 
-    this.highlightAllFeatures = function(parsingConfig){
+    this.highlightAllFeatures = function(parsingConfig, plates){
 
         for(var featureName in parsingConfig.features){
-            this.highlightFeature(featureName, parsingConfig);
+            this.highlightFeature(featureName, parsingConfig, plates);
         }
     };
 

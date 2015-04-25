@@ -2,15 +2,15 @@
  * Created by zacharymartin on 3/24/15.
  */
 
-ImportData.NO_ID = "none";
+ImportData.NO_ID = "&lt;&lt;none&gt;&gt;";
 ImportData.BLANK = "";
 ImportData.NUMERIC = "numeric";
 ImportData.NON_NUMERIC = "non-numeric";
 
 
-function ImportData(experimentIdentifier, parsingConfigIdentifier, numPlates, numRows, numCols){
-    this.experimentID = experimentIdentifier;
-    this.parsingID = parsingConfigIdentifier;
+function ImportData(numPlates, numRows, numCols){
+    this.experimentID = null;
+    this.parsingID = null;
     this.experimentFeatures = {
         labels: {}
     };
@@ -79,6 +79,36 @@ function ImportData(experimentIdentifier, parsingConfigIdentifier, numPlates, nu
             }
         }
     }
+
+    this.getExperimentID = function(){
+        return this.experimentID;
+    };
+
+    this.setExperimentID = function(experimentID){
+        if (!experimentID){
+            throw new ImportDataError(ImportDataError.INVALID_EXPERIMENT_ID,
+                                      experimentID,
+                                      "general",
+                                      "set an import data experiment ID");
+        }
+
+        this.experimentID = experimentID;
+    };
+
+    this.getParsingID = function(){
+        return this.parsingID;
+    };
+
+    this.setParsingID = function(parsingID){
+        if (!parsingID){
+            throw new ImportDataError(ImportDataError.INVALID_PARSING_ID,
+                                      parsingID,
+                                      "general",
+                                      "set an import data parsing ID");
+        }
+
+        this.parsingID = parsingID;
+    };
 
     this.addExperimentLevelCategory = function(categoryName){
 
@@ -492,6 +522,100 @@ function ImportData(experimentIdentifier, parsingConfigIdentifier, numPlates, nu
         }
     };
 
+    this.getPlateIdentifier = function(plateIndex){
+        if (!this.plates[plateIndex]){
+            throw new ImportDataError(ImportDataError.NO_SUCH_PLATE,
+                plateIndex,
+                "plate",
+                "get a plate identifier");
+        }
+
+        if (this.plates && this.plates[plateIndex] && this.plates[plateIndex].plateID){
+            return this.plates[plateIndex].plateID;
+        } else {
+            return null;
+        }
+    };
+
+    this.getPlateIdentifierArray = function(){
+        var result = [];
+
+        for (var plateIndex = 0; plateIndex < this.plates.length; plateIndex++){
+            result.push(this.plates[plateIndex].plateID);
+        }
+
+        return result;
+    };
+
+    this.setPlateIdentifier = function(plateIndex, identifier){
+        if (!identifier){
+            throw new ImportDataError(ImportDataError.ILLEGAL_ARGUMENT,
+                identifier,
+                "plate identifier",
+                "set a plate identifier");
+        }
+
+        if (!this.plates[plateIndex]){
+            throw new ImportDataError(ImportDataError.NO_SUCH_PLATE,
+                plateIndex,
+                "plate",
+                "set a plate identifier");
+        }
+
+        // check if plate identifier is unique
+        if (identifier !== ImportData.NO_ID){
+            for (var i=0; i<this.numPlates(); i++){
+                if (i !== plateIndex
+                        && identifier.trim() === this.plates[i].plateID.trim()){
+                    throw new ImportDataError(ImportDataError.REPEATED_PLATE_ID,
+                                              identifier,
+                                              "plate",
+                                              "set a plate identifier");
+                }
+            }
+        }
+
+        this.plates[plateIndex].plateID = identifier;
+    };
+
+    this.setPlateIdentifiersWithArray = function(identifierArray){
+        for (var i=0; i<identifierArray.length; i++){
+            _self.setPlateIdentifier(i, identifierArray[i]);
+        }
+    };
+
+    this.throwErrorIfAnyPlateIDsNotSet = function(){
+        var unsetPlateIndices = [];
+        var descriptor = "";
+
+        for (var i=0; i<this.plates.length; i++){
+            if (this.plates[i].plateID === ImportData.NO_ID){
+                unsetPlateIndices.push(i);
+            }
+        }
+
+        if (unsetPlateIndices.length === 1){
+            descriptor = unsetPlateIndices[0];
+        } else if (unsetPlateIndices.length > 1){
+            for (var j=0; j<unsetPlateIndices.length; j++){
+                if (j < unsetPlateIndices.length - 1){
+                    descriptor += (unsetPlateIndices[j] + 1) + ", ";
+                } else {
+                    descriptor += "and " + (unsetPlateIndices[j] + 1);
+                }
+            }
+        }
+
+        if (unsetPlateIndices.length > 0){
+            throw new ImportDataError(ImportDataError.PLATE_ID_NOT_SET,
+                descriptor,
+                "plate",
+                "check plate identifiers as set");
+        }
+
+
+    };
+
     this.numPlates = function(){
         if (this.plates && this.plates.length){
             return this.plates.length;
@@ -723,7 +847,10 @@ ImportDataError.NEGATIVE_NUMBER_OF_PLATES = "negative number of plates";
 ImportDataError.NEGATIVE_NUMBER_OF_COLUMNS = "negative number of columns";
 ImportDataError.NEGATIVE_NUMBER_OF_ROWS = "negative number of rows";
 ImportDataError.ILLEGAL_ARGUMENT = "illegal argument";
-
+ImportDataError.REPEATED_PLATE_ID = "repeated plate ID";
+ImportDataError.INVALID_EXPERIMENT_ID = "invalid experiment ID";
+ImportDataError.INVALID_PARSING_ID = "invalid parsing ID";
+ImportDataError.PLATE_ID_NOT_SET = "plate ID not set";
 
 function ImportDataError(type, descriptor, level, attemptedAction){
     this.type = type;
@@ -731,33 +858,44 @@ function ImportDataError(type, descriptor, level, attemptedAction){
     this.level = level;
     this.attemptedAction = attemptedAction;
 
-    this.errorMessage = function(){
+    this.getMessage = function(){
         if (this.type == ImportDataError.NO_SUCH_CATEGORY){
             return "The category, " + this.descriptor + ", has not been defined at the "
                 + this.level + " level.";
-        } else if (this.type == ImportDataError.CATEGORY_ALREADY_DEFINED){
+        } else if (this.type === ImportDataError.CATEGORY_ALREADY_DEFINED){
             return "The category, " + this.descriptor + ", has already been defined at " +
                 "the " + this.level + " level.";
-        } else if (this.type == ImportDataError.NO_SUCH_PLATE){
+        } else if (this.type === ImportDataError.NO_SUCH_PLATE){
             return "The plate of index, " + this.descriptor + ", has not been defined.";
-        } else if (this.type == ImportDataError.NO_SUCH_ROW){
+        } else if (this.type === ImportDataError.NO_SUCH_ROW){
             return "The plate row of index, " + this.descriptor + ", has not been " +
                 "defined.";
-        } else if (this.type == ImportDataError.NO_SUCH_COLUMN){
+        } else if (this.type === ImportDataError.NO_SUCH_COLUMN){
             return "The plate column of index, " + this.descriptor + ", has not been " +
                 "defined.";
-        } else if (this.type == ImportDataError.NEGATIVE_NUMBER_OF_PLATES){
+        } else if (this.type === ImportDataError.NEGATIVE_NUMBER_OF_PLATES){
             return "The number of plates must be non-negative, i.e. greater than or " +
                 "equal to 0";
-        } else if (this.type == ImportDataError.NEGATIVE_NUMBER_OF_COLUMNS){
+        } else if (this.type === ImportDataError.NEGATIVE_NUMBER_OF_COLUMNS){
             return "The number of columns must be non-negative, i.e. greater than or " +
                 "equal to 0";
-        } else if (this.type == ImportDataError.NEGATIVE_NUMBER_OF_ROWS){
+        } else if (this.type === ImportDataError.NEGATIVE_NUMBER_OF_ROWS){
             return "The number of rows must be non-negative, i.e. greater than or " +
                 "equal to 0";
-        } else if (this.type == ImportDataError.ILLEGAL_ARGUMENT){
+        } else if (this.type === ImportDataError.ILLEGAL_ARGUMENT){
             return "The value, " + this.descriptor + " is not a valid " + this.level
                 + ".";
+        } else if (this.type === ImportDataError.REPEATED_PLATE_ID){
+            return "The plate identifier, " + this.descriptor + " cannot be repeated."+
+                " Plate identifiers must be unique.";
+        } else if (this.type === ImportDataError.INVALID_EXPERIMENT_ID){
+            return "A valid experiment plate set must be selected to associate with " +
+                "the results in the output file.";
+        } else if (this.type === ImportDataError.INVALID_PARSING_ID){
+            return "The given parsing ID, \"" + this.descriptor +"\", is not valid.";
+        } else if (this.type === ImportDataError.PLATE_ID_NOT_SET){
+            return "All plate identifiers must be set. The plate(s) " + this.descriptor +
+                    " is(are) not set.";
         }
     }
 }

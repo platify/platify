@@ -8,104 +8,10 @@ function ImportDataFileGenerator(importDataObject){
     var PLATE_COLUMN_HEADER = "Plate/Barcode";
     var WELL_COLUMN_HEADER = "Well";
     var BLANK_CELL = "";
-    var NO_PLATE_ID = "none";
+    var NO_PLATE_ID = ImportData.NO_ID;
 
     var matrix = createImportDataMatrix(importData);
 
-    function findExperimentLevelCategories(dataObject){
-        var result = [];
-
-        if (dataObject
-                    && dataObject.experimentFeatures
-                    && dataObject.experimentFeatures.labels) {
-
-            for (var category in importData.experimentFeatures.labels){
-                result.push(category);
-            }
-        }
-
-        return result;
-    }
-
-    function findPlateLevelCategories(dataObject){
-        var result = [];
-        var seenCategories = {};
-
-        if (dataObject && dataObject.plates && dataObject.plates.length){
-            for (var plateIndex = 0; plateIndex<dataObject.plates.length; plateIndex++){
-                var plate = dataObject.plates[plateIndex];
-
-                if (plate.labels){
-                    for (var category in plate.labels){
-                        if (!seenCategories[category]){
-                            seenCategories[category] = true;
-                            result.push(category);
-                        }
-                    }
-                }
-            }
-        }
-
-        return result;
-    }
-
-    function findWellLevelCategories(dataObject){
-        var result = [];
-        var seenCategories = {};
-
-        if (dataObject && dataObject.plates && dataObject.plates.length) {
-            for (var plateIndex = 0; plateIndex < dataObject.plates.length; plateIndex++){
-                var plate = dataObject.plates[plateIndex];
-
-                if (plate.rows && plate.rows.length){
-                    for(var rowIndex = 0; rowIndex < plate.rows.length ; rowIndex++){
-                        var row = plate.rows[rowIndex];
-
-                        for (var columnIndex=0;
-                             columnIndex<row.columns.length;
-                             columnIndex++){
-                            var well = row.columns[columnIndex];
-
-                            if (well.labels){
-                                for (var category in well.labels){
-                                    if (!seenCategories[category]){
-                                        seenCategories[category] = true;
-                                        result.push(category);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return result;
-    }
-
-    function findNumberOfPlateRowsAndColumns(dataObject){
-        var result = [0,0];
-
-        if (dataObject && dataObject.plates && dataObject.plates.length) {
-            for (var plateIndex = 0; plateIndex < dataObject.plates.length; plateIndex++){
-                var plate = dataObject.plates[plateIndex];
-
-                if (plate.rows && plate.rows.length){
-                    for(var rowIndex = 0; rowIndex < plate.rows.length ; rowIndex++){
-                        var row = plate.rows[rowIndex];
-
-                        result[0]++;
-
-                        if (row.columns && row.columns.length && row.columns.length > result[1]){
-                            result[1] = row.columns.length;
-                        }
-                    }
-                }
-            }
-        }
-
-        return result;
-    }
 
     function createMatrixHeaderRow(wellCategories, plateCategories, experimentCategories){
         var result = [];
@@ -189,9 +95,9 @@ function ImportDataFileGenerator(importDataObject){
         var matrixRowIndex;
 
         // get label categories at all levels
-        var wellLevelCategories = findWellLevelCategories(importData);
-        var plateLevelCategories = findPlateLevelCategories(importData);
-        var experimentLevelCategories = findExperimentLevelCategories(importData);
+        var wellLevelCategories = importData.getWellLevelCategories();
+        var plateLevelCategories = importData.getPlateLevelCategories();
+        var experimentLevelCategories = importData.getExperimentLevelCategories();
 
         if (!wellLevelCategories.length){
             // the file will be empty

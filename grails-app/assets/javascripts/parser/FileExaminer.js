@@ -148,6 +148,21 @@ function FileExaminer(){
     };
 
     /**
+     * This function returns an array of the names of the supported delimiters available
+     * in the FileExaminer.
+     * @returns {result|*|Array}
+     */
+    this.getSupportedDelimiterNames = function(){
+        var delimiterNameArray = [];
+
+        for (var delimiterName in this.CELL_TERMINATORS){
+            delimiterNameArray.push(delimiterName);
+        }
+
+        return delimiterNameArray;
+    };
+
+    /**
      * This private function calls all of the registered load observer callbacks for the
      * FileExaminer instance.
      */

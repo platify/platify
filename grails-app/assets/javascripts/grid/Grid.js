@@ -400,6 +400,15 @@ function Grid(containerID){
     };
 
     /**
+     * This function scrolls the grid so that the row indicated by the given row number
+     * is at the top of the viewable cells.
+     * @param rowNumber - the number of the row to scroll the grid to
+     */
+    this.scrollToRow = function(rowNumber){
+        this.grid.scrollRowToTop(rowNumber - 1);
+    };
+
+    /**
      * A private method for converting a 2D data array to the array containing
      * row objects format required by SlickGrid
      * @param data - a 2D array containing data to be converted to SlickGrid data format

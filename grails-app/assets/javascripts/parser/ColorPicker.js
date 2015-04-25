@@ -78,4 +78,12 @@ function ColorPicker(){
     this.resetColorPicker = function(){
         colorPointer = 0;
     };
+
+    this.getColorIndex = function(){
+        return colorPointer;
+    };
+
+    this.setColorIndex = function(index){
+        colorPointer = index;
+    };
 }

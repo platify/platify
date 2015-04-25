@@ -29,7 +29,6 @@ var selectCells;  // a reference to the function to be used for handling cell se
 var experimentIDSelectize;
 var plateIDSelectize;
 
-var colorPointer = 0;
 var colorPicker = new ColorPicker();
 
 var parseOnlyModeOn = false;
@@ -360,8 +359,6 @@ function saveConfig(targetUrl,verb){
 			console.log( "error "  + JSON.stringify(resData));
 			showUserMsg("error","Error. when trying to store configuration => " + JSON.stringify(resData) );
 		});
-    
-    
 }
 
 
@@ -403,11 +400,6 @@ function handleExaminerLoad(examiner){
     colorPicker.resetColorPicker();
 }
 
-function changeDelimiter(){
-    var delimiter = document.getElementById("delimiterList").value;
-    examiner.reExamineWithDelimiter(delimiter);
-}
-
 document.getElementById('files').addEventListener('change', handleFileSelect, false);
 
 function handleGetFile(){
@@ -442,6 +434,11 @@ document.addEventListener('drop', function(e) {
 
 }, false);
 
+function changeDelimiter(){
+    var delimiter = document.getElementById("delimiterList").value;
+    examiner.reExamineWithDelimiter(delimiter);
+}
+
 function setDelimiter(delimiter){
     var element = document.getElementById("delimiterList");
     element.value = delimiter;
@@ -467,7 +464,7 @@ function loadDelimiterList(){
 
 
 function handleSelectedCells(startRow, startCol, endRow, endCol){
-    var range = new Range(startRow, startCol, endRow, endCol);
+    var range = new CellRange(startRow, startCol, endRow, endCol);
 
     selectCells(range);
 }
@@ -537,7 +534,7 @@ function cellRangeChange(inputElement){
     grid.selectedEndRow = end[0];
     grid.selectedEndCol = end[1];
 
-    var selectedRange = new Range(start[0], start[1], end[0], end[1]);
+    var selectedRange = new CellRange(start[0], start[1], end[0], end[1]);
     selectCells(selectedRange);
 }
 
@@ -647,7 +644,7 @@ function handlePlateSelect(event){
     var plateIndex = target.value;
 
     // highlight the selected plate
-    gridHighlighter.removeAllHighlighting()
+    gridHighlighter.removeAllHighlighting();
     gridHighlighter.highlightPlate(plateIndex, parsingConfig);
 }
 
@@ -758,12 +755,11 @@ function sendImportDataToServer(){
     importData.parsingID = $('#parsingId').val();
 
     console.log(importData);
-    console.log(ParsingConfig.createImportDataMatrix(importData));
 
     var jqxhr = $.ajax({
         url: hostname + "/rawData/save",
         type: "POST",
-        data: JSON.stringify(importData),
+        data: JSON.stringify(importData.getJSONImportDataObject()),
         processData: false,
         contentType: "application/json; charset=UTF-8"
     }).done(function(resData) {

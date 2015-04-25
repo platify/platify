@@ -7,9 +7,9 @@ var WELL_LEVEL = "wellLevel";
 var PLATE_LEVEL = "plateLevel";
 var EXPERIMENT_LEVEL = "experimentLevel";
 
-// type of value values
-var QUANTITATIVE = "quantitative";
-var QUALITATIVE = "qualitative";
+// assume all assay plates have a 2:3 well row number to column number ratio
+ParsingConfig.WELL_ROW_FACTOR = 2;
+ParsingConfig.WELL_COL_FACTOR = 3;
 
 /**
  * The constructor for ParsingConfig objects.
@@ -17,9 +17,6 @@ var QUALITATIVE = "qualitative";
  * @param machineName - a string name for the assay machine that the parsing configuration
  *                  is for.
  * @param description - a string description of the parsing configuration
- * @param exampleFileName - a string name for the example output file used to create the
- *                      configuration
- * @param exampleFileContents - the string contents of the example output file
  * @param delimiter - a string representing the delimiter to be used for parsing the
  *                  delimiter separated value file format. The acceptable values are:
  *                      "comma"
@@ -40,338 +37,190 @@ function ParsingConfig(name,
     this.plate = null;
     this.plateAnchors = [];  // elements stored as [relativeRow, relativeColumn, value]
     this.features = {};  // keyed on feature name
-    this.plates = [];
     this.numPlateRows = 0;
     this.numPlateCols = 0;
+    this.colorPickerIndex = 0;
 
     var _self = this;
 
 
     function BioFeature(feaLabel){
         this.featureLabel = feaLabel;
-        this.topLeftCoords = null;
-        this.bottomRightCoords = null;
-        this.topLeftValue = null;
+        this.coordinateRange = null;
         this.relativeToLeftX= null;
         this.relativeToLeftY= null;
         this.color = null;
         this.typeOfFeature = null;  // PLATE, WELL_LEVEL, PLATE_LEVEL, EXPERIMENT_LEVEL
     }
 
-
-    this.isPlateTopLeftCorner = function(row, column, grid){
-        if (!this.plateAnchors || !this.plateAnchors.length){
-            return false;
-        }
-
-        for(var i=0; i<this.plateAnchors.length; i++){
-
-            var possibleAnchorRow = this.plateAnchors[i][0] + row;
-            var possibleAnchorCol = this.plateAnchors[i][1] + column;
-            var anchorValue = this.plateAnchors[i][2].trim();
-
-            var valueToCheck
-                = grid.getDataPoint(possibleAnchorRow, possibleAnchorCol).trim();
-
-            if (valueToCheck != anchorValue){
-                return false;
-            }
-        }
-
-        return true;
+    this.getID = function(){
+        return this.id;
     };
 
-    function findPlates(examiner, grid){
-        var plateRanges = []; // elements of form [startRow, startCol, endRow, endCol]
-                              // each represents a plate on the grid
-        var plateHeight
-            = _self.plate.bottomRightCoords[0] - _self.plate.topLeftCoords[0] + 1;
-        var plateWidth
-            = _self.plate.bottomRightCoords[1] - _self.plate.topLeftCoords[1] + 1;
+    _self.setID = function(parsingConfigIdentifier){
+        _self.id = parsingConfigIdentifier;
+    };
 
-        var lastRowToCheck = examiner.rowsSize - plateHeight + 1;
-        var lastColumnToCheck = examiner.colsSize - plateWidth + 1;
+    this.getName = function(){
+        return this.name;
+    };
 
-        for (var row = 1; row<=lastRowToCheck; row++){
-            for (var col = 1; col<=lastColumnToCheck; col++){
-                if (_self.isPlateTopLeftCorner(row, col, grid)) {
-                    plateRanges.push([row,
-                                      col,
-                                      row + plateHeight - 1,
-                                      col + plateWidth - 1]);
-                }
-            }
-
+    this.setName = function(nameForParsingConfig){
+        if (!nameForParsingConfig || !nameForParsingConfig.trim()){
+            throw new ParsingConfigError(ParsingConfigError.INVALID_PARSING_NAME,
+                                         nameForParsingConfig,
+                                         "general",
+                                         "set the parsing config name")
         }
 
-        return plateRanges;
-    }
-
-    this.setPlates = function(examiner, grid){
-        this.plates = findPlates(examiner, grid);
+        this.name = nameForParsingConfig.trim();
     };
 
-    this.findExperimentLevelFeatureCoords = function(featureName){
-        var feature = this.features[featureName];
-        var row = feature.topLeftCoords[0];
-        var col = feature.topLeftCoords[1];
-
-        return [row, col];
+    this.getMachineName = function(){
+        return this.machineName;
     };
 
-    this.findPlateLevelFeatureCoords = function(featureName){
-        var plateFeatures = [];
-        var feature = this.features[featureName];
-
-        for (var j=0; j<this.plates.length; j++){
-            var plateTopLeftRow = this.plates[j][0];
-            var plateTopLeftCol = this.plates[j][1];
-            var row = plateTopLeftRow + feature.relativeToLeftY;
-            var col = plateTopLeftCol + feature.relativeToLeftX;
-
-            plateFeatures.push([row, col]);
+    this.setMachineName = function(nameOfAssayMachine){
+        if (!nameOfAssayMachine || !nameOfAssayMachine.trim()){
+            throw new ParsingConfigError(ParsingConfigError.INVALID_MACHINE_NAME,
+                nameOfAssayMachine,
+                "general",
+                "set the parsing config machine name")
         }
 
-        return plateFeatures;
+        this.machineName = nameOfAssayMachine.trim();
     };
 
-    this.findWellLevelFeatureCoords = function(featureName){
-        var wellFeatures = [];
-        var feature = this.features[featureName];
+    this.getDescription = function(){
+        return this.description;
+    };
 
-        for (var j=0; j<this.plates.length; j++){
-            var plateTopLeftRow = this.plates[j][0];
-            var plateTopLeftCol = this.plates[j][1];
-            var wellCounter = 0;
-            var width
-                = feature.bottomRightCoords[1] - feature.topLeftCoords[1] + 1;
-            var height
-                = feature.bottomRightCoords[0] - feature.topLeftCoords[0] + 1;
-            var plateWellFeatures = [];
+    this.setDescription = function(parsingDescription){
+        this.description = parsingDescription;
+    };
 
-            for (var k = 0; k<height; k++ ){
-                for (var m = 0; m<width; m++ ){
-                    var row = plateTopLeftRow + feature.relativeToLeftY + k;
-                    var col = plateTopLeftCol + feature.relativeToLeftX + m;
+    this.getDelimiter = function(){
+        return this.delimiter;
+    };
 
-                    plateWellFeatures.push([row,
-                        col]);
+    this.setDelimiter = function(parsingDelimiter){
+        this.delimiter = parsingDelimiter;
+    };
 
-                    wellCounter++;
-                }
-            }
+    this.getColorPickerIndex = function(){
+        return this.colorPickerIndex;
+    };
 
-            wellFeatures.push(plateWellFeatures);
+    this.setColorPickerIndex = function(index){
+        this.colorPickerIndex = index;
+    };
+
+    this.getNumberOfPlateRows = function(){
+        return this.numPlateRows;
+    };
+
+    this.getNumberOfPlateColumns = function(){
+        return this.numPlateCols;
+    };
+
+    this.addPlateAnchor = function(row, column, value){
+        if (!this.plate){
+            throw new ParsingConfigError(ParsingConfigError.FIRST_PLATE_NOT_DEFINED,
+                                         Grid.getRowLabel(row) + column,
+                                         "anchors",
+                                         "add a new plate anchor");
         }
 
-        return wellFeatures;
-    };
-
-    this.getFeatureCoords = function(featureName){
-        var feature = this.features[featureName];
-        var coords = [];
-        var plate;
-        var coordinates;
-
-        if (feature.typeOfFeature == WELL_LEVEL){
-            var wellFeatureCoords = this.findWellLevelFeatureCoords(featureName);
-
-            for (plate = 0; plate < wellFeatureCoords.length; plate++){
-                var plateCoords = wellFeatureCoords[plate];
-
-                for (var i=0; i<plateCoords.length; i++){
-                    coordinates = plateCoords[i];
-
-                    coords.push(coordinates);
-                }
-            }
-        } else if (feature.typeOfFeature == PLATE_LEVEL) {
-            var plateFeatureCoords = this.findPlateLevelFeatureCoords(featureName);
-
-            for (plate = 0; plate < plateFeatureCoords.length; plate++){
-                coordinates = plateFeatureCoords[plate];
-
-                coords.push(coordinates);
-            }
-        } else if (feature.typeOfFeature == EXPERIMENT_LEVEL){
-            coords.push(this.findExperimentLevelFeatureCoords(featureName));
+        if (!this.coordinateIsOnFirstPlate(row, column)){
+            throw new ParsingConfigError(ParsingConfigError.NOT_ON_FIRST_PLATE,
+                                        Grid.getRowLabel(row) + column,
+                                        "anchors",
+                                        "add a new plate anchor");
         }
 
-        return coords;
+        if (this.findPlateAnchorIndex(row, column) !== null){
+            throw new ParsingConfigError()
+        }
+
+        this.plateAnchors.push([row - this.plate.coordinateRange.startRow,
+                                column - this.plate.coordinateRange.startCol,
+                                value]);
     };
 
-    this.getFeatureValuesDescriptors = function(featureName, grid){
+    this.removePlateAnchor = function(row, column){
+        var anchorIndex = this.findPlateAnchorIndex(row, column);
+
+        if (!this.plate){
+            throw new ParsingConfigError(ParsingConfigError.FIRST_PLATE_NOT_DEFINED,
+                                         Grid.getRowLabel(row) + column,
+                                         "anchors",
+                                         "remove a plate anchor");
+        }
+
+        if (anchorIndex === null) {
+            throw new ParsingConfigError(ParsingConfigError.DUPLICATE_ANCHOR,
+                                         Grid.getRowLabel(row) + column,
+                                         "anchors",
+                                         "remove a plate anchor")
+        }
+
+        this.plateAnchors.splice(anchorIndex, 1);
+    };
+
+    this.getFeatureNames = function(){
         var result = [];
-        var featureCoords;
-        var feature = this.features[featureName];
-        var plateIndex;
-        var gridRow;
-        var gridCol;
-        var cell;
-        var value;
-        var descriptor;
-
-        if (feature.typeOfFeature == WELL_LEVEL){
-            featureCoords = this.findWellLevelFeatureCoords(featureName);
-
-            for (plateIndex = 0; plateIndex < featureCoords.length; plateIndex++){
-                var plate = featureCoords[plateIndex];
-
-                for (var wellIndex = 0; wellIndex < plate.length; wellIndex++){
-                    gridRow = plate[wellIndex][0];
-                    gridCol = plate[wellIndex][1];
-                    cell = Grid.getRowLabel(gridRow) + gridCol;
-                    value = grid.getDataPoint(gridRow, gridCol);
-
-                    var coordsOnPlate = ParsingConfig.wellNumberToPlateCoords(wellIndex,
-                                                                              plate.length,
-                                                                              2,
-                                                                              3);
-                    var plateRow = Grid.getRowLabel(coordsOnPlate[0] + 1);
-                    var plateCol = coordsOnPlate[1] + 1;
-                    descriptor = "plate: " + (plateIndex + 1) + ", well: " + plateRow
-                                    + plateCol + ", value: " + value;
-                    result.push({
-                        descriptor: descriptor,
-                        cell: cell
-                    });
-                }
-            }
-        } else if (feature.typeOfFeature == PLATE_LEVEL) {
-            featureCoords = this.findPlateLevelFeatureCoords(featureName);
-
-            for (plateIndex = 0; plateIndex < featureCoords.length; plateIndex++){
-                var plate = featureCoords[plateIndex];
-
-                gridRow = plate[0];
-                gridCol = plate[1];
-                cell = Grid.getRowLabel(gridRow) + gridCol;
-                value = grid.getDataPoint(gridRow, gridCol);
-                descriptor = "plate: " + (plateIndex + 1) + ", value: " + value;
-
-                result.push({
-                    descriptor: descriptor,
-                    cell: cell
-                });
-            }
-        } else if (feature.typeOfFeature == EXPERIMENT_LEVEL){
-            featureCoords = this.findExperimentLevelFeatureCoords(featureName);
-
-            gridRow = featureCoords[0];
-            gridCol = featureCoords[1];
-            cell = Grid.getRowLabel(gridRow) + gridCol;
-            value = grid.getDataPoint(gridRow, gridCol);
-            descriptor = "value: " + value;
-
-            result.push({
-                descriptor: descriptor,
-                cell: cell
-            });
-        }
-
-        return result;
-    };
-
-    this.featureIsNumeric = function(featureName, grid){
-        result = true;
-        featureCoords = this.getFeatureCoords(featureName);
-
-        for (var i = 0; i<featureCoords.length; i++){
-            var value = grid.getDataPoint(featureCoords[i][0], featureCoords[i][1]);
-
-            if (!$.isNumeric(value) && value !== ""){
-                result = false;
-                break
-            }
-        }
-
-        return result;
-    };
-
-
-    this.createImportData = function(plateIDs, grid){
-        var importData = new ImportData(ImportData.NO_ID,
-                                        ImportData.NO_ID,
-                                        this.plates.length,
-                                        this.numPlateRows,
-                                        this.numPlateCols);
-        var plate;
 
         for (var featureName in this.features){
-            var feature = this.features[featureName];
-            var category = feature.featureLabel;
+            result.push(featureName);
+        }
 
-            if (feature.typeOfFeature == WELL_LEVEL){
-                var wellFeatureCoords = this.findWellLevelFeatureCoords(featureName);
-                var isNumeric = this.featureIsNumeric(category, grid);
-                importData.addWellLevelCategory(category, isNumeric);
+        return result;
+    };
 
-                for (plate = 0; plate < wellFeatureCoords.length; plate++){
-                    var plateCoords = wellFeatureCoords[plate];
+    this.getPlateLevelFeatureNames = function(){
+        var result = [];
 
-                    for (var i=0; i<plateCoords.length; i++){
-                        var gridCoordinates = plateCoords[i];
-                        var gridRow = gridCoordinates[0];
-                        var gridColumn = gridCoordinates[1];
-                        var plateCoordinates = ParsingConfig.wellNumberToPlateCoords(i, plateCoords.length, 2, 3);
-                        var plateRow = plateCoordinates[0];
-                        var plateColumn = plateCoordinates[1];
+        for (var featureName in this.features){
+            var feature = this.getFeature(featureName);
 
-                        var value = grid.getDataPoint(gridRow, gridColumn);
-
-                        importData.setWellLevelLabel(plate,
-                                                     plateRow,
-                                                     plateColumn,
-                                                     category,
-                                                     value);
-                    }
-                }
-            } else if (feature.typeOfFeature == PLATE_LEVEL) {
-                var plateFeatureCoords = this.findPlateLevelFeatureCoords(featureName);
-                importData.addPlateLevelCategory(category);
-
-                for (plate = 0; plate < plateFeatureCoords.length; plate++){
-                    var gridCoordinates = plateFeatureCoords[plate];
-                    var gridRow = gridCoordinates[0];
-                    var gridColumn = gridCoordinates[1];
-                    var value = grid.getDataPoint(gridRow, gridColumn);
-
-                    importData.setPlateLevelLabel(plate, category, value);
-                }
-            } else if (feature.typeOfFeature == EXPERIMENT_LEVEL){
-                importData.addExperimentLevelCategory(category);
-
-                var gridCoordinates = this.findExperimentLevelFeatureCoords(featureName);
-                var gridRow = gridCoordinates[0];
-                var gridColumn = gridCoordinates[1];
-                var value = grid.getDataPoint(gridRow, gridColumn);
-
-                importData.setExperimentLevelLabel(category, value);
+            if (feature.typeOfFeature === PLATE_LEVEL){
+                result.push(featureName);
             }
         }
 
-        return importData;
+        return result;
     };
 
+    this.getFeature = function(featureName){
+        var feature = this.features[featureName.trim()];
 
-    this.addFeature = function(name, grid, isParent, parent, typeOfFeature, color){
-        var newFeature = new BioFeature(name);
-        newFeature.topLeftCoords= [grid.selectedStartRow, grid.selectedStartCol];
-        newFeature.topLeftValue=grid.getDataPoint(grid.selectedStartRow, grid.selectedStartCol);
-        newFeature.bottomRightCoords = [grid.selectedEndRow, grid.selectedEndCol];
-        newFeature.relativeToLeftX = grid.selectedStartCol;
-        newFeature.relativeToLeftY = grid.selectedStartRow;
+        if (!feature){
+           throw new ParsingConfigError(ParsingConfigError.NO_SUCH_FEATURE,
+                                        featureName,
+                                        "general",
+                                        "get a feature")
+        }
+
+        return feature;
+    };
+
+    this.addFeature = function(name, range, isParent, parent, typeOfFeature, color){
+        if (this.features[name.trim()]){
+            throw new ParsingConfigError(ParsingConfigError.DUPLICATE_FEATURE_NAME,
+                                         name,
+                                         typeOfFeature,
+                                         "add a new feature");
+        }
+
+        var newFeature = new BioFeature(name.trim());
+        newFeature.coordinateRange = range;
+        newFeature.relativeToLeftX = range.startCol;
+        newFeature.relativeToLeftY = range.startRow;
         newFeature.typeOfFeature = typeOfFeature;
         newFeature.color = color;
         if (!isParent) {
-            // When it is one value set both top and bottom properties to
-            // the same value.
-            if(newFeature.typeOfFeature== PLATE_LEVEL
-                || newFeature.typeOfFeature == EXPERIMENT_LEVEL){
-                newFeature.bottomRightCoords=newFeature.topLeftCoords;
-            }
-            newFeature.relativeToLeftX = newFeature.topLeftCoords[1] - parent.topLeftCoords[1];
-            newFeature.relativeToLeftY = newFeature.topLeftCoords[0] - parent.topLeftCoords[0];
+            newFeature.relativeToLeftX = range.startCol - parent.coordinateRange.startCol;
+            newFeature.relativeToLeftY = range.startRow - parent.coordinateRange.startRow;
             newFeature.importData = true;
         }
 
@@ -380,52 +229,193 @@ function ParsingConfig(name,
     };
 
     this.deleteFeature = function(nameOfFeatureToDelete){
+        if (!this.features[nameOfFeatureToDelete.trim()]){
+            throw new ParsingConfigError(ParsingConfigError.NO_SUCH_FEATURE,
+                                         nameOfFeatureToDelete,
+                                         "general",
+                                         "delete a feature");
+        }
+
         delete this.features[nameOfFeatureToDelete];
     };
 
-    this.addPlate = function(grid, examiner, color){
+    this.addPlate = function(range, examiner, color){
         this.plateAnchors = [];
         this.features = {};
-        this.plates = [];
 
-        this.plate = this.addFeature("plate", grid, true, null, PLATE, color);
-
-        this.plateAnchors.push([this.plate.topLeftCoords[0] - this.plate.topLeftCoords[0],
-                                   this.plate.topLeftCoords[1] - this.plate.topLeftCoords[1],
-                                   this.plate.topLeftValue]);
-        this.setPlates(examiner, grid);
+        this.plate = this.addFeature("plate", range, true, null, PLATE, color);
         return this.plate
     };
 
-    this.addExperimentLevelFeature = function(name, grid, color){
-        return this.addFeature(name, grid, true, null, EXPERIMENT_LEVEL, color);
+    this.addExperimentLevelFeature = function(name, range, color){
+        if (!this.plate){
+            throw new ParsingConfigError(ParsingConfigError.FIRST_PLATE_NOT_DEFINED,
+                                         name,
+                                         "experiment",
+                                         "add a new well level feature");
+        }
+
+        if(ParsingConfig.getCoordsInARange(range.startRow,
+                                           range.startCol,
+                                           range.endRow,
+                                           range.endCol).length > 1){
+            // case where an experiment level feature would have more than
+            // one cell in its range
+            throw new ParsingConfigError(
+                ParsingConfigError.FEATURE_TYPE_DOES_NOT_SUPPORT_MULTIPLE_CELLS,
+                range.toString,
+                "experiment",
+                "add a new well level feature");
+        }
+
+        var feature = this.addFeature(name, range, true, null, EXPERIMENT_LEVEL, color);
+
+        this.features[name.trim()] = feature;
+
+        return feature;
     };
 
-    this.addPlateLevelFeature = function(name, grid, color){
-        return this.addFeature(name, grid, false, this.plate, PLATE_LEVEL, color);
+    this.addPlateLevelFeature = function(name, range, color){
+        if (!this.plate){
+            throw new ParsingConfigError(ParsingConfigError.FIRST_PLATE_NOT_DEFINED,
+                                         name,
+                                         "plate",
+                                         "add a new plate level feature");
+        }
+
+        if (!this.rangeIsOnFirstPlate(range)){
+            throw new ParsingConfigError(ParsingConfigError.NOT_ON_FIRST_PLATE,
+                                         name + " = " + range.toString(),
+                                         "plate level features",
+                                         "add a new plate level feature");
+        }
+
+        if(ParsingConfig.getCoordsInARange(range.startRow,
+                                           range.startCol,
+                                           range.endRow,
+                                           range.endCol).length > 1){
+            // case where a plate level feature would have more than
+            // one cell in its range
+            throw new ParsingConfigError(
+                ParsingConfigError.FEATURE_TYPE_DOES_NOT_SUPPORT_MULTIPLE_CELLS,
+                range.toString,
+                "plate",
+                "add a new plate level feature");
+        }
+
+        var feature = this.addFeature(name, range, false, this.plate, PLATE_LEVEL, color);
+
+        this.features[name.trim()] = feature;
+
+        return feature;
     };
 
-    this.addWellLevelFeature = function(name, grid, color){
+    this.addWellLevelFeature = function(name, range, color){
+        if (!this.plate){
+            throw new ParsingConfigError(ParsingConfigError.FIRST_PLATE_NOT_DEFINED,
+                                         name,
+                                         "well",
+                                         "add a new well level feature");
+        }
+
+        if (!this.rangeIsOnFirstPlate(range)){
+            throw new ParsingConfigError(ParsingConfigError.NOT_ON_FIRST_PLATE,
+                                         name + " = " + range.toString(),
+                                         "well level features",
+                                         "add a new well level feature");
+        }
+
+
+
+        var feature = this.addFeature(name, range, false, this.plate, WELL_LEVEL, color);
+
+        this.updatePlateDimensions(range);
+        this.features[name.trim()] = feature;
+
+        return feature;
+    };
+
+    this.createFeature = function(name, range, level, color){
+        if (!name || !name.trim || !name.trim()){
+            throw new ParsingConfigError(ParsingConfigError.FEATURE_NAME_NOT_SPECIFIED,
+                                         name,
+                                         level,
+                                         "create a new feature");
+        }
+        if (!range){
+            throw new ParsingConfigError(ParsingConfigError.FEATURE_RANGE_NOT_SPECIFIED,
+                                         range,
+                                         level,
+                                         "create a new feature");
+        }
+        if (!level){
+            throw new ParsingConfigError(ParsingConfigError.FEATURE_LEVEL_NOT_SPECIFIED,
+                                         level,
+                                         level,
+                                         "create a new feature");
+        }
+
+        if (!color){
+            throw new ParsingConfigError(ParsingConfigError.FEATURE_COLOR_NOT_SPECIFIED,
+                                         color,
+                                         level,
+                                         "create a new feature");
+        }
+
+        var feature;
+
+        if (level === WELL_LEVEL){
+            feature = this.addWellLevelFeature(name, range, color);
+        } else if (level === PLATE_LEVEL){
+            feature = this.addPlateLevelFeature(name, range, color);
+        } else if (level === EXPERIMENT_LEVEL){
+            feature = this.addExperimentLevelFeature(name, range, color);
+        } else {
+            throw new ParsingConfigError(ParsingConfigError.LEVEL_NOT_RECOGNIZED,
+                                         level,
+                                         "general",
+                                         "create a new feature");
+        }
+
+        return feature;
+    };
+
+    this.updatePlateDimensions = function(rangeOfWellLevelFeature){
         var numPlateWells = ParsingConfig.getNumberOfWellsFromFeatureBounds(
-                                                                    grid.selectedStartRow,
-                                                                    grid.selectedStartCol,
-                                                                    grid.selectedEndRow,
-                                                                    grid.selectedEndCol);
+                                                        rangeOfWellLevelFeature.startRow,
+                                                        rangeOfWellLevelFeature.startCol,
+                                                        rangeOfWellLevelFeature.endRow,
+                                                        rangeOfWellLevelFeature.endCol);
+
+        if (!ParsingConfig.plateDimensionIsCorrect(numPlateWells,
+                                                   ParsingConfig.WELL_ROW_FACTOR,
+                                                   ParsingConfig.WELL_COL_FACTOR)){
+            throw new ParsingConfigError(
+                                    ParsingConfigError.NON_STANDARD_PLATE_DIMENSION_RATIO,
+                                    numPlateWells,
+                                    "well",
+                                    "update plate dimensions");
+        }
+
         var plateDimensions = ParsingConfig.wellNumberToPlateDimension(numPlateWells,
-                                                                       2,
-                                                                       3);
-        if (plateDimensions[0] > this.numPlateRows){
-            this.numPlateRows = plateDimensions[0];
+                                                        ParsingConfig.WELL_ROW_FACTOR,
+                                                        ParsingConfig.WELL_COL_FACTOR);
+
+
+        if ((this.numPlateRows > 0 && plateDimensions[0] !== this.numPlateRows )
+            || (this.numPlateCols > 0 && plateDimensions[1] !== this.numPlateCols)){
+            throw new ParsingConfigError(ParsingConfig.PLATE_DIMENSION_DIFFERENCE,
+                                            plateDimensions[0] + ":" + plateDimensions[1],
+                                            this.numPlateRows + ":" + this.numPlateCols,
+                                            "update plate dimensions");
         }
 
-        if (plateDimensions[1] > this.numPlateCols){
-            this.numPlateCols = plateDimensions[1];
-        }
+        this.numPlateRows = plateDimensions[0];
+        this.numPlateCols = plateDimensions[1];
 
-        return this.addFeature(name, grid, false, this.plate, WELL_LEVEL, color);
     };
 
-    this.getJSONString = function(){
+    this.getJSONObject = function(){
         var JSONObject = {};
 
         JSONObject["id"] = this.id;
@@ -436,9 +426,62 @@ function ParsingConfig(name,
         JSONObject["plate"] = this.plate;
         JSONObject["plateAnchors"] = this.plateAnchors;
         JSONObject["features"] = this.features;
+        JSONObject["numPlateRows"] = this.numPlateRows;
+        JSONObject["numPlateCols"] = this.numPlateCols;
+        JSONObject["colorPickerIndex"] = this.colorPickerIndex;
 
         return JSONObject;
     };
+
+    this.getFeatureLevels = function(){
+        return [WELL_LEVEL, PLATE_LEVEL, EXPERIMENT_LEVEL];
+    };
+
+    this.coordinateIsOnFirstPlate = function(row, col){
+
+        return (row >= this.plate.coordinateRange.startRow)
+                && (row <= this.plate.coordinateRange.endRow)
+                && (col >= this.plate.coordinateRange.startCol)
+                && (col <= this.plate.coordinateRange.endCol);
+    };
+
+    this.rangeIsOnFirstPlate = function(range){
+        return (this.coordinateIsOnFirstPlate(range.startRow, range.startCol))
+                && (this.coordinateIsOnFirstPlate(range.endRow, range.endCol));
+    };
+
+    this.findPlateAnchorIndex = function(row, column){
+        result = null;
+
+        for (var i=0; i<this.plateAnchors.length; i++){
+            var plateAnchorRow = this.plateAnchors[i][0];
+            var plateAnchorCol = this.plateAnchors[i][1];
+
+            if (row === plateAnchorRow && column === plateAnchorCol){
+                result = i;
+                break;
+            }
+        }
+
+        return result;
+    };
+
+
+    function init(){
+        _self.id = null;
+        _self.setName(name);
+        _self.setMachineName(machineName);
+        _self.setDescription(description);
+        _self.setDelimiter(delimiter);
+        _self.plate = null;
+        _self.plateAnchors = [];  // elements stored as [relativeRow, relativeColumn, value]
+        _self.features = {};  // keyed on feature name
+        _self.numPlateRows = 0;
+        _self.numPlateCols = 0;
+        _self.colorPickerIndex = 0;
+    }
+
+    init();
 }
 
 ParsingConfig.loadParsingConfig = function(JSONParsingConfig){
@@ -450,11 +493,36 @@ ParsingConfig.loadParsingConfig = function(JSONParsingConfig){
         rawParsingConfig.description,
         rawParsingConfig.delimiter);
 
+    config.id = rawParsingConfig.id;
     config.plate = rawParsingConfig.plate;
     config.plateAnchors = rawParsingConfig.plateAnchors;
     config.features = rawParsingConfig.features;
+    config.numPlateRows = rawParsingConfig.numPlateRows;
+    config.numPlateCols = rawParsingConfig.numPlateCols;
+    config.colorPickerIndex = rawParsingConfig.colorPickerIndex;
+
+    for (var featureName in config.features){
+        var feature = config.getFeature(featureName);
+        var range = feature.coordinateRange;
+        feature.coordinateRange = new CellRange(range.startRow,
+                                                range.startCol,
+                                                range.endRow,
+                                                range.endCol);
+    }
+
+    var plateRange = config.plate.coordinateRange;
+    config.plate.coordinateRange = new CellRange(plateRange.startRow,
+                                             plateRange.startCol,
+                                             plateRange.endRow,
+                                             plateRange.endCol);
 
     return config;
+};
+
+ParsingConfig.plateDimensionIsCorrect = function(numberOfWells, rowProportion, colProportion){
+    var base = Math.sqrt(numberOfWells/(rowProportion * colProportion));
+
+    return (base % 1 === 0);
 };
 
 ParsingConfig.wellNumberToPlateDimension = function(numberOfWells, rowProportion, colProportion){
@@ -521,5 +589,79 @@ ParsingConfig.createZeros2DArray = function(rows, columns){
 
     return result;
 };
+
+
+
+ParsingConfigError.FEATURE_TYPE_DOES_NOT_SUPPORT_MULTIPLE_CELLS
+    = "multiple cells not supported for feature type";
+ParsingConfigError.NOT_ON_FIRST_PLATE = "not on first plate";
+ParsingConfigError.FIRST_PLATE_NOT_DEFINED = "first plate not defined";
+ParsingConfigError.NO_SUCH_ANCHOR = "no such anchor";
+ParsingConfigError.DUPLICATE_ANCHOR = "duplicate anchor";
+ParsingConfigError.DUPLICATE_FEATURE_NAME = "duplicate feature name";
+ParsingConfigError.NO_SUCH_FEATURE = "no such feature";
+ParsingConfigError.INVALID_PARSING_NAME = "invalid parsing name";
+ParsingConfigError.INVALID_MACHINE_NAME = "invalid machine name";
+ParsingConfigError.LEVEL_NOT_RECOGNIZED = "level not recognized";
+ParsingConfigError.NON_STANDARD_PLATE_DIMENSION_RATIO = "non-standard plate dimension " +
+                                                        "ratio";
+ParsingConfigError.PLATE_DIMENSION_DIFFERENCE = "plate dimension difference";
+ParsingConfigError.FEATURE_NAME_NOT_SPECIFIED = "feature name not specified";
+ParsingConfigError.FEATURE_LEVEL_NOT_SPECIFIED = "feature level not specified";
+ParsingConfigError.FEATURE_RANGE_NOT_SPECIFIED = "feature range not specified";
+ParsingConfigError.FEATURE_COLOR_NOT_SPECIFIED = "feature color not specified";
+
+
+function ParsingConfigError(type, descriptor, level, attemptedAction){
+    this.type = type;
+    this.descriptor = descriptor;
+    this.level = level;
+    this.attemptedAction = attemptedAction;
+
+
+    this.getMessage = function() {
+        if (this.type === ParsingConfigError.FEATURE_TYPE_DOES_NOT_SUPPORT_MULTIPLE_CELLS) {
+            return "Features at the " + this.level + " level cannot have multiple cells.";
+        } else if (this.type === ParsingConfigError.NOT_ON_FIRST_PLATE) {
+            return "All " + this.level + " must be entirely on the first plate.";
+        } else if (this.type === ParsingConfigError.FIRST_PLATE_NOT_DEFINED) {
+            return "The first plate must be defined before you may "
+                + this.attemptedAction + ".";
+        } else if (this.type === ParsingConfigError.NO_SUCH_ANCHOR) {
+            return "The anchor at cell " + this.descriptor + " does not exist.";
+        } else if (this.type === ParsingConfigError.DUPLICATE_ANCHOR) {
+            return "An anchor at cell " + this.descriptor + " already exists.";
+        } else if (this.type === ParsingConfigError.DUPLICATE_FEATURE_NAME) {
+            return "A feature named " + this.descriptor + " already exists.";
+        } else if (this.type === ParsingConfigError.NO_SUCH_FEATURE) {
+            return "There is no feature named " + this.descriptor + ".";
+        } else if (this.type === ParsingConfigError.INVALID_PARSING_NAME) {
+            return "The name for the parsing configuration, \"" + descriptor + "\", " +
+                "is not a valid name.";
+        } else if (this.type === ParsingConfigError.INVALID_MACHINE_NAME){
+            return "The machine name for the parsing configuration, \"" + descriptor
+                    + "\", is not a valid machine name.";
+        }else if (this.type === ParsingConfigError.LEVEL_NOT_RECOGNIZED){
+            return "The level \"" + this.descriptor + "\" was not recognized.";
+        } else if (this.type === ParsingConfigError.NON_STANDARD_PLATE_DIMENSION_RATIO){
+            return "The number of wells per plate for this feature does not match the" +
+                " standard row to column ratio " + ParsingConfig.WELL_ROW_FACTOR + ":"
+                + ParsingConfig.WELL_COL_FACTOR + ".";
+        } else if (this.type === ParsingConfigError.PLATE_DIMENSION_DIFFERENCE){
+            return "The previous well level features indicated a " + this.level +
+                " plate well dimension while the current feature indicates a plate well "+
+                "dimension of " + this.descriptor + ".";
+        } else if (this.type === ParsingConfigError.FEATURE_NAME_NOT_SPECIFIED){
+            return "A feature category must be specified to " + this.attemptedAction +".";
+        } else if (this.type === ParsingConfigError.FEATURE_LEVEL_NOT_SPECIFIED){
+            return "A feature level must be specified to " + this.attemptedAction + ".";
+        } else if (this.type === ParsingConfigError.FEATURE_RANGE_NOT_SPECIFIED){
+            return "A valid feature range must be specified to " + this.attemptedAction
+                    + ".";
+        } else if (this.type === ParsingConfigError.FEATURE_COLOR_NOT_SPECIFIED){
+        return "A feature color must be specified to " + this.attemptedAction + ".";
+    }
+    }
+}
 
 

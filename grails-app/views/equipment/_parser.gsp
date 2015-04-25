@@ -80,7 +80,7 @@
 								   	<td ><label for="featureCellRange"> Cell Range</label></td>
 								    <td ><input type="text" id="featureCellRange" autocomplete="off"/></td>
 								    <td ><label for="featureLevel">Apply to</label></td>
-								    <td >
+								    <td id="featureLevel">
 								    	<input type="radio" id="wellLevel" name="featureLevel" value="well" /> Well<br>
 		                                <input type="radio" id="plateLevel" name="featureLevel" value="plate" /> Plate<br>
 		                                <input type="radio" id="experimentLevel" name="featureLevel" value="experiment" /> Experiment
@@ -185,7 +185,7 @@
         </g:javascript> 
     </g:else>
 
-<asset:javascript src="jquery-1.11.2.min.js"/>
+    <asset:javascript src="jquery-1.11.2.min.js"/>
 	<asset:javascript src="jquery-ui.js"/>
 	<asset:javascript src="jquery.event.drag-2.2.js"/>
 	<asset:javascript src="grid/slick.core.js"/>
@@ -197,13 +197,18 @@
     <asset:javascript src="grid/slick.cellselectionmodel.js"/>
     <asset:javascript src="grid/slick.editors.js"/>
     <asset:javascript src="selectize.js"/>
-    <asset:javascript src="parser/Range.js"/>
+    <asset:javascript src="parser/CellRange.js"/>
     <asset:javascript src="grid/Grid.js"/>
-    <asset:javascript src="parser/ImportDataFileGenerator.js"/>
     <asset:javascript src="parser/GridHighlighter.js"/>
     <asset:javascript src="parser/FileExaminer.js"/>
     <asset:javascript src="parser/ColorPicker.js"/>
     <asset:javascript src="parser/ImportData.js"/>
     <asset:javascript src="parser/ParsingConfig.js"/>
-    <asset:javascript src="parser/parsingConfigCreator.js"/>
+    <asset:javascript src="parser/ImportDataFileGenerator.js"/>
+    <asset:javascript src="parser/DataExtractor.js"/>
+    <asset:javascript src="parser/FlashMessenger.js"/>
+    <asset:javascript src="parser/ServerCommunicator.js"/>
+    <asset:javascript src="parser/ParserUI.js"/>
+    <asset:javascript src="parser/ParsingController.js"/>
+
 
