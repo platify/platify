@@ -579,6 +579,18 @@ function createNewLabel(cat, label, units, color, applyToCells) {
 			//plateModel["rows"][row]["columns"][column]["wellGroupName"] = data[row-1][column-1];
 			plateModel["rows"][row]["columns"][column]["wellGroupName"] = "-";
 		}
+		
+		// the case where we are overwriting a cell with a new value for the same category
+		if (plateModel["rows"][row]["columns"][column]["categories"][cat] != null) {
+			// if that is the case we should remove the old reference to the cell in the catLegend cellref
+			for (var oldLab in plateModel["rows"][row]["columns"][column]["categories"][cat]) {
+				var pos = catLegend[cat]['labels'][oldLab]["cellref"].indexOf(row + "-" + column);
+				if (pos != -1) {
+					catLegend[cat]['labels'][oldLab]["cellref"].splice(pos, 1);
+				}
+			}
+		}
+		
 		plateModel["rows"][row]["columns"][column]["categories"][cat] = {};
 		plateModel["rows"][row]["columns"][column]["categories"][cat][label] = {};
 		plateModel["rows"][row]["columns"][column]["categories"][cat][label]["color"] = color;
@@ -611,7 +623,6 @@ function createNewLabel(cat, label, units, color, applyToCells) {
  * This function changes the style of a particular cell
  */
 function addNewLabel() {
-	//var selCells = grid.getSelectedCells();
 	var selCells = highlightedCoords;
 	console.log(selCells);
 	var cat = document.getElementById("newCatValue").value;
@@ -621,8 +632,6 @@ function addNewLabel() {
 	createNewLabel(cat, label, "", color, selCells);
 	
 	updateCategoryList();
-	// disable selection of grid cells
-	//hideLabelPanel();
 	// output current object model to console
 	console.log("plateModel:" + JSON.stringify(plateModel));
 	console.log("catLegend:" + JSON.stringify(catLegend));
