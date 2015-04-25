@@ -52,19 +52,21 @@
 								<table class="table table-striped table-hover">
 								<thead>
 										<tr>
-											<g:sortableColumn property="id" title="#" />
-											<g:sortableColumn property="name" title="${message(code: 'plateTemplate.name.label', default: 'Name')}" />
-											<g:sortableColumn property="owner" title="${message(code: 'plateTemplate.owner.label', default: 'Owner')}" />	
-											<g:sortableColumn property="dateCreated" title="${message(code: 'plateTemplate.date.label', default: 'Date')}" />																
+											<g:sortableColumn property="barcode" title="Barcode" />
+											<g:sortableColumn property="id" title="Plate Id" />
+											<g:sortableColumn property="name" title="${message(code: 'plateSetInstance.plate.name.label', default: 'Template Name')}" />
+											<g:sortableColumn property="owner" title="${message(code: 'plateSetInstance.plate.owner.label', default: 'Owner')}" />	
+											<g:sortableColumn property="dateCreated" title="${message(code: 'plateSetInstance.plate.date.label', default: 'Date')}" />																
 										</tr>
 									</thead>
 									<tbody>
-									<g:each in="${plateTemplatelist}" status="i" var="plateTemplateInstance">
+									<g:each in="${plateSetlist}" status="i" var="plateSetInstance">
 										<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
-											<td>${plateTemplateInstance.id}</td>
-											<td>${fieldValue(bean: plateTemplateInstance, field: "name")}</td>
-											<td>${plateTemplateInstance.owner.firstName + ' ' + plateTemplateInstance.owner.lastName}</td>
-											<td>${fieldValue(bean: plateTemplateInstance, field: "dateCreated")}</td>
+											<td>${plateSetInstance.barcode}</td>
+											<td>${fieldValue(bean: plateSetInstance.plate, field: "id")}</td>
+											<td>${fieldValue(bean: plateSetInstance.plate, field: "name")}</td>
+											<td>${plateSetInstance.plate.owner.firstName + ' ' + plateSetInstance.plate.owner.lastName}</td>
+											<td>${fieldValue(bean: plateSetInstance.plate, field: "dateCreated")}</td>
 										</tr>
 									</g:each>
 									</tbody>

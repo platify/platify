@@ -74,9 +74,8 @@ class ExperimentalPlateSetController {
     }
 	
 	def showactions(ExperimentalPlateSet experimentalPlateSetInstance) {
-		//def plateList = PlateSet.findAllByExperiment(experimentalPlateSetInstance);
-		def plateList = PlateTemplate.all;		// THIS IS NOT THE RIGHT VALUES. Should be plateMaps, not templates. Just here for example list !!
-		respond experimentalPlateSetInstance, model:[plateTemplatelist: plateList]
+		def plateSetList = PlateSet.findAllByExperiment(experimentalPlateSetInstance);
+		respond experimentalPlateSetInstance, model:[plateSetlist: plateSetList]
 	}
 	
 	def createPlate() {

@@ -202,6 +202,8 @@ function createGrid() {
 	// register a function to be called each time a new set of cells are
 	// selected by a user
 	grid.registerSelectedCellCallBack(handleSelectedCells);
+	
+	enableGridSelection();
 }
 
 /**
@@ -421,13 +423,16 @@ function createCatLabel(catKey) {
 }
 
 function enableGridSelection() {
-	//removeAllHighlightedCells();
-	grid.enableCellSelection();
+	if (grid != null) {
+		grid.enableCellSelection();
+	}
 }
 
 function disableGridSelection() {
-	removeAllHighlightedCells();
-	grid.disableCellSelection();
+	if (grid != null) {
+		removeAllHighlightedCells();
+		grid.disableCellSelection();
+	}
 }
 
 // remove and cleanup references to cat and label
@@ -728,7 +733,7 @@ function saveConfigToServer() {
 	console.log("SendingToServer: " + JSON.stringify(plateJson));
    
 	var jqxhr = $.ajax({		// need to update to save plate instead of template
-		url: hostname + "/plateTemplate/save",
+		url: hostname + "/plate/save",
 		type: "POST",
 		data: JSON.stringify(plateJson),
 		processData: false,
@@ -746,10 +751,10 @@ function saveConfigToServer() {
 		console.log( "second complete" );
 		console.log("result=" + JSON.stringify(resData));
 		
-		if (resData["plateTemplate"] !=null &&  resData["plateTemplate"]["id"] != null) {
-			plateModel["templateID"] = resData["plateTemplate"]["id"];
+		if (resData["plate"] !=null &&  resData["plate"]["id"] != null) {
+			//plateModel["templateID"] = resData["plateTemplate"]["id"];
 			// use less hacky method !!
-			window.location.href = hostname + "/experimentalPlateSet/showactions/1"; // need to add correct experimentID !!!
+			window.location.href = hostname + "/experimentalPlateSet/showactions/" + window.expId;
 		} else {
 			alert("An error while saving the template!");
 		}
@@ -814,7 +819,9 @@ function translateModelToOutputJson(pModel) {
 	plate["name"] = pModel["name"];
 	plate["width"] = pModel["grid_width"];
 	plate["height"] = pModel["grid_height"];
-	
+	plate["experimentID"] = window.expId;
+	plate["templateID"] = window.templateId;
+		
 	plate["plateID"] = document.getElementById("barcode").value;
 	plate["wells"] = [];
 	
@@ -824,6 +831,20 @@ function translateModelToOutputJson(pModel) {
 		plate["labels"] = [];
 	}
 	
+	// take the values from the compound input text fields (could do this at input onChange event also)
+	for (var wellGroup in groupNames) {
+		if (groupNames[wellGroup] != null) {
+			var cmpdValue = document.getElementById("wellGroup-" + wellGroup).value;
+			if (cmpdValue == null || cmpdValue == "") {
+				// !!! THROW ERROR DIALOG HERE ASKING TO FILL OUT THIS FIELD !!!
+				groupNames[wellGroup] = "SOME_COMPOUND";
+			} else {
+				groupNames[wellGroup] = cmpdValue;
+			}
+		}
+	}
+	
+	// 
 	for (var row in pModel["rows"]) {
 		for (var column in pModel["rows"][row]["columns"]) {
 			var well = {};
