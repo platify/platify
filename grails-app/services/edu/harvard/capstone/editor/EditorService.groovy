@@ -38,7 +38,7 @@ class EditorService {
     		return
 
 		// first create the plate
-		def plateInstance = new PlateTemplate(owner: scientistInstance, name: data.plate.name)
+		def plateInstance = new PlateTemplate(owner: scientistInstance, name: data.plate.name, width: data.plate.width, height: data.plate.height)
 		plateInstance.save()
 		// if it has errors, delete all the data just created and exit
 		if (plateInstance.hasErrors()){
@@ -329,18 +329,19 @@ class EditorService {
     		def row = ""
     		row = row + well.row +","
     		row = row + well.column +","
-    		row = row + well.control +","
+    		row = row + well.control.value() +","
     		row = row + "compound," + well.groupName + ","
 			file.append("\r\n"+row+"\r\n")
 
-			row = well.row +","+well.column + "," + well.control +","
+			row = well.row +","+well.column + "," + well.control.value() +","
     		
     		def labels = DomainLabel.findAllByDomainIdAndLabelTypeAndPlateIsNull(well.id, DomainLabel.LabelType.WELL).collect{it.label}
 
     		labels.each{ label ->
-    			row = row + label.category + ","
-    			row = row + label.name
-    			file.append("\r\n"+row+"\r\n")
+    			def labelRow = row 
+    			labelRow = labelRow + label.category + ","
+    			labelRow = labelRow + label.name
+    			file.append("\r\n"+labelRow+"\r\n")
     		}
 
     	}
@@ -359,24 +360,75 @@ class EditorService {
     	if (!wells)
     		return
 
-        File file = File.createTempFile("template",".csv")
+        File file = File.createTempFile("plate",".csv")
 
     	wells.each{ well ->
+
     		def row = ""
     		row = row + well.row +","
     		row = row + well.column +","
-    		row = row + well.control +","
-    		row = row + "compound," + well.groupName + ","
-			file.append("\r\n"+row+"\r\n")
-
-			row = well.row +","+well.column + "," + well.control +","
-    		
-    		def labels = DomainLabel.findAllByDomainIdAndLabelTypeAndPlateIsNull(well.id, DomainLabel.LabelType.WELL).collect{it.label}
-
-    		labels.each{ label ->
-    			row = row + label.category + ","
-    			row = row + label.name
+    		row = row + well.control.value() +","
+    		if (well.control == Well.WellControl.EMPTY){
+    			row = row + ",,,,"
     			file.append("\r\n"+row+"\r\n")
+    		} else {
+	    		
+	    		def wellLabels = DomainLabel.findAllByDomainIdAndLabelTypeAndPlateIsNull(well.id, DomainLabel.LabelType.WELL)
+	    		def labels = wellLabels.findAll{!it.label.category.toLowerCase().contains('compound') && !it.label.category.toLowerCase().contains('dosage')}
+	    		def compounds = wellLabels.findAll{it.label.category.toLowerCase().contains('compound')}
+	    		def dosage = wellLabels.findAll{it.label.category.toLowerCase().contains('dosage')}
+
+	    		if (labels){
+		    		labels.each{ label ->
+		    			if (compounds){
+			    			compounds.each{ compound ->
+			    				def plateRow = row
+			    				plateRow = plateRow + label.category + "," + label.name + ","
+			    				plateRow = plateRow + compound.name + ","
+			    				if (dosage){
+			    					plateRow = plateRow + dosage[0].name + "," + dosage[0].units
+			    				} else {
+			    					plateRow = plateRow + "1.0,"
+			    				}
+			    				file.append("\r\n"+plateRow+"\r\n")
+			    			}
+		    			} else {
+		    				def plateRow = row
+		    				plateRow = plateRow + label.category + "," + label.name + ","
+		    				plateRow = plateRow + ","
+		    				if (dosage){
+		    					plateRow = plateRow + dosage[0].name + "," + dosage[0].units
+		    				} else {
+		    					plateRow = plateRow + "1.0,"
+		    				}
+		    				file.append("\r\n"+plateRow+"\r\n")
+		    			}
+		    		}
+	    		} else {
+					if (compounds){
+			    			compounds.each{ compound ->
+			    				def plateRow = row
+			    				plateRow = plateRow + "," + ","
+			    				plateRow = plateRow + compound.name + ","
+			    				if (dosage){
+			    					plateRow = plateRow + dosage[0].name + "," + dosage[0].units
+			    				} else {
+			    					plateRow = plateRow + "1.0,"
+			    				}
+			    				file.append("\r\n"+plateRow+"\r\n")
+			    			}
+	    			} else {
+	    				def plateRow = row
+	    				plateRow = plateRow + "," + ","
+	    				plateRow = plateRow + ","
+	    				if (dosage){
+	    					plateRow = plateRow + dosage[0].name + "," + dosage[0].units
+	    				} else {
+	    					plateRow = plateRow + "1.0,"
+	    				}
+	    				file.append("\r\n"+plateRow+"\r\n")
+	    			}	    			
+	    		}
     		}
 
     	}

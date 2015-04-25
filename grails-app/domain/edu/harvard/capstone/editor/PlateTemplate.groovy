@@ -8,9 +8,14 @@ class PlateTemplate {
 	Scientist owner
 	String name
 
+	String width
+	String height
+
  	Date lastUpdated
 	Date dateCreated
 
-   	static constraints = {
+   	static constraints = {	
+   		width nullable: true, blank: true
+   		height nullable: true, blank: true
     }
 }
