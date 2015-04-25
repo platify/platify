@@ -47,13 +47,20 @@ class ExperimentalPlateSetController {
         respond experimentalPlateSetInstance
     }
 
+    def showy(ExperimentalPlateSet experimentalPlateSetInstance) {
+        render editorService.getExperimentData(experimentalPlateSetInstance) as JSON
+    }
+
+
     def showWithTemplate(ExperimentalPlateSet experimentalPlateSetInstance) {
         def result = []
         if (!experimentalPlateSetInstance) {
             result = [error: "No such experiment"]
         }
         else {
-            def plateSet = PlateSet.findAllByExperiment(experimentalPlateSetInstance)
+            def plateSets = PlateSet.findAllByExperiment(experimentalPlateSetInstance)
+	    
+
             def templateInstance = plateSet ? plateSet[0].plate : null
             def template = templateInstance ? editorService.getTemplate(templateInstance) : null
             result = [experiment: experimentalPlateSetInstance,
@@ -67,9 +74,8 @@ class ExperimentalPlateSetController {
     }
 	
 	def showactions(ExperimentalPlateSet experimentalPlateSetInstance) {
-		//def plateList = PlateSet.findAllByExperiment(experimentalPlateSetInstance);
-		def plateList = PlateTemplate.all;		// THIS IS NOT THE RIGHT VALUES. Should be plateMaps, not templates. Just here for example list !!
-		respond experimentalPlateSetInstance, model:[plateTemplatelist: plateList]
+		def plateSetList = PlateSet.findAllByExperiment(experimentalPlateSetInstance);
+		respond experimentalPlateSetInstance, model:[plateSetlist: plateSetList]
 	}
 	
 	def createPlate() {

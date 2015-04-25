@@ -26,13 +26,13 @@
 						from="${edu.harvard.capstone.editor.ExperimentalPlateSet.list()}"
 						optionKey="id"
 						optionValue="${{it.name + " - " + it.id}}"
-						onChange="updatePlateList(this.value)"
+						onChange="experimentSelected(this.value)"
 					/>
 					</div>
-					<select id="plateSelect" onChange="updateResults(this.value)" size="5" style="width: 90%"></select>
+					<select id="plateSelect" onChange="plateSelected(this.value)" size="5" style="width: 90%"></select>
 					<div>
-					<label>Raw: <input type="radio" name="rawOrNorm" value="raw" onClick="toggleRawOrNorm(this)" checked /></label>
-					<label>Normalized: <input type="radio" name="rawOrNorm" value="norm" onClick="toggleRawOrNorm(this)" /></label>
+						<label>Raw: <input type="radio" name="rawOrNorm" value="raw" onClick="toggleRawOrNorm(this)" checked /></label>
+						<label>Normalized: <input type="radio" name="rawOrNorm" value="norm" onClick="toggleRawOrNorm(this)" /></label>
 					</div>
 					<dl>
 						<dt>Z-Factor</dt>
@@ -71,9 +71,10 @@
 
 	<!-- results-specific js -->
 	<g:javascript>
-	var READ_EXPERIMENT_URL = "${createLink(action: 'readExperiment', experimentInstance: null)}";
+	var RESULT_KITCHEN_SINK_URL = "${createLink(action: 'kitchenSink', experimentInstance: null)}";
 	</g:javascript>
 	<asset:javascript src="plate-statistics/statistics.js" />
+	<asset:javascript src="result/ExperimentModel.js" />
 	<asset:javascript src="result/index.js" />
 	</body>
 </html>

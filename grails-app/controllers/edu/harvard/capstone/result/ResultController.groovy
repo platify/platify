@@ -5,6 +5,7 @@ import edu.harvard.capstone.editor.ExperimentalPlateSet
 
 import static org.springframework.http.HttpStatus.*
 import grails.validation.ValidationException
+import grails.converters.JSON
 
 class ResultController {
 
@@ -25,6 +26,33 @@ class ResultController {
     def create() {
         respond new Result(params)
     }
+
+    def kitchenSink(ExperimentalPlateSet experiment) {
+        if (!springSecurityService.isLoggedIn()){
+            render(contentType: "application/json") {
+                [error: "User not logged in"]
+            }
+            return
+        } 
+
+        if (experiment == null) {
+            render(contentType: "application/json") {
+                [error: "Result not found"]
+            }
+            return
+        }
+
+        if (experiment.hasErrors()) {
+            render(contentType: "application/json") {
+                [error: experiment.errors]
+            }
+            return   
+        }
+
+	def result = [ImportData: resultService.getKitchenSink(experiment)]
+        render result as JSON
+    }
+
 
     def readExperiment(ExperimentalPlateSet experiment) {
         if (!springSecurityService.isLoggedIn()){

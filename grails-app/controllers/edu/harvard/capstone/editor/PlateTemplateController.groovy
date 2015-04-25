@@ -3,7 +3,7 @@ package edu.harvard.capstone.editor
 import groovy.json.*
 import static org.springframework.http.HttpStatus.*
 import grails.validation.ValidationException
-
+import grails.plugin.springsecurity.annotation.Secured
 
 class PlateTemplateController {
 
@@ -12,7 +12,13 @@ class PlateTemplateController {
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
+    @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
     def index(Integer max) {
+
+        if(!springSecurityService.principal?.getAuthorities().any { it.authority == "ROLE_ADMIN" || it.authority == "ROLE_SUPER_ADMIN"}){
+            params.owner = springSecurityService.principal
+        }
+  
         params.max = Math.min(max ?: 10, 100)
         respond PlateTemplate.list(params), model:[plateTemplateInstanceCount: PlateTemplate.count()]
     }
@@ -23,7 +29,7 @@ class PlateTemplateController {
 
 	def create() {
         respond new PlateTemplate(params), model:[expId: params.expid, templateName: params.name, 
-			gridWidth: params.width, gridHeigth: params.heigth]
+			gridWidth: params.width, gridHeight: params.height]
     }
 
     def getPlate(PlateTemplate plateTemplateInstance){

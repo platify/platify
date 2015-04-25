@@ -23,9 +23,9 @@ var tmpEditCat;
 function createBlankData() {
 	var result = [];
 
-	for (var i=0; i<DIMENSION; i++){
+	for (var i = 0; i < plateModel["grid_height"]; i++){
 		result[i] = [];
-		for (var j=0; j<DIMENSION; j++){
+		for (var j = 0; j < plateModel["grid_width"]; j++){
 			result[i][j] = null;
 		}
 	}
@@ -38,9 +38,9 @@ function createBlankData() {
  */
 function createRandomData() {
 	var result = [];
-	for (var i=0; i<DIMENSION; i++){
+	for (var i = 0; i < plateModel["grid_height"]; i++){
 		result[i] = [];
-		for (var j=0; j<DIMENSION; j++){
+		for (var j = 0; j < plateModel["grid_width"]; j++){
 			result[i][j] = "L" + Math.floor(Math.random()*100);
 		}
 	}
@@ -51,14 +51,27 @@ function createRandomData() {
  * Loads a json plate model and updates the grid and category legend
  */
 function loadJsonData(plateJson) {
-	
+	// translate the json received to the internal models structure
 	plateModel = translateInputJsonToModel(plateJson);
-
+	
+	// create initial grid, based on template size
+	if (plateModel["grid_width"] == null) {
+		plateModel["grid_width"] = 100; // default value
+	}
+	
+	if (plateModel["grid_height"] == null) {
+		plateModel["grid_height"] = 100; // default value
+	}
+	
+	createGrid();
+	
+	// load data into the grid
 	for (var row in plateModel["rows"]) {
 		for (var column in plateModel["rows"][row]["columns"]) {
 		
 			var wellgrp = plateModel["rows"][row]["columns"][column]["wellGroupName"];
-			groupNames[wellgrp] = "SOME_COMPOUND";
+			//groupNames[wellgrp] = "SOME_COMPOUND";
+			groupNames[wellgrp] = "";
 		
 			var newContents = wellgrp;
 
@@ -189,6 +202,8 @@ function createGrid() {
 	// register a function to be called each time a new set of cells are
 	// selected by a user
 	grid.registerSelectedCellCallBack(handleSelectedCells);
+	
+	enableGridSelection();
 }
 
 /**
@@ -297,7 +312,7 @@ function createColorPicker(cat, label) {
 	var newInput = document.createElement("input");
 	newInput.id = "color-" + cat + "-" + label;
 	newInput.type = "color";
-	newInput.className = "btn-default";
+	newInput.className = "btn-default glyphicon color-p";
 	newInput.defaultValue = catLegend[cat]['labels'][label]['color'];
 	newInput.value = catLegend[cat]['labels'][label]['color'];
 	//newInput.onchange = onCatColorChange;
@@ -348,20 +363,17 @@ function updateCompoundList() {
 function updateCategoryList() {
 	var newDiv = document.createElement("div");
 	for (var catKey in catLegend) {
-		var newUl = document.createElement("ul");
 		newDiv.appendChild(createCatLabel(catKey));
-		
 		for (var labelKey in catLegend[catKey]['labels']) {
-			var newLi = document.createElement("li");
+			var newLi = document.createElement("div");
 			// if label has been converted from a decimal, then convert it back for display!!
 			var convLab = labelKey.toString().split('__dot__').join('.');
 			newLi.appendChild(document.createTextNode(convLab));
 			
 			var newInput = createColorPicker(catKey, labelKey);
 			newLi.appendChild(newInput);
-			newUl.appendChild(newLi);
+			newDiv.appendChild(newLi);
 		}
-		newDiv.appendChild(newUl);
 	}
 	document.getElementById("categoryList").innerHTML = newDiv.innerHTML;
 	
@@ -393,27 +405,34 @@ function updatePlateLabelList() {
 
 
 function createCatLabel(catKey) {
-	var newStrong = document.createElement("strong");
+	var labDiv = document.createElement("div");
+	labDiv.className = "button-labels";
 	var newCheckbox = document.createElement("input");
 	newCheckbox.type = "checkbox";
 	newCheckbox.checked = true;
 	newCheckbox.id = "vischeck-" + catKey;
-	newStrong.appendChild(newCheckbox);
+	labDiv.appendChild(newCheckbox);
+	var newLabel = document.createElement("label");
+	newLabel.setAttribute("for", "vischeck-" + catKey);
 	// if category has been converted from a decimal, then convert it back for display!!
 	var convCat = catKey.toString().split('__dot__').join('.');
-	newStrong.appendChild(document.createTextNode(convCat));
+	newLabel.appendChild(document.createTextNode(convCat));
+	labDiv.appendChild(newLabel);
 	
-	return newStrong;
+	return labDiv;
 }
 
 function enableGridSelection() {
-	//removeAllHighlightedCells();
-	grid.enableCellSelection();
+	if (grid != null) {
+		grid.enableCellSelection();
+	}
 }
 
 function disableGridSelection() {
-	removeAllHighlightedCells();
-	grid.disableCellSelection();
+	if (grid != null) {
+		removeAllHighlightedCells();
+		grid.disableCellSelection();
+	}
 }
 
 // remove and cleanup references to cat and label
@@ -578,6 +597,18 @@ function createNewLabel(cat, label, units, color, applyToCells) {
 			//plateModel["rows"][row]["columns"][column]["wellGroupName"] = data[row-1][column-1];
 			plateModel["rows"][row]["columns"][column]["wellGroupName"] = "-";
 		}
+		
+		// the case where we are overwriting a cell with a new value for the same category
+		if (plateModel["rows"][row]["columns"][column]["categories"][cat] != null) {
+			// if that is the case we should remove the old reference to the cell in the catLegend cellref
+			for (var oldLab in plateModel["rows"][row]["columns"][column]["categories"][cat]) {
+				var pos = catLegend[cat]['labels'][oldLab]["cellref"].indexOf(row + "-" + column);
+				if (pos != -1) {
+					catLegend[cat]['labels'][oldLab]["cellref"].splice(pos, 1);
+				}
+			}
+		}
+		
 		plateModel["rows"][row]["columns"][column]["categories"][cat] = {};
 		plateModel["rows"][row]["columns"][column]["categories"][cat][label] = {};
 		plateModel["rows"][row]["columns"][column]["categories"][cat][label]["color"] = color;
@@ -610,7 +641,6 @@ function createNewLabel(cat, label, units, color, applyToCells) {
  * This function changes the style of a particular cell
  */
 function addNewLabel() {
-	//var selCells = grid.getSelectedCells();
 	var selCells = highlightedCoords;
 	console.log(selCells);
 	var cat = document.getElementById("newCatValue").value;
@@ -620,8 +650,6 @@ function addNewLabel() {
 	createNewLabel(cat, label, "", color, selCells);
 	
 	updateCategoryList();
-	// disable selection of grid cells
-	//hideLabelPanel();
 	// output current object model to console
 	console.log("plateModel:" + JSON.stringify(plateModel));
 	console.log("catLegend:" + JSON.stringify(catLegend));
@@ -702,10 +730,10 @@ function addEvent(elementId, eventType, handlerFunction) {
 // ajax save object call
 function saveConfigToServer() {
 	var plateJson = translateModelToOutputJson(plateModel);
-	console.log(JSON.stringify(plateJson));
+	console.log("SendingToServer: " + JSON.stringify(plateJson));
    
 	var jqxhr = $.ajax({		// need to update to save plate instead of template
-		url: hostname + "/plateTemplate/save",
+		url: hostname + "/plate/save",
 		type: "POST",
 		data: JSON.stringify(plateJson),
 		processData: false,
@@ -723,10 +751,10 @@ function saveConfigToServer() {
 		console.log( "second complete" );
 		console.log("result=" + JSON.stringify(resData));
 		
-		if (resData["plateTemplate"] !=null &&  resData["plateTemplate"]["id"] != null) {
-			plateModel["templateID"] = resData["plateTemplate"]["id"];
+		if (resData["plate"] !=null &&  resData["plate"]["id"] != null) {
+			//plateModel["templateID"] = resData["plateTemplate"]["id"];
 			// use less hacky method !!
-			window.location.href = hostname + "/experimentalPlateSet/showactions/1"; // need to add correct experimentID !!!
+			window.location.href = hostname + "/experimentalPlateSet/showactions/" + window.expId;
 		} else {
 			alert("An error while saving the template!");
 		}
@@ -753,7 +781,7 @@ function fetchTemplateData(tId){
 	// Set another completion function for the request above
 	jqxhr.always(function(resData) {
 		console.log( "second complete" );
-		console.log("templateJson=" + JSON.stringify(resData));
+		console.log("recievedFromServer:  " + JSON.stringify(resData));
 		loadJsonData(resData);
 	});
 }
@@ -763,26 +791,20 @@ function fetchTemplateData(tId){
  * This function handles the window load event. It initializes and fills the
  * grid with blank data and sets up the event handlers on the
  */
-function init(){
+function init() {
 	hidePlateLabelCatPanel();
 	hideDosePanel();
 	hideDoseStepPanel();
 	hidePlateLabelPanel();
 	
-	createGrid();		// maybe need template size before creating grid !!
-
 	// fetch templateJson
+	fetchTemplateData(window.templateId); // should set flag to say if recieved model was ok!, inform user otherwise
 	console.log("templateId:" + window.templateId);
-	//fetchTemplateData(window.templateId);
-	fetchTemplateData(window.templateId);
-	//loadJsonData(inputJson);
-	//loadRandomData();
-	
+
 	addEvent("addNewLabel", "click", addNewLabel);
 	addEvent("addNewDose", "click", addNewDose);
 	addEvent("addDoseStep", "click", addDoseStep);
 	addEvent("addNewPlateLabel", "click", addNewPlateLabel);
-	
 	addEvent("clearAllSelection", "click", removeAllHighlightedCells);
 
 	enableGridSelection();
@@ -795,6 +817,11 @@ function translateModelToOutputJson(pModel) {
 	var plateJson = {};
 	var plate = {}
 	plate["name"] = pModel["name"];
+	plate["width"] = pModel["grid_width"];
+	plate["height"] = pModel["grid_height"];
+	plate["experimentID"] = window.expId;
+	plate["templateID"] = window.templateId;
+		
 	plate["plateID"] = document.getElementById("barcode").value;
 	plate["wells"] = [];
 	
@@ -804,6 +831,20 @@ function translateModelToOutputJson(pModel) {
 		plate["labels"] = [];
 	}
 	
+	// take the values from the compound input text fields (could do this at input onChange event also)
+	for (var wellGroup in groupNames) {
+		if (groupNames[wellGroup] != null) {
+			var cmpdValue = document.getElementById("wellGroup-" + wellGroup).value;
+			if (cmpdValue == null || cmpdValue == "") {
+				// !!! THROW ERROR DIALOG HERE ASKING TO FILL OUT THIS FIELD !!!
+				groupNames[wellGroup] = "SOME_COMPOUND";
+			} else {
+				groupNames[wellGroup] = cmpdValue;
+			}
+		}
+	}
+	
+	// 
 	for (var row in pModel["rows"]) {
 		for (var column in pModel["rows"][row]["columns"]) {
 			var well = {};
@@ -858,6 +899,8 @@ function translateInputJsonToModel(plateJson) {
 	}
 	
 	pModel["name"] = plate["name"];			// should also copy expId and plateId at this point !!
+	pModel["grid_width"] = plate["width"];
+	pModel["grid_height"] = plate["height"];
 	
 	for (var i=0; i < plate["wells"].length; i++) {
 		var row = plate["wells"][i]["row"];

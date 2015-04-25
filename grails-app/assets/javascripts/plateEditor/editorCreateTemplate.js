@@ -20,9 +20,9 @@ var highlightedCoords = [];
 function createBlankData(){
 	var result = [];
 
-	for (var i=0; i < GRID_HEIGHT; i++){
+	for (var i = 0; i < GRID_HEIGHT; i++){
 		result[i] = [];
-		for (var j=0; j < GRID_WIDTH; j++){
+		for (var j = 0; j < GRID_WIDTH; j++){
 			result[i][j] = null;
 		}
 	}
@@ -238,6 +238,9 @@ function translateModelToOutputJson(pModel) {
 	var plateJson = {};
 	var plate = {};
 	plate["name"] = window.tName;			// should do null check ???
+	plate["width"] = GRID_WIDTH;
+	plate["height"] = GRID_HEIGHT;
+	
 	plate["experimentID"] = window.expId;
 	plate["labels"] = [];		// plate level labels, should set these if available already !!!
 	plate["wells"] = [];
@@ -303,7 +306,7 @@ function translateInputJsonToModel(plateJson) {
 // ajax save object call
 function saveConfigToServer(){
 	var plateJson = translateModelToOutputJson(plateModel);
-	console.log(JSON.stringify(plateJson));
+	console.log("SendingToServer:" + JSON.stringify(plateJson));
    
 	var jqxhr = $.ajax({
 		url: hostname + "/plateTemplate/save",
@@ -330,8 +333,14 @@ function saveConfigToServer(){
 		if (resData["plateTemplate"] !=null &&  resData["plateTemplate"]["id"] != null) {
 			plateModel["templateID"] = resData["plateTemplate"]["id"];
 			// use less hacky method !!
-			window.location.href = hostname + "/experimentalPlateSet/createPlate" 
-				+ '?expid=' + expId + '&tmpid=' + plateModel["templateID"];
+			if (window.expId != null) {
+				// if we're in an experiment, then continue to assignlabels page
+				window.location.href = hostname + "/experimentalPlateSet/createPlate" 
+					+ '?expid=' + window.expId + '&tmpid=' + plateModel["templateID"];
+			} else {
+				// if we're not in an experiment, then return to homepage
+				window.location.href = hostname + "/";
+			}
 		} else {
 			alert("An error while saving the template: " + storedTemplate);
 		}
