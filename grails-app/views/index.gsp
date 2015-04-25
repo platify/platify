@@ -15,11 +15,11 @@
 					<div class="col-sm-3">
 						<div id="expPanel" class="panel panel-default">
 							<div class="panel-heading">
-								<h4 class="panel-title">Experiments</h4>
+								<h4 class="panel-title">Assays</h4>
 							</div>
 							<div class="panel-body ">
-								<g:link class="btn btn-info btn-sm" controller="experimentalPlateSet" action="index">View Experiments</g:link>
-								<g:link class="btn btn-info btn-sm" controller="experimentalPlateSet" action="create">Create Experiment</g:link>
+								<g:link class="btn btn-info btn-sm" controller="experimentalPlateSet" action="index">View Assays</g:link>
+								<g:link class="btn btn-info btn-sm" controller="experimentalPlateSet" action="create">Create New Assay</g:link>
 							</div>
 						</div>
 					</div>
@@ -51,6 +51,17 @@
 							</div>
 							<div class="panel-body ">
 								<g:link class="btn btn-info btn-sm" controller="result" action="index">View Results</g:link>
+							</div>
+						</div>
+					</div>
+					<div class="col-sm-3">
+						<div id="expPanel" class="panel panel-default">
+							<div class="panel-heading">
+								<h4 class="panel-title">Users</h4>
+							</div>
+							<div class="panel-body ">
+								<g:link class="btn btn-info btn-sm" controller="scientist" action="index">View Users</g:link>
+								<g:link class="btn btn-info btn-sm" controller="scientist" action="create">Create New User</g:link>
 							</div>
 						</div>
 					</div>
