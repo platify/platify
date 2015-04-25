@@ -128,6 +128,8 @@ class EditorService {
    		def template = [:]
 
     	template.name = plateTemplateInstance.name
+    	template.height = plateTemplateInstance.height
+    	template.width = plateTemplateInstance.width
     	template.labels = []
 
     	def plateLabels = DomainLabel.findAllByDomainIdAndLabelTypeAndPlateIsNull(plateTemplateInstance.id, DomainLabel.LabelType.PLATE).collect{it.label}
