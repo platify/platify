@@ -330,8 +330,14 @@ function saveConfigToServer(){
 		if (resData["plateTemplate"] !=null &&  resData["plateTemplate"]["id"] != null) {
 			plateModel["templateID"] = resData["plateTemplate"]["id"];
 			// use less hacky method !!
-			window.location.href = hostname + "/experimentalPlateSet/createPlate" 
-				+ '?expid=' + expId + '&tmpid=' + plateModel["templateID"];
+			if (window.expId != null) {
+				// if we're in an experiment, then continue to assignlabels page
+				window.location.href = hostname + "/experimentalPlateSet/createPlate" 
+					+ '?expid=' + window.expId + '&tmpid=' + plateModel["templateID"];
+			} else {
+				// if we're not in an experiment, then return to homepage
+				window.location.href = hostname + "/";
+			}
 		} else {
 			alert("An error while saving the template: " + storedTemplate);
 		}

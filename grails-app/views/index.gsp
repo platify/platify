@@ -28,8 +28,8 @@
 							<div class="panel-heading">
 								<h4 class="panel-title">Plate Templates</h4>
 							</div>
-							<div class="panel-body ">
-								<g:link class="btn btn-info btn-sm" controller="plateTemplate" action="create">Create New Template</g:link>
+							<div class="panel-body ">							
+								<button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#createTemplateModal">Create New Template</button>
 							</div>
 						</div>
 					</div>
@@ -68,5 +68,7 @@
 				</div>
 			</div>
 		</div>
+		
+		<g:render template="/plateTemplate/createTemplateDialog"/>
 	</body>
 </html>
