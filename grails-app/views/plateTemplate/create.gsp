@@ -9,7 +9,8 @@
 			<g:if test="${expId}">
 				window.expId = ${expId};
 			</g:if>
-			window.tHeight = "${gridHeigth}";
+			window.tName = "${templateName}";
+			window.tHeight = "${gridHeight}";
 			window.tWidth = "${gridWidth}";
 		</g:javascript>
 		

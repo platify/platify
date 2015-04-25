@@ -23,9 +23,9 @@ var tmpEditCat;
 function createBlankData() {
 	var result = [];
 
-	for (var i=0; i<DIMENSION; i++){
+	for (var i = 0; i < plateModel["grid_height"]; i++){
 		result[i] = [];
-		for (var j=0; j<DIMENSION; j++){
+		for (var j = 0; j < plateModel["grid_width"]; j++){
 			result[i][j] = null;
 		}
 	}
@@ -38,9 +38,9 @@ function createBlankData() {
  */
 function createRandomData() {
 	var result = [];
-	for (var i=0; i<DIMENSION; i++){
+	for (var i = 0; i < plateModel["grid_height"]; i++){
 		result[i] = [];
-		for (var j=0; j<DIMENSION; j++){
+		for (var j = 0; j < plateModel["grid_width"]; j++){
 			result[i][j] = "L" + Math.floor(Math.random()*100);
 		}
 	}
@@ -51,9 +51,21 @@ function createRandomData() {
  * Loads a json plate model and updates the grid and category legend
  */
 function loadJsonData(plateJson) {
-	
+	// translate the json received to the internal models structure
 	plateModel = translateInputJsonToModel(plateJson);
-
+	
+	// create initial grid, based on template size
+	if (plateModel["grid_width"] == null) {
+		plateModel["grid_width"] = 100; // default value
+	}
+	
+	if (plateModel["grid_height"] == null) {
+		plateModel["grid_height"] = 100; // default value
+	}
+	
+	createGrid();
+	
+	// load data into the grid
 	for (var row in plateModel["rows"]) {
 		for (var column in plateModel["rows"][row]["columns"]) {
 		
@@ -774,26 +786,20 @@ function fetchTemplateData(tId){
  * This function handles the window load event. It initializes and fills the
  * grid with blank data and sets up the event handlers on the
  */
-function init(){
+function init() {
 	hidePlateLabelCatPanel();
 	hideDosePanel();
 	hideDoseStepPanel();
 	hidePlateLabelPanel();
 	
-	createGrid();		// maybe need template size before creating grid !!
-
 	// fetch templateJson
+	fetchTemplateData(window.templateId); // should set flag to say if recieved model was ok!, inform user otherwise
 	console.log("templateId:" + window.templateId);
-	//fetchTemplateData(window.templateId);
-	fetchTemplateData(window.templateId);
-	//loadJsonData(inputJson);
-	//loadRandomData();
-	
+
 	addEvent("addNewLabel", "click", addNewLabel);
 	addEvent("addNewDose", "click", addNewDose);
 	addEvent("addDoseStep", "click", addDoseStep);
 	addEvent("addNewPlateLabel", "click", addNewPlateLabel);
-	
 	addEvent("clearAllSelection", "click", removeAllHighlightedCells);
 
 	enableGridSelection();
@@ -806,6 +812,9 @@ function translateModelToOutputJson(pModel) {
 	var plateJson = {};
 	var plate = {}
 	plate["name"] = pModel["name"];
+	plate["width"] = pModel["grid_width"];
+	plate["height"] = pModel["grid_height"];
+	
 	plate["plateID"] = document.getElementById("barcode").value;
 	plate["wells"] = [];
 	
@@ -869,6 +878,8 @@ function translateInputJsonToModel(plateJson) {
 	}
 	
 	pModel["name"] = plate["name"];			// should also copy expId and plateId at this point !!
+	pModel["grid_width"] = plate["width"];
+	pModel["grid_height"] = plate["height"];
 	
 	for (var i=0; i < plate["wells"].length; i++) {
 		var row = plate["wells"][i]["row"];

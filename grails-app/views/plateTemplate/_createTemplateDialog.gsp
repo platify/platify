@@ -5,7 +5,7 @@
 		var goTolocation = hostname + "/plateTemplate/create"
 			+ '?name=' + document.getElementById("templateName").value
 	    	+ '&width=' + document.getElementById("templateWidth").value
-	    	+ '&heigth=' + document.getElementById("templateHeight").value;
+	    	+ '&height=' + document.getElementById("templateHeight").value;
 
     	if (expIdParam != "") {
     		goTolocation = goTolocation + '&expid=' + expIdParam;

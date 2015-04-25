@@ -3,7 +3,7 @@
 	<head lang="en">
 		<meta name="layout" content="main">
 		<g:set var="entityName" value="${message(code: 'experimentalPlateSet.label', default: 'ExperimentalPlateSet')}" />
-		<title><g:message code="default.create.label" args="[entityName]" /></title>
+		<title>Selected Assay</title>
 	</head>
 	<body>
 		<div class="content-fluid ">
@@ -13,7 +13,7 @@
 					<ol class="breadcrumb">
 						<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
 						<li><g:link controller="experimentalPlateSet" action="index">Assays</g:link></li>
-						<li><g:link controller="experimentalPlateSet" action="showactions" id="${experimentalPlateSetInstance.id}">Show Assay</g:link></li>
+						<li>Show Assay</li>
 					</ol>
 					<div class="col-sm-6">
 						<div id="expDetailsPanel" class="panel panel-default">

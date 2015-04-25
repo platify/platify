@@ -29,7 +29,7 @@ class PlateTemplateController {
 
 	def create() {
         respond new PlateTemplate(params), model:[expId: params.expid, templateName: params.name, 
-			gridWidth: params.width, gridHeigth: params.heigth]
+			gridWidth: params.width, gridHeight: params.height]
     }
 
     def getPlate(PlateTemplate plateTemplateInstance){

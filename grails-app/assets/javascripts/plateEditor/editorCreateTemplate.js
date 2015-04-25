@@ -20,9 +20,9 @@ var highlightedCoords = [];
 function createBlankData(){
 	var result = [];
 
-	for (var i=0; i < GRID_HEIGHT; i++){
+	for (var i = 0; i < GRID_HEIGHT; i++){
 		result[i] = [];
-		for (var j=0; j < GRID_WIDTH; j++){
+		for (var j = 0; j < GRID_WIDTH; j++){
 			result[i][j] = null;
 		}
 	}
@@ -238,6 +238,9 @@ function translateModelToOutputJson(pModel) {
 	var plateJson = {};
 	var plate = {};
 	plate["name"] = window.tName;			// should do null check ???
+	plate["width"] = GRID_WIDTH;
+	plate["height"] = GRID_HEIGHT;
+	
 	plate["experimentID"] = window.expId;
 	plate["labels"] = [];		// plate level labels, should set these if available already !!!
 	plate["wells"] = [];

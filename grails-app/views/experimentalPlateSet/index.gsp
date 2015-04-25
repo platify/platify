@@ -5,7 +5,7 @@
 	<head>
 		<meta name="layout" content="main">
 		<g:set var="entityName" value="${message(code: 'experimentalPlateSet.label', default: 'Experiment')}" />
-		<title><g:message code="default.list.label" args="[entityName]" /></title>
+		<title>Assays</title>
 	</head>
 	<body>
 		<div class="content-fluid">
@@ -14,7 +14,7 @@
 					<h3 style="margin-left:15px">Assays</h3>
 					<ol class="breadcrumb">
 						<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
-						<li><g:link controller="experimentalPlateSet" action="index">Assays</g:link></li>
+						<li>Assays</li>
 					</ol>
 					<div class="col-sm-12">
 						<div id="expDetailsPanel" class="panel panel-default">
