@@ -298,7 +298,7 @@ function createColorPicker(cat, label) {
 	var newInput = document.createElement("input");
 	newInput.id = "color-" + cat + "-" + label;
 	newInput.type = "color";
-	newInput.className = "btn-default";
+	newInput.className = "btn-default glyphicon color-p";
 	newInput.defaultValue = catLegend[cat]['labels'][label]['color'];
 	newInput.value = catLegend[cat]['labels'][label]['color'];
 	//newInput.onchange = onCatColorChange;
@@ -349,20 +349,17 @@ function updateCompoundList() {
 function updateCategoryList() {
 	var newDiv = document.createElement("div");
 	for (var catKey in catLegend) {
-		var newUl = document.createElement("ul");
 		newDiv.appendChild(createCatLabel(catKey));
-		
 		for (var labelKey in catLegend[catKey]['labels']) {
-			var newLi = document.createElement("li");
+			var newLi = document.createElement("div");
 			// if label has been converted from a decimal, then convert it back for display!!
 			var convLab = labelKey.toString().split('__dot__').join('.');
 			newLi.appendChild(document.createTextNode(convLab));
 			
 			var newInput = createColorPicker(catKey, labelKey);
 			newLi.appendChild(newInput);
-			newUl.appendChild(newLi);
+			newDiv.appendChild(newLi);
 		}
-		newDiv.appendChild(newUl);
 	}
 	document.getElementById("categoryList").innerHTML = newDiv.innerHTML;
 	
@@ -394,17 +391,21 @@ function updatePlateLabelList() {
 
 
 function createCatLabel(catKey) {
-	var newStrong = document.createElement("strong");
+	var labDiv = document.createElement("div");
+	labDiv.className = "button-labels";
 	var newCheckbox = document.createElement("input");
 	newCheckbox.type = "checkbox";
 	newCheckbox.checked = true;
 	newCheckbox.id = "vischeck-" + catKey;
-	newStrong.appendChild(newCheckbox);
+	labDiv.appendChild(newCheckbox);
+	var newLabel = document.createElement("label");
+	newLabel.setAttribute("for", "vischeck-" + catKey);
 	// if category has been converted from a decimal, then convert it back for display!!
 	var convCat = catKey.toString().split('__dot__').join('.');
-	newStrong.appendChild(document.createTextNode(convCat));
+	newLabel.appendChild(document.createTextNode(convCat));
+	labDiv.appendChild(newLabel);
 	
-	return newStrong;
+	return labDiv;
 }
 
 function enableGridSelection() {

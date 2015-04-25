@@ -10,6 +10,30 @@
 			window.templateId = ${templateId};
 		</g:javascript>
 		
+		<style type="text/css">
+			.color-p {
+		        padding: 0;
+		        width: 21px;
+		        height: 21px;
+		        top: 2px;
+		    }
+		    
+		    .button-labels {
+			    margin-top: 3px;
+			}
+		    
+		    .button-labels label { 
+			    display: inline-block; 
+			    padding: 3px;
+			    margin: 0px;
+			}
+			
+			.button-labels input { 
+			    padding: 0px;
+			    margin: 0px;
+			}
+		</style>
+		
 		<asset:stylesheet href="jquery-ui.css"/>
 	    <asset:stylesheet href="grid/style.css"/>
 	    <asset:stylesheet href="grid/slick.grid.css"/>

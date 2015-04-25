@@ -30,7 +30,7 @@
 	            <div id="addLabelPanel">
 		            <label>Category:</label> <input type="text" id="newCatValue"/>
 					<label>Label:</label><input type="text" id="newLabelValue"/>
-					<label>Color:</label><input type="color" class="btn-default" id="newColorValue" value="#FFFF00"/>
+					<label>Color:</label><input type="color" class="btn-default glyphicon color-p" id="newColorValue" value="#FFFF00" styl/>
 					<button id="addNewLabel" class="btn btn-default btn-xs glyphicon glyphicon-plus"></button>
 				</div>
 			</div>
@@ -38,7 +38,7 @@
 				<div id="addDosePanel">
 					<label>Dosage:</label><input type="text" id="newDoseValue"/>
 					<label>Units:</label><input type="text" id="newDoseUnits"/>
-					<label>Color:</label><input type="color" class="btn-default" id="newDoseColorValue" value="#FFFF00"/>
+					<label>Color:</label><input type="color" class="btn-default glyphicon color-p" id="newDoseColorValue" value="#FFFF00"/>
 					<button id="addNewDose" class="btn btn-default btn-xs glyphicon glyphicon-plus"></button>
 				</div>
 			</div>
@@ -48,7 +48,7 @@
 					<label>Units:</label><input type="text" id="doseStepUnits"/>
 					<label>Step Dilution:</label><input type="text" id="stepDilutionValue"/>
 					<label># of Replicates:</label><input type="text" id="replicatesValue" value="1"/>
-					<label>Top Dose Color:</label><input type="color" class="btn-default" id="tDoseColorValue" value="#FFFF00"/>
+					<label>Top Dose Color:</label><input type="color" class="btn-default glyphicon color-p" id="tDoseColorValue" value="#FFFF00"/>
 					<button id="addDoseStep" class="btn btn-default btn-xs glyphicon glyphicon-plus"></button>
 				</div>
 			</div>
