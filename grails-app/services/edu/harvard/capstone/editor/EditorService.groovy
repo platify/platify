@@ -198,11 +198,11 @@ class EditorService {
 		}
 
 		// for storing the created objects
-    	def labelsList = []
-    	def wellsLabelsList = []    		
+    	def labelsList		
 
 		// iterate throught the labels and create if it's a new one
 		data.plate.labels.each{ label ->
+			labelsList = []  
 			if (label){
 				def labelInstance = Label.get(label.id)
 				if (!labelInstance){
@@ -228,6 +228,7 @@ class EditorService {
 
 		// create the wells
 		data.plate.wells.each{ well ->
+			def wellsLabelsList = []
 			if (well){
 				def wellInstance = Well.findByPlateAndRowAndColumn(templateInstance, well.row, well.column)
 				if (!wellInstance){
