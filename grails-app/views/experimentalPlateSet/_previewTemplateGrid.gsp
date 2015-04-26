@@ -10,8 +10,10 @@
 			      	<div class="form-group" style="margin-bottom:0px">
 						<h4><label class="control-label col-sm-2" for="plateSelect">Templates: </label></h4>
 					    <div class="col-sm-9">
-							<g:select id="plateSelect" name="plate.id" from="${edu.harvard.capstone.editor.PlateTemplate.list()}" optionValue="${{it.name + ' - ' + it.id}}"
-							 optionKey="id" required="" onchange="onPlateSelectChange(this)"  value="${plateSetInstance?.plate?.id}" class="many-to-one"/>
+					    	
+							<g:select id="plateSelect" name="plate.id" from="${edu.harvard.capstone.editor.PlateTemplate.list().findAll {it.width != null}}" 
+							 optionValue="${{it.name + ' - ' + it.id + '; ' + it.width+ ',' + it.height}}" optionKey="id" required="" onchange="onPlateSelectChange(this)"
+							 value="${plateSetInstance?.plate?.id}" class="many-to-one"/>
 						</div>						
 			      	</div>
 				</form>
