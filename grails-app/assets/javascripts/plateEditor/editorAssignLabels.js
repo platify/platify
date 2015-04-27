@@ -732,7 +732,6 @@ function addEvent(elementId, eventType, handlerFunction) {
  * well groupings for the current plate.
  */
 function importCompoundsFromFile() {
-    var importForm = $('#importCompoundsForm')[0];
     var fileInput = $('#compoundsFile')[0];
     var reader = new FileReader();
     reader.onload = function (progressEvent) {
@@ -759,7 +758,6 @@ function importCompoundsFromFile() {
                 return;
         }
         updateCompoundList();
-        importForm.reset();
     };
     // TODO - check for loaded file
     reader.readAsText($('#compoundsFile')[0].files[0]);
@@ -1024,6 +1022,10 @@ $(function() {
 			}
 		}
 	});
+        $('#importCompoundsModal').on('hidden.bs.modal', function (e) {
+            $('#importCompoundsForm')[0].reset();
+        });
+
 });
 
 function txtFieldFocus() {
