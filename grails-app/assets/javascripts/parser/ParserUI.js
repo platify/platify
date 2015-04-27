@@ -15,6 +15,7 @@ ParserUI.LABEL_LIST_PLACEHOLDER = "--- labels ---";
 
 function ParserUI(parsingController){
     this.parsingController = parsingController;
+    this.parseOnlyModeOn = false;
 
     var _self = this;
 
@@ -91,27 +92,55 @@ function ParserUI(parsingController){
 
 
     this.getParsingName = function(){
-        return parsingNameElement.value;
+        if (_self.parseOnlyModeOn){
+            return parsingNameElement.innerHTML;
+        } else {
+            return parsingNameElement.value;
+        }
     };
 
     this.setParsingName = function(parsingName){
-        parsingNameElement.value = parsingName;
+        console.log("name = " + parsingName);
+        if (_self.parseOnlyModeOn){
+            parsingNameElement.innerHTML = parsingName;
+        } else {
+            parsingNameElement.value = parsingName;
+        }
     };
 
     this.getMachineName = function(){
-        return machineNameElement.value;
+        if (_self.parseOnlyModeOn){
+            return machineNameElement.innerHTML;
+        } else {
+            return machineNameElement.value;
+        }
     };
 
     this.setMachineName = function(machineName){
-        machineNameElement.value = machineName;
+
+        if (_self.parseOnlyModeOn){
+            machineNameElement.innerHTML = machineName;
+        } else {
+            machineNameElement.value = machineName;
+        }
+
+        console.log(typeof machineNameElement.innerHTML);
     };
 
     this.getParsingDescription = function(){
-        return parsingDescriptionElement.value;
+        if (_self.parseOnlyModeOn){
+            return parsingDescriptionElement.innerHTML;
+        } else {
+            return parsingDescriptionElement.value;
+        }
     };
 
     this.setParsingDescription = function(parsingDescription){
-        parsingDescriptionElement.value = parsingDescription;
+        if (_self.parseOnlyModeOn){
+            parsingDescriptionElement.innerHTML = parsingDescription;
+        } else {
+            parsingDescriptionElement.value = parsingDescription;
+        }
     };
 
     this.getSelectedFileName = function(){
@@ -123,15 +152,77 @@ function ParserUI(parsingController){
     };
 
     this.getSelectedDelimiter = function(){
-        return delimiterList.value;
+        if (_self.parseOnlyModeOn){
+            return delimiterList.innerHTML;
+        } else {
+            return delimiterList.value;
+        }
     };
 
     this.setDelimiter = function(delimiterName){
-        delimiterList.value = delimiterName;
+        if (delimiterName !== null){
+            if (_self.parseOnlyModeOn){
+                delimiterList.innerHTML = delimiterName;
+            } else {
+                delimiterList.value = delimiterName;
+            }
+        } else {
+            if (_self.parseOnlyModeOn){
+                delimiterList.innerHTML = "";
+            } else {
+                delimiterList.scrollTop = 0;
+            }
+
+            // deselect all options
+            for (var i=0; i<delimiterOptions.length; i++){
+                delimiterOptions[i].selected = false;
+            }
+        }
     };
 
     this.loadDelimiterList = function(delimiterNameArray){
-        loadSelectElement(delimiterList, delimiterNameArray, delimiterOptions);
+
+        // load the delimiterOptions array
+        delimiterOptions = [];
+
+        for (var i=0; i<delimiterNameArray.length; i++){
+            var optionName = delimiterNameArray[i];
+            var option = document.createElement("option");
+            delimiterOptions.push(option);
+            option.setAttribute("value", optionName);
+            option.innerHTML = optionName;
+        }
+
+        if (!_self.parseOnlyModeOn){
+            delimiterList.innerHTML = "";
+
+            // load the delimiter list
+            for (var j=0; j<delimiterOptions.length; j++){
+                delimiterList.appendChild(delimiterOptions[j])
+            }
+        }
+
+        _self.setDelimiter(null);
+    };
+
+    this.switchDelimiterListToSpan = function(){
+        var span = document.createElement("span");
+
+        span.innerHTML = _self.getSelectedDelimiter();
+        $(delimiterList).replaceWith(span);
+        delimiterList = span;
+    };
+
+    this.switchDelimiterListToSelect = function(){
+        var select = document.createElement("select");
+
+        for (var j=0; j<delimiterOptions.length; j++){
+            select.appendChild(delimiterOptions[j]);
+        }
+
+        select.value = _self.getSelectedDelimiter();
+        $(delimiterList).replaceWith(select);
+        delimiterList = select;
     };
 
     this.getListedDelimiters = function(){
@@ -186,14 +277,25 @@ function ParserUI(parsingController){
     // ---------------------- Plate tab getters and setters ------------------------------
 
     this.getFirstPlateCellRange = function(){
-        var cellRange
-            = ParserUI.convertStringToCellRange(firstPlateCellRangeElement.value);
+        var cellRange;
+
+        if (_self.parseOnlyModeOn){
+            cellRange
+                = ParserUI.convertStringToCellRange(firstPlateCellRangeElement.innerHTML);
+        } else {
+            cellRange
+                = ParserUI.convertStringToCellRange(firstPlateCellRangeElement.value);
+        }
 
         return cellRange;
     };
 
     this.setFirstPlateCellRange = function(firstPlateRange){
-        firstPlateCellRangeElement.value = firstPlateRange.toString();
+        if (_self.parseOnlyModeOn){
+            firstPlateCellRangeElement.innerHTML = firstPlateRange.toString();
+        } else {
+            firstPlateCellRangeElement.value = firstPlateRange.toString();
+        }
     };
 
 
@@ -222,11 +324,19 @@ function ParserUI(parsingController){
     // ----------------------- Features tab getters and setters --------------------------
 
     this.getFeatureCellRange = function(){
-        return ParserUI.convertStringToCellRange(featureCellRangeElement.value);
+        if (_self.parseOnlyModeOn){
+            return ParserUI.convertStringToCellRange(featureCellRangeElement.innerHTML);
+        } else {
+            return ParserUI.convertStringToCellRange(featureCellRangeElement.value);
+        }
     };
 
     this.setFeatureCellRange = function(featureRange){
-        featureCellRangeElement.value = featureRange.toString();
+        if (_self.parseOnlyModeOn){
+            featureCellRangeElement.innerHTML = featureRange.toString();
+        } else {
+            featureCellRangeElement.value = featureRange.toString();
+        }
     };
 
     this.getFeatureLevel = function(){
@@ -265,7 +375,11 @@ function ParserUI(parsingController){
     };
 
     this.getFeatureCategory = function(){
-        return featureCategoryElement.value;
+        if (_self.parseOnlyModeOn){
+            return featureCategoryElement.innerHTML;
+        } else {
+            return featureCategoryElement.value;
+        }
     };
 
     this.setFeatureCategory = function(categoryName){
@@ -549,7 +663,19 @@ function ParserUI(parsingController){
     };
 
     this.loadPlateLevelFeatureList = function(plateLevelFeatureNameArray){
-        loadSelectElement(plateLevelFeatureListElement, plateLevelFeatureNameArray, []);
+
+        // clear the select element and scroll back to the top
+        plateLevelFeatureListElement.innerHTML = "";
+        plateLevelFeatureListElement.scrollTop = 0;
+
+        // load the select element
+        for (var i=0; i<plateLevelFeatureNameArray.length; i++){
+            var optionName = plateLevelFeatureNameArray[i];
+            var option = document.createElement("option");
+            option.setAttribute("value", optionName);
+            option.innerHTML = optionName;
+            plateLevelFeatureListElement.appendChild(option);
+        }
     };
 
     this.getListedPlateLevelFeatures = function(){
@@ -892,9 +1018,74 @@ function ParserUI(parsingController){
 
 
 
+    this.switchToParseOnlyMode = function(){
+        parsingNameElement = switchTextInputToSpan(parsingNameElement);
+        machineNameElement = switchTextInputToSpan(machineNameElement);
+        parsingDescriptionElement = switchTextAreaToP(parsingDescriptionElement);
+        _self.switchDelimiterListToSpan();
+        firstPlateCellRangeElement = switchTextInputToSpan(firstPlateCellRangeElement);
+        featureCellRangeElement = switchTextInputToSpan(featureCellRangeElement);
+        featureCategoryElement = switchTextInputToSpan(featureCategoryElement);
+        applyFirstPlateButton.style.display = "none";
+        newFeatureButton.style.display = "none";
+        addFeatureButton.style.display = "none";
+        deleteFeatureButton.style.display = "none";
+
+        _self.parseOnlyModeOn = true;
+    };
+
+    this.switchOutOfParseOnlyMode = function(){
+        parsingNameElement = switchSpanToTextInput(parsingNameElement);
+        machineNameElement = switchSpanToTextInput(machineNameElement);
+        parsingDescriptionElement = switchPToTextArea(parsingDescriptionElement);
+        _self.switchDelimiterListToSelect();
+        firstPlateCellRangeElement = switchSpanToTextInput(firstPlateCellRangeElement);
+        featureCellRangeElement = switchSpanToTextInput(featureCellRangeElement);
+        featureCategoryElement = switchSpanToTextInput(featureCategoryElement);
+        applyFirstPlateButton.style.display = "block";
+        newFeatureButton.style.display = "block";
+        addFeatureButton.style.display = "block";
+        deleteFeatureButton.style.display = "block";
+
+        _self.parseOnlyModeOn = false;
+    };
 
 
 
+    function switchTextInputToSpan(element){
+        var span = document.createElement("span");
+        span.innerHTML = element.value;
+        console.log(element.id.value);
+        //span.id = element.id;
+        //console.log(span);
+        $(element).replaceWith(span);
+        //console.log(span);
+        return span;
+    }
+
+    function switchSpanToTextInput(element){
+        var textInput = document.createElement("input");
+        textInput.value = element.innerHTML;
+        textInput.id = element.id;
+        $(element).replaceWith(textInput);
+        return textInput;
+    }
+
+    function switchTextAreaToP(element){
+        var p = document.createElement("p");
+        p.innerHTML = element.value;
+        p.id = element.id;
+        $(element).replaceWith(p);
+        return p;
+    }
+
+    function switchPToTextArea(element){
+        var textArea = document.createElement("textarea");
+        textArea.value = element.innerHTML;
+        textArea.id = element.id;
+        $(element).replaceWith(textArea);
+        return textArea;
+    }
 
     function loadSelectElement(selectElement, optionNamesArray, optionsArray){
         // clear the select element and scroll back to the top

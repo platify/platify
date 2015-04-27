@@ -404,7 +404,7 @@ function ParsingConfig(name,
 
         if ((this.numPlateRows > 0 && plateDimensions[0] !== this.numPlateRows )
             || (this.numPlateCols > 0 && plateDimensions[1] !== this.numPlateCols)){
-            throw new ParsingConfigError(ParsingConfig.PLATE_DIMENSION_DIFFERENCE,
+            throw new ParsingConfigError(ParsingConfigError.PLATE_DIMENSION_DIFFERENCE,
                                             plateDimensions[0] + ":" + plateDimensions[1],
                                             this.numPlateRows + ":" + this.numPlateCols,
                                             "update plate dimensions");
@@ -510,11 +510,13 @@ ParsingConfig.loadParsingConfig = function(JSONParsingConfig){
                                                 range.endCol);
     }
 
-    var plateRange = config.plate.coordinateRange;
-    config.plate.coordinateRange = new CellRange(plateRange.startRow,
-                                             plateRange.startCol,
-                                             plateRange.endRow,
-                                             plateRange.endCol);
+    if (rawParsingConfig.plate && rawParsingConfig.plate.coordinateRange){
+        var plateRange = config.plate.coordinateRange;
+        config.plate.coordinateRange = new CellRange(plateRange.startRow,
+            plateRange.startCol,
+            plateRange.endRow,
+            plateRange.endCol);
+    }
 
     return config;
 };
@@ -659,8 +661,8 @@ function ParsingConfigError(type, descriptor, level, attemptedAction){
             return "A valid feature range must be specified to " + this.attemptedAction
                     + ".";
         } else if (this.type === ParsingConfigError.FEATURE_COLOR_NOT_SPECIFIED){
-        return "A feature color must be specified to " + this.attemptedAction + ".";
-    }
+            return "A feature color must be specified to " + this.attemptedAction + ".";
+        }
     }
 }
 

@@ -453,8 +453,11 @@ function ParsingController(){
         _self.parsingConfig = ParsingConfig.loadParsingConfig(JSONParsingConfig);
         _self.colorPicker.setColorIndex(_self.parsingConfig.getColorPickerIndex());
 
+        // TODO - for tomorrow
+        //_self.parserUI.switchToParseOnlyMode();
+
         if (!canUpdate){
-            //_self.parserUI.parseOnlyMode();
+            _self.parserUI.switchToParseOnlyMode();
             _self.parserUI.disableSaveButton();
         }
     };
