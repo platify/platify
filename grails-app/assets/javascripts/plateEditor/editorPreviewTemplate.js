@@ -266,6 +266,15 @@ function onPlateSelectChange(selectEl){
 	fetchTemplateData(tId);
 }
 
+function updatePlateSelection() {
+	var pSelect = document.getElementById("plateSelect");
+	var tId = pSelect.value;
+	console.log("tId!:" + tId);
+	if (tId != null && tId != "") {
+		fetchTemplateData(tId);
+	}
+}
+
 
 /**
  * This function handles the window load event. It initializes and fills the

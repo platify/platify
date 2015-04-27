@@ -13,7 +13,7 @@
 							 <div id="templateSelection">
 							  	<g:select class="form-control" id="plateSelect" name="plate.id" from="${edu.harvard.capstone.editor.PlateTemplate.list()}" 
 							  		optionKey="id" optionValue="${{it.name + ' - ' + it.id + '; ' + it.width+ ',' + it.height}}"
-									onchange="onPlateSelectChange(this)" value="${plateSetInstance?.plate?.id}" class="many-to-one"/> 
+									onchange="onPlateSelectChange(this)" onload="onPlateSelectChange(this)" value="${plateSetInstance?.plate?.id}" class="many-to-one"/> 
 							 </div>
 						</div>						
 			      	</div>
@@ -36,17 +36,18 @@
 				                        controller: 'plateTemplate',
 				                        action: 'filterTemplateBySize',
 				                        params: '\'filterWells=\'+escape(this.value)',
-				                        update: 'templateSelection'
+				                        update: 'templateSelection',
+										onSuccess: 'updatePlateSelection();'
 				                )}" />
 						</div>
-						<h4><label class="control-label col-sm-2" for="tTypeFilter">Type: </label></h4>
+						<!-- <h4><label class="control-label col-sm-2" for="tTypeFilter">Type: </label></h4>
 					    <div class="col-sm-3">
 							<select class="form-control" id="tTypeFilter">
 							  <option>Any</option>
 							  <option>Bio-plate</option>
 							  <option>Chem-plate</option>
 							</select>
-						</div>						
+						</div>			 -->			
 			      	</div>
 				</form>
 			</div>
