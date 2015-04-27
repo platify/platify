@@ -51,6 +51,7 @@ class EditorService {
 
 		// iterate throught the labels and create if it's a new one
 		data.plate.labels.each{ label ->
+			labelsList = []
 			if (label){
 				def labelInstance = Label.get(label.id)
 				if (!labelInstance){
@@ -76,6 +77,7 @@ class EditorService {
 
 		// create the wells
 		data.plate.wells.each{ well ->
+			wellsLabelsList = []
 			if (well){
 				def controlType
 				try {
