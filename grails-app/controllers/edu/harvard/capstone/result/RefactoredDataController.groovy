@@ -6,8 +6,13 @@ import grails.validation.ValidationException
 
 import static org.springframework.http.HttpStatus.*
 
-class RefactoredDataController {
+import grails.validation.ValidationException
 
+class RefactoredDataController {
+    
+    def springSecurityService
+    def resultService
+    
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
 
@@ -36,6 +41,7 @@ class RefactoredDataController {
             }
             return
         }
+
         try{
             resultService.storeNormalizedData(resultInstance, data)
         }
