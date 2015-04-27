@@ -14,14 +14,14 @@ var BLANK_CHAR = "-"
 
 /**
  * A function that creates a blank data set for initializing the grid example
- * page. The data set is of dimension DIMENSION x DIMENSION.
+ * page. The data set is of dimension grid_height x grid_width.
  */
-function createBlankData() {
+function createBlankData(grid_height, grid_width) {
 	var result = [];
 
-	for (var i=0; i < DIMENSION; i++){
+	for (var i = 0; i < grid_height; i++) {
 		result[i] = [];
-		for (var j=0; j < DIMENSION; j++){
+		for (var j = 0; j < grid_width; j++) {
 			result[i][j] = null;
 		}
 	}
@@ -32,10 +32,20 @@ function createBlankData() {
  * Loads a json plate model and updates the grid and category legend
  */
 function loadJsonData(plateJson) {
-	var newData = createBlankData();		// TMP	--> should only load plateModel instead, 
 	// assuming plate model has all empty rows ??
+	plateModel = translateInputJsonToModel(plateJson); 		// TMP	--> should only load plateModel instead, 
+	var g_height = DIMENSION;
+	var g_width = DIMENSION;
 	
-	plateModel = translateInputJsonToModel(plateJson);
+	if (plateModel["grid_height"] != null) {
+		g_height = plateModel["grid_height"];
+	}
+	
+	if (plateModel["grid_width"] != null) {
+		g_width = plateModel["grid_width"];
+	}
+	
+	var newData = createBlankData(g_height, g_width);
 	
 	for (var row in plateModel["rows"]) {
 		for (var column in plateModel["rows"][row]["columns"]) {
@@ -95,7 +105,7 @@ function createGrid(){
 	grid  = new Grid("myGrid");
 
 	// set the data to be displayed which must be in 2D array form
-	var data = createBlankData();
+	var data = createBlankData(DIMENSION, DIMENSION);
 	grid.setData(data);
 
 	// display the data
@@ -181,7 +191,10 @@ function translateInputJsonToModel(plateJson) {
 	pModel["rows"] = {};
 	var plate = plateJson["plate"];
 	
-	for (var i=0; i < plate["wells"].length; i++) {
+	pModel["grid_width"] = plate["width"];
+	pModel["grid_height"] = plate["height"];
+	
+	for (var i = 0; i < plate["wells"].length; i++) {
 		var row = plate["wells"][i]["row"];
 		var column = plate["wells"][i]["column"];
 		var groupName = plate["wells"][i]["groupName"];
@@ -198,7 +211,7 @@ function translateInputJsonToModel(plateJson) {
 			pModel["rows"][row]["columns"][column]["categories"] = {};
 		}
 
-		for (var j=0; j < labels.length; j++) {
+		for (var j = 0; j < labels.length; j++) {
 			if (pModel["rows"][row]["columns"][column]["categories"][labels[j].category] == null) {
 				pModel["rows"][row]["columns"][column]["categories"][labels[j].category] = {};
 			}
@@ -251,6 +264,15 @@ function onPlateSelectChange(selectEl){
 	var tId = selectEl.value;
 	console.log("selectEvent!:" + tId);
 	fetchTemplateData(tId);
+}
+
+function updatePlateSelection() {
+	var pSelect = document.getElementById("plateSelect");
+	var tId = pSelect.value;
+	console.log("tId!:" + tId);
+	if (tId != null && tId != "") {
+		fetchTemplateData(tId);
+	}
 }
 
 

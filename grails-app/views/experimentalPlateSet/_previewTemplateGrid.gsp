@@ -10,8 +10,11 @@
 			      	<div class="form-group" style="margin-bottom:0px">
 						<h4><label class="control-label col-sm-2" for="plateSelect">Templates: </label></h4>
 					    <div class="col-sm-9">
-							<g:select id="plateSelect" name="plate.id" from="${edu.harvard.capstone.editor.PlateTemplate.list()}" optionValue="${{it.name + ' - ' + it.id}}"
-							 optionKey="id" required="" onchange="onPlateSelectChange(this)"  value="${plateSetInstance?.plate?.id}" class="many-to-one"/>
+							 <div id="templateSelection">
+							  	<g:select class="form-control" id="plateSelect" name="plate.id" from="${edu.harvard.capstone.editor.PlateTemplate.list()}" 
+							  		optionKey="id" optionValue="${{it.name + ' - ' + it.id + '; ' + it.width+ ',' + it.height}}"
+									onchange="onPlateSelectChange(this)" onload="onPlateSelectChange(this)" value="${plateSetInstance?.plate?.id}" class="many-to-one"/> 
+							 </div>
 						</div>						
 			      	</div>
 				</form>
@@ -28,23 +31,23 @@
 			      	<div class="form-group" style="margin-bottom:0px">
 			      		<h4><label class="control-label col-sm-2" for="tSizeFilter">Size: </label></h4>
 					    <div class="col-sm-3">
-							<select class="form-control" id="weltSizeFilterlCount">
-							  <option>Any</option>
-							  <option>96 wells</option>
-							  <option>386 wells</option>
-							  <option>1536 wells</option>
-							  <option>3456 wells</option>
-							  <option>9600 wells</option>
-							</select>
+							<g:select class="form-control" name="weltSizeFilter" from="${['Any', '96 wells', '384 wells', '1536 wells', '3456 wells', '9600 wells']}"
+				                onchange="${remoteFunction (
+				                        controller: 'plateTemplate',
+				                        action: 'filterTemplateBySize',
+				                        params: '\'filterWells=\'+escape(this.value)',
+				                        update: 'templateSelection',
+										onSuccess: 'updatePlateSelection();'
+				                )}" />
 						</div>
-						<h4><label class="control-label col-sm-2" for="tTypeFilter">Type: </label></h4>
+						<!-- <h4><label class="control-label col-sm-2" for="tTypeFilter">Type: </label></h4>
 					    <div class="col-sm-3">
 							<select class="form-control" id="tTypeFilter">
 							  <option>Any</option>
 							  <option>Bio-plate</option>
 							  <option>Chem-plate</option>
 							</select>
-						</div>						
+						</div>			 -->			
 			      	</div>
 				</form>
 			</div>

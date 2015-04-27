@@ -27,7 +27,7 @@
 						<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
 						<li><g:link controller="experimentalPlateSet" action="index">Assays</g:link></li>
 						<li><g:link controller="experimentalPlateSet" action="showactions" id="${experimentalPlateSetInstance.id}">Show Assay</g:link></li>
-						<li><g:link controller="experimentalPlateSet" action="selectTemplate" id="${experimentalPlateSetInstance.id}">Select Template</g:link></li>
+						<li>Select Template</li>
 					</ol>						
 					<g:render template="previewTemplateGrid"/>
 				</div>

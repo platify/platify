@@ -727,6 +727,42 @@ function addEvent(elementId, eventType, handlerFunction) {
 	}
 } // end of function addEvent
 
+/**
+ * importCompoundsFromFile - Reads compounds from a local list, maps them to
+ * well groupings for the current plate.
+ */
+function importCompoundsFromFile() {
+    var fileInput = $('#compoundsFile')[0];
+    var reader = new FileReader();
+    reader.onload = function (progressEvent) {
+        var parsed = Papa.parse(progressEvent.target.result,
+                                {skipEmptyLines: true});
+        switch (parsed.data[0].length) {
+            case 1:
+                Object.keys(groupNames).forEach(function (group) { groupNames[group] = null; });
+                var compounds = parsed.data.map(function (obj) { return obj[0] });
+                Object.keys(groupNames).forEach(function (group, i) {
+                    groupNames[group] = compounds[i];
+                });
+                break;
+
+            case 2:
+                Object.keys(groupNames).forEach(function (group) { groupNames[group] = null; });
+                parsed.data.forEach(function (row) {
+                    groupNames[row[0]] = row[1];
+                });
+                break;
+
+            default:
+                alert('Compounds file can contain 1 column (matched in order) or 2 columns (first is well grouping, second is compound), but no more');
+                return;
+        }
+        updateCompoundList();
+    };
+    // TODO - check for loaded file
+    reader.readAsText($('#compoundsFile')[0].files[0]);
+}
+
 // ajax save object call
 function saveConfigToServer() {
 	var plateJson = translateModelToOutputJson(plateModel);
@@ -986,6 +1022,10 @@ $(function() {
 			}
 		}
 	});
+        $('#importCompoundsModal').on('hidden.bs.modal', function (e) {
+            $('#importCompoundsForm')[0].reset();
+        });
+
 });
 
 function txtFieldFocus() {

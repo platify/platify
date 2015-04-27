@@ -47,7 +47,6 @@
 					<h3 style="margin-left:15px">Create Plate
 					    <small>
 					        <span class="btn-group pull-right">
-								<!-- <button id="copyPlate" class="btn btn-info btn-sm ui-state-disabled">Copy Plate</button> -->
 								<button id="savePlate" type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#savePlateModal" style="margin-right:15px">Save Plate</button>
 					        </span>
 					    </small>
@@ -57,11 +56,12 @@
 						<li><g:link controller="experimentalPlateSet" action="index">Assays</g:link></li>
 						<li><g:link controller="experimentalPlateSet" action="showactions" id="${expId}">Show Assay</g:link></li>
 						<li><g:link controller="experimentalPlateSet" action="selectTemplate" id="${expId}">Select Template</g:link></li> <!-- NEED TO SUPPLY EXP ID & Width/Height HERE !!! -->
-						<li><g:link controller="experimentalPlateSet" action="createPlate">Assign Labels</g:link></li>		<!-- NEED TO SUPPLY EXP ID & TMP ID HERE !!! -->
+						<li>Assign Labels</li>
 					</ol>
 					<g:render template="assignLabels"/>					
 				</div>
 			</div>
 		</div>
+		<asset:javascript src="papaparse.min.js" />
 	</body>
 </html>
