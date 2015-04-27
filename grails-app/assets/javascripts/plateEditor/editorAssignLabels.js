@@ -727,6 +727,28 @@ function addEvent(elementId, eventType, handlerFunction) {
 	}
 } // end of function addEvent
 
+/**
+ * importCompoundsFromFile - Reads compounds from a local list, maps them to
+ * well groupings for the current plate.
+ */
+function importCompoundsFromFile() {
+    var importForm = $('#importCompoundsForm')[0];
+    var fileInput = $('#compoundsFile')[0];
+    var reader = new FileReader();
+    reader.onload = function (progressEvent) {
+        var parsed = Papa.parse(progressEvent.target.result,
+                                {skipEmptyLines: true});
+        var compounds = parsed.data.map(function (obj) { return obj[0] });
+        Object.keys(groupNames).forEach(function (group, i) {
+            groupNames[group] = compounds[i];
+        });
+        updateCompoundList();
+        importForm.reset();
+    };
+    // TODO - check for loaded file
+    reader.readAsText($('#compoundsFile')[0].files[0]);
+}
+
 // ajax save object call
 function saveConfigToServer() {
 	var plateJson = translateModelToOutputJson(plateModel);

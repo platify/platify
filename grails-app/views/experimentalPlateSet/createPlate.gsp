@@ -47,7 +47,6 @@
 					<h3 style="margin-left:15px">Create Plate
 					    <small>
 					        <span class="btn-group pull-right">
-								<!-- <button id="copyPlate" class="btn btn-info btn-sm ui-state-disabled">Copy Plate</button> -->
 								<button id="savePlate" type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#savePlateModal" style="margin-right:15px">Save Plate</button>
 					        </span>
 					    </small>
@@ -63,5 +62,6 @@
 				</div>
 			</div>
 		</div>
+		<asset:javascript src="papaparse.min.js" />
 	</body>
 </html>
