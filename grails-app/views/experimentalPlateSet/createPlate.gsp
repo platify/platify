@@ -57,7 +57,7 @@
 						<li><g:link controller="experimentalPlateSet" action="index">Assays</g:link></li>
 						<li><g:link controller="experimentalPlateSet" action="showactions" id="${expId}">Show Assay</g:link></li>
 						<li><g:link controller="experimentalPlateSet" action="selectTemplate" id="${expId}">Select Template</g:link></li> <!-- NEED TO SUPPLY EXP ID & Width/Height HERE !!! -->
-						<li><g:link controller="experimentalPlateSet" action="createPlate">Assign Labels</g:link></li>		<!-- NEED TO SUPPLY EXP ID & TMP ID HERE !!! -->
+						<li>Assign Labels</li>
 					</ol>
 					<g:render template="assignLabels"/>					
 				</div>
