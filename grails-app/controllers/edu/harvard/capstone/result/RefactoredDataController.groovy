@@ -2,6 +2,7 @@ package edu.harvard.capstone.result
 
 
 import grails.plugin.springsecurity.annotation.Secured
+import grails.validation.ValidationException
 
 import static org.springframework.http.HttpStatus.*
 
@@ -35,9 +36,8 @@ class RefactoredDataController {
             }
             return
         }
-        def resultInstance
         try{
-            resultInstance = resultService.storeNormalizedData(resultInstance, data)
+            resultService.storeNormalizedData(resultInstance, data)
         }
         catch (ValidationException e) {
             render(contentType: "application/json") {
