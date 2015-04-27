@@ -60,6 +60,7 @@ function ParserUI(parsingController){
     // ~~~~~~~~~~~~~~~~~~~~~~~~~ Experiment ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     var importAndSaveDataButton = document.getElementById("sendImportDataToServer");
     var downloadFileImportButton = document.getElementById("downloadFileImport");
+    var downloadIntergroupButton = document.getElementByID("downloadIntergroupFile");
     var byPlateLevelFeatureRadioButton = document.getElementById("byFeature");
     var byManualEntryRadioButton = document.getElementById("byManualEntry");
     var plateLevelFeatureListElement = document.getElementById("plateLevelFeatureList");
@@ -856,6 +857,14 @@ function ParserUI(parsingController){
         }
     };
 
+    this.handleIntergroupDownload = function(){
+        try {
+            _self.parsingController.downloadIntergroupData() ;
+        } catch (error) {
+            _self.displayError(error);
+        }
+    };
+
     this.handleByPlateLevelFeatureMethod = function(){
         try {
             _self.parsingController.assignPlateIDsByFeature();
@@ -1219,6 +1228,7 @@ function ParserUI(parsingController){
 
         addEvent(importAndSaveDataButton, "click", _self.handleDataImport);
         addEvent(downloadFileImportButton, "click", _self.handleDownloadFileImport);
+        addEvent(downloadIntergroupButton, "click", _self.handleIntergroupDownload);
         addEvent(byPlateLevelFeatureRadioButton,
                  "click",
                  _self.handleByPlateLevelFeatureMethod);
