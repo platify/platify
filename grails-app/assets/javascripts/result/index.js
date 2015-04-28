@@ -36,6 +36,9 @@ function experimentSelected(experimentId) {
             select.append(options);
             plateSelected(experiment.currentPlateBarcode);
         }
+        else {
+            loadGrid([]);
+        }
     });
 }
 

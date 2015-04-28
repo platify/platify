@@ -167,11 +167,18 @@ function ExperimentModel(experimentId) {
      * 	      parser.
      */
     this.selectPlate = function(plateID) {
-        this.currentPlateBarcode = plateID;
-        this.currentPlate = this.plates[plateID];
-        this.locateControls();
-        this.loadDataForGrid();
-        this.loadNormalizedDataForGrid();
+        if (this.plates) {
+            this.currentPlateBarcode = plateID;
+            this.currentPlate = this.plates[plateID];
+            this.locateControls();
+            this.loadDataForGrid();
+            this.loadNormalizedDataForGrid();
+        }
+        else {
+            this.currentPlate = null;
+            this.data = [];
+            this.normalizedData = [];
+        }
     }
 
 
