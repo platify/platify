@@ -24,8 +24,7 @@ var normalize = function(plate, label,
     for (var i=0; i<plate.rows.length; i++) {
         normalized[i] = [];
         for (var j=0; j<plate.rows[i].columns.length; j++) {
-            var raw_value = plate.rows[i].columns[j].rawData[label];
-            normalized[i][j] = scale(raw_value);
+            normalized[i][j] = scale(getRawValue([i,j]));
         }
     }
 
@@ -72,7 +71,7 @@ var zFactor = function(plate, label,
     for (var i=0; i<plate.rows.length; i++) {
         for (var j=0; j<plate.rows[i].columns.length; j++) {
             if (!controls.has([i,j])) {
-                nonControlValues.push(plate.rows[i].columns[j].rawData[label]);
+                nonControlValues.push(getRawValue([i,j]));
             }
         }
     }
@@ -107,9 +106,8 @@ var zScore = function(plate, label,
             if (controls.has([i,j])) {
                 zScores[i][j] = null;
             } else {
-                zScores[i][j] = 
-                    (plate.rows[i].columns[j].rawData[label] - negativeMean)
-                    / negativeStdDev;
+                zScores[i][j] = (getRawValue([i,j]) - negativeMean)
+                                / negativeStdDev;
             }
         }
     }
