@@ -60,7 +60,7 @@ function ParserUI(parsingController){
     // ~~~~~~~~~~~~~~~~~~~~~~~~~ Experiment ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     var importAndSaveDataButton = document.getElementById("sendImportDataToServer");
     var downloadFileImportButton = document.getElementById("downloadFileImport");
-    var downloadIntergroupButton = document.getElementByID("downloadIntergroupFile");
+    var downloadIntergroupButton = document.getElementById("downloadIntergroupFile");
     var byPlateLevelFeatureRadioButton = document.getElementById("byFeature");
     var byManualEntryRadioButton = document.getElementById("byManualEntry");
     var plateLevelFeatureListElement = document.getElementById("plateLevelFeatureList");
