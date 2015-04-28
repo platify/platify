@@ -359,7 +359,8 @@ DataExtractor.fillImportDataWithExperimentLevelFeatureValues = function(importDa
                                                                         grid){
     importData.addExperimentLevelCategory(featureName);
 
-    var gridCoordinates = DataExtractor.findExperimentLevelFeatureCoords(featureName);
+    var gridCoordinates = DataExtractor.findExperimentLevelFeatureCoords(featureName,
+                                                                         parsingConfig);
     var gridRow = gridCoordinates[0];
     var gridColumn = gridCoordinates[1];
     var value = grid.getDataPoint(gridRow, gridColumn);

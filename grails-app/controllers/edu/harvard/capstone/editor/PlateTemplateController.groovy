@@ -61,6 +61,54 @@ class PlateTemplateController {
         }        
 
     }
+	
+	def filterTemplateBySize = {
+		def filterWidth;
+		def filterHeight;
+		def pList;
+		
+		switch(params.filterWells) {
+			case "96 wells":
+				filterWidth = "12";
+				filterHeight = "8";
+				break;
+			case "384 wells":
+				filterWidth = "24";
+				filterHeight = "16";
+				break;
+			case "1536 wells":
+				filterWidth = "48";
+				filterHeight = "32";
+				break;
+			case "3456 wells":
+				filterWidth = "72";
+				filterHeight = "48";
+				break;
+			case "9600 wells":
+				filterWidth = "120";
+				filterHeight = "80";
+				break;
+			case "custom":
+				filterWidth = "";	// need to send custom size as params
+				filterHeight = "";
+				break;
+			default:
+				// default to show all templates
+				filterWidth = null;
+				filterHeight = null;
+				break;
+		}
+		
+		if (filterWidth == null || filterHeight == null) {
+			// no filter
+			pList = edu.harvard.capstone.editor.PlateTemplate.list();
+		} else {
+			pList = edu.harvard.capstone.editor.PlateTemplate.list().findAll {
+				it.width == filterWidth && it.height == filterHeight
+			}
+		}
+		render(template: 'templateDropDown', model:  [filteredTemplateList: pList])
+	}
 
     def save() {
         if (!springSecurityService.isLoggedIn()){

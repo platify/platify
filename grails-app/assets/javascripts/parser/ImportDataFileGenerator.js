@@ -3,14 +3,14 @@
  */
 
 
-function ImportDataFileGenerator(importDataObject){
+function ImportDataFileGenerator(){
     var NUM_BLANK_COLUMNS_BETWEEN_WELL_AND_PLATE_LEVEL_DATA = 2;
     var PLATE_COLUMN_HEADER = "Plate/Barcode";
     var WELL_COLUMN_HEADER = "Well";
     var BLANK_CELL = "";
     var NO_PLATE_ID = ImportData.NO_ID;
 
-    var matrix = createImportDataMatrix(importData);
+    var matrix = null;
 
 
     function createMatrixHeaderRow(wellCategories, plateCategories, experimentCategories){
@@ -81,7 +81,7 @@ function ImportDataFileGenerator(importDataObject){
     }
 
 
-    function createImportDataMatrix(importData){
+    this.createImportDataMatrix = function(importData){
         var result = [];
         var plate;
         var row;
@@ -148,8 +148,83 @@ function ImportDataFileGenerator(importDataObject){
 
         }
 
-        return result;
-    }
+        this.matrix = result;
+    };
+
+
+    this.addWellDataToMatrix = function(wellRow, wellCol, plateIndex, importData, matrix){
+        var wellLevelCategories = importData.getWellLevelCategories();
+        var plateLevelCategories = importData.getPlateLevelCategories();
+        var experimentLevelCategories = importData.getExperimentLevelCategories();
+
+        var matrixRowIndex = matrix.length;
+        var currentCategory;
+        var currentMatrixRow;
+        var wellRowIndex = wellRow - 1;
+        var wellColIndex = wellCol - 1;
+
+        for (var i=0; i<wellLevelCategories.length; i++){
+            currentCategory = wellLevelCategories[i];
+            currentMatrixRow = [];
+
+            currentMatrixRow[0] = wellRowIndex;
+            currentMatrixRow[1] = wellColIndex;
+            currentMatrixRow[2] = importData.getWellLevelLabelForSinglePlate(plateIndex,
+                                                                             wellRow,
+                                                                             wellCol,
+                                                                         currentCategory);
+            currentMatrixRow[3] = currentCategory;
+            matrix[matrixRowIndex++] = currentMatrixRow;
+        }
+
+        for (var j=0; j<plateLevelCategories.length; j++){
+            currentCategory = plateLevelCategories[j];
+            currentMatrixRow = [];
+
+            currentMatrixRow[0] = wellRowIndex;
+            currentMatrixRow[1] = wellColIndex;
+            currentMatrixRow[2] = importData.getPlateLevelLabelForSinglePlate(plateIndex,
+                                                                         currentCategory);
+            currentMatrixRow[3] = currentCategory;
+            matrix[matrixRowIndex++] = currentMatrixRow;
+        }
+
+        for (var k=0; k<experimentLevelCategories.length; k++){
+            currentCategory = experimentLevelCategories[k];
+            currentMatrixRow = [];
+
+            currentMatrixRow[0] = wellRowIndex;
+            currentMatrixRow[1] = wellColIndex;
+            currentMatrixRow[2] = importData.getExperimentLevelLabels(currentCategory);
+            currentMatrixRow[3] = currentCategory;
+            matrix[matrixRowIndex++] = currentMatrixRow;
+        }
+    };
+
+
+    this.createIntergroupInterchangeFormatMatrix = function(importData){
+        var result = [];
+        var numPlates = importData.numPlates();
+        var numPlateRows = importData.numberOfPlateRows();
+        var numPlateCols = importData.numberOfPlateColumns();
+
+        for (var plateIndex=0; plateIndex<numPlates; plateIndex++){
+
+            for (var row=1; row<=numPlateRows; row++){
+
+                for (var col=1; col<=numPlateCols; col++){
+                    this.addWellDataToMatrix(row, col, plateIndex, importData, result);
+                }
+
+            }
+
+            // blank line after each plate
+            result[result.length] = ["", "", "", ""];
+
+        }
+
+        this.matrix = result;
+    };
 
 
     this.createDSVString = function(cellTerminator, lineTerminator){
@@ -201,7 +276,13 @@ function ImportDataFileGenerator(importDataObject){
         var TSVString = this.createDSVString("\t", "\n");
 
         ImportDataFileGenerator.forceFileDownload(filename, TSVString);
-    }
+    };
+
+    this.forceCSVDownload = function(filename){
+        var CSVString = this.createDSVString(" , ", "\n");
+
+        ImportDataFileGenerator.forceFileDownload(filename, CSVString);
+    };
 }
 
 /**

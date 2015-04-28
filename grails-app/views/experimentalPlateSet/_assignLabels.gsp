@@ -103,7 +103,7 @@
 <div class="col-xs-2">
 	<div id="compoundPanel" class="panel panel-default">
 		<div class="panel-heading">
-			<h4 class="panel-title">Compounds<span class="pull-right"><button id="importCmpListButton" class="btn btn-info btn-xs ui-state-disabled">Import</button></span></h4>
+			<h4 class="panel-title">Compounds<span class="pull-right"><button id="importCompoundListButton" type="button" class="btn btn-info btn-xs" data-toggle="modal" data-target="#importCompoundsModal">Import</button></span></h4>
 		</div>
 		<div class="panel-body">
 			<div id="compoundList"></div>
@@ -111,7 +111,35 @@
 	</div>
 </div>
 
-<!-- Modal -->
+<!-- Import Compounds Modal -->
+<div class="modal fade" id="importCompoundsModal" tabindex="-1" role="dialog" aria-labelledby="modalHeaderLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="modalHeaderLabel">Import Compounds From File</h4>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+          <form class="form-horizontal" id="importCompoundsForm">
+            <div class="form-group">
+              <label class="control-label col-sm-3" for="compoundsFile">Compounds File:</label>
+              <div class="col-sm-9">
+                <input type="file" class="form-control" id="compoundsFile" />
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-default" onclick="importCompoundsFromFile()" data-dismiss="modal">Import</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Save Plate Modal -->
 <div class="modal fade" id="savePlateModal" tabindex="-1" role="dialog" aria-labelledby="modalHeaderLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">

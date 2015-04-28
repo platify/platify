@@ -19,7 +19,7 @@
 		    	document.getElementById("templateWidth").value = "12";
 		    	document.getElementById("templateHeight").value = "8";
 		        break;
-		    case "386 wells":
+		    case "384 wells":
 		    	document.getElementById("templateWidth").value = "24";
 		    	document.getElementById("templateHeight").value = "16";
 		        break;
@@ -71,7 +71,7 @@
   						<div class="col-sm-9">
   							<select class="form-control" id="wellCount" onchange="updateWellCountFields(this)">
 							  <option>96 wells</option>
-							  <option>386 wells</option>
+							  <option>384 wells</option>
 							  <option>1536 wells</option>
 							  <option>3456 wells</option>
 							  <option>9600 wells</option>

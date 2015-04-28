@@ -101,6 +101,7 @@
 								    	<%--<button id="returnToConfig">Go back to parsing configuration</button>--%>
 								    	<button class="btn btn-info btn-sm" id="sendImportDataToServer">Import and save the data</button>
 	                    				<button class="btn btn-info btn-sm" id="downloadFileImport">Download file import</button>
+                                        <button class="btn btn-info btn-sm" id="downloadIntergroupFile">Download inter-group data format</button>
 								    </th>
 								  </tr>
 								  <tr  >

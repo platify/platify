@@ -432,7 +432,8 @@ function ParsingController(){
     };
 
     _self.downloadImportData = function(){
-        var importFileDataGenerator = new ImportDataFileGenerator(importData);
+        var importFileDataGenerator = new ImportDataFileGenerator();
+        importFileDataGenerator.createImportDataMatrix(importData);
         var filename;
         var experimentName = _self.parserUI.getSelectedExperimentName();
         if (experimentName){
@@ -444,6 +445,20 @@ function ParsingController(){
         importFileDataGenerator.forceTSVDownload(filename);
     };
 
+    _self.downloadIntergroupData = function(){
+        var importFileDataGenerator = new ImportDataFileGenerator();
+        importFileDataGenerator.createIntergroupInterchangeFormatMatrix(importData);
+        var filename;
+        var experimentName = _self.parserUI.getSelectedExperimentName();
+        if (experimentName){
+            filename = experimentName + "_results.txt";
+        } else {
+            filename = "experiment_results.txt"
+        }
+
+        importFileDataGenerator.forceCSVDownload(filename);
+    };
+
     /**
      * This function assumes that a parsing config will be loaded at page loading time
      * and that the parser will start in the parsing info stage.
@@ -453,8 +468,11 @@ function ParsingController(){
         _self.parsingConfig = ParsingConfig.loadParsingConfig(JSONParsingConfig);
         _self.colorPicker.setColorIndex(_self.parsingConfig.getColorPickerIndex());
 
+        // TODO - for tomorrow
+        //_self.parserUI.switchToParseOnlyMode();
+
         if (!canUpdate){
-            //_self.parserUI.parseOnlyMode();
+            _self.parserUI.switchToParseOnlyMode();
             _self.parserUI.disableSaveButton();
         }
     };
