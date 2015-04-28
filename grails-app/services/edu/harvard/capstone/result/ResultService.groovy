@@ -310,6 +310,7 @@ class ResultService {
 	def plateSetsByBarcode = PlateSet.findAllByExperiment(experimentInstance).collectEntries{plateSet -> [plateSet.barcode, plateSet]}
 
 	def result = Result.findByExperiment(experimentInstance)
+        experiment.resultID = result.id
         def resultPlatesByBarcode = [:]
 	if (result) {
             resultPlatesByBarcode = ResultPlate.findAllByResult(result).collectEntries{resultPlate -> [resultPlate.barcode, resultPlate]}

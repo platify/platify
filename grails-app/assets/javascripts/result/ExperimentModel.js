@@ -42,6 +42,9 @@ function ExperimentModel(experimentId) {
                     that.plates[plate.plateID] = plate;
                 }
                 that.selectPlate(that.experiment.plates[0].plateID);
+                if ($.isEmptyObject(that.currentPlate.rows[0].columns[0].normalizedData)) {
+                    that.normalizeAndSave();
+                }
             }
         });
     }
@@ -55,11 +58,12 @@ function ExperimentModel(experimentId) {
         var label = this.rawDataLabel();
 
         this.data = [];
-        for (var i=0; i<this.currentPlate.rows.length; i++) {
-            this.data[i] = [];
-            for (var j=0; j<this.currentPlate.rows[i].columns.length; j++) {
-                if (this.currentPlate.rows[i].columns[j].rawData) {
-                    this.data[i][j] = this.currentPlate.rows[i].columns[j].rawData[label];
+        for (var x=0; x<this.currentPlate.rows.length; x++) {
+            this.data[x] = [];
+            for (var y=0; y<this.currentPlate.rows[0].columns.length; y++) {
+                var well = this.currentPlate.rows[x].columns[y]
+                if (!$.isEmptyObject(well.rawData)) {
+                    this.data[x][y] = well.rawData[label];
                 }
             }
         }
@@ -71,12 +75,18 @@ function ExperimentModel(experimentId) {
      * to supply to slickgrid.
      */
     this.loadNormalizedDataForGrid = function() {
-        var normalized = normalize(this.currentPlate, this.rawDataLabel(),
-                                   this.controls.negative, this.controls.positive);
-        this.normalizedData = $.map(normalized, function(row) {
-            return [$.map(row, function(val) {
-                return val.toString(); })]
-        });
+        var label = this.rawDataLabel();
+
+        this.normalizedData = [];
+        for (var x=0; x<this.currentPlate.rows.length; x++) {
+            this.normalizedData[x] = [];
+            for (var y=0; y<this.currentPlate.rows[0].columns.length; y++) {
+                var well = this.currentPlate.rows[x].columns[y];
+                if (!$.isEmptyObject(well.normalizedData)) {
+                    this.normalizedData[x][y] = well.normalizedData[label];
+                }
+            }
+        }
     }
 
 
@@ -87,17 +97,47 @@ function ExperimentModel(experimentId) {
     this.locateControls = function() {
         this.controls = {'negative': [], 'positive': []};
 
-        for (var i=0; i<this.currentPlate.rows.length; i++) {
-            for (var j=0; j<this.currentPlate.rows[i].columns.length; j++) {
-                var controlType = this.currentPlate.rows[i].columns[j].control;
+        for (var x=0; x<this.currentPlate.rows.length; x++) {
+            for (var y=0; y<this.currentPlate.rows[x].columns.length; y++) {
+                var controlType = this.currentPlate.rows[x].columns[y].control;
                 switch (controlType) {
                     case 'NEGATIVE':
                     case 'POSITIVE':
-                        this.controls[controlType.toLowerCase()].push([i, j]);
+                        this.controls[controlType.toLowerCase()].push([x, y]);
                         break;
                 }
             }
         }
+    }
+
+
+    /**
+     * Normalizes the data for the current plate, and saves it back to the 
+     * server.
+     */
+    this.normalizeAndSave = function() {
+        var label = this.rawDataLabel();
+        var normalized = normalize(this.currentPlate, label,
+                                   this.controls.negative, this.controls.positive);
+        for (var x=0; x<this.currentPlate.rows.length; x++) {
+            for (var y=0; y<this.currentPlate.rows[0].columns.length; y++) {
+                this.currentPlate.rows[x].columns[y].normalizedData[label]
+                    = normalized[x][y].toString();
+            }
+        }
+
+        var url = RESULT_SAVE_REFACTORED_DATA_URL + '/' + this.experiment.resultID;
+        var jqxhr = $.ajax({
+            url: url,
+            contentType: 'application/json; charset=UTF-8',
+            data: JSON.stringify(this.experiment),
+            method: 'POST',
+            processData: false,
+        });
+        jqxhr.done(function() {
+            console.log('POST of normalized data for plate '
+                        + this.currentPlateBarcode + ' complete');
+        });
     }
 
 

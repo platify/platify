@@ -72,6 +72,7 @@
 	<!-- results-specific js -->
 	<g:javascript>
 	var RESULT_KITCHEN_SINK_URL = "${createLink(action: 'kitchenSink', experimentInstance: null)}";
+	var RESULT_SAVE_REFACTORED_DATA_URL = "${createLink(controller: 'refactoredData', action: 'save', resultInstance: null)}";
 	</g:javascript>
 	<asset:javascript src="plate-statistics/statistics.js" />
 	<asset:javascript src="result/ExperimentModel.js" />
