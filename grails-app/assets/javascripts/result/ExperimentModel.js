@@ -52,11 +52,15 @@ function ExperimentModel(experimentId) {
      * to slickgrid.
      */
     this.loadDataForGrid = function() {
+        var label = this.rawDataLabel();
+
         this.data = [];
         for (var i=0; i<this.currentPlate.rows.length; i++) {
             this.data[i] = [];
             for (var j=0; j<this.currentPlate.rows[i].columns.length; j++) {
-                this.data[i][j] = this.currentPlate.rows[i].columns[j].rawData[this.rawDataLabel()];
+                if (this.currentPlate.rows[i].columns[j].rawData) {
+                    this.data[i][j] = this.currentPlate.rows[i].columns[j].rawData[label];
+                }
             }
         }
     }
@@ -104,7 +108,12 @@ function ExperimentModel(experimentId) {
      * qa/qc and results display doesn't.
      */
     this.rawDataLabel = function() {
-        return Object.keys(this.currentPlate.rows[0].columns[0].rawData).sort()[0];
+        if (this.currentPlate.rows[0].columns[0].rawData) {
+            return Object.keys(this.currentPlate.rows[0].columns[0].rawData).sort()[0];
+        }
+        else {
+            return null;
+        }
     }
 
 
