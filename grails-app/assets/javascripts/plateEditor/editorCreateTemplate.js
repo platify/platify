@@ -166,7 +166,7 @@ function addTemplateValue() {
 	"use strict";
 	var selCells, cellValue, cell, row, column, wgs;
 	selCells = highlightedCoords;
-	console.log(selCells);
+	// console.log(selCells);
 	cellValue = document.getElementById("newLabelValue").value;
 
 	// just keeping list of well values
@@ -179,21 +179,21 @@ function addTemplateValue() {
 		row = selCells[cell][0];
 		column = selCells[cell][1];
 
-		if (plateModel["rows"] == null) {
-			plateModel["rows"] = {};
+		if (plateModel.rows === undefined) {
+			plateModel.rows = {};
 		}
 
-		if (plateModel["rows"][row] == null) {
-			plateModel["rows"][row] = {};
+		if (plateModel.rows[row] === undefined) {
+			plateModel.rows[row] = {};
 		}
 
-		if (plateModel["rows"][row]["columns"] == null) {
-			plateModel["rows"][row]["columns"] = {};
+		if (plateModel.rows[row].columns === undefined) {
+			plateModel.rows[row].columns = {};
 		}
 
-		if (plateModel["rows"][row]["columns"][column] == null) {
-			plateModel["rows"][row]["columns"][column] = {};
-			plateModel["rows"][row]["columns"][column]["wellGroupName"] = cellValue;
+		if (plateModel.rows[row].columns[column] === undefined) {
+			plateModel.rows[row].columns[column] = {};
+			plateModel.rows[row].columns[column].wellGroupName = cellValue;
 		}
 
 		grid.updateCellContents(row, column, cellValue);
@@ -221,10 +221,9 @@ function addTemplateValue() {
  */
 function addEvent(elementId, eventType, handlerFunction) {
 	'use strict';
-
 	var element;
 
-	if (typeof(elementId) === "string"){
+	if (typeof(elementId) === "string") {
 		element = document.getElementById(elementId);
 	} else {
 		element = elementId;
@@ -239,68 +238,72 @@ function addEvent(elementId, eventType, handlerFunction) {
 
 //data format translation
 function translateModelToOutputJson(pModel) {
-	var plateJson = {};
-	var plate = {};
-	plate["name"] = window.tName;			// should do null check ???
-	plate["width"] = GRID_WIDTH;
-	plate["height"] = GRID_HEIGHT;
-	
-	plate["experimentID"] = window.expId;
-	plate["labels"] = [];		// plate level labels, should set these if available already !!!
-	plate["wells"] = [];
-	for (var row in pModel["rows"]) {
-		for (var column in pModel["rows"][row]["columns"]) {
-			var well = {};
-			well["row"] = row;
-			well["column"] = column;
-			well["control"] = null;
-			var labels = [];
-			for (var catKey in pModel["rows"][row]["columns"][column]["categories"]) {
-				for (var labKey in pModel["rows"][row]["columns"][column]["categories"][catKey]) {
-					var label = {};
-					label["category"] = catKey;
-					label["name"] = labKey;
-					label["color"] = pModel["rows"][row]["columns"][column]["categories"][catKey][labKey];
+	'use strict';
+	var plateJson, plate, row, column, well, labels, catKey, labKey, label;
+	plateJson = {};
+	plate = {};
+	plate.name = window.tName;			// should do null check ???
+	plate.width = GRID_WIDTH;
+	plate.height = GRID_HEIGHT;
+
+	plate.experimentID = window.expId;
+	plate.labels = [];		// plate level labels, should set these if available already !!!
+	plate.wells = [];
+	for (row in pModel.rows) {
+		for (column in pModel.rows[row].columns) {
+			well = {};
+			well.row = row;
+			well.column = column;
+			well.control = null;
+			labels = [];
+			for (catKey in pModel.rows[row].columns[column].categories) {
+				for (labKey in pModel.rows[row].columns[column].categories[catKey]) {
+					label = {};
+					label.category = catKey;
+					label.name = labKey;
+					label.color = pModel.rows[row].columns[column].categories[catKey][labKey];
 					labels.push(label);
 				}
 			}
-			well["labels"] = labels;
-			well["groupName"] = pModel["rows"][row]["columns"][column]["wellGroupName"];
-			plate["wells"].push(well);
+			well.labels = labels;
+			well.groupName = pModel.rows[row].columns[column].wellGroupName;
+			plate.wells.push(well);
 		}
 	}
-	plateJson["plate"] = plate;
+	plateJson.plate = plate;
 	return plateJson;
 }
 
 // data format translation
 function translateInputJsonToModel(plateJson) {
-	var pModel = {};
-	pModel["rows"] = {};
-	var plate = plateJson["plate"];
-	
-	for (var i=0; i < plate["wells"].length; i++) {
-		var row = plate["wells"][i]["row"];
-		var column = plate["wells"][i]["column"];
-		var groupName = plate["wells"][i]["groupName"];
-		var labels = plate["wells"][i]["labels"];
-		
-		if (pModel["rows"][row] == null) {
-			pModel["rows"][row] = {};
-			pModel["rows"][row]["columns"] = {};
-		}
-		
-		if (pModel["rows"][row]["columns"][column] == null) {
-			pModel["rows"][row]["columns"][column] = {};
-			pModel["rows"][row]["columns"][column]["wellGroupName"] = groupName;
-			pModel["rows"][row]["columns"][column]["categories"] = {};
+	"use strict";
+	var pModel, plate, i, j, row, column, groupName, labels;
+	pModel = {};
+	pModel.rows = {};
+	plate = plateJson.plate;
+
+	for (i = 0; i < plate.wells.length; i++) {
+		row = plate.wells[i].row;
+		column = plate.wells[i].column;
+		groupName = plate.wells[i].groupName;
+		labels = plate.wells[i].labels;
+
+		if (pModel.rows[row] === undefined) {
+			pModel.rows[row] = {};
+			pModel.rows[row].columns = {};
 		}
 
-		for (var j=0; j < labels.length; j++) {
-			if (pModel["rows"][row]["columns"][column]["categories"][labels[j].category] == null) {
-				pModel["rows"][row]["columns"][column]["categories"][labels[j].category] = {};
+		if (pModel.rows[row].columns[column] === undefined) {
+			pModel.rows[row].columns[column] = {};
+			pModel.rows[row].columns[column].wellGroupName = groupName;
+			pModel.rows[row].columns[column].categories = {};
+		}
+
+		for (j = 0; j < labels.length; j++) {
+			if (pModel.rows[row].columns[column].categories[labels[j].category] === undefined) {
+				pModel.rows[row].columns[column].categories[labels[j].category] = {};
 			}
-			pModel["rows"][row]["columns"][column]["categories"][labels[j].category][labels[j].name] = labels[j].color;
+			pModel.rows[row].columns[column].categories[labels[j].category][labels[j].name] = labels[j].color;
 		}
 	}
 
@@ -308,11 +311,13 @@ function translateInputJsonToModel(plateJson) {
 }
 
 // ajax save object call
-function saveConfigToServer(){
-	var plateJson = translateModelToOutputJson(plateModel);
+function saveConfigToServer() {
+	"use strict";
+	var plateJson, jqxhr;
+	plateJson = translateModelToOutputJson(plateModel);
 	console.log("SendingToServer:" + JSON.stringify(plateJson));
-   
-	var jqxhr = $.ajax({
+
+	jqxhr = $.ajax({
 		url: hostname + "/plateTemplate/save",
 		type: "POST",
 		data: JSON.stringify(plateJson),
@@ -325,22 +330,21 @@ function saveConfigToServer(){
 	}).always(function() {
 		console.log("complete");
 	});
-   
+
 	// Set another completion function for the request above
 	jqxhr.always(function(resData) {
 		var storedTemplate = JSON.stringify(resData);
-		console.log( "second complete" );
+		console.log("second complete");
 		console.log("result=" + storedTemplate);		// should parse for id
-		console.log("storedTemplate['plateTemplate']=" + resData["plateTemplate"]);
-		console.log("storedTemplate['plateTemplate']['id']=" + resData["plateTemplate"]["id"]);
-		
-		if (resData["plateTemplate"] !=null &&  resData["plateTemplate"]["id"] != null) {
-			plateModel["templateID"] = resData["plateTemplate"]["id"];
+		console.log("storedTemplate['plateTemplate']=" + resData.plateTemplate);
+		console.log("storedTemplate['plateTemplate']['id']=" + resData.plateTemplate.id);
+
+		if (resData.plateTemplate !== undefined &&  resData.plateTemplate.id !== undefined) {
+			plateModel.templateID = resData.plateTemplate.id;
 			// use less hacky method !!
-			if (window.expId != null) {
+			if (window.expId !== undefined) {
 				// if we're in an experiment, then continue to assignlabels page
-				window.location.href = hostname + "/experimentalPlateSet/createPlate" 
-					+ '?expid=' + window.expId + '&tmpid=' + plateModel["templateID"];
+				window.location.href = hostname + "/experimentalPlateSet/createPlate" + '?expid=' + window.expId + '&tmpid=' + plateModel.templateID;
 			} else {
 				// if we're not in an experiment, then return to homepage
 				window.location.href = hostname + "/";
@@ -348,7 +352,7 @@ function saveConfigToServer(){
 		} else {
 			alert("An error while saving the template: " + storedTemplate);
 		}
-		
+
 	});
 }
 
@@ -360,9 +364,9 @@ function loadJsonData(plateJson) {
 	var row, column, newContents;
 	plateModel = translateInputJsonToModel(plateJson);
 
-	for (row in plateModel["rows"]) {
-		for (column in plateModel["rows"][row]["columns"]) {
-			newContents = plateModel["rows"][row]["columns"][column]["wellGroupName"];
+	for (row in plateModel.rows) {
+		for (column in plateModel.rows[row].columns) {
+			newContents = plateModel.rows[row].columns[column].wellGroupName;
 
 			grid.updateCellContents(row, column, newContents);
 		}
@@ -374,21 +378,20 @@ function loadJsonData(plateJson) {
  * grid with blank data and sets up the event handlers on the
  */
 function init() {
-
-	if (window.tWidth != null) {
+	"use strict";
+	if (window.tWidth !== undefined) {
 		GRID_WIDTH = window.tWidth;
 	}
-	
-	if (window.tHeight != null) {
-		GRID_HEIGHT = window.tHeight;
-	}	
 
+	if (window.tHeight !== undefined) {
+		GRID_HEIGHT = window.tHeight;
+	}
 	createGrid();
-	
+
 	// allows for passing input Json, but it not used here. Perhaps refactor!
 	//var testInputJson = {"plate":{"wells":[{"row":"2","column":"2","control":null,"labels":[{"category":"c1","name":"l1","color":"#ffff00"}],"groupName":"L67"},{"row":"2","column":"3","control":null,"labels":[{"category":"c1","name":"l2","color":"#4780b8"}],"groupName":"L5"},{"row":"3","column":"2","control":null,"labels":[{"category":"c1","name":"l1","color":"#ffff00"},{"category":"c2","name":"l3","color":"#8d7278"}],"groupName":"L51"},{"row":"3","column":"3","control":null,"labels":[{"category":"c1","name":"l2","color":"#4780b8"},{"category":"c2","name":"l3","color":"#8d7278"}],"groupName":"L17"},{"row":"4","column":"2","control":null,"labels":[{"category":"c2","name":"l3","color":"#8d7278"}],"groupName":"L2"},{"row":"4","column":"3","control":null,"labels":[{"category":"c2","name":"l3","color":"#8d7278"}],"groupName":"L47"}],"labels":[]}};
 	//loadJsonData(testInputJson);
-	
+
 	addEvent("addTemplateValueBtn", "click", addTemplateValue);
 	addEvent("clearAllSelection", "click", removeAllHighlightedCells);
 	addEvent("saveTemplate", "click", saveConfigToServer);
