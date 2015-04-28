@@ -16,7 +16,7 @@
                     <div id="parsingTab">
                     	<div>
                     		<h4>
-	                    		<table style="border:0px solid black;width:99%;"  >
+                    			<table class="table"  >
 								  <tr >
 								    <th style="padding-bottom:7px;width:50%;" colspan="2">
 								    	<input type="hidden" id="parsingId" autocomplete="off"/>
@@ -64,7 +64,7 @@
                     <div id="featuresTab">
                         <div>
                         	<h4>
-                        		<table style="width:99%;"  >
+                        		<table class="table" >
 								  <tr >
 								    <th colspan="8">
 								    	<button class="btn btn-info btn-sm" id="newFeature">New feature</button>
@@ -73,10 +73,7 @@
 			                            <button class="btn btn-info btn-sm" id="applyFeatures">Apply</button>
 								    </th>
 								  </tr>
-								  <tr>
-								    <td colspan="8">&nbsp;</td>
-								  </tr>  
-								  <tr style="border: 1px solid gray;">
+								  <tr >
 								   	<td ><label for="featureCellRange"> Cell Range</label></td>
 								    <td ><input type="text" id="featureCellRange" autocomplete="off"/></td>
 								    <td ><label for="featureLevel">Apply to</label></td>
@@ -85,10 +82,10 @@
 		                                <input type="radio" id="plateLevel" name="featureLevel" value="plate" /> Plate<br>
 		                                <input type="radio" id="experimentLevel" name="featureLevel" value="experiment" /> Experiment
 								    </td>
-								    <td ><label for="featureCategory">Category</label></td>
-								    <td ><input type="text" id="featureCategory" autocomplete="off"/></td>
-								    <td style="border: 1px solid gray;" ><select name="featureList" id="featureList" size="5"><option>--features--</option></select></td>
-								    <td style="border: 1px solid gray;" ><select name="labelList" id="labelList" size="5"><option>---labels---</option></select></td>
+								    <td><label for="featureCategory">Category</label></td>
+								    <td><input type="text" id="featureCategory" autocomplete="off"/></td>
+								    <td><select name="featureList" id="featureList" size="5"><option>--features--</option></select></td>
+								    <td><select name="labelList" id="labelList" size="5"><option>---labels---</option></select></td>
 								  </tr>
 								</table>	  
                         	</h4>
@@ -98,7 +95,7 @@
                     <div id="plateIDSelection">
 	                    <div>
 	                    	<h5>
-                        		<table style="width:99%;"  >
+                        		<table class="table"  >
 								  <tr >
 								    <th colspan="8">
 								    	<%--<button id="returnToConfig">Go back to parsing configuration</button>--%>
@@ -118,13 +115,10 @@
 			                            </select>
 								    </td>
 								    <td colspan="2" >&nbsp;</td>
-								    <td colspan="2" ><select name="plateList" id="plateList" size="5"><option>--Plate List ---</option></select></td>
+								    <td colspan="2" ><select name="plateList" id="plateList" size="3"><option>--Plate List ---</option></select></td>
 								  </tr>
 								  <tr >
-								  	<td colspan="8" >&nbsp;</td>
-								  </tr>	
-								  <tr >
-								  	<td style="border: 1px solid gray;margin: 5px;" colspan="8">
+								  	<td colspan="8">
 								  		<label for="plateIDMatchMethod">Plate ID match by &nbsp;&nbsp;&nbsp;  </label>
 								    	<input type="radio" id="byFeature" name="plateIDMatchMethod" value="byFeature" /> Plate level feature &nbsp;&nbsp;&nbsp; 
 	                                	<input type="radio" id="byManualEntry" name="plateIDMatchMethod" value="byManualEntry" /> Manual entry
@@ -139,7 +133,7 @@
 					                            Select a plate level feature to serve as the plate identifier
 					                            for matching with the plates defined in the plate editor
 					                        </p>
-					                        <select name="plateLevelFeatureList" id="plateLevelFeatureList" size="4"><option>--Plate Level Feature List--<option></select>
+					                        <select name="plateLevelFeatureList" id="plateLevelFeatureList" size="3"><option>--Plate Level Feature List--<option></select>
 					                    </div>
 								    	<div id="byManualEntryMethod">
 								    		<p>
