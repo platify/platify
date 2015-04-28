@@ -179,15 +179,15 @@ class ResultService {
 		// create the result plates
 		data.plates.eachWithIndex{ dataPlate, plateIndex ->
 
-			def plateInstance = ResultPlate.findByResultAndBarcode(resultInstance, barcode: dataPlate.plateID)
+			def plateInstance = ResultPlate.findByResultAndBarcode(resultInstance, dataPlate.plateID)
 			
     		// well level
     		dataPlate.rows.eachWithIndex{ row, rowIndex ->
-    			row.columns.eachWithIndex{ well, columnIndex ->
+    			row.columns.eachWithIndex{ wellInstance, columnIndex ->
     				//for each well
 
 		    		def wellResultInstance = ResultWell.withCriteria {
-		    			well{
+		    			well {
 	    					eq('row', rowIndex)
 	    					eq('column', columnIndex)
 	    					eq('plate', PlateSet.findByBarcodeAndExperiment(dataPlate.plateID, experimentInstance)?.plate)
@@ -196,11 +196,11 @@ class ResultService {
 		    		}			
 
 		    		// nomalized data
-		    		well.nomalizedData?.each{ key, value ->
-		    			def nomalizedData = new ResultLabel(name: key, value: value, labelType: ResultLabel.LabelType.NORMALIZED_DATA, scope: ResultLabel.LabelScope.WELL, domainId: wellResultInstance.id)
-		    			nomalizedData.save()
-		    			if (nomalizedData.hasErrors()){
-			    			throw new ValidationException("Normalized Data is not valid", nomalizedData.errors)
+		    		wellInstance.normalizedData?.each{ key, value ->
+		    			def normalizedData = new ResultLabel(name: key, value: value, labelType: ResultLabel.LabelType.NORMALIZED_DATA, scope: ResultLabel.LabelScope.WELL, domainId: wellResultInstance.id)
+		    			normalizedData.save()
+		    			if (normalizedData.hasErrors()){
+			    			throw new ValidationException("Normalized Data is not valid", normalizedData.errors)
 			    		}		    			
 		    		}		    		
 
@@ -307,23 +307,23 @@ class ResultService {
         experiment.experimentID = experimentInstance.id
         experiment.plates = []
 
-	def plateSetsByBarcode = PlateSet.findAllByExperiment(experimentInstance).collectEntries{plateSet -> [plateSet.barcode, plateSet]}
+        def plateSetsByBarcode = PlateSet.findAllByExperiment(experimentInstance).collectEntries{plateSet -> [plateSet.barcode, plateSet]}
 
-	def result = Result.findByExperiment(experimentInstance)
-        experiment.resultID = result.id
+        def result = Result.findByExperiment(experimentInstance)
         def resultPlatesByBarcode = [:]
-	if (result) {
+        if (result) {
+            experiment.resultID = result.id
             resultPlatesByBarcode = ResultPlate.findAllByResult(result).collectEntries{resultPlate -> [resultPlate.barcode, resultPlate]}
 
             def resultExperimentLabels = ResultLabel.findAllByDomainIdAndLabelTypeAndScope(result.id, ResultLabel.LabelType.LABEL, ResultLabel.LabelScope.RESULT)
             def experimentFeatureLabels = resultExperimentLabels.collectEntries{resultExperimentLabel -> [resultExperimentLabel.name, resultExperimentLabel.value]}
             experiment.experimentFeatures = [labels: experimentFeatureLabels]
-	    experiment.parsingID = result.equipment.id
+            experiment.parsingID = result.equipment.id
         }
 
-	def allBarcodes = plateSetsByBarcode.keySet() + resultPlatesByBarcode.keySet()
+        def allBarcodes = plateSetsByBarcode.keySet() + resultPlatesByBarcode.keySet()
 
-	allBarcodes.each{ barcode ->
+        allBarcodes.each{ barcode ->
             def plate = [:]
             plate.plateID = barcode
             plate.rows = []

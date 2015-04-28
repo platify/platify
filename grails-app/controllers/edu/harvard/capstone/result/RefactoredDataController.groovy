@@ -16,7 +16,8 @@ class RefactoredDataController {
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
 
-    def save(Result resultInstance) {
+    def save() {
+        def resultInstance = Result.get(params.id)
 
         if (!resultInstance){
             render(contentType: "application/json") {
