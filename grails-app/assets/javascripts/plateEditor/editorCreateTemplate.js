@@ -1,3 +1,6 @@
+/*jslint browser: true*/
+/*global $, jQuery, alert*/
+
 // constants
 var DIMENSION = 100;
 var GRID_HEIGHT = 100;
@@ -17,12 +20,14 @@ var highlightedCoords = [];
  * A function that creates a blank data set for initializing the grid example
  * page. The data set is of dimension DIMENSION x DIMENSION.
  */
-function createBlankData(){
-	var result = [];
+function createBlankData() {
+	"use strict";
+	var i, j, result;
+	result = [];
 
-	for (var i = 0; i < GRID_HEIGHT; i++){
+	for (i = 0; i < GRID_HEIGHT; i++) {
 		result[i] = [];
-		for (var j = 0; j < GRID_WIDTH; j++){
+		for (j = 0; j < GRID_WIDTH; j++) {
 			result[i][j] = null;
 		}
 	}
@@ -33,31 +38,23 @@ function createBlankData(){
  * A function that creates a random data set for displaying in the grid example
  * page. The data set is of dimension DIMENSION x DIMENSION.
  */
-function createRandomData(){
-	var result = [];
-	for (var i=0; i < GRID_HEIGHT; i++){
+function createRandomData() {
+	"use strict";
+	var i, j, result;
+	result = [];
+
+	for (i = 0; i < GRID_HEIGHT; i++) {
 		result[i] = [];
-		for (var j=0; j < GRID_WIDTH; j++){
-			result[i][j] = "L" + Math.floor(Math.random()*100);
+		for (j = 0; j < GRID_WIDTH; j++) {
+			result[i][j] = "L" + Math.floor(Math.random() * 100);
 		}
 	}
 	return result;
 }
 
-/**
- * Loads a json plate model and updates the grid and category legend
- */
-function loadJsonData(plateJson) {
-	
-	plateModel = translateInputJsonToModel(plateJson);
-	
-	for (var row in plateModel["rows"]) {
-		for (var column in plateModel["rows"][row]["columns"]) {
-			var newContents = plateModel["rows"][row]["columns"][column]["wellGroupName"];		// perhaps use return result, like random data instead !! ??
-			
-			grid.updateCellContents(row, column, newContents);
-		}
-	}
+function txtFieldFocus() {
+	"use strict";
+	$("#newLabelValue").focus();
 }
 
 /**
@@ -67,24 +64,25 @@ function loadJsonData(plateJson) {
  * Class. This function changes the background color of all selected cells
  * to the currentHighlightColor.
  */
-function handleSelectedCells(startRow,startCol,endRow, endCol){
+function handleSelectedCells(startRow, startCol, endRow, endCol) {
+	"use strict";
+	var out, i, j, key, coordinatesToHighlight;
 	// write to the selected cells div, the cells that are selected
-	var out = document.getElementById("cellRange");
-	out.innerHTML = Grid.getRowLabel(startRow)+startCol+":"
-					+Grid.getRowLabel(endRow)+endCol;
+	out = document.getElementById("cellRange");
+	out.innerHTML = Grid.getRowLabel(startRow) + startCol + ":" + Grid.getRowLabel(endRow) + endCol;
 
 
 	// highlight those cells with the current color
-	var coordinatesToHighlight = [];
-	for (var i=startRow; i<=endRow; i++){
-		for (var j=startCol; j<=endCol; j++){
+	coordinatesToHighlight = [];
+	for (i = startRow; i <= endRow; i++) {
+		for (j = startCol; j <= endCol; j++) {
 			coordinatesToHighlight.push([i, j]);
 			// set global record of highlights
 			highlightedCoords.push([i, j]);
 		}
 	}
-	var key = "key" + highlightKeyCounter;
-	grid.setCellColors(coordinatesToHighlight,currentHighlightColor, key);
+	key = "key" + highlightKeyCounter;
+	grid.setCellColors(coordinatesToHighlight, currentHighlightColor, key);
 	currentHighlightKeys.push(key);
 	highlightKeyCounter++;
 	txtFieldFocus();
@@ -97,10 +95,11 @@ function handleSelectedCells(startRow,startCol,endRow, endCol){
  * the most key used to create the most recent background color change as
  * stored in the currentHighlightKeys array.
  */
-function removeHighlightedArea(){
+function removeHighlightedArea() {
+	"use strict";
 	if (currentHighlightKeys.length > 0) {
 		grid.removeCellColors(currentHighlightKeys.pop());
-		
+
 		// need to decrement highlightedCoords here !! 
 		//(not the same number of items removed !!!)
 		highlightedCoords.pop();	// need to fix !!
@@ -114,7 +113,8 @@ function removeHighlightedArea(){
  * the most key used to create the most recent background color change as
  * stored in the currentHighlightKeys array.
  */
-function removeAllHighlightedCells(){
+function removeAllHighlightedCells() {
+	"use strict";
 	while (currentHighlightKeys.length > 0) {
 		grid.removeCellColors(currentHighlightKeys.pop());
 	}
@@ -128,7 +128,8 @@ function removeAllHighlightedCells(){
  * It also registers the handleSelectedCells function as a listener for
  * the event that user selected cell ranges in the grid change.
  */
-function createGrid(){
+function createGrid() {
+	"use strict";
 	// construct the Grid object with the id of the html container element
 	// where it should be placed (probably a div) as an argument
 	grid  = new Grid("myGrid");
@@ -147,11 +148,13 @@ function createGrid(){
 }
 
 function enableGridSelection() {
+	"use strict";
 	removeAllHighlightedCells();
 	grid.enableCellSelection();
 }
 
 function disableGridSelection() {
+	"use strict";
 	removeAllHighlightedCells();
 	grid.disableCellSelection();
 }
@@ -160,46 +163,47 @@ function disableGridSelection() {
  * This function changes the style of a particular cell
  */
 function addTemplateValue() {
-	//var selCells = grid.getSelectedCells();
-	var selCells = highlightedCoords;
+	"use strict";
+	var selCells, cellValue, cell, row, column, wgs;
+	selCells = highlightedCoords;
 	console.log(selCells);
-	var cellValue = document.getElementById("newLabelValue").value;
-	
+	cellValue = document.getElementById("newLabelValue").value;
+
 	// just keeping list of well values
-	if (wellGroupings.indexOf(cellValue) == -1) {
+	if (wellGroupings.indexOf(cellValue) === -1) {
 		wellGroupings.push(cellValue);
 	}
-	
+
 	// update selected grid cells with label
-	for (var cell in selCells) {
-		var row = selCells[cell][0];
-		var column = selCells[cell][1];
-		
+	for (cell in selCells) {
+		row = selCells[cell][0];
+		column = selCells[cell][1];
+
 		if (plateModel["rows"] == null) {
 			plateModel["rows"] = {};
 		}
-		
+
 		if (plateModel["rows"][row] == null) {
 			plateModel["rows"][row] = {};
 		}
-		
+
 		if (plateModel["rows"][row]["columns"] == null) {
 			plateModel["rows"][row]["columns"] = {};
 		}
-		
+
 		if (plateModel["rows"][row]["columns"][column] == null) {
 			plateModel["rows"][row]["columns"][column] = {};
 			plateModel["rows"][row]["columns"][column]["wellGroupName"] = cellValue;
 		}
-		
+
 		grid.updateCellContents(row, column, cellValue);
 	}
-	
+
 	console.log("plateModel1:" + JSON.stringify(plateModel));
-	
-	var wgs = document.getElementById("wellGroupSpan");
+
+	wgs = document.getElementById("wellGroupSpan");
 	wgs.innerHTML = wellGroupings;
-	
+
 	// clear current selection
 	removeAllHighlightedCells();
 }
@@ -348,12 +352,28 @@ function saveConfigToServer(){
 	});
 }
 
+/**
+ * Loads a json plate model and updates the grid and category legend
+ */
+function loadJsonData(plateJson) {
+	"use strict";
+	var row, column, newContents;
+	plateModel = translateInputJsonToModel(plateJson);
+
+	for (row in plateModel["rows"]) {
+		for (column in plateModel["rows"][row]["columns"]) {
+			newContents = plateModel["rows"][row]["columns"][column]["wellGroupName"];
+
+			grid.updateCellContents(row, column, newContents);
+		}
+	}
+}
 
 /**
  * This function handles the window load event. It initializes and fills the
  * grid with blank data and sets up the event handlers on the
  */
-function init(){
+function init() {
 
 	if (window.tWidth != null) {
 		GRID_WIDTH = window.tWidth;
@@ -378,8 +398,3 @@ function init(){
 }
 
 window.onload = init;
-
-// jQuery ui stuff
-function txtFieldFocus() {
-	$("#newLabelValue").focus();
-};
