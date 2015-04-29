@@ -14,6 +14,30 @@ function createBlankData(width, height) {
 }
 
 
+/**
+ * Colors each cell in the grid.  The color is determined by the value
+ * in the cell.
+ */
+function colorGrid(dataSet) {
+    // first get a color quantizer
+    var flattened = dataSet.reduce(function(a, b) {
+        return a.concat(b);
+    });
+    var colorScale = d3.scale.linear().domain([d3.min(flattened),
+                                               d3.max(flattened)]).rangeRound([0,8]);
+
+    var valueStyles = {};
+    for (var x=0; x<grid.rowsSize; x++) {
+        valueStyles[x] = {};
+        for (var y=1; y<=grid.colsSize; y++) {
+            var value = grid.getDataPoint(x+1, y);
+            valueStyles[x][y] = "q" + colorScale(value) + "-9";
+        }
+    }
+    grid.grid.setCellCssStyles("valueStyles", valueStyles);
+}
+
+
 function createGrid() {
     grid  = new Grid("resultGrid");
     loadGrid(createBlankData(100,100));
@@ -53,12 +77,14 @@ function init() {
 function loadGrid(dataSet) {
     grid.setData(dataSet);
     grid.fillUpGrid();
+    colorGrid(dataSet);
 }
 
 
 function plateSelected(plateID) {
     experiment.selectPlate(plateID);
     loadGrid(experiment.data);
+
     $('input[name="rawOrNorm"][value="raw"]')[0].checked = true;
     $('#zFactor').text(experiment.zFactor());
     $('#zPrimeFactor').text(experiment.zPrimeFactor());
