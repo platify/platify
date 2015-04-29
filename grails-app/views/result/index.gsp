@@ -14,6 +14,7 @@
 		<asset:stylesheet href="grid/slick-default-theme.css"/>
 		<asset:stylesheet href="grid/Grid.css"/>
 		<asset:stylesheet href="colorbrewer.css"/>
+		<asset:stylesheet href="bootstrap-toggle.min.css"/>
 	</head>
 	<body>
 		<div class="content-fluid">
@@ -31,10 +32,7 @@
 					/>
 					</div>
 					<select id="plateSelect" onChange="plateSelected(this.value)" size="5" style="width: 90%"></select>
-					<div>
-						<label>Raw: <input type="radio" name="rawOrNorm" value="raw" onClick="toggleRawOrNorm(this)" checked /></label>
-						<label>Normalized: <input type="radio" name="rawOrNorm" value="norm" onClick="toggleRawOrNorm(this)" /></label>
-					</div>
+					<input id="rawNormToggle" type="checkbox" data-toggle="toggle" data-on="Raw" data-off="Normalized" data-size="small">
 					<dl>
 						<dt>Z-Factor</dt>
 						<dd id="zFactor"></dd>
@@ -46,7 +44,6 @@
 				<!-- Right Column -->
 				<div class="col-sm-10">
 				<div id="resultGrid" class="Blues" style="width:100%;height:650px;"></div>
-				<pre id="dump"></pre>
 				</div> <!-- Right Column END -->	
 			</div>
 		</div>
@@ -71,12 +68,14 @@
 	<asset:javascript src="d3.v3.min.js" />
 
 	<!-- results-specific js -->
+	<asset:javascript src="bootstrap-toggle.min.js" />
+	<asset:javascript src="plate-statistics/statistics.js" />
 	<g:javascript>
 	var RESULT_KITCHEN_SINK_URL = "${createLink(action: 'kitchenSink', experimentInstance: null)}";
 	var RESULT_SAVE_REFACTORED_DATA_URL = "${createLink(controller: 'refactoredData', action: 'save', resultInstance: null)}";
 	</g:javascript>
-	<asset:javascript src="plate-statistics/statistics.js" />
 	<asset:javascript src="result/ExperimentModel.js" />
 	<asset:javascript src="result/index.js" />
+
 	</body>
 </html>

@@ -68,6 +68,12 @@ function experimentSelected(experimentId) {
 
 
 function init() {
+    // set up handlers
+    $('#rawNormToggle').change(function() {
+        toggleRawOrNorm($(this).prop('checked') ? 'raw' : 'norm');
+    });
+
+    // set up grid
     createGrid();
     var experimentId = $('#experimentSelect option:selected')[0].value;
     experimentSelected(experimentId); // calls plateSelected for us
@@ -85,15 +91,14 @@ function plateSelected(plateID) {
     experiment.selectPlate(plateID);
     loadGrid(experiment.data);
 
-    $('input[name="rawOrNorm"][value="raw"]')[0].checked = true;
+    $('#rawNormToggle').bootstrapToggle('on');
     $('#zFactor').text(experiment.zFactor());
     $('#zPrimeFactor').text(experiment.zPrimeFactor());
-    $('#dump').text(JSON.stringify(experiment.currentPlate, null, 4));
 }
 
 
-function toggleRawOrNorm(input) {
-    if (input.value === 'norm') {
+function toggleRawOrNorm(value) {
+    if (value === 'norm') {
         loadGrid(experiment.normalizedData);
     }
     else {
