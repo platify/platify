@@ -32,7 +32,7 @@
 					/>
 					</div>
 					<select id="plateSelect" onChange="plateSelected(this.value)" size="5" style="width: 90%"></select>
-					<input id="rawNormToggle" type="checkbox" data-toggle="toggle" data-on="Raw" data-off="Normalized" data-size="small">
+					<input id="rawNormToggle" type="checkbox" data-toggle="toggle" data-onstyle="primary" data-offstyle="primary" data-on="Raw" data-off="Normalized" data-size="small">
 					<dl>
 						<dt>Z-Factor</dt>
 						<dd id="zFactor"></dd>
