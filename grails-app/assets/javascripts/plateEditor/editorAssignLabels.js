@@ -753,7 +753,7 @@ function importCompoundsFromFile() {
 //data format translation
 function translateModelToOutputJson(pModel) {
 	"use strict";
-	var plateJson, plate, wellGroup, cmpdValue, row, column, well, labels, catKey, labKey, label, convCat, convLab, cmpdLabel;
+	var plateJson, plate, wellGroup, cmpdValue, row, column, well, labels, catKey, labKey, label, convCat, convLab, cmpdLabel, i, j;
 	plateJson = {};
 	plate = {};
 	plate.name = pModel.name;
@@ -784,55 +784,65 @@ function translateModelToOutputJson(pModel) {
 		}
 	}
 
-	// 
-	for (row in pModel.rows) {
-		for (column in pModel.rows[row].columns) {
-			well = {};
-			well.row = row;
-			well.column = column;
 
-			well.groupName = pModel.rows[row].columns[column].wellGroupName;
+	// Send all values for the grid
+	for (i = 1; i <= pModel.grid_width; i++) {
+		// need null check here !!
+		for (j = 1; j <= pModel.grid_height; j++) {
+			well = {};
+			well.row = i;
+			well.column = j;
 			labels = [];
-			for (catKey in pModel.rows[row].columns[column].categories) {
-				for (labKey in pModel.rows[row].columns[column].categories[catKey]) {
-					label = {};
-					// if catKey, or labKey have been converted from a decimal, convert them back for output!
-					convCat = catKey.toString().split('__dot__').join('.');
-					convLab = labKey.toString().split('__dot__').join('.');
-					
-					// TEMP, fix to add control wells!
-					if (convCat === "control") {
-						if (convLab === "positive") {
-							well.control = "positive";
-						} else if (convLab === "negative") {
-							well.control = "negative";
+			
+			if (pModel.rows[i] !== undefined && pModel.rows[i].columns[j] !== undefined) {
+				well.groupName = pModel.rows[i].columns[j].wellGroupName;
+				for (catKey in pModel.rows[i].columns[j].categories) {
+					for (labKey in pModel.rows[i].columns[j].categories[catKey]) {
+						label = {};
+						// if catKey, or labKey have been converted from a decimal, convert them back for output!
+						convCat = catKey.toString().split('__dot__').join('.');
+						convLab = labKey.toString().split('__dot__').join('.');
+						
+						// TEMP, fix to add control wells!
+						if (convCat === "control") {
+							if (convLab === "positive") {
+								well.control = "positive";
+							} else if (convLab === "negative") {
+								well.control = "negative";
+							} else {
+								// ignoring other labels with control: something ??
+							}
 						} else {
-							// ignoring other labels with control: something ??
+							label.category = convCat;
+							label.name = convLab;
+							label.value = pModel.rows[i].columns[j].categories[catKey][labKey].color;
+							label.units = pModel.rows[i].columns[j].categories[catKey][labKey].units;
+							labels.push(label);
 						}
-					} else {
-						label.category = convCat;
-						label.name = convLab;
-						label.value = pModel.rows[row].columns[column].categories[catKey][labKey].color;
-						label.units = pModel.rows[row].columns[column].categories[catKey][labKey].units;
-						labels.push(label);
 					}
 				}
+				
+				if (well.groupName !== undefined) {
+					cmpdLabel = {};
+					cmpdLabel.category = "compound";
+					cmpdLabel.name = groupNames[well.groupName];
+					labels.push(cmpdLabel);
+					if (well.control !== "positive" && well.control !== "negative") {
+						well.control = "compound";		// could also be a control !!!
+					}
+				} else {
+					// default to empty control
+					if (well.control !== "positive" && well.control !== "negative") {
+						well.control = "empty";
+					}
+				}
+				
+			} else {
+				// check for empty well:
+				well.groupName = "";
+				well.control = "empty";
 			}
 
-			if (well.groupName !== undefined) {
-				cmpdLabel = {};
-				cmpdLabel.category = "compound";
-				cmpdLabel.name = groupNames[well.groupName];
-				labels.push(cmpdLabel);
-				if (well.control !== "positive" && well.control !== "negative") {
-					well.control = "compound";		// could also be a control !!!
-				}
-			} else {
-				if (well.control !== "positive" && well.control !== "negative") {
-					well.control = "empty";
-				}
-			}
-			
 			well.labels = labels;
 			plate.wells.push(well);
 		}
