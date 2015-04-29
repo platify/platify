@@ -664,6 +664,27 @@ function addNewDose() {
 	removeAllHighlightedCells();
 }
 
+function addNewControlLabel() {
+	"use strict";
+	var selCells, cat, label, color;
+	selCells = highlightedCoords;
+	console.log(selCells);
+	cat = "control";
+	
+	if (document.getElementById("negWellType").checked) {
+		label = "negative";
+	} else {
+		label = "positive";
+	}
+	//label = document.getElementById("newControlWellType").value;
+	color = document.getElementById("newControlWellValue").value;
+
+	createNewLabel(cat, label, "", color, selCells);
+
+	updateCategoryList();
+	removeAllHighlightedCells();
+}
+
 /**
  * addEvent - This function adds an event handler to an html element in
  * a way that covers many browser types.
@@ -780,10 +801,14 @@ function translateModelToOutputJson(pModel) {
 					convLab = labKey.toString().split('__dot__').join('.');
 					
 					// TEMP, fix to add control wells!
-					if (convCat === "positive") {
-						well.control = "positive";
-					} else if (convCat === "negative") {
-						well.control = "negative";
+					if (convCat === "control") {
+						if (convLab === "positive") {
+							well.control = "positive";
+						} else if (convLab === "negative") {
+							well.control = "negative";
+						} else {
+							// ignoring other labels with control: something ??
+						}
 					} else {
 						label.category = convCat;
 						label.name = convLab;
@@ -929,6 +954,11 @@ function hideDoseStepPanel() {
 	$("#addDoseStepPanel").hide();
 }
 
+function hideControlWellPanel() {
+	"use strict";
+	$("#addControlWellPanel").hide();
+}
+
 function hidePlateLabelPanel() {
 	"use strict";
 	$("#addPlateLabelPanel").hide();
@@ -958,6 +988,7 @@ function showLabelPanel() {
 	"use strict";
 	hideDosePanel();
 	hideDoseStepPanel();
+	hideControlWellPanel();
 	hidePlateLabelPanel();
 	hidePlateLabelCatPanel();
 	$("#addLabelPanel").show();
@@ -969,6 +1000,7 @@ function showDosePanel() {
 	"use strict";
 	hideLabelPanel();
 	hideDoseStepPanel();
+	hideControlWellPanel();
 	hidePlateLabelPanel();
 	hidePlateLabelCatPanel();
 	$("#addDosePanel").show();
@@ -980,9 +1012,22 @@ function showDoseStepPanel() {
 	"use strict";
 	hideLabelPanel();
 	hideDosePanel();
+	hideControlWellPanel();
 	hidePlateLabelPanel();
 	hidePlateLabelCatPanel();
 	$("#addDoseStepPanel").show();
+	enableGridSelection();
+	showCategoryPanel();
+}
+
+function showControlWellPanel() {
+	"use strict";
+	hideLabelPanel();
+	hideDosePanel();
+	hideDoseStepPanel();
+	hidePlateLabelPanel();
+	hidePlateLabelCatPanel();
+	$("#addControlWellPanel").show();
 	enableGridSelection();
 	showCategoryPanel();
 }
@@ -992,6 +1037,7 @@ function showPlateLabelPanel() {
 	hideLabelPanel();
 	hideDosePanel();
 	hideDoseStepPanel();
+	hideControlWellPanel();
 	hideCategoryPanel();
 	$("#addPlateLabelPanel").show();
 
@@ -1011,6 +1057,8 @@ $(function() {
 			showDosePanel();
 		} else if ($(this).prop('id') === "doseStepLabType") {
 			showDoseStepPanel();
+		} else if ($(this).prop('id') === "controlType") {
+			showControlWellPanel();
 		} else if ($(this).prop('id') === "plateLabType") {
 			showPlateLabelPanel();
 		}
@@ -1185,6 +1233,7 @@ function init() {
 	hidePlateLabelCatPanel();
 	hideDosePanel();
 	hideDoseStepPanel();
+	hideControlWellPanel();
 	hidePlateLabelPanel();
 
 	// fetch templateJson
@@ -1194,6 +1243,7 @@ function init() {
 	addEvent("addNewLabel", "click", addNewLabel);
 	addEvent("addNewDose", "click", addNewDose);
 	addEvent("addDoseStep", "click", addDoseStep);
+	addEvent("addNewControlWell", "click", addNewControlLabel);
 	addEvent("addNewPlateLabel", "click", addNewPlateLabel);
 	addEvent("clearAllSelection", "click", removeAllHighlightedCells);
 

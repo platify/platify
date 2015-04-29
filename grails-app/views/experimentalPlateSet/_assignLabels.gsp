@@ -16,7 +16,10 @@
 		                    <input type="radio" name="labeltype" id="doseStepLabType"/>Dose Step
 		                </label>
 		                <label class="btn btn-default btn-xs">
-		                    <input type="radio" name="labeltype" id="plateLabType"/> Plate Label
+		                    <input type="radio" name="labeltype" id="controlType"/>Control
+		                </label>
+		                <label class="btn btn-default btn-xs">
+		                    <input type="radio" name="labeltype" id="plateLabType"/>Plate Label
 		                </label>
 		               <!--  <label class="btn btn-default btn-xs">
 		                    <input type="radio" name="labeltype" id="plateSetLevel"/> Plate-Set
@@ -50,6 +53,22 @@
 					<label># of Replicates:</label><input type="text" id="replicatesValue" value="1"/>
 					<label>Top Dose Color:</label><input type="color" class="btn-default glyphicon color-p" id="tDoseColorValue" value="#FFFF00"/>
 					<button id="addDoseStep" class="btn btn-default btn-xs glyphicon glyphicon-plus"></button>
+				</div>
+			</div>
+			<div class="toggler">
+				<div id="addControlWellPanel">
+					<label>Control Type:</label>
+					<div class="btn-group" data-toggle="buttons">
+		                <label class="btn btn-default btn-xs active">
+		                    <input type="radio" name="newControlWellType" id="posWellType"/>Positive Control
+		                </label>
+		                <label class="btn btn-default btn-xs">
+		                    <input type="radio" name="newControlWellType" id="negWellType"/>Negative Control
+		                </label>
+		            </div>
+					
+					<label>Color:</label><input type="color" class="btn-default glyphicon color-p" id="newControlWellValue" value="#FFFF00"/>
+					<button id="addNewControlWell" class="btn btn-default btn-xs glyphicon glyphicon-plus"></button>
 				</div>
 			</div>
 			<div class="toggler">
