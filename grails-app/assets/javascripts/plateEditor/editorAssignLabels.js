@@ -28,9 +28,9 @@ function createBlankData() {
 	var result, i, j;
 	result = [];
 
-	for (i = 0; i < plateModel.grid_height; i++){
+	for (i = 0; i < plateModel.grid_height; i++) {
 		result[i] = [];
-		for (j = 0; j < plateModel.grid_width; j++){
+		for (j = 0; j < plateModel.grid_width; j++) {
 			result[i][j] = null;
 		}
 	}
@@ -45,11 +45,11 @@ function createRandomData() {
 	"use strict";
 	var result, i, j;
 	result = [];
-	
-	for (i = 0; i < plateModel.grid_height; i++){
+
+	for (i = 0; i < plateModel.grid_height; i++) {
 		result[i] = [];
-		for (j = 0; j < plateModel.grid_width; j++){
-			result[i][j] = "L" + Math.floor(Math.random()*100);
+		for (j = 0; j < plateModel.grid_width; j++) {
+			result[i][j] = "L" + Math.floor(Math.random() * 100);
 		}
 	}
 	return result;
@@ -80,8 +80,8 @@ function handleSelectedCells(startRow, startCol, endRow, endCol) {
 
 	// highlight those cells with the current color
 	coordinatesToHighlight = [];
-	for (i = startRow; i <= endRow; i++){
-		for (j = startCol; j <= endCol; j++){
+	for (i = startRow; i <= endRow; i++) {
+		for (j = startCol; j <= endCol; j++) {
 			coordinatesToHighlight.push([i, j]);
 			// set global record of highlights
 			highlightedCoords.push([i, j]);
@@ -105,7 +105,7 @@ function removeHighlightedArea() {
 	"use strict";
 	if (currentHighlightKeys.length > 0) {
 		grid.removeCellColors(currentHighlightKeys.pop());
-		
+
 		// need to decrement highlightedCoords here !! 
 		//(not the same number of items removed !!!)
 		highlightedCoords.pop();	// need to fix !!
@@ -155,9 +155,9 @@ function updateCellColors(cat, label, color) {
 			plateModel.rows[row].columns[column].categories[cat] = {};
 			plateModel.rows[row].columns[column].categories[cat][label] = {};
 			plateModel.rows[row].columns[column].categories[cat][label].color = color;
-			
+
 			catLegend[cat].labels[label].color = color;
-			
+
 			// update actual grid cell
 			newContents = plateModel.rows[row].columns[column].wellGroupName;
 			for (catKey in plateModel.rows[row].columns[column].categories) {
@@ -177,11 +177,10 @@ function updateCatVisibility(cat) {
 	if (catLegend[cat] !== undefined) {
 		for (legLab in catLegend[cat].labels) {
 			for (cellRef in catLegend[cat].labels[legLab].cellref) {
-				
 				cellRefArr = catLegend[cat].labels[legLab].cellref[cellRef].split("-");
 				row = cellRefArr[0];
 				column = cellRefArr[1];
-				
+
 				// update actual grid cell
 				newContents = plateModel.rows[row].columns[column].wellGroupName;
 				for (catKey in plateModel.rows[row].columns[column].categories) {
@@ -202,8 +201,6 @@ function createCompoundInput(wellGroup) {
 	var newInput = document.createElement("input");
 	newInput.id = "wellGroup-" + wellGroup;
 	newInput.type = "text";
-	//newInput.className = "btn-default";
-	
 	return newInput;
 }
 
@@ -217,25 +214,22 @@ function createColorPicker(cat, label) {
 	newInput.className = "btn-default glyphicon color-p";
 	newInput.defaultValue = catLegend[cat].labels[label].color;
 	newInput.value = catLegend[cat].labels[label].color;
-	//newInput.onchange = onCatColorChange;
-	
+
 	editLabelBtn = document.createElement("button");
 	editLabelBtn.id = "edit-" + cat + "-" + label;
 	editLabelBtn.type = "button";
 	editLabelBtn.className = "btn btn-default btn-xs glyphicon glyphicon-pencil";
-	//editLabelBtn.onclick = onEditLabelChange;
-	
+
 	deleteLabelBtn = document.createElement("button");
 	deleteLabelBtn.id = "delete-" + cat + "-" + label;
 	deleteLabelBtn.type = "button";
 	deleteLabelBtn.value = "Delete Label";
 	deleteLabelBtn.className = "btn btn-default btn-xs glyphicon glyphicon-trash";
-	//deleteLabelBtn.onclick = onDeleteLabelChange;
-	
+
 	cpDiv.appendChild(newInput);
 	cpDiv.appendChild(editLabelBtn);
 	cpDiv.appendChild(deleteLabelBtn);
-	
+
 	return cpDiv;
 }
 
@@ -248,14 +242,14 @@ function updateCompoundList() {
 		innerDiv.className = "col-xs-12";
 		newLabel = document.createElement("label");
 		newLabel.appendChild(document.createTextNode(wellGroup));
-		
+
 		newInput = createCompoundInput(wellGroup);
 		innerDiv.appendChild(newLabel);
 		innerDiv.appendChild(newInput);
 		newDiv.appendChild(innerDiv);
 	}
 	document.getElementById("compoundList").innerHTML = newDiv.innerHTML;
-	
+
 	// won't seem to take value for input until created ??
 	for (wellGroup in groupNames) {			// USED a second time ?? // does this need to be re-inited ?? ( it's prob ok?)
 		if (groupNames[wellGroup] !== undefined && groupNames[wellGroup] !== null) {
@@ -270,7 +264,7 @@ function updatePlateLabelList() {
 	var pLabels, newDiv, i, newH;
 	pLabels = plateModel.labels;
 	newDiv = document.createElement("div");
-	
+
 	for (i = 0; i < pLabels.length; i++) {
 		newH = document.createElement("H5");
 		newH.appendChild(document.createTextNode(pLabels[i].category + ": "));	// should null check !
@@ -298,45 +292,45 @@ function createCatLabel(catKey) {
 	convCat = catKey.toString().split('__dot__').join('.');
 	newLabel.appendChild(document.createTextNode(convCat));
 	labDiv.appendChild(newLabel);
-	
+
 	return labDiv;
 }
 
 // event handlers
-function onCatColorChange() {
+function onCatColorChange(event) {
 	"use strict";
 	var idArr, cat, label;
-	idArr = this.id.split("-");		// investigate use of "event.currentTarget"
+	idArr = event.currentTarget.id.split("-");
 	cat = idArr[1];
 	label = idArr[2];
-	updateCellColors(cat, label, this.value);	
+	updateCellColors(cat, label, event.currentTarget.value);
 }
 
-function onCatVisCheck() {
+function onCatVisCheck(event) {
 	"use strict";
 	var idArr, cat;
-	idArr = this.id.split("-");		// investigate use of "event.currentTarget"
+	idArr = event.currentTarget.id.split("-");		// investigate use of "event.currentTarget"
 	cat = idArr[1];
-	catLegend[cat].visible = this.checked;
+	catLegend[cat].visible = event.currentTarget.checked;
 	updateCatVisibility(cat);
 }
 
-function onEditLabelChange() {		// some issues here !! (when editing 1st label in cat, it actually changes 2nd !!)
+function onEditLabelChange(event) {	// some issues here !! (when editing 1st label in cat, it actually changes 2nd !!)
 	"use strict";
-	var idArr = this.id.split("-");		// investigate use of "event.currentTarget"
+	var idArr = event.currentTarget.id.split("-");		// investigate use of "event.currentTarget"
 	tmpEditCat = idArr[1];
 	tmpEditOldLabel = idArr[2];
-	console.log("editLabel: "+ tmpEditCat + ";" + tmpEditOldLabel);
+	console.log("editLabel: " + tmpEditCat + ";" + tmpEditOldLabel);
 	$("#editLabelDialog").dialog("open");
 }
 
-function onDeleteLabelChange() {
+function onDeleteLabelChange(event) {
 	"use strict";
 	var idArr, cat, label;
-	idArr = this.id.split("-");
+	idArr = event.currentTarget.id.split("-");
 	cat = idArr[1];
 	label = idArr[2];
-	console.log("deleteLabel: "+ cat + ";" + label);
+	console.log("deleteLabel: " + cat + ";" + label);
 	removeLabel(cat, label);
 }
 
@@ -351,14 +345,14 @@ function updateCategoryList() {
 			// if label has been converted from a decimal, then convert it back for display!!
 			convLab = labelKey.toString().split('__dot__').join('.');
 			newLi.appendChild(document.createTextNode(convLab));
-			
+
 			newInput = createColorPicker(catKey, labelKey);
 			newLi.appendChild(newInput);
 			newDiv.appendChild(newLi);
 		}
 	}
 	document.getElementById("categoryList").innerHTML = newDiv.innerHTML;
-	
+
 	// apply events with a redundant nested loop. only seems to work when part of dom. fix!!(remove loop)
 	for (catKey in catLegend) {
 		$("#vischeck-" + catKey).attr('checked', 'checked');
@@ -391,7 +385,7 @@ function removeLabel(cat, label) {
 	"use strict";
 	var cellRef, cellRefArr, row, column, newContents, catKey, labKey;
 	delete catLegend[cat].labels[label].color;
-	
+
 	// remove all cells with cat and label (messy?)
 	for (cellRef in catLegend[cat].labels[label].cellref) {			//change iteration method !!!
 		// what are you doing here ??, define some sort of structure !!!
@@ -400,7 +394,7 @@ function removeLabel(cat, label) {
 		column = cellRefArr[1];
 
 		delete plateModel.rows[row].columns[column].categories[cat];
-		
+
 		// update actual grid cell
 		newContents = plateModel.rows[row].columns[column].wellGroupName;
 		for (catKey in plateModel.rows[row].columns[column].categories) {
@@ -410,14 +404,14 @@ function removeLabel(cat, label) {
 		}
 		grid.updateCellContents(row, column, newContents);
 	}
-	
+
 	// remove from color legend cell reverse lookup
 	delete catLegend[cat].labels[label];
-	
+
 	if (Object.keys(catLegend[cat].labels).length === 0) {
 		delete catLegend[cat];
 	}
-	
+
 	// referesh category elements
 	updateCategoryList();
 }
@@ -428,22 +422,22 @@ function updateLabelName(cat, oldLabel, label) {	// should we allow for change o
 	// remove spaces from the names (replacing with '_')
 	cat = cat.toString().split(' ').join('_');
 	label = label.toString().split(' ').join('_');
-	
+
 	// remove decimal point from the names (replacing with '_|_')
 	cat = cat.toString().split('.').join('__dot__');
 	label = label.toString().split('.').join('__dot__');
-	
+
 	// update color legend cell reverse lookup				
 	if (catLegend[cat].labels[label] === undefined) {
 		//catLegend[cat][label] = {};
 		//catLegend[cat][label].cellref = [];
 		catLegend[cat].labels[label] = catLegend[cat].labels[oldLabel];
 
-		console.log("Old color:"+catLegend[cat].labels[oldLabel].color);
-		console.log("New color:"+catLegend[cat].labels[label].color);
+		console.log("Old color:" + catLegend[cat].labels[oldLabel].color);
+		console.log("New color:" + catLegend[cat].labels[label].color);
 		// remove old label
 		delete catLegend[cat].labels[oldLabel];
-		
+
 		// referesh category elements
 		updateCategoryList();
 	} else {
@@ -457,14 +451,15 @@ function updateLabelName(cat, oldLabel, label) {	// should we allow for change o
 // code sample from http://stackoverflow.com/questions/5560248/programmatically-lighten-or-darken-a-hex-color-or-rgb-and-blend-colors
 function shadeColor2(color, percent) {
 	"use strict";
-	var f=parseInt(color.slice(1),16),t=percent<0?0:255,p=percent<0?percent*-1:percent,R=f>>16,G=f>>8&0x00FF,B=f&0x0000FF;
-	return "#"+(0x1000000+(Math.round((t-R)*p)+R)*0x10000+(Math.round((t-G)*p)+G)*0x100+(Math.round((t-B)*p)+B)).toString(16).slice(1);
+	var f = parseInt(color.slice(1), 16), t = percent < 0 ? 0 : 255, p = percent < 0 ? percent * -1 : percent, R = f >> 16, G = f >> 8 & 0x00FF, B = f & 0x0000FF;
+	return "#" + (0x1000000 + (Math.round((t - R) * p) + R) * 0x10000 + (Math.round((t - G) * p) + G) * 0x100 + (Math.round((t - B) * p) + B)).toString(16).slice(1);
 }
 
 function shade(color, percent) {
 	"use strict";
 	if (color.length > 7) {
-		return shadeRGBColor(color, percent);		// THIS FUNCTION is not defined !!, need to throw exception instead !!
+		//return shadeRGBColor(color, percent);		// THIS FUNCTION is not defined !!, need to throw exception instead !!
+		return "0x0000FF";		// some default / or shoudl be null ???
 	} else {
 		return shadeColor2(color, percent);
 	}
@@ -477,18 +472,18 @@ function createNewLabel(cat, label, units, color, applyToCells) {
 	// remove spaces from the names (replacing with '_')
 	cat = cat.toString().split(' ').join('_');
 	label = label.toString().split(' ').join('_');
-	
+
 	// remove decimal point from the names (replacing with '_|_')
 	cat = cat.toString().split('.').join('__dot__');
 	label = label.toString().split('.').join('__dot__');
-	
+
 	// update catLegend color
 	if (catLegend[cat] === undefined) {
 		catLegend[cat] = {};
 		catLegend[cat].labels = {};
 		catLegend[cat].visible = true;
 	}
-	
+
 	if (catLegend[cat].labels[label] === undefined) {
 		catLegend[cat].labels[label] = {};
 		catLegend[cat].labels[label].color = color;
@@ -498,12 +493,12 @@ function createNewLabel(cat, label, units, color, applyToCells) {
 		// in this case cells which already have this label need their color updated also!!
 		updateCellColors(cat, label, color);
 	}
-	
+
 	// update selected grid cells with label
 	for (cell in applyToCells) {
 		row = applyToCells[cell][0];		// change iteration method !!!
 		column = applyToCells[cell][1];
-		
+
 		// messy hack	--> maybe not so bad for efficiency actually ?
 		if (plateModel.rows === undefined) {
 			plateModel.rows = {};
@@ -518,13 +513,13 @@ function createNewLabel(cat, label, units, color, applyToCells) {
 			plateModel.rows[row].columns[column] = {};
 			plateModel.rows[row].columns[column].categories = {};
 		}
-		
+
 		if (plateModel.rows[row].columns[column].wellGroupName === undefined) {
 			// shouldn't real be neccessary if json is loaded at init
 			//plateModel.rows[row].columns[column].wellGroupName = data[row-1][column-1];
 			plateModel.rows[row].columns[column].wellGroupName = "-";
 		}
-		
+
 		// the case where we are overwriting a cell with a new value for the same category
 		if (plateModel.rows[row].columns[column].categories[cat] !== undefined) {
 			// if that is the case we should remove the old reference to the cell in the catLegend cellref
@@ -535,7 +530,7 @@ function createNewLabel(cat, label, units, color, applyToCells) {
 				}
 			}
 		}
-		
+
 		plateModel.rows[row].columns[column].categories[cat] = {};
 		plateModel.rows[row].columns[column].categories[cat][label] = {};
 		plateModel.rows[row].columns[column].categories[cat][label].color = color;
@@ -547,9 +542,9 @@ function createNewLabel(cat, label, units, color, applyToCells) {
 				newContents += "," + plateModel.rows[row].columns[column].categories[catKey][labKey].color;
 			}
 		}
-		
+
 		grid.updateCellContents(row, column, newContents);
-		
+
 		// update color legend cell reverse lookup
 		if (catLegend[cat].labels[label].cellref === undefined) {
 			catLegend[cat].labels[label].cellref = [];
@@ -569,32 +564,32 @@ function createNewLabel(cat, label, units, color, applyToCells) {
 function addDoseStep() {
 	"use strict";
 	var selCells, cat, topDose, units, dilution, replicates, topColor, wellGroupLength, doseStepLength, currentDose, currentColor, i, j;
-	
+
 	selCells = highlightedCoords;
-	console.log("selcells="+selCells);
+	console.log("selcells=" + selCells);
 	cat = "dosage";
-	
+
 	topDose = document.getElementById("topDoseValue").value;
 	units = document.getElementById("doseStepUnits").value;
 	dilution = document.getElementById("stepDilutionValue").value;
 	replicates = document.getElementById("replicatesValue").value;
 	topColor = document.getElementById("tDoseColorValue").value;
-	
+
 	wellGroupLength = selCells.length;
-	doseStepLength = wellGroupLength/replicates;		// need some validation !!
+	doseStepLength = wellGroupLength / replicates;		// need some validation !!
 	currentDose = topDose;
 	currentColor = topColor;
-	
+
 	for (i = 0; i < wellGroupLength; i++) {
 		for (j = 0; j < replicates; j++) {
-			console.log("i+j:" + (i+j));
-			createNewLabel(cat, currentDose, units, currentColor, [selCells[i+j]]);
+			console.log("i+j:" + (i + j));
+			createNewLabel(cat, currentDose, units, currentColor, [selCells[i + j]]);
 		}
 		i += (replicates - 1);
 		currentColor = shade(currentColor, 0.2); // should we use 1/dilution instead ?? (might be too dramatic a difference !!
 		currentDose = currentDose / dilution;
 	}
-				
+
 	updateCategoryList();
 	removeAllHighlightedCells();
 }
@@ -611,14 +606,14 @@ function addNewLabel() {
 	cat = document.getElementById("newCatValue").value;
 	label = document.getElementById("newLabelValue").value;
 	color = document.getElementById("newColorValue").value;
-	
+
 	createNewLabel(cat, label, "", color, selCells);
-	
+
 	updateCategoryList();
 	// output current object model to console
 	console.log("plateModel:" + JSON.stringify(plateModel));
 	console.log("catLegend:" + JSON.stringify(catLegend));
-	
+
 	//var jsonPlate = translateModelToOutputJson(plateModel);
 	//console.log("jsonPlate:" + JSON.stringify(jsonPlate));
 	removeAllHighlightedCells();
@@ -629,17 +624,17 @@ function addNewPlateLabel() {
 	var cat, label, pLabel;
 	cat = document.getElementById("newPlateCatValue").value;
 	label = document.getElementById("newPlateLabelValue").value;
-	
+
 	if (plateModel.labels === undefined) {
 		plateModel.labels = [];
 	}
-	
+
 	pLabel = {};
 	pLabel.category = cat;
 	pLabel.name = label;
-	
+
 	plateModel.labels.push(pLabel);
-	
+
 	updatePlateLabelList();
 }
 
@@ -655,15 +650,15 @@ function addNewDose() {
 	label = document.getElementById("newDoseValue").value;
 	units = document.getElementById("newDoseUnits").value;
 	color = document.getElementById("newDoseColorValue").value;
-	
+
 	createNewLabel(cat, label, units, color, selCells);
-	
+
 	updateCategoryList();
 
 	// output current object model to console
 	console.log("plateModel:" + JSON.stringify(plateModel));
 	console.log("catLegend:" + JSON.stringify(catLegend));
-	
+
 	//var jsonPlate = translateModelToOutputJson(plateModel);
 	//console.log("jsonPlate:" + JSON.stringify(jsonPlate));
 	removeAllHighlightedCells();
@@ -705,10 +700,9 @@ function importCompoundsFromFile() {
     fileInput = $('#compoundsFile')[0];
     reader = new FileReader();
     reader.onload = function (progressEvent) {
-        parsed = Papa.parse(progressEvent.target.result,
-                                {skipEmptyLines: true});
-        switch (parsed.data[0].length) {
-            case 1:
+		parsed = Papa.parse(progressEvent.target.result, {skipEmptyLines: true});
+		switch (parsed.data[0].length) {
+			case 1:
                 Object.keys(groupNames).forEach(function (group) { groupNames[group] = null; });
                 var compounds = parsed.data.map(function (obj) { return obj[0]; });
                 Object.keys(groupNames).forEach(function (group, i) {
@@ -746,16 +740,16 @@ function translateModelToOutputJson(pModel) {
 	plate.height = pModel.grid_height;
 	plate.experimentID = window.expId;
 	plate.templateID = window.templateId;
-		
+
 	plate.plateID = document.getElementById("barcode").value;
 	plate.wells = [];
-	
+
 	if (pModel.labels !== undefined) {
 		plate.labels = pModel.labels;
 	} else {
 		plate.labels = [];
 	}
-	
+
 	// take the values from the compound input text fields (could do this at input onChange event also)
 	for (wellGroup in groupNames) {
 		if (groupNames[wellGroup] !== undefined) {
@@ -768,14 +762,14 @@ function translateModelToOutputJson(pModel) {
 			}
 		}
 	}
-	
+
 	// 
 	for (row in pModel.rows) {
 		for (column in pModel.rows[row].columns) {
 			well = {};
 			well.row = row;
 			well.column = column;
-			
+
 			well.groupName = pModel.rows[row].columns[column].wellGroupName;
 			labels = [];
 			for (catKey in pModel.rows[row].columns[column].categories) {
@@ -791,17 +785,17 @@ function translateModelToOutputJson(pModel) {
 					labels.push(label);
 				}
 			}
-			
+
 			if (well.groupName !== undefined) {
 				cmpdLabel = {};
 				cmpdLabel.category = "compound";
 				cmpdLabel.name = groupNames[well.groupName];
 				labels.push(cmpdLabel);
-				
+
 				well.control = "compound";		// could also be a control !!!
 			} else {
 				well.control = "empty";
-			}			
+			}
 			well.labels = labels;
 			plate.wells.push(well);
 		}
@@ -818,28 +812,28 @@ function translateInputJsonToModel(plateJson) {
 	groupNames = {};
 	pModel.rows = {};
 	plate = plateJson.plate;
-	
+
 	if (plateJson.labels !== undefined) {
 		pModel.labels = plateJson.labels;
 	} else {
 		pModel.labels = [];
 	}
-	
+
 	pModel.name = plate.name;			// should also copy expId and plateId at this point !!
 	pModel.grid_width = plate.width;
 	pModel.grid_height = plate.height;
-	
+
 	for (i = 0; i < plate.wells.length; i++) {
 		row = plate.wells[i].row;
 		column = plate.wells[i].column;
 		groupName = plate.wells[i].groupName;
 		labels = plate.wells[i].labels;
-		
+
 		if (pModel.rows[row] === undefined) {
 			pModel.rows[row] = {};
 			pModel.rows[row].columns = {};
 		}
-		
+
 		if (pModel.rows[row].columns[column] === undefined) {
 			pModel.rows[row].columns[column] = {};
 			pModel.rows[row].columns[column].wellGroupName = groupName;
@@ -850,17 +844,16 @@ function translateInputJsonToModel(plateJson) {
 			// convert possible disruptive input to safer format !
 			convCat = labels[j].category.toString().split('.').join('__dot__');
 			convLab = labels[j].name.toString().split('.').join('__dot__');
-			
+
 			if (convCat === "compound") {
 				// deal with special 'compound' category !
 				groupNames[groupName] = convLab;		// should do null check ??
-				
 			} else {
 				// other labels
 				if (pModel.rows[row].columns[column].categories[convCat] === undefined) {
 					pModel.rows[row].columns[column].categories[convCat] = {};
 				}
-				
+
 				if (pModel.rows[row].columns[column].categories[convCat][convLab] === undefined) {
 					pModel.rows[row].columns[column].categories[convCat][convLab] = {};
 				}
@@ -879,7 +872,7 @@ function saveConfigToServer() {
 	var plateJson, jqxhr;
 	plateJson = translateModelToOutputJson(plateModel);
 	console.log("SendingToServer: " + JSON.stringify(plateJson));
-   
+
 	jqxhr = $.ajax({		// need to update to save plate instead of template
 		url: hostname + "/plate/save",
 		type: "POST",
@@ -893,12 +886,12 @@ function saveConfigToServer() {
 	}).always(function() {
 		console.log("complete");
 	});
-   
+
 	// Set another completion function for the request above
 	jqxhr.always(function(resData) {
-		console.log( "second complete" );
+		console.log("second complete");
 		console.log("result=" + JSON.stringify(resData));
-		
+
 		if (resData.plate !== undefined &&  resData.plate.id !== undefined) {
 			//plateModel.templateID = resData.plateTemplate.id;
 			// use less hacky method !!
@@ -989,7 +982,7 @@ function showPlateLabelPanel() {
 	hideDoseStepPanel();
 	hideCategoryPanel();
 	$("#addPlateLabelPanel").show();
-	
+
 	// disable grid selection !! (labels only apply to plate level)
 	disableGridSelection();
 	showPlateLabelCatPanel();
@@ -1008,18 +1001,18 @@ $(function() {
 			showDoseStepPanel();
 		} else if ($(this).prop('id') === "plateLabType") {
 			showPlateLabelPanel();
-		} 
+		}
 	});
-	
+
 	$('[data-toggle="popover').popover({
 		trigger: 'hover',
-			'placement': 'top'
+		'placement': 'top'
 	});
 
 	$("#editLabelDialog").dialog({
 		autoOpen: false,
 		resizable: false,
-		height:140,
+		height: 140,
 		modal: true,
 		buttons: {
 			"Save New Name": function() {
@@ -1039,10 +1032,10 @@ $(function() {
 			}
 		}
 	});
-        $('#importCompoundsModal').on('hidden.bs.modal', function (e) {
-            $('#importCompoundsForm')[0].reset();
-        });
 
+	$('#importCompoundsModal').on('hidden.bs.modal', function (e) {
+		$('#importCompoundsForm')[0].reset();
+	});
 });
 
 
@@ -1068,7 +1061,7 @@ function createGrid() {
 	// register a function to be called each time a new set of cells are
 	// selected by a user
 	grid.registerSelectedCellCallBack(handleSelectedCells);
-	
+
 	enableGridSelection();
 }
 
@@ -1080,33 +1073,32 @@ function loadJsonData(plateJson) {
 	var row, column, wellgrp, catKey, labKey, color, newContents;
 	// translate the json received to the internal models structure
 	plateModel = translateInputJsonToModel(plateJson);
-	
+
 	// create initial grid, based on template size
 	if (plateModel.grid_width === undefined || plateModel.grid_width === null) {
 		plateModel.grid_width = 100; // default value
 	}
-	
+
 	if (plateModel.grid_height === undefined || plateModel.grid_height === null) {
 		plateModel.grid_height = 100; // default value
 	}
-	
+
 	createGrid();
-	
+
 	// load data into the grid
 	for (row in plateModel.rows) {
 		for (column in plateModel.rows[row].columns) {
-		
 			wellgrp = plateModel.rows[row].columns[column].wellGroupName;
 			//groupNames[wellgrp] = "SOME_COMPOUND";
 			groupNames[wellgrp] = "";
-		
+
 			newContents = wellgrp;
 
 			for (catKey in plateModel.rows[row].columns[column].categories) {
 				for (labKey in plateModel.rows[row].columns[column].categories[catKey]) {
 					color = plateModel.rows[row].columns[column].categories[catKey][labKey].color;
 					newContents += "," + color;
-					
+
 					// cat legend part !! --> only needed for assignlabels page ??
 					// update catLegend color
 					if (catLegend[catKey] === undefined) {
@@ -1124,7 +1116,7 @@ function loadJsonData(plateJson) {
 						// in this case cells which already have this label need their color updated also!!
 						updateCellColors(catKey, labKey, color);
 					}
-					
+
 					// update color legend cell reverse lookup
 					if (catLegend[catKey].labels[labKey].cellref === undefined) {
 						catLegend[catKey].labels[labKey].cellref = [];
@@ -1138,17 +1130,17 @@ function loadJsonData(plateJson) {
 					}
 				}
 			}
-			
+
 			grid.updateCellContents(row, column, newContents);
 		}
 	}
-	
+
 	updateCategoryList();
 	updateCompoundList();
 }
 
 //ajax save object call
-function fetchTemplateData(tId){
+function fetchTemplateData(tId) {
 	"use strict";
 	var jqxhr = $.ajax({		// need to update to save plate instead of template
 		url: hostname + "/plateTemplate/getPlate/" + tId,
@@ -1163,10 +1155,10 @@ function fetchTemplateData(tId){
 	}).always(function() {
 		console.log("complete");
 	});
-   
+
 	// Set another completion function for the request above
 	jqxhr.always(function(resData) {
-		console.log( "second complete" );
+		console.log("second complete");
 		console.log("recievedFromServer:  " + JSON.stringify(resData));
 		loadJsonData(resData);
 	});
@@ -1182,7 +1174,7 @@ function init() {
 	hideDosePanel();
 	hideDoseStepPanel();
 	hidePlateLabelPanel();
-	
+
 	// fetch templateJson
 	fetchTemplateData(window.templateId); // should set flag to say if recieved model was ok!, inform user otherwise
 	console.log("templateId:" + window.templateId);
