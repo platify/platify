@@ -799,11 +799,11 @@ function translateModelToOutputJson(pModel) {
 				cmpdLabel.category = "compound";
 				cmpdLabel.name = groupNames[well.groupName];
 				labels.push(cmpdLabel);
-				if (well.control !== "positive" || well.control !== "negative") {
+				if (well.control !== "positive" && well.control !== "negative") {
 					well.control = "compound";		// could also be a control !!!
 				}
 			} else {
-				if (well.control !== "positive" || well.control !== "negative") {
+				if (well.control !== "positive" && well.control !== "negative") {
 					well.control = "empty";
 				}
 			}
