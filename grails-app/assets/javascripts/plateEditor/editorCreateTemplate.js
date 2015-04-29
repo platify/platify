@@ -7,7 +7,6 @@ var GRID_HEIGHT = 100;
 var GRID_WIDTH = 100;
 var CELL_HEIGHT = 25;
 var CELL_WIDTH = 40;
-var data;
 var plateModel = {};
 var wellGroupings = [];
 var grid;
@@ -135,8 +134,7 @@ function createGrid() {
 	grid  = new Grid("myGrid");
 
 	// set the data to be displayed which must be in 2D array form
-	data = createBlankData();
-	grid.setData(data);
+	grid.setData(createBlankData());
 
 	// display the data
 	grid.fillUpGrid(CELL_WIDTH, CELL_HEIGHT);
@@ -176,27 +174,29 @@ function addTemplateValue() {
 
 	// update selected grid cells with label
 	for (cell in selCells) {
-		row = selCells[cell][0];
-		column = selCells[cell][1];
+		if (selCells.hasOwnProperty(cell)) {
+			row = selCells[cell][0];
+			column = selCells[cell][1];
 
-		if (plateModel.rows === undefined) {
-			plateModel.rows = {};
+			if (plateModel.rows === undefined) {
+				plateModel.rows = {};
+			}
+
+			if (plateModel.rows[row] === undefined) {
+				plateModel.rows[row] = {};
+			}
+
+			if (plateModel.rows[row].columns === undefined) {
+				plateModel.rows[row].columns = {};
+			}
+
+			if (plateModel.rows[row].columns[column] === undefined) {
+				plateModel.rows[row].columns[column] = {};
+				plateModel.rows[row].columns[column].wellGroupName = cellValue;
+			}
+
+			grid.updateCellContents(row, column, cellValue);
 		}
-
-		if (plateModel.rows[row] === undefined) {
-			plateModel.rows[row] = {};
-		}
-
-		if (plateModel.rows[row].columns === undefined) {
-			plateModel.rows[row].columns = {};
-		}
-
-		if (plateModel.rows[row].columns[column] === undefined) {
-			plateModel.rows[row].columns[column] = {};
-			plateModel.rows[row].columns[column].wellGroupName = cellValue;
-		}
-
-		grid.updateCellContents(row, column, cellValue);
 	}
 
 	console.log("plateModel1:" + JSON.stringify(plateModel));
@@ -223,7 +223,7 @@ function addEvent(elementId, eventType, handlerFunction) {
 	'use strict';
 	var element;
 
-	if (typeof(elementId) === "string") {
+	if (typeof elementId === "string") {
 		element = document.getElementById(elementId);
 	} else {
 		element = elementId;
@@ -250,24 +250,26 @@ function translateModelToOutputJson(pModel) {
 	plate.labels = [];		// plate level labels, should set these if available already !!!
 	plate.wells = [];
 	for (row in pModel.rows) {
-		for (column in pModel.rows[row].columns) {
-			well = {};
-			well.row = row;
-			well.column = column;
-			well.control = null;
-			labels = [];
-			for (catKey in pModel.rows[row].columns[column].categories) {
-				for (labKey in pModel.rows[row].columns[column].categories[catKey]) {
-					label = {};
-					label.category = catKey;
-					label.name = labKey;
-					label.color = pModel.rows[row].columns[column].categories[catKey][labKey];
-					labels.push(label);
+		if (pModel.rows.hasOwnProperty(row)) {
+			for (column in pModel.rows[row].columns) {
+				well = {};
+				well.row = row;
+				well.column = column;
+				well.control = null;
+				labels = [];
+				for (catKey in pModel.rows[row].columns[column].categories) {
+					for (labKey in pModel.rows[row].columns[column].categories[catKey]) {
+						label = {};
+						label.category = catKey;
+						label.name = labKey;
+						label.color = pModel.rows[row].columns[column].categories[catKey][labKey];
+						labels.push(label);
+					}
 				}
+				well.labels = labels;
+				well.groupName = pModel.rows[row].columns[column].wellGroupName;
+				plate.wells.push(well);
 			}
-			well.labels = labels;
-			well.groupName = pModel.rows[row].columns[column].wellGroupName;
-			plate.wells.push(well);
 		}
 	}
 	plateJson.plate = plate;
@@ -365,10 +367,14 @@ function loadJsonData(plateJson) {
 	plateModel = translateInputJsonToModel(plateJson);
 
 	for (row in plateModel.rows) {
-		for (column in plateModel.rows[row].columns) {
-			newContents = plateModel.rows[row].columns[column].wellGroupName;
+		if (plateModel.rows.hasOwnProperty(row)) {
+			for (column in plateModel.rows[row].columns) {
+				if (plateModel.rows[row].columns.hasOwnProperty(column)) {
+					newContents = plateModel.rows[row].columns[column].wellGroupName;
 
-			grid.updateCellContents(row, column, newContents);
+					grid.updateCellContents(row, column, newContents);
+				}
+			}
 		}
 	}
 }
