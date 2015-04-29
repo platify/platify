@@ -13,6 +13,7 @@
 		<asset:stylesheet href="grid/slick.grid.css"/>
 		<asset:stylesheet href="grid/slick-default-theme.css"/>
 		<asset:stylesheet href="grid/Grid.css"/>
+		<asset:stylesheet href="colorbrewer.css"/>
 	</head>
 	<body>
 		<div class="content-fluid">
@@ -44,7 +45,7 @@
 				</div> <!-- Left Column END -->
 				<!-- Right Column -->
 				<div class="col-sm-10">
-				<div id="resultGrid" style="width:100%;height:650px;"></div>
+				<div id="resultGrid" class="Blues" style="width:100%;height:650px;"></div>
 				<pre id="dump"></pre>
 				</div> <!-- Right Column END -->	
 			</div>
