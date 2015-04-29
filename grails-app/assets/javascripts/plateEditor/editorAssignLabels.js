@@ -778,11 +778,19 @@ function translateModelToOutputJson(pModel) {
 					// if catKey, or labKey have been converted from a decimal, convert them back for output!
 					convCat = catKey.toString().split('__dot__').join('.');
 					convLab = labKey.toString().split('__dot__').join('.');
-					label.category = convCat;
-					label.name = convLab;
-					label.value = pModel.rows[row].columns[column].categories[catKey][labKey].color;
-					label.units = pModel.rows[row].columns[column].categories[catKey][labKey].units;
-					labels.push(label);
+					
+					// TEMP, fix to add control wells!
+					if (convCat === "positive") {
+						well.control = "positive";
+					} else if (convCat === "negative") {
+						well.control = "negative";
+					} else {
+						label.category = convCat;
+						label.name = convLab;
+						label.value = pModel.rows[row].columns[column].categories[catKey][labKey].color;
+						label.units = pModel.rows[row].columns[column].categories[catKey][labKey].units;
+						labels.push(label);
+					}
 				}
 			}
 
@@ -791,11 +799,15 @@ function translateModelToOutputJson(pModel) {
 				cmpdLabel.category = "compound";
 				cmpdLabel.name = groupNames[well.groupName];
 				labels.push(cmpdLabel);
-
-				well.control = "compound";		// could also be a control !!!
+				if (well.control !== "positive" || well.control !== "negative") {
+					well.control = "compound";		// could also be a control !!!
+				}
 			} else {
-				well.control = "empty";
+				if (well.control !== "positive" || well.control !== "negative") {
+					well.control = "empty";
+				}
 			}
+			
 			well.labels = labels;
 			plate.wells.push(well);
 		}
