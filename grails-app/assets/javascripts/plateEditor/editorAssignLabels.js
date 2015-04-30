@@ -146,7 +146,7 @@ function updateCellColors(cat, label, color) {
 	"use strict";
 	var cellRef, cellRefArr, row, column, newContents, catKey, labKey;
 	// update all cells with cat and label (messy?)
-	if (catLegend[cat] !== undefined && catLegend[cat].labels[label] !== undefined) {
+	if (catLegend[cat] !== undefined && catLegend[cat] !== null && catLegend[cat].labels[label] !== undefined && catLegend[cat].labels[label] !== null) {
 		for (cellRef in catLegend[cat].labels[label].cellref) {			//change iteration method !!!
 			// what are you doing here ??, define some sort of structure !!!
 			cellRefArr = catLegend[cat].labels[label].cellref[cellRef].split("-");
@@ -174,7 +174,7 @@ function updateCatVisibility(cat) {
 	"use strict";
 	var legLab, cellRef, cellRefArr, row, column, newContents, catKey, labKey;
 	// update all cells with cat
-	if (catLegend[cat] !== undefined) {
+	if (catLegend[cat] !== undefined && catLegend[cat] !== null) {
 		for (legLab in catLegend[cat].labels) {
 			for (cellRef in catLegend[cat].labels[legLab].cellref) {
 				cellRefArr = catLegend[cat].labels[legLab].cellref[cellRef].split("-");
@@ -238,22 +238,26 @@ function updateCompoundList() {
 	var newDiv, wellGroup, innerDiv, newLabel, newInput;
 	newDiv = document.createElement("div");
 	for (wellGroup in groupNames) {
-		innerDiv = document.createElement("div");
-		innerDiv.className = "col-xs-12";
-		newLabel = document.createElement("label");
-		newLabel.appendChild(document.createTextNode(wellGroup));
+		if (wellGroup !== null) {
+			innerDiv = document.createElement("div");
+			innerDiv.className = "col-xs-12";
+			newLabel = document.createElement("label");
+			newLabel.appendChild(document.createTextNode(wellGroup));
 
-		newInput = createCompoundInput(wellGroup);
-		innerDiv.appendChild(newLabel);
-		innerDiv.appendChild(newInput);
-		newDiv.appendChild(innerDiv);
+			newInput = createCompoundInput(wellGroup);
+			innerDiv.appendChild(newLabel);
+			innerDiv.appendChild(newInput);
+			newDiv.appendChild(innerDiv);
+		}
 	}
 	document.getElementById("compoundList").innerHTML = newDiv.innerHTML;
 
 	// won't seem to take value for input until created ??
 	for (wellGroup in groupNames) {			// USED a second time ?? // does this need to be re-inited ?? ( it's prob ok?)
-		if (groupNames[wellGroup] !== undefined && groupNames[wellGroup] !== null) {
-			document.getElementById("wellGroup-" + wellGroup).value = groupNames[wellGroup];
+		if (wellGroup !== null) {
+			if (groupNames[wellGroup] !== undefined && groupNames[wellGroup] !== null) {
+				document.getElementById("wellGroup-" + wellGroup).value = groupNames[wellGroup];
+			}
 		}
 	}
 }
@@ -773,7 +777,7 @@ function translateModelToOutputJson(pModel) {
 
 	// take the values from the compound input text fields (could do this at input onChange event also)
 	for (wellGroup in groupNames) {
-		if (groupNames[wellGroup] !== undefined) {
+		if (groupNames[wellGroup] !== undefined && groupNames[wellGroup] !== null) {
 			cmpdValue = document.getElementById("wellGroup-" + wellGroup).value;
 			if (cmpdValue === undefined || cmpdValue === null || cmpdValue === "") {
 				// !!! THROW ERROR DIALOG HERE ASKING TO FILL OUT THIS FIELD !!!
@@ -822,7 +826,7 @@ function translateModelToOutputJson(pModel) {
 					}
 				}
 				
-				if (well.groupName !== undefined) {
+				if (well.groupName !== undefined && well.groupName !== null && well.groupName !== "") {
 					cmpdLabel = {};
 					cmpdLabel.category = "compound";
 					cmpdLabel.name = groupNames[well.groupName];
@@ -873,7 +877,12 @@ function translateInputJsonToModel(plateJson) {
 	for (i = 0; i < plate.wells.length; i++) {
 		row = plate.wells[i].row;
 		column = plate.wells[i].column;
-		groupName = plate.wells[i].groupName;
+		if (plate.wells[i].groupName !== undefined && plate.wells[i].groupName !== null) {
+			groupName = plate.wells[i].groupName;
+		} else {
+			groupName = "";
+		}
+		
 		labels = plate.wells[i].labels;
 
 		if (pModel.rows[row] === undefined) {
@@ -894,7 +903,9 @@ function translateInputJsonToModel(plateJson) {
 
 			if (convCat === "compound") {
 				// deal with special 'compound' category !
-				groupNames[groupName] = convLab;		// should do null check ??
+				if (groupName !== null && groupName !== "") {
+					groupNames[groupName] = convLab;		// should do null check ??
+				}
 			} else {
 				// other labels
 				if (pModel.rows[row].columns[column].categories[convCat] === undefined) {
@@ -1159,8 +1170,10 @@ function loadJsonData(plateJson) {
 	for (row in plateModel.rows) {
 		for (column in plateModel.rows[row].columns) {
 			wellgrp = plateModel.rows[row].columns[column].wellGroupName;
-			//groupNames[wellgrp] = "SOME_COMPOUND";
-			groupNames[wellgrp] = "";
+			if (wellgrp !== undefined && wellgrp !== null && wellgrp !== "") {
+				//groupNames[wellgrp] = "SOME_COMPOUND";
+				groupNames[wellgrp] = "";
+			}
 
 			newContents = wellgrp;
 
