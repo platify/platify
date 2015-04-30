@@ -23,8 +23,16 @@ ServerCommunicator.SAVE_UPDATE = "save update";
  *
  * @constructor
  */
-function ServerCommunicator() {
+function ServerCommunicator(hostname) {
     var _self = this;
+
+    if (!hostname){
+        throw new ServerCommunicatorError(
+                                       ServerCommunicatorError.HOSTNAME_NOT_DEFINED,
+                                       hostname,
+                                       "initialize a server communicator object");
+    }
+
     this.hostname = hostname;
     this.plateIDArrayCallbacks = [];
     this.importDataSaveCallbacks = [];
@@ -32,12 +40,6 @@ function ServerCommunicator() {
 
 
     this.getExperimentPlateIDArray = function(experimentID){
-        if (!_self.hostname){
-            throw new ServerCommunicatorError(
-                    ServerCommunicatorError.HOSTNAME_NOT_DEFINED,
-                    hostname,
-                    "get the user's experiment plate identifier data");
-        }
 
         var jqxhr = $.ajax({
             url: _self.hostname
@@ -93,12 +95,6 @@ function ServerCommunicator() {
 
 
     this.saveImportDataToServer = function(importData){
-        if (!_self.hostname){
-            throw new ServerCommunicatorError(
-                ServerCommunicatorError.HOSTNAME_NOT_DEFINED,
-                hostname,
-                "save import data to server");
-        }
 
         var jqxhr = $.ajax({
             url: _self.hostname + ServerCommunicator.SAVE_IMPORT_DATA_URL_SUFFIX,
@@ -151,13 +147,6 @@ function ServerCommunicator() {
     };
 
     this.saveParsingConfigToServer = function(parsingConfig, saveType, parsingID){
-
-        if (!_self.hostname){
-            throw new ServerCommunicatorError(
-                ServerCommunicatorError.HOSTNAME_NOT_DEFINED,
-                hostname,
-                "save parsing config to server");
-        }
 
         var verb;
         var urlSuffix;

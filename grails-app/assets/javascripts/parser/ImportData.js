@@ -1,5 +1,11 @@
 /**
- * Created by zacharymartin on 3/24/15.
+ * ImportData.js
+ *
+ * ImportData objects store the information parsed from a plate assay machine output file.
+ *
+ * @author Team SurNorte
+ * CSCI-E99
+ * May 7, 2015
  */
 
 ImportData.NO_ID = "&lt;&lt;none&gt;&gt;";
@@ -8,6 +14,23 @@ ImportData.NUMERIC = "numeric";
 ImportData.NON_NUMERIC = "non-numeric";
 
 
+/**
+ * The constructor for ImportData objects. Note that it is assumed that all plates that
+ * an ImportData object represents are of the same dimensions, that is they all have the
+ * same number of rows and columns.
+ *
+ * @param numPlates - the number of plates that the ImportData object is to store data
+ *                  for
+ * @param numRows - the number of rows on each plate that the new ImportData object will
+ *                  be storing assay results for
+ * @param numCols - the number of columns on each plate that the new ImportData object
+ *                  will be storing assay results for
+ * @constructor
+ *
+ * Note: - If numPlates, numRows, or numCols is negative then a
+ *      NEGATIVE_NUMBER_OF_PLATES, NEGATIVE_NUMBER_OF_ROWS, or a
+ *      NEGATIVE_NUMBER_OF_COLUMNS error will be thrown, respectively.
+ */
 function ImportData(numPlates, numRows, numCols){
     this.experimentID = null;
     this.parsingID = null;
@@ -26,6 +49,21 @@ function ImportData(numPlates, numRows, numCols){
 
     init(numPlates, numRows, numCols);
 
+    /**
+     * This function initializes the ImportData object to have the correct structure.
+     *
+     *  @param numPlates - the number of plates that the ImportData object is to store data
+     *                  for
+     * @param numRows - the number of rows on each plate that the new ImportData object
+     *                  will be storing assay results for
+     * @param numCols - the number of columns on each plate that the new ImportData object
+     *                  will be storing assay results for
+     *
+     * Note: - If numPlates, numRows, or numCols is negative then a
+     *      NEGATIVE_NUMBER_OF_PLATES, NEGATIVE_NUMBER_OF_ROWS, or a
+     *      NEGATIVE_NUMBER_OF_COLUMNS error will be thrown, respectively.
+     *
+     */
     function init(numPlates, numRows, numCols){
         // first some error checking
         if (numPlates < 0){
@@ -80,12 +118,27 @@ function ImportData(numPlates, numRows, numCols){
         }
     }
 
+    /**
+     * A getter for the ImportData object experiment identifier
+     *
+     * @returns {null|*} - the experiment identifier for the ImportData object, this
+     *                  will be null if the experiment identifier has not been previously
+     *                  set.
+     */
     this.getExperimentID = function(){
         return this.experimentID;
     };
 
+    /**
+     * A setter for the ImportData object experiment identifier.
+     *
+     * @param experimentID - The experiment identifier to set for the ImportData object.
+     *
+     * Note: - Undefined, null, NaN or empty string arguments will cause an
+     *      INVALID_EXPERIMENT_ID error.
+     */
     this.setExperimentID = function(experimentID){
-        if (!experimentID){
+        if (!experimentID && experimentID !== 0){
             throw new ImportDataError(ImportDataError.INVALID_EXPERIMENT_ID,
                                       experimentID,
                                       "general",
@@ -95,10 +148,26 @@ function ImportData(numPlates, numRows, numCols){
         this.experimentID = experimentID;
     };
 
+    /**
+     * A getter for the ImportData object parsing configuration identifier, that is the
+     * identifier of the parsing configuration used to parse the assay results data.
+     *
+     * @returns {null|*} - the parsing configuration identifier for the ImportData object,
+     * this will be null if the parsing configuration identifier has not been previously
+     * set.
+     */
     this.getParsingID = function(){
         return this.parsingID;
     };
 
+    /**
+     * A setter for the ImportData object parsing configuration identifier.
+     *
+     * @param parsingID - The experiment identifier to set for the ImportData object.
+     *
+     * Note: - undefined, null, NaN or empty string arguments will cause an
+     *      INVALID_PARSING_ID error.
+     */
     this.setParsingID = function(parsingID){
         if (!parsingID){
             throw new ImportDataError(ImportDataError.INVALID_PARSING_ID,
@@ -110,6 +179,15 @@ function ImportData(numPlates, numRows, numCols){
         this.parsingID = parsingID;
     };
 
+    /**
+     * This method adds an experiment level category to the ImportData object.
+     *
+     * @param categoryName - the string name of the new experiment level category
+     *
+     * Note: - An empty string will cause an ILLEGAL_ARGUMENT error.
+     *       - If the given category name has already been added to the ImportData object,
+     *       it will cause a CATEGORY_ALREADY_DEFINED error.
+     */
     this.addExperimentLevelCategory = function(categoryName){
 
         // first some error checking
@@ -131,6 +209,11 @@ function ImportData(numPlates, numRows, numCols){
         this.experimentFeatures.labels[categoryName] = ImportData.BLANK;
     };
 
+    /**
+     * This function returns an array of all of the experiment level category names.
+     *
+     * @returns {Array} - an array of all the experiment level category names
+     */
     this.getExperimentLevelCategories = function(){
         var result = [];
 
@@ -143,6 +226,15 @@ function ImportData(numPlates, numRows, numCols){
         return result;
     };
 
+    /**
+     * This method removes an experiment level category from the calling ImportData
+     * object.
+     *
+     * @param categoryName - the string name of the category to be removed,
+     *
+     * Note: - If this category has not been previously added at the same level, then a
+     *      NO_SUCH_CATEGORY error will be thrown.
+     */
     this.removeExperimentLevelCategory = function(categoryName){
         // first some error checking
         if (!this.experimentLevelCategories[categoryName]){
@@ -156,6 +248,16 @@ function ImportData(numPlates, numRows, numCols){
         delete this.experimentLevelCategories[categoryName];
     };
 
+    /**
+     * This method returns the experiment level label for a given category.
+     *
+     * @param categoryName - the name of the category for the desired label value
+     * @returns {*} - the label value for the given category
+     *
+     * Note: - that this method throws a NO_SUCH_CATEGORY error if the category given by
+     *      the categoryName argument has not previously been added at the experiment
+     *      level to the calling ImportData object.
+     */
     this.getExperimentLevelLabels = function(categoryName){
         var result;
 
@@ -171,6 +273,20 @@ function ImportData(numPlates, numRows, numCols){
         return result;
     };
 
+    /**
+     * This method sets a label value for a given experiment level label category.
+     *
+     * @param categoryName - the name of the experiment level category to set the label
+     *                      for
+     * @param value - the value to set the label to
+     *
+     * Note: - This method throws a NO_SUCH_CATEGORY error if the experiment level
+     *      category given by the categoryName argument has not previously been added to
+     *      the calling ImportData object at the experiment level
+     *       - This method throws an ILLEGAL_ARGUMENT error if the given value is null,
+     *       NaN, or undefined.
+     *
+     */
     this.setExperimentLevelLabel = function(categoryName, value){
 
         // first some error checking
@@ -181,7 +297,7 @@ function ImportData(numPlates, numRows, numCols){
                                       "set an experiment level label value");
         }
 
-        if (!value && value !== ImportData.BLANK){
+        if (!value && value !== ImportData.BLANK && value !== 0){
             throw new ImportDataError(ImportDataError.ILLEGAL_ARGUMENT,
                                       value,
                                       "experiment level label value",
@@ -191,6 +307,16 @@ function ImportData(numPlates, numRows, numCols){
         this.experimentFeatures.labels[categoryName] = value;
     };
 
+
+    /**
+     * This method adds a plate level category to the ImportData object.
+     *
+     * @param categoryName - the string name of the new plate level category,
+     *
+     * Note: - An empty string will cause an ILLEGAL_ARGUMENT error.
+     *       - If this category name has already been added to the ImportData object, it
+     *       will cause a CATEGORY_ALREADY_DEFINED error.
+     */
     this.addPlateLevelCategory = function(categoryName){
         // first some error checking
         if (!categoryName){
@@ -216,6 +342,11 @@ function ImportData(numPlates, numRows, numCols){
 
     };
 
+    /**
+     * This function returns an array of all of the plate level category names.
+     *
+     * @returns {Array} - an array of all the plate level category names
+     */
     this.getPlateLevelCategories = function(){
         var result = [];
 
@@ -228,6 +359,15 @@ function ImportData(numPlates, numRows, numCols){
         return result;
     };
 
+    /**
+     * This method removes a plate level category from the calling ImportData
+     * object.
+     *
+     * @param categoryName - the string name of the category to be removed
+     *
+     * Note: - if this category has not been previously added at the same level, then a
+     *      NO_SUCH_CATEGORY error will be thrown.
+     */
     this.removePlateLevelCategory = function(categoryName){
         // first some error checking
         if (!this.plateLevelCategories[categoryName]){
@@ -246,7 +386,21 @@ function ImportData(numPlates, numRows, numCols){
         }
     };
 
-
+    /**
+     * This method returns the plate level label value for a given category on a given
+     * plate.
+     *
+     * @param plateIndex - the index number (starting at 0) of the plate that the label
+     *                  value is to be gotten for
+     * @param categoryName - the name of the category for the desired label value
+     * @returns {*} - the label value for the given category and plate
+     *
+     * Note - This method throws a NO_SUCH_CATEGORY error if the category given by
+     *      the categoryName argument has not previously been added at the plate level to
+     *      the calling ImportData object.
+     *      - This method throws a NO_SUCH_PLATE error if the calling ImportData object
+     *      does not have a defined plate for the given plate index.
+     */
     this.getPlateLevelLabelForSinglePlate = function(plateIndex, categoryName){
         var result;
 
@@ -270,6 +424,17 @@ function ImportData(numPlates, numRows, numCols){
         return result;
     };
 
+    /**
+     * This method returns all of the plate level label values for a given category.
+     *
+     * @param categoryName - the name of the category for the desired label values of
+     *                      every plate.
+     * @returns {Array} - the label values for the given category for every plate in order
+     *
+     * Note: - This method throws a NO_SUCH_CATEGORY error if the category given by
+     *      the categoryName argument has not previously been added at the plate level to
+     *      the calling ImportData object.
+     */
     this.getPlateLevelLabelforAllPlates = function(categoryName){
         var result = [];
 
@@ -288,6 +453,24 @@ function ImportData(numPlates, numRows, numCols){
         return result;
     };
 
+    /**
+     * This method sets a label value for a given plate level label category on a given
+     * plate.
+     *
+     * @param plateIndex - the index (starting at 0) of the plate on which the label value
+     *                  is to be set
+     * @param categoryName - the name of the experiment level category to set the label
+     *                      for
+     * @param value - the value to set the label to
+     *
+     * Note: - This method throws a NO_SUCH_PLATE error if the calling ImportData object
+     *      does not have a plate for the given plate index.
+     *       - This method throws a NO_SUCH_CATEGORY error if the experiment level
+     *      category given by the categoryName argument has not previously been added to
+     *      the calling ImportData object at the experiment level
+     *       - This method throws an ILLEGAL_ARGUMENT error if the given value is null,
+     *       NaN or undefined.
+     */
     this.setPlateLevelLabel = function(plateIndex, categoryName, value){
         // first some error checking
         if (!this.plates[plateIndex]){
@@ -304,7 +487,7 @@ function ImportData(numPlates, numRows, numCols){
                 "set a plate level label value");
         }
 
-        if (!value && value !== ImportData.BLANK){
+        if (!value && value !== ImportData.BLANK && value !== 0){
             throw new ImportDataError(ImportDataError.ILLEGAL_ARGUMENT,
                 value,
                 "plate level label value",
@@ -317,7 +500,15 @@ function ImportData(numPlates, numRows, numCols){
 
 
 
-
+    /**
+     * This method adds a well level category to the ImportData object.
+     *
+     * @param categoryName - the string name of the new well level category,
+     *
+     * Note: - An empty string will cause an ILLEGAL_ARGUMENT error.
+     *       - If this category name has already been added to the ImportData object, it
+     *       will cause a CATEGORY_ALREADY_DEFINED error.
+     */
     this.addWellLevelCategory = function(categoryName, numeric){
         // first some error checking
         if (!categoryName){
@@ -361,6 +552,10 @@ function ImportData(numPlates, numRows, numCols){
         }
     };
 
+    /**
+     *
+     * @returns {Array}
+     */
     this.getWellLevelCategories = function(){
         var result = [];
 

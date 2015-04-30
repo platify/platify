@@ -1,5 +1,29 @@
 /**
- * Created by zacharymartin on 4/16/15.
+ * ImportDataFileGenerator.js
+ *
+ * ImportDataFileGenerator objects examine and extract the necessary information from
+ * ImportData objects in order to display this information in two separate formats.
+ *
+ * The first format shows the data in a grid with one row per well and a separate column
+ * for each data category. This format has two leading columns that show the plate and
+ * well identifiers. The subsequent columns display the values for that well, for each
+ * data category. Note that this format separates values given at the well level from
+ * those given at the plate or experiment level with
+ * NUM_BLANK_COLUMNS_BETWEEN_WELL_AND_PLATE_LEVEL_DATA blank columns.
+ *
+ * The second format shows the same data in a given ImportData object in grid format but
+ * with 4 columns. Each row in this format represents a single data value for a given
+ * category and well. The first two columns display the row and column number of the
+ * well for which the value is given. The third column displays the value and the fourth
+ * column displays the category name of the value. In this format, a blank row is placed
+ * between rows displaying values for one plate and another.
+ *
+ *
+ *
+ * @author Team SurNorte
+ * CSCI-E99
+ * May 7, 2015
+ * @constructor
  */
 
 
@@ -10,7 +34,7 @@ function ImportDataFileGenerator(){
     var BLANK_CELL = "";
     var NO_PLATE_ID = ImportData.NO_ID;
 
-    var matrix = null;
+    this.matrix = null;
 
 
     function createMatrixHeaderRow(wellCategories, plateCategories, experimentCategories){
@@ -160,20 +184,18 @@ function ImportDataFileGenerator(){
         var matrixRowIndex = matrix.length;
         var currentCategory;
         var currentMatrixRow;
-        var wellRowIndex = wellRow - 1;
-        var wellColIndex = wellCol - 1;
 
         for (var i=0; i<wellLevelCategories.length; i++){
             currentCategory = wellLevelCategories[i];
             currentMatrixRow = [];
 
-            currentMatrixRow[0] = wellRowIndex;
-            currentMatrixRow[1] = wellColIndex;
-            currentMatrixRow[2] = importData.getWellLevelLabelForSinglePlate(plateIndex,
-                                                                             wellRow,
-                                                                             wellCol,
-                                                                         currentCategory);
-            currentMatrixRow[3] = currentCategory;
+            currentMatrixRow[0] = wellRow;
+            currentMatrixRow[1] = wellCol;
+            currentMatrixRow[2] = currentCategory;
+            currentMatrixRow[3] = importData.getWellLevelLabelForSinglePlate(plateIndex,
+                wellRow,
+                wellCol,
+                currentCategory);
             matrix[matrixRowIndex++] = currentMatrixRow;
         }
 
@@ -181,11 +203,11 @@ function ImportDataFileGenerator(){
             currentCategory = plateLevelCategories[j];
             currentMatrixRow = [];
 
-            currentMatrixRow[0] = wellRowIndex;
-            currentMatrixRow[1] = wellColIndex;
-            currentMatrixRow[2] = importData.getPlateLevelLabelForSinglePlate(plateIndex,
-                                                                         currentCategory);
-            currentMatrixRow[3] = currentCategory;
+            currentMatrixRow[0] = wellRow;
+            currentMatrixRow[1] = wellCol;
+            currentMatrixRow[2] = currentCategory;
+            currentMatrixRow[3] = importData.getPlateLevelLabelForSinglePlate(plateIndex,
+                currentCategory);
             matrix[matrixRowIndex++] = currentMatrixRow;
         }
 
@@ -193,10 +215,10 @@ function ImportDataFileGenerator(){
             currentCategory = experimentLevelCategories[k];
             currentMatrixRow = [];
 
-            currentMatrixRow[0] = wellRowIndex;
-            currentMatrixRow[1] = wellColIndex;
-            currentMatrixRow[2] = importData.getExperimentLevelLabels(currentCategory);
-            currentMatrixRow[3] = currentCategory;
+            currentMatrixRow[0] = wellRow;
+            currentMatrixRow[1] = wellCol;
+            currentMatrixRow[2] = currentCategory;
+            currentMatrixRow[3] = importData.getExperimentLevelLabels(currentCategory);
             matrix[matrixRowIndex++] = currentMatrixRow;
         }
     };
@@ -210,9 +232,9 @@ function ImportDataFileGenerator(){
 
         for (var plateIndex=0; plateIndex<numPlates; plateIndex++){
 
-            for (var row=1; row<=numPlateRows; row++){
+            for (var row=0; row<numPlateRows; row++){
 
-                for (var col=1; col<=numPlateCols; col++){
+                for (var col=0; col<numPlateCols; col++){
                     this.addWellDataToMatrix(row, col, plateIndex, importData, result);
                 }
 
@@ -227,13 +249,22 @@ function ImportDataFileGenerator(){
     };
 
 
+    /**
+     * This method coverts the ImportData data stored in the calling instance of the
+     * ImportDataFileGenerator object type, to a single Delimiter Separated Value (DSV)
+     * string.
+     * @param cellTerminator - the string that terminates each cell in the DSV string
+     *              except for the final one in a row.
+     * @param lineTerminator - the string that terminates a row in the DSV string
+     * @returns {string} - the string representing the
+     */
     this.createDSVString = function(cellTerminator, lineTerminator){
         var result = "";
 
         var numRows;
 
-        if (matrix && matrix.length){
-            numRows = matrix.length
+        if (this.matrix && this.matrix.length){
+            numRows = this.matrix.length
         } else {
             // return empty DSV string if there are no rows in the matrix
             numRows = 0;
@@ -243,9 +274,9 @@ function ImportDataFileGenerator(){
         // count max number of columns
         var numColumns = 0;
 
-        for (var i=0; i<matrix.length; i++){
-            if (matrix[i].length > numColumns){
-                numColumns = matrix[i].length;
+        for (var i=0; i<this.matrix.length; i++){
+            if (this.matrix[i].length > numColumns){
+                numColumns = this.matrix[i].length;
             }
         }
 
@@ -257,8 +288,8 @@ function ImportDataFileGenerator(){
         // fill out the DSV string with the values of the matrix
         for (var row = 0; row<numRows; row++){
             for (var col = 0; col<numColumns; col++){
-                if (typeof matrix[row][col] != "undefined"){
-                    result += matrix[row][col]
+                if (typeof this.matrix[row][col] != "undefined"){
+                    result += this.matrix[row][col]
                 }
 
                 if (col != numColumns - 1){
@@ -286,11 +317,11 @@ function ImportDataFileGenerator(){
 }
 
 /**
- * This method is based on a suggestion from stackoverflow thread:
+ * This function is based on a suggestion from stackoverflow thread:
  *
  * http://stackoverflow.com/questions/3665115/create-a-file-in-memory-for-user-to-download-not-through-server
  *
- * for downloading a browser generated file to the client machine.
+ * for forcing the download of a browser generated file to the client machine.
  */
 ImportDataFileGenerator.forceFileDownload = function(fileName, fileContents){
     var downloadLinkElement = document.createElement("a");

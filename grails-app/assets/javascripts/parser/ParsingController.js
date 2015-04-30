@@ -25,7 +25,6 @@ function ParsingController(){
     _self.parsingConfig = null;
     _self.importData = null;
     _self.colorPicker = new ColorPicker();
-    _self.serverCommunicator = new ServerCommunicator();
     _self.parseOnlyMode = false;
     _self.selectCells = null;
     _self.originalName = null;
@@ -416,7 +415,7 @@ function ParsingController(){
         _self.importData.setExperimentID(_self.parserUI.getSelectedExperimentID());
         _self.importData.throwErrorIfAnyPlateIDsNotSet();
 
-        var serverCommunicator = new ServerCommunicator();
+        var serverCommunicator = new ServerCommunicator(hostname);
         serverCommunicator.registerImportDataSaveCallback(function(response){
             if (response instanceof ServerCommunicatorError){
                 _self.parserUI.displayError(response);
@@ -502,7 +501,7 @@ function ParsingController(){
     };
 
     _self.saveParsingConfigToServer = function(){
-        var serverCommunicator = new ServerCommunicator();
+        var serverCommunicator = new ServerCommunicator(hostname);
 
         // make sure parsing config has been initialized or updated
         _self.createOrUpdateParsingConfig();
@@ -539,7 +538,7 @@ function ParsingController(){
                                         "save parsing config to server");
         }
 
-        var serverCommunicator = new ServerCommunicator();
+        var serverCommunicator = new ServerCommunicator(hostname);
 
         serverCommunicator.registerParsingConfigSaveCallback(
                                                         _self.saveConfigToServerCallback);
@@ -562,7 +561,7 @@ function ParsingController(){
     };
 
     _self.fillOutExperimentPlateIDs = function(experimentID){
-        var serverCommunicator = new ServerCommunicator();
+        var serverCommunicator = new ServerCommunicator(hostname);
         serverCommunicator.registerPlateIDArrayCallback(function(response){
             if (response instanceof ServerCommunicatorError){
                 _self.parserUI.displayError(response);
