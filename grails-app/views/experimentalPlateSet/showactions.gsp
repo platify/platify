@@ -56,7 +56,8 @@
 											<g:sortableColumn property="id" title="Plate Id" />
 											<g:sortableColumn property="name" title="${message(code: 'plateSetInstance.plate.name.label', default: 'Template Name')}" />
 											<g:sortableColumn property="owner" title="${message(code: 'plateSetInstance.plate.owner.label', default: 'Owner')}" />	
-											<g:sortableColumn property="dateCreated" title="${message(code: 'plateSetInstance.plate.date.label', default: 'Date')}" />																
+											<g:sortableColumn property="dateCreated" title="${message(code: 'plateSetInstance.plate.date.label', default: 'Date')}" />
+											<th>Preview</th>																
 										</tr>
 									</thead>
 									<tbody>
@@ -67,6 +68,7 @@
 											<td>${fieldValue(bean: plateSetInstance.plate, field: "name")}</td>
 											<td>${plateSetInstance.plate.owner.firstName + ' ' + plateSetInstance.plate.owner.lastName}</td>
 											<td>${fieldValue(bean: plateSetInstance.plate, field: "dateCreated")}</td>
+											<td><button value="${plateSetInstance.id}" onclick="onViewSelect(this)" type="button" class="btn btn-info btn-xs" data-toggle="modal" data-target="#viewSavedPlateModal">View</button></td>
 										</tr>
 									</g:each>
 									</tbody>
@@ -80,7 +82,8 @@
 				</div>
 			</div>
 		</div>
-
+		
 		<g:render template="/plateTemplate/createTemplateDialog"/>
+		<g:render template="/experimentalPlateSet/viewSavedPlateDialog"/>
 	</body>
 </html>
