@@ -112,6 +112,32 @@ function ExperimentModel(experimentId) {
 
 
     /**
+     * Returns the mean of the negative control values
+     */
+    this.meanNegativeControl = function() {
+        var label = this.rawDataLabel();
+        var plate = this.currentPlate;
+
+        return d3.mean(this.controls.negative.map(function(coords) {
+            return plate.rows[coords[0]].columns[coords[1]].rawData[label];
+        }));
+    }
+
+
+    /**
+     * Returns the mean of the positive control values
+     */
+    this.meanPositiveControl = function() {
+        var label = this.rawDataLabel();
+        var plate = this.currentPlate;
+
+        return d3.mean(this.controls.positive.map(function(coords) {
+            return plate.rows[coords[0]].columns[coords[1]].rawData[label];
+        }));
+    }
+
+
+    /**
      * Normalizes the data for the current plate, and saves it back to the 
      * server.
      */

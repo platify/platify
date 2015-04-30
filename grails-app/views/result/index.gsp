@@ -39,6 +39,12 @@
 
 					        <dt>Z'-Factor</dt>
 						<dd id="zPrimeFactor"></dd>
+
+					        <dt>Mean Negative Control</dt>
+						<dd id="negativeControl"></dd>
+
+					        <dt>Mean Positive Control</dt>
+						<dd id="positiveControl"></dd>
 					</dl>
 				</div> <!-- Left Column END -->
 				<!-- Right Column -->

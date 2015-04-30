@@ -94,6 +94,8 @@ function plateSelected(plateID) {
     $('#rawNormToggle').bootstrapToggle('on');
     $('#zFactor').text(experiment.zFactor());
     $('#zPrimeFactor').text(experiment.zPrimeFactor());
+    $('#negativeControl').text(experiment.meanNegativeControl());
+    $('#positiveControl').text(experiment.meanPositiveControl());
 }
 
 
