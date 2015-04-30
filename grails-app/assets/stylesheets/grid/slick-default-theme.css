@@ -6,18 +6,18 @@ classes should alter those!
 */
 
 .slick-header-columns {
-  background: url('/images/slickgrid/header-columns-bg.gif') repeat-x center bottom;
+  background: url('../slickgrid/header-columns-bg.gif') repeat-x center bottom;
   border-bottom: 1px solid silver;
 }
 
 .slick-header-column {
-    background: url('/images/slickgrid/header-columns-bg.gif') repeat-x center bottom;
+    background: url('../slickgrid/header-columns-bg.gif') repeat-x center bottom;
     border-right: 1px solid silver;
     text-align: center;
 }
 
 .slick-header-column:hover, .slick-header-column-active {
-  background: white url('/images/slickgrid/header-columns-over-bg.gif') repeat-x center bottom;
+  background: white url('../slickgrid/header-columns-over-bg.gif') repeat-x center bottom;
 }
 
 .slick-headerrow {
@@ -62,11 +62,11 @@ classes should alter those!
 }
 
 .slick-group-toggle.expanded {
-  background: url(/images/slickgrid/collapse.gif) no-repeat center center;
+  background: url(../slickgrid/collapse.gif) no-repeat center center;
 }
 
 .slick-group-toggle.collapsed {
-  background: url(/images/slickgrid/expand.gif) no-repeat center center;
+  background: url(../slickgrid/expand.gif) no-repeat center center;
 }
 
 .slick-group-totals {

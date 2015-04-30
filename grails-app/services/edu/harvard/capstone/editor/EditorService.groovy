@@ -84,9 +84,10 @@ class EditorService {
 					controlType = Well.WellControl[well.control.toUpperCase()]
 				}
 				catch(Exception e) {
+
 					controlType = Well.WellControl.EMPTY
 				}
-				
+
 				def wellInstance = new Well(plate: plateInstance, row: well.row, column: well.column, groupName: well.groupName, control: controlType)
 				wellInstance.save()
 				if (wellInstance.hasErrors()){
@@ -331,23 +332,29 @@ class EditorService {
         File file = File.createTempFile("template",".csv")
 
     	wells.each{ well ->
+
     		def row = ""
     		row = row + well.row +","
     		row = row + well.column +","
     		row = row + well.control.value() +","
-    		row = row + "compound," + well.groupName + ","
-			file.append("\r\n"+row+"\r\n")
+    		if (well.control == Well.WellControl.EMPTY){
+    			row = row + ","
+    			file.append(row+"\r\n")
+    		} else {
+	    		row = row + "compound," + well.groupName
+				file.append(row+"\r\n")
 
-			row = well.row +","+well.column + "," + well.control.value() +","
-    		
-    		def labels = DomainLabel.findAllByDomainIdAndLabelTypeAndPlateIsNull(well.id, DomainLabel.LabelType.WELL).collect{it.label}
+				row = well.row +","+well.column + "," + well.control.value() +","
+	    		
+	    		def labels = DomainLabel.findAllByDomainIdAndLabelTypeAndPlateIsNull(well.id, DomainLabel.LabelType.WELL).collect{it.label}
 
-    		labels.each{ label ->
-    			def labelRow = row 
-    			labelRow = labelRow + label.category + ","
-    			labelRow = labelRow + label.name
-    			file.append("\r\n"+labelRow+"\r\n")
-    		}
+	    		labels.each{ label ->
+	    			def labelRow = row 
+	    			labelRow = labelRow + label.category + ","
+	    			labelRow = labelRow + label.name
+	    			file.append(labelRow+"\r\n")
+	    		}
+	    	}
 
     	}
 
@@ -375,13 +382,13 @@ class EditorService {
     		row = row + well.control.value() +","
     		if (well.control == Well.WellControl.EMPTY){
     			row = row + ",,,,"
-    			file.append("\r\n"+row+"\r\n")
+    			file.append(row+"\r\n")
     		} else {
 	    		
-	    		def wellLabels = DomainLabel.findAllByDomainIdAndLabelTypeAndPlateIsNull(well.id, DomainLabel.LabelType.WELL)
-	    		def labels = wellLabels.findAll{!it.label.category.toLowerCase().contains('compound') && !it.label.category.toLowerCase().contains('dosage')}
-	    		def compounds = wellLabels.findAll{it.label.category.toLowerCase().contains('compound')}
-	    		def dosage = wellLabels.findAll{it.label.category.toLowerCase().contains('dosage')}
+	    		def wellLabels = DomainLabel.findAllByDomainIdAndLabelTypeAndPlate(well.id, DomainLabel.LabelType.WELL,plateInstance)
+	    		def labels = wellLabels.findAll{!it.label.category.toLowerCase().contains('compound') && !it.label.category.toLowerCase().contains('dosage')}.collect{it.label}
+	    		def compounds = wellLabels.findAll{it.label.category.toLowerCase().contains('compound')}.collect{it.label}
+	    		def dosage = wellLabels.findAll{it.label.category.toLowerCase().contains('dosage')}.collect{it.label}
 
 	    		if (labels){
 		    		labels.each{ label ->
@@ -395,7 +402,7 @@ class EditorService {
 			    				} else {
 			    					plateRow = plateRow + "1.0,"
 			    				}
-			    				file.append("\r\n"+plateRow+"\r\n")
+			    				file.append(plateRow+"\r\n")
 			    			}
 		    			} else {
 		    				def plateRow = row
@@ -406,7 +413,7 @@ class EditorService {
 		    				} else {
 		    					plateRow = plateRow + "1.0,"
 		    				}
-		    				file.append("\r\n"+plateRow+"\r\n")
+		    				file.append(plateRow+"\r\n")
 		    			}
 		    		}
 	    		} else {
@@ -420,7 +427,7 @@ class EditorService {
 			    				} else {
 			    					plateRow = plateRow + "1.0,"
 			    				}
-			    				file.append("\r\n"+plateRow+"\r\n")
+			    				file.append(plateRow+"\r\n")
 			    			}
 	    			} else {
 	    				def plateRow = row
@@ -431,7 +438,7 @@ class EditorService {
 	    				} else {
 	    					plateRow = plateRow + "1.0,"
 	    				}
-	    				file.append("\r\n"+plateRow+"\r\n")
+	    				file.append(plateRow+"\r\n")
 	    			}	    			
 	    		}
     		}

@@ -137,21 +137,6 @@ class EquipmentController {
             [equipment: equipmentInstance]
         }
     }
-    @Secured(['permitAll'])
-    def debug(){
-        File file = File.createTempFile("temp",".csv")
-        file.write("hello,world!")
-
-        def valueA = "testA"
-        def valueB = "testB"
-        def valueC = "testC"
-        file.append("\r\n"+valueA+","+valueB+","+valueC+"\r\n")
-
-        response.setHeader "Content-disposition", "attachment; filename=${file.name}.csv"
-        response.contentType = 'text-plain'
-        response.outputStream << file.text
-        response.outputStream.flush()
-    }
 
     def delete(Equipment equipmentInstance) {
 

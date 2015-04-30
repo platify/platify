@@ -3,6 +3,7 @@ package edu.harvard.capstone.editor
 import groovy.json.*
 
 import static org.springframework.http.HttpStatus.*
+import grails.plugin.springsecurity.annotation.Secured
 
 import grails.validation.ValidationException
 
@@ -93,4 +94,20 @@ class PlateController {
             [plate: plateInstance]
         }
    }
+
+       @Secured(['permitAll'])
+    def debug(Long id){
+/*
+    File exportPlate(PlateSet plateInstance){
+
+    File exportTemplate(PlateTemplate templateInstance){
+
+*/
+        def file = editorService.exportPlate(PlateSet.get(id))
+        //def file = editorService.exportTemplate(PlateTemplate.get(id))
+        response.setHeader "Content-disposition", "attachment; filename=${file.name}.csv"
+        response.contentType = 'text-plain'
+        response.outputStream << file.text
+        response.outputStream.flush()
+    }
 }

@@ -23,7 +23,7 @@
   border: 1px solid gray;
   border-bottom: 0;
   border-top: 0;
-  background: url('/images/slickgrid/header-bg.gif') repeat-x center top;
+  background: url('../slickgrid/header-bg.gif') repeat-x center top;
   color: black;
   height: 24px;
   line-height: 24px;
@@ -145,7 +145,7 @@ input.editor-percentcomplete {
   display: inline-block;
   width: 16px;
   height: 100%;
-  background: url("/images/slickgrid/pencil.gif") no-repeat center center;
+  background: url("../slickgrid/pencil.gif") no-repeat center center;
   overflow: visible;
   z-index: 1000;
   float: right;
@@ -156,7 +156,7 @@ input.editor-percentcomplete {
   position: absolute;
   top: -2px;
   left: -9px;
-  background: url("/images/slickgrid/editor-helper-bg.gif") no-repeat top left;
+  background: url("../slickgrid/editor-helper-bg.gif") no-repeat top left;
   padding-left: 9px;
 
   width: 120px;
@@ -213,12 +213,12 @@ input.editor-checkbox {
 .l0 {
     font-weight: bold;
     color: #1c94c4;
-    background: url('/images/slickgrid/header-columns-bg.gif') repeat-x center bottom;
+    background: url('../slickgrid/header-columns-bg.gif') repeat-x center bottom;
     border-right: 1px solid silver;
 }
 
 .l0:hover {
-    background: white url('/images/slickgrid/header-columns-over-bg.gif') repeat-x center bottom;
+    background: white url('../slickgrid/header-columns-over-bg.gif') repeat-x center bottom;
 }
 
 
