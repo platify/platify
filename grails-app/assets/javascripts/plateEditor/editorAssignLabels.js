@@ -786,9 +786,9 @@ function translateModelToOutputJson(pModel) {
 
 
 	// Send all values for the grid
-	for (i = 1; i <= pModel.grid_width; i++) {
+	for (i = 1; i <= pModel.grid_height; i++) {
 		// need null check here !!
-		for (j = 1; j <= pModel.grid_height; j++) {
+		for (j = 1; j <= pModel.grid_width; j++) {
 			well = {};
 			well.row = i;
 			well.column = j;

@@ -239,7 +239,7 @@ function addEvent(elementId, eventType, handlerFunction) {
 //data format translation
 function translateModelToOutputJson(pModel) {
 	'use strict';
-	var plateJson, plate, row, column, well, labels, catKey, labKey, label;
+	var plateJson, plate, i, j, well, labels, catKey, labKey, label;
 	plateJson = {};
 	plate = {};
 	plate.name = window.tName;			// should do null check ???
@@ -249,27 +249,35 @@ function translateModelToOutputJson(pModel) {
 	plate.experimentID = window.expId;
 	plate.labels = [];		// plate level labels, should set these if available already !!!
 	plate.wells = [];
-	for (row in pModel.rows) {
-		if (pModel.rows.hasOwnProperty(row)) {
-			for (column in pModel.rows[row].columns) {
-				well = {};
-				well.row = row;
-				well.column = column;
-				well.control = null;
-				labels = [];
-				for (catKey in pModel.rows[row].columns[column].categories) {
-					for (labKey in pModel.rows[row].columns[column].categories[catKey]) {
+
+	// Send all values for the grid
+	for (i = 1; i <= plate.height; i++) {
+		for (j = 1; j <= plate.width; j++) {
+			well = {};
+			well.row = i;
+			well.column = j;
+			
+			labels = [];
+			if (pModel.rows[i] !== undefined && pModel.rows[i].columns[j] !== undefined) {
+				// RECONSIDER what you are doing here. Are labels even present at template stage ??
+				for (catKey in pModel.rows[i].columns[j].categories) {
+					for (labKey in pModel.rows[i].columns[j].categories[catKey]) {
 						label = {};
 						label.category = catKey;
 						label.name = labKey;
-						label.color = pModel.rows[row].columns[column].categories[catKey][labKey];
+						label.color = pModel.rows[i].columns[j].categories[catKey][labKey];
 						labels.push(label);
 					}
 				}
-				well.labels = labels;
-				well.groupName = pModel.rows[row].columns[column].wellGroupName;
-				plate.wells.push(well);
+				
+				well.groupName = pModel.rows[i].columns[j].wellGroupName;
+				well.control = "compound";
+			} else {
+				well.control = "empty";
 			}
+
+			well.labels = labels;
+			plate.wells.push(well);
 		}
 	}
 	plateJson.plate = plate;
