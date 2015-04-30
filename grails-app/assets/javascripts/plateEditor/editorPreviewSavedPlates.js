@@ -298,11 +298,11 @@ function loadJsonData(plateJson) {
 	g_height = DIMENSION;
 	g_width = DIMENSION;
 	
-	if (GRID_HEIGHT !== null && GRID_HEIGHT !== undefined) {
+	if (GRID_HEIGHT !== null && GRID_HEIGHT !== undefined && GRID_HEIGHT !== "") {
 		g_height = GRID_HEIGHT;
 	}
 	
-	if (GRID_WIDTH !== null && GRID_WIDTH !== undefined) {
+	if (GRID_WIDTH !== null && GRID_WIDTH !== undefined && GRID_WIDTH !== "") {
 		g_width = GRID_WIDTH;
 	}
 	
@@ -355,7 +355,9 @@ function loadJsonData(plateJson) {
 				}
 			}
 			//grid.updateCellContents(row, column, newContents);
-			newData[row - 1][column - 1] = newContents;
+			if (row > 0 && column > 0) {
+				newData[row - 1][column - 1] = newContents;
+			}
 		}
 	}
 	
