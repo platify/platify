@@ -365,7 +365,7 @@ function ImportData(numPlates, numRows, numCols){
      *
      * @param categoryName - the string name of the category to be removed
      *
-     * Note: - if this category has not been previously added at the same level, then a
+     * Note: - If this category has not been previously added at the same level, then a
      *      NO_SUCH_CATEGORY error will be thrown.
      */
     this.removePlateLevelCategory = function(categoryName){
@@ -465,9 +465,9 @@ function ImportData(numPlates, numRows, numCols){
      *
      * Note: - This method throws a NO_SUCH_PLATE error if the calling ImportData object
      *      does not have a plate for the given plate index.
-     *       - This method throws a NO_SUCH_CATEGORY error if the experiment level
+     *       - This method throws a NO_SUCH_CATEGORY error if the plate level
      *      category given by the categoryName argument has not previously been added to
-     *      the calling ImportData object at the experiment level
+     *      the calling ImportData object at the plate level
      *       - This method throws an ILLEGAL_ARGUMENT error if the given value is null,
      *       NaN or undefined.
      */
@@ -553,8 +553,9 @@ function ImportData(numPlates, numRows, numCols){
     };
 
     /**
+     * This function returns an array of all of the well level category names.
      *
-     * @returns {Array}
+     * @returns {Array} - an array of all the well level category names
      */
     this.getWellLevelCategories = function(){
         var result = [];
@@ -568,6 +569,15 @@ function ImportData(numPlates, numRows, numCols){
         return result;
     };
 
+    /**
+     * This method removes a well level category from the calling ImportData
+     * object.
+     *
+     * @param categoryName - the string name of the category to be removed
+     *
+     * Note: - If this category has not been previously added at the same level, then a
+     *      NO_SUCH_CATEGORY error will be thrown.
+     */
     this.removeWellLevelCategory = function(categoryName){
         // first some error checking
         if (!this.wellLevelCategories[categoryName]){
@@ -596,6 +606,29 @@ function ImportData(numPlates, numRows, numCols){
     };
 
 
+    /**
+     * This method returns the well level label value for a given category on a given
+     * plate at a given plate row and column.
+     *
+     * @param plateIndex - the index number (starting at 0) of the plate that the label
+     *                  value is to be gotten for
+     * @param rowIndex - the row index (starting at 0) of the well that thw label value is
+     *                  to be gotten for
+     * @param columnIndex - the column index (starting at 0) of the well that thw label
+     *                  value is to be gotten for
+     * @param categoryName - the name of the category for the desired label value
+     * @returns {*} - the label value for the given category, plate, and well
+     *
+     * Note: - This method throws a NO_SUCH_PLATE error if the calling ImportData object
+     *      does not have a defined plate for the given plate index.
+     *       - This method throws a NO_SUCH_ROW error if the calling ImportData object
+     *      does not have a defined row for the given row index.
+     *       - This method throws a NO_SUCH_COLUMN error if the calling ImportData object
+     *      does not have a defined column for the given plate index.
+     *       - This method throws a NO_SUCH_CATEGORY error if the category given by
+     *      the categoryName argument has not previously been added at the plate level to
+     *      the calling ImportData object.
+     */
     this.getWellLevelLabelForSinglePlate = function(plateIndex,
                                                     rowIndex,
                                                     columnIndex,
@@ -638,6 +671,21 @@ function ImportData(numPlates, numRows, numCols){
         return result;
     };
 
+    /**
+     * This method returns the labels for a given category for all wells on all plates in
+     * an ImportData object for a given well level category.
+     *
+     * @param categoryName - the name of the well level category that the label values are
+     *                      to be gotten for.
+     * @returns {Array} - an array of objects in which each object contains the well level
+     *                  label values for each well on a plate in the calling ImportData
+     *                  object. These objects are keyed on the well label, e.g. "B13", and
+     *                  the value is the label value for that well. The plate objects are
+     *                  placed in the returned array in the same order as they are in the
+     *                  calling ImportData object.
+     * Note: - This method throws a NO_SUCH_CATEGORY error if the given category name has
+     *      not been added to the calling ImportData object previously.
+     */
     this.getWellLevelLabelforAllPlates = function(categoryName){
         var result = [];
 
@@ -666,6 +714,32 @@ function ImportData(numPlates, numRows, numCols){
         return result;
     };
 
+    /**
+     * This method sets a label value for a given well level label category on a given
+     * plate and well.
+     *
+     * @param plateIndex - the index (starting at 0) of the plate on which the label value
+     *                  is to be set
+     * @param rowIndex - the row index (starting at 0) of the well on which the label
+     *                  value is to be set
+     * @param columnIndex - the column index (starting at 0) of the well on which the
+     *                  label value is to be set
+     * @param categoryName - the name of the experiment level category to set the label
+     *                      for
+     * @param value - the value to set the label to
+     *
+     * Note: - This method throws a NO_SUCH_PLATE error if the calling ImportData object
+     *      does not have a plate for the given plate index.
+     *       - This method throws a NO_SUCH_ROW error if the calling ImportData object
+     *      does not have a row for the given row index.
+     *       - This method throws a NO_SUCH_COLUMN error if the calling ImportData object
+     *      does not have a column for the given column index.
+     *       - This method throws a NO_SUCH_CATEGORY error if the well level
+     *      category given by the categoryName argument has not previously been added to
+     *      the calling ImportData object at the well level
+     *       - This method throws an ILLEGAL_ARGUMENT error if the given value is null,
+     *       NaN or undefined.
+     */
     this.setWellLevelLabel = function(plateIndex,
                                        rowIndex,
                                        columnIndex,
@@ -700,7 +774,7 @@ function ImportData(numPlates, numRows, numCols){
                 "set a well level label value");
         }
 
-        if (!value && value !== ImportData.BLANK){
+        if (!value && value !== ImportData.BLANK && value !== 0){
             throw new ImportDataError(ImportDataError.ILLEGAL_ARGUMENT,
                 value,
                 "plate level label value",
