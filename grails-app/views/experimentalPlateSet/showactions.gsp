@@ -57,6 +57,8 @@
 											<g:sortableColumn property="name" title="${message(code: 'plateSetInstance.plate.name.label', default: 'Template Name')}" />
 											<g:sortableColumn property="owner" title="${message(code: 'plateSetInstance.plate.owner.label', default: 'Owner')}" />	
 											<g:sortableColumn property="dateCreated" title="${message(code: 'plateSetInstance.plate.date.label', default: 'Date')}" />
+											<th>Horizontal Wells</th>
+											<th>Vertical Wells</th>			<!-- Change to well size ?? -->
 											<th>Preview</th>																
 										</tr>
 									</thead>
@@ -68,7 +70,10 @@
 											<td>${fieldValue(bean: plateSetInstance.plate, field: "name")}</td>
 											<td>${plateSetInstance.plate.owner.firstName + ' ' + plateSetInstance.plate.owner.lastName}</td>
 											<td>${fieldValue(bean: plateSetInstance.plate, field: "dateCreated")}</td>
-											<td><button value="${plateSetInstance.id}" onclick="onViewSelect(this)" type="button" class="btn btn-info btn-xs" data-toggle="modal" data-target="#viewSavedPlateModal">View</button></td>
+											<td>${fieldValue(bean: plateSetInstance.plate, field: "width")}</td>
+											<td>${fieldValue(bean: plateSetInstance.plate, field: "height")}</td>
+											<td><button value="${plateSetInstance.id}-${fieldValue(bean: plateSetInstance.plate, field: 'width')}-${fieldValue(bean: plateSetInstance.plate, field: 'height')}"
+											onclick="onViewSelect(this)" type="button" class="btn btn-info btn-xs" data-toggle="modal" data-target="#viewSavedPlateModal">View</button></td>
 										</tr>
 									</g:each>
 									</tbody>

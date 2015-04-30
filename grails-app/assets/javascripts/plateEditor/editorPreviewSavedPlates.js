@@ -3,6 +3,8 @@
 
 // constants
 var DIMENSION = 100;
+var GRID_HEIGHT = 100;
+var GRID_WIDTH = 100;
 var CELL_HEIGHT = 25;
 var CELL_WIDTH = 40;
 var plateModel = {};
@@ -173,8 +175,8 @@ function translateInputJsonToModel(plateJson) {
 	}
 
 	pModel.name = plate.name;			// should also copy expId and plateId at this point !!
-	pModel.grid_width = plate.width;
-	pModel.grid_height = plate.height;
+	//pModel.grid_width = plate.width;
+	//pModel.grid_height = plate.height;
 
 	for (i = 0; i < plate.wells.length; i++) {
 		row = plate.wells[i].row;
@@ -296,12 +298,12 @@ function loadJsonData(plateJson) {
 	g_height = DIMENSION;
 	g_width = DIMENSION;
 	
-	if (plateModel.grid_height !== null && plateModel.grid_height !== undefined) {
-		g_height = plateModel.grid_height;
+	if (GRID_HEIGHT !== null && GRID_HEIGHT !== undefined) {
+		g_height = GRID_HEIGHT;
 	}
 	
-	if (plateModel.grid_width !== null && plateModel.grid_width !== undefined) {
-		g_width = plateModel.grid_width;
+	if (GRID_WIDTH !== null && GRID_WIDTH !== undefined) {
+		g_width = GRID_WIDTH;
 	}
 	
 	newData = createBlankData(g_height, g_width);
@@ -368,7 +370,12 @@ function loadJsonData(plateJson) {
 
 function onViewSelect(clickedEL) {
 	"use strict";
-	var plateId = clickedEL.value;
+	var elValArr, plateId;
+	elValArr = clickedEL.value.split("-");
+	plateId = elValArr[0];
+	GRID_WIDTH = elValArr[1];
+	GRID_HEIGHT = elValArr[2];
+	
 	console.log("selectEvent!:" + plateId);
 	fetchTemplateData(plateId);
 }
