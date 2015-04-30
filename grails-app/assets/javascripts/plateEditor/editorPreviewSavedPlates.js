@@ -137,8 +137,8 @@ function translateModelToOutputJson(pModel) {
 	for (row in pModel.rows) {
 		for (column in pModel.rows[row].columns) {
 			well = {};
-			well.row = row;
-			well.column = column;
+			well.row = row - 1;
+			well.column = column - 1;
 			well.control = null;
 			labels = [];
 			for (catKey in pModel.rows[row].columns[column].categories) {
@@ -179,8 +179,8 @@ function translateInputJsonToModel(plateJson) {
 	//pModel.grid_height = plate.height;
 
 	for (i = 0; i < plate.wells.length; i++) {
-		row = plate.wells[i].row;
-		column = plate.wells[i].column;
+		row = plate.wells[i].row + 1;
+		column = plate.wells[i].column + 1;
 		groupName = plate.wells[i].groupName;
 		labels = plate.wells[i].labels;
 

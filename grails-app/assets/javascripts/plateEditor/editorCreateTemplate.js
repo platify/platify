@@ -254,8 +254,8 @@ function translateModelToOutputJson(pModel) {
 	for (i = 1; i <= plate.height; i++) {
 		for (j = 1; j <= plate.width; j++) {
 			well = {};
-			well.row = i;
-			well.column = j;
+			well.row = i - 1;
+			well.column = j - 1;
 			
 			labels = [];
 			if (pModel.rows[i] !== undefined && pModel.rows[i].columns[j] !== undefined) {
@@ -293,8 +293,8 @@ function translateInputJsonToModel(plateJson) {
 	plate = plateJson.plate;
 
 	for (i = 0; i < plate.wells.length; i++) {
-		row = plate.wells[i].row;
-		column = plate.wells[i].column;
+		row = plate.wells[i].row + 1;
+		column = plate.wells[i].column + 1;
 		groupName = plate.wells[i].groupName;
 		labels = plate.wells[i].labels;
 

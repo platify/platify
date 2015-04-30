@@ -794,8 +794,8 @@ function translateModelToOutputJson(pModel) {
 		// need null check here !!
 		for (j = 1; j <= pModel.grid_width; j++) {
 			well = {};
-			well.row = i;
-			well.column = j;
+			well.row = i - 1;
+			well.column = j - 1;
 			labels = [];
 			
 			if (pModel.rows[i] !== undefined && pModel.rows[i].columns[j] !== undefined) {
@@ -875,8 +875,8 @@ function translateInputJsonToModel(plateJson) {
 	pModel.grid_height = plate.height;
 
 	for (i = 0; i < plate.wells.length; i++) {
-		row = plate.wells[i].row;
-		column = plate.wells[i].column;
+		row = plate.wells[i].row + 1;
+		column = plate.wells[i].column + 1;
 		if (plate.wells[i].groupName !== undefined && plate.wells[i].groupName !== null) {
 			groupName = plate.wells[i].groupName;
 		} else {
