@@ -116,8 +116,11 @@ function ExperimentModel(experimentId) {
      */
     this.meanNegativeControl = function() {
         var label = this.rawDataLabel();
-        var plate = this.currentPlate;
+        if (!label) {
+            return null;
+        }
 
+        var plate = this.currentPlate;
         return d3.mean(this.controls.negative.map(function(coords) {
             return plate.rows[coords[0]].columns[coords[1]].rawData[label];
         }));
@@ -129,8 +132,11 @@ function ExperimentModel(experimentId) {
      */
     this.meanPositiveControl = function() {
         var label = this.rawDataLabel();
-        var plate = this.currentPlate;
+        if (!label) {
+            return null;
+        }
 
+        var plate = this.currentPlate;
         return d3.mean(this.controls.positive.map(function(coords) {
             return plate.rows[coords[0]].columns[coords[1]].rawData[label];
         }));
@@ -212,8 +218,9 @@ function ExperimentModel(experimentId) {
      * Calculates the z-factor value for the current plate.
      */
     this.zFactor = function() {
-        return zFactor(this.currentPlate, this.rawDataLabel(),
-                       this.controls.negative, this.controls.positive);
+        var rv = zFactor(this.currentPlate, this.rawDataLabel(),
+                         this.controls.negative, this.controls.positive);
+        return isNaN(rv) ? null : rv;
     }
 
 
@@ -221,7 +228,8 @@ function ExperimentModel(experimentId) {
      * Calculates the z'-factor value for the current plate.
      */
     this.zPrimeFactor = function() {
-        return zPrimeFactor(this.currentPlate, this.rawDataLabel(),
-                            this.controls.negative, this.controls.positive);
+        var rv = zPrimeFactor(this.currentPlate, this.rawDataLabel(),
+                              this.controls.negative, this.controls.positive);
+        return isNaN(rv) ? null : rv;
     }
 }
