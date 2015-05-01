@@ -15,8 +15,10 @@ var highlightedCoords = [];
 //var BLANK_CHAR = "-";
 
 /**
- * A function that creates a blank data set for initializing the grid example
- * page. The data set is of dimension grid_height x grid_width.
+ * Creates a blank data set for initializing the grid data set. 
+ * The data set is of dimension grid_height x grid_width.
+ * @param grid_height - number of rows on the grid
+ * @param grid_width - number of columns on the grid
  */
 function createBlankData(grid_height, grid_width) {
 	"use strict";
@@ -37,7 +39,12 @@ function createBlankData(grid_height, grid_width) {
  * function is registered to listen for these events in the createGrid
  * function using the registerSelectedCellsCallBack function of the Grid
  * Class. This function changes the background color of all selected cells
- * to the currentHighlightColor.
+ * to the currentHighlightColor. 
+ * Then causes the cursor to focus in the textField.
+ * @param startRow - the row index of top left cell of the selecting box
+ * @param startCol - the column index of top left cell of the selecting box
+ * @param endRow - the row index of bottom right cell of the selecting box
+ * @param endCol - the column index of bottom right cell of the selecting box
  */
 function handleSelectedCells(startRow,startCol,endRow, endCol) {
 	"use strict";
@@ -63,7 +70,7 @@ function handleSelectedCells(startRow,startCol,endRow, endCol) {
 
 
 /**
- * This function creates a new grid applying it to the "myGrid" div on the
+ * Creates a new grid applying it to the "myGrid" div on the
  * page. It then creates a blank data set and displays it in the grid.
  * It also registers the handleSelectedCells function as a listener for
  * the event that user selected cell ranges in the grid change.
@@ -86,18 +93,24 @@ function createGrid() {
 
 }
 
+/**
+ * Enables the ability to make selections on the grid. 
+ */
 function enableGridSelection() {
 	"use strict";
 	grid.enableCellSelection();
 }
 
+/**
+ * Disables the ability to make selections on the grid. 
+ */
 function disableGridSelection() {
 	"use strict";
 	grid.disableCellSelection();
 }
 
 /**
- * addEvent - This function adds an event handler to an html element in
+ * This function adds an event handler to an html element in
  * a way that covers many browser types.
  * @param elementId - the string id of the element to attach the handler to
  * or a reference to the element itself.
@@ -120,9 +133,18 @@ function addEvent(elementId, eventType, handlerFunction) {
 	} else if (window.attachEvent) {
 		element.attachEvent("on" + eventType, handlerFunction);
 	}
-} // end of function addEvent
+}
 
-//data format translation
+/**
+ * This function is used to convert the internal data structure json format into
+ * a data structure json format that is expected by the server when sending the 
+ * template json to be saved by the back-end. This allows for differences between
+ * the 2 models. The internal model providing a more efficient referencing structure
+ * for the client-side tasks, and allows for quick changes to either model while
+ * maintaining the contract with the server.
+ * @param pModel - a data structure in the format of the internal data model.
+ * @returns plateJson - a data structure in the format excepted by the server.
+ */
 function translateModelToOutputJson(pModel) {
 	'use strict';
 	var plateJson, plate, row, column, well, labels, catKey, labKey, label;
@@ -157,7 +179,17 @@ function translateModelToOutputJson(pModel) {
 	return plateJson;
 }
 
-// data format translation
+/**
+ * This function is used to convert a json data structure in the format that is 
+ * sent by the server, into the json data structure that is expected by the
+ * client-side JavaScript. This allows for differences between
+ * the 2 models. This is used when loading data received from the server into 
+ * the grid and associated internal data model. The internal model providing a 
+ * more efficient referencing structure for the client-side tasks, and allows 
+ * for quick changes to either model while maintaining the contract with the server.
+ * @param plateJson - a data structure in the format sent by the server.
+ * @returns pModel - a data structure in the format expected by the internal data model.
+ */
 function translateInputJsonToModel(plateJson) {
 	'use strict';
 	var pModel, plate, i, j, row, column, groupName, labels;
@@ -196,20 +228,11 @@ function translateInputJsonToModel(plateJson) {
 	return pModel;
 }
 
-// ajax save object call
-function selectAndContinue() {
-	"use strict";
-	var pSelect = document.getElementById("plateSelect");
-	if (pSelect.value !== undefined) {
-		// use less hacky method !!
-		window.location.href = hostname + "/experimentalPlateSet/createPlate" + '?expid=' + window.expId + '&tmpid=' + pSelect.value;
-	} else {
-		alert("An error while selecting the template. TemplateId is null");
-	}
-}
-
 /**
- * Loads a json plate model and updates the grid and category legend
+ * Loads a json data structure received from the server. It is translated into 
+ * a format understood by the local internal plate model and updates the grid
+ * with the data received.
+ * @param plateJson - a data structure in the format sent by the server.
  */
 function loadJsonData(plateJson) {
 	"use strict";
@@ -249,7 +272,12 @@ function loadJsonData(plateJson) {
 	grid.fillUpGrid(CELL_WIDTH, CELL_HEIGHT);
 }
 
-//ajax save object call
+/**
+ * Makes an ajax call to the server to retrieve the json data model containing
+ * the information about a single stored template.
+ * If successful it calls loadJsonData to update the grid with the new model.
+ * @param tId - ID of template to retrieve the json data model for. 
+ */
 function fetchTemplateData(tId) {
 	"use strict";
 	var jqxhr = $.ajax({		// need to update to save plate instead of template
@@ -274,6 +302,12 @@ function fetchTemplateData(tId) {
 	});
 }
 
+/**
+ * Event Handler for template select drop-down. When a new item is selected
+ * the id of the selected item is passed to fetchTemplateData to retrieve the
+ * template data and update the preview grid.
+ * @param selectEl - selected item in the drop-down.
+ */
 function onPlateSelectChange(selectEl) {
 	"use strict";
 	var tId = selectEl.value;
@@ -281,7 +315,13 @@ function onPlateSelectChange(selectEl) {
 	fetchTemplateData(tId);
 }
 
-function updatePlateSelection() {
+/**
+ * This Function updates the grid based on the current the id of the selected item 
+ * in the template select drop-down. FetchTemplateData is called to retrieve the
+ * template data and update the preview grid.
+ * @param selectEl - selected item in the drop-down.
+ */
+function updatePlateSelection() {				// TODO can this be combined with the onPlateSelectChange method ??
 	"use strict";
 	var pSelect, tId;
 	pSelect = document.getElementById("plateSelect");
@@ -293,8 +333,23 @@ function updatePlateSelection() {
 }
 
 /**
+ * Transitions to the next page, passing the currently selected template id as a param.
+ */
+function selectAndContinue() {
+	"use strict";
+	var pSelect = document.getElementById("plateSelect");
+	if (pSelect.value !== undefined) {
+		// use less hacky method !!
+		window.location.href = hostname + "/experimentalPlateSet/createPlate" + '?expid=' + window.expId + '&tmpid=' + pSelect.value;
+	} else {
+		alert("An error while selecting the template. TemplateId is null");
+	}
+}
+
+/**
  * This function handles the window load event. It initializes and fills the
- * grid with blank data and sets up the event handlers on the
+ * grid with the initial item in the plateSelect drop-down, or blank data if 
+ * no templates are available, and sets up the event handlers.
  */
 function init() {
 	"use strict";
@@ -318,6 +373,9 @@ function init() {
 
 window.onload = init;
 
+/**
+ * Template select drop-down uses selectize.
+ */
 $('#plateSelect').selectize({
     create: true,
     sortField: 'text'
