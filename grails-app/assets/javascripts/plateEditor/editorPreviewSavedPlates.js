@@ -17,8 +17,10 @@ var groupNames = {};
 var catLegend = {};
 
 /**
- * A function that creates a blank data set for initializing the grid example
- * page. The data set is of dimension grid_height x grid_width.
+ * Creates a blank data set for initializing the grid data set. 
+ * The data set is of dimension grid_height x grid_width.
+ * @param grid_height - number of rows on the grid
+ * @param grid_width - number of columns on the grid
  */
 function createBlankData(grid_height, grid_width) {
 	"use strict";
@@ -39,7 +41,12 @@ function createBlankData(grid_height, grid_width) {
  * function is registered to listen for these events in the createGrid
  * function using the registerSelectedCellsCallBack function of the Grid
  * Class. This function changes the background color of all selected cells
- * to the currentHighlightColor.
+ * to the currentHighlightColor. 
+ * Then causes the cursor to focus in the textField.
+ * @param startRow - the row index of top left cell of the selecting box
+ * @param startCol - the column index of top left cell of the selecting box
+ * @param endRow - the row index of bottom right cell of the selecting box
+ * @param endCol - the column index of bottom right cell of the selecting box
  */
 function handleSelectedCells(startRow, startCol, endRow, endCol) {
 	"use strict";
@@ -65,7 +72,7 @@ function handleSelectedCells(startRow, startCol, endRow, endCol) {
 
 
 /**
- * This function creates a new grid applying it to the "myGrid" div on the
+ * Creates a new grid applying it to the "myGrid" div on the
  * page. It then creates a blank data set and displays it in the grid.
  * It also registers the handleSelectedCells function as a listener for
  * the event that user selected cell ranges in the grid change.
@@ -88,18 +95,24 @@ function createGrid() {
 
 }
 
+/**
+ * Enables the ability to make selections on the grid. 
+ */
 function enableGridSelection() {
 	"use strict";
 	grid.enableCellSelection();
 }
 
+/**
+ * Disables the ability to make selections on the grid. 
+ */
 function disableGridSelection() {
 	"use strict";
 	grid.disableCellSelection();
 }
 
 /**
- * addEvent - This function adds an event handler to an html element in
+ * This function adds an event handler to an html element in
  * a way that covers many browser types.
  * @param elementId - the string id of the element to attach the handler to
  * or a reference to the element itself.
@@ -122,9 +135,18 @@ function addEvent(elementId, eventType, handlerFunction) {
 	} else if (window.attachEvent) {
 		element.attachEvent("on" + eventType, handlerFunction);
 	}
-} // end of function addEvent
+}
 
-//data format translation
+/**
+ * This function is used to convert the internal data structure json format into
+ * a data structure json format that is expected by the server when sending the 
+ * template json to be saved by the back-end. This allows for differences between
+ * the 2 models. The internal model providing a more efficient referencing structure
+ * for the client-side tasks, and allows for quick changes to either model while
+ * maintaining the contract with the server.
+ * @param pModel - a data structure in the format of the internal data model.
+ * @returns plateJson - a data structure in the format excepted by the server.
+ */
 function translateModelToOutputJson(pModel) {
 	'use strict';
 	var plateJson, plate, row, column, well, labels, catKey, labKey, label;
@@ -137,8 +159,8 @@ function translateModelToOutputJson(pModel) {
 	for (row in pModel.rows) {
 		for (column in pModel.rows[row].columns) {
 			well = {};
-			well.row = row;
-			well.column = column;
+			well.row = row - 1;
+			well.column = column - 1;
 			well.control = null;
 			labels = [];
 			for (catKey in pModel.rows[row].columns[column].categories) {
@@ -159,7 +181,17 @@ function translateModelToOutputJson(pModel) {
 	return plateJson;
 }
 
-// data format translation
+/**
+ * This function is used to convert a json data structure in the format that is 
+ * sent by the server, into the json data structure that is expected by the
+ * client-side JavaScript. This allows for differences between
+ * the 2 models. This is used when loading data received from the server into 
+ * the grid and associated internal data model. The internal model providing a 
+ * more efficient referencing structure for the client-side tasks, and allows 
+ * for quick changes to either model while maintaining the contract with the server.
+ * @param plateJson - a data structure in the format sent by the server.
+ * @returns pModel - a data structure in the format expected by the internal data model.
+ */
 function translateInputJsonToModel(plateJson) {
 	"use strict";
 	var pModel, plate, i, j, row, column, groupName, labels, convCat, convLab;
@@ -179,8 +211,8 @@ function translateInputJsonToModel(plateJson) {
 	//pModel.grid_height = plate.height;
 
 	for (i = 0; i < plate.wells.length; i++) {
-		row = plate.wells[i].row;
-		column = plate.wells[i].column;
+		row = plate.wells[i].row + 1;
+		column = plate.wells[i].column + 1;
 		groupName = plate.wells[i].groupName;
 		labels = plate.wells[i].labels;
 
@@ -221,6 +253,12 @@ function translateInputJsonToModel(plateJson) {
 	return pModel;
 }
 
+/**
+ * Creates a new div containing a label and color picker.
+ * @param cat - name of category to create a label for.
+ * @param label - name of label to create.
+ * @returns cpDiv - div containing new label and color picker.
+ */
 function createColorPicker(cat, label) {
 	"use strict";
 	var cpDiv, newInput, editLabelBtn, deleteLabelBtn;
@@ -237,13 +275,18 @@ function createColorPicker(cat, label) {
 	return cpDiv;
 }
 
-function createCatLabel(catKey) {
+/**
+ * Creates a new div containing a category label and visibility toggle.
+ * @param catKey - name of category to create a label for.
+ * @returns labDiv - div containing new category label structure.
+ */
+function createCatLabel(catKey) {			// TODO -- update split to deal with "-" !!!!
 	"use strict";
 	var labDiv, newLabel, convCat;
 	labDiv = document.createElement("div");
 	labDiv.className = "button-labels";
 	newLabel = document.createElement("label");
-	newLabel.setAttribute("for", "vischeck-" + catKey);
+	newLabel.setAttribute("for", "vischeck-" + catKey);		// TODO -- is vischeck used here ?? !!!!
 	// if category has been converted from a decimal, then convert it back for display!!
 	convCat = catKey.toString().split('__dot__').join('.');
 	newLabel.appendChild(document.createTextNode(convCat));
@@ -252,6 +295,10 @@ function createCatLabel(catKey) {
 	return labDiv;
 }
 
+/**
+ * Updates the list of well labels displayed beside the preview grid with 
+ * the current well values stored in catLegend.
+ */
 function updateCategoryList() {
 	"use strict";
 	var newDiv, catKey, labelKey, newLi, convLab, newInput;
@@ -272,6 +319,10 @@ function updateCategoryList() {
 	document.getElementById("categoryList").innerHTML = newDiv.innerHTML;
 }
 
+/**
+ * Updates the list of compounds displayed beside the preview grid with 
+ * the current compound values stored in groupNames.
+ */
 function updateCompoundList() {
 	"use strict";
 	var newDiv, wellGroup, newLabel;
@@ -286,7 +337,10 @@ function updateCompoundList() {
 }
 
 /**
- * Loads a json plate model and updates the grid and category legend
+ * Loads a json data structure received from the server. It is translated into 
+ * a format understood by the local internal plate model and updates the grid
+ * with the data received.
+ * @param plateJson - a data structure in the format sent by the server.
  */
 function loadJsonData(plateJson) {
 	"use strict";

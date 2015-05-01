@@ -20,8 +20,8 @@ var tmpEditOldLabel;
 var tmpEditCat;
 
 /**
- * A function that creates a blank data set for initializing the grid example
- * page. The data set is of dimension DIMENSION x DIMENSION.
+ * Creates a blank data set for initializing the grid data set. 
+ * The data set is of dimension plateModel.grid_height x plateModel.grid_width.
  */
 function createBlankData() {
 	"use strict";
@@ -38,8 +38,8 @@ function createBlankData() {
 }
 
 /**
- * A function that creates a random data set for displaying in the grid example
- * page. The data set is of dimension DIMENSION x DIMENSION.
+ * Creates a random data set for displaying in the grid example
+ * page. The data set is of dimension plateModel.grid_height x plateModel.grid_width.
  */
 function createRandomData() {
 	"use strict";
@@ -55,6 +55,9 @@ function createRandomData() {
 	return result;
 }
 
+/**
+ * Focuses on appropriate visible text field.
+ */
 function txtFieldFocus() {
 	"use strict";
 	if ($("#addLabelPanel").is(":visible")) {
@@ -62,6 +65,7 @@ function txtFieldFocus() {
 	} else if ($("#addDosePanel").is(":visible")) {
 		$("#topDoseValue").focus();
 	}
+	// TODO add focus for other panels  !!!!!
 }
 
 /**
@@ -69,7 +73,12 @@ function txtFieldFocus() {
  * function is registered to listen for these events in the createGrid
  * function using the registerSelectedCellsCallBack function of the Grid
  * Class. This function changes the background color of all selected cells
- * to the currentHighlightColor.
+ * to the currentHighlightColor. 
+ * Then causes the cursor to focus in the textField.
+ * @param startRow - the row index of top left cell of the selecting box
+ * @param startCol - the column index of top left cell of the selecting box
+ * @param endRow - the row index of bottom right cell of the selecting box
+ * @param endCol - the column index of bottom right cell of the selecting box
  */
 function handleSelectedCells(startRow, startCol, endRow, endCol) {
 	"use strict";
@@ -95,8 +104,7 @@ function handleSelectedCells(startRow, startCol, endRow, endCol) {
 }
 
 /**
- * This function handles the event that the removeHighlighting button is
- * clicked by removing the most recent cell background color change. This
+ * Removes the most recent cell background color change. This
  * is achieved by calling the removeCellColors method of the Grid class with
  * the most key used to create the most recent background color change as
  * stored in the currentHighlightKeys array.
@@ -106,16 +114,15 @@ function removeHighlightedArea() {
 	if (currentHighlightKeys.length > 0) {
 		grid.removeCellColors(currentHighlightKeys.pop());
 
-		// need to decrement highlightedCoords here !! 
+		// TODO need to decrement highlightedCoords here !! 
 		//(not the same number of items removed !!!)
-		highlightedCoords.pop();	// need to fix !!
+		highlightedCoords.pop();	// TODO need to fix or remove !!
 	}
 }
 
 /**
- * This function handles the event that the removeHighlighting button is
- * clicked by removing the most recent cell background color change. This
- * is achieved by calling the removeCellColors method of the Grid class with
+ * Removes all the current cell selections and related background color 
+ * change. This is achieved by calling the removeCellColors method of the Grid class with
  * the most key used to create the most recent background color change as
  * stored in the currentHighlightKeys array.
  */
@@ -133,20 +140,26 @@ function removeAllHighlightedCells() {
  * displayed Grid. It is a handler for the event that the "loadData" button
  * is clicked.
  */
-function loadRandomData() {
+function loadRandomData() {				// TODO consider removing this, as it is not used !!!
 	"use strict";
 	data = createRandomData();
 	grid.setData(data);
 	grid.fillUpGrid(CELL_WIDTH, CELL_HEIGHT);
 }
 
-
-
+/**
+ * Updates cells in the grid with category 'cat' and label 'label' to 
+ * have the new color 'color'. Cells are updated based on the reference
+ * to the cells with that cat/label stored in catLegend.
+ * @param cat - name of category which label belongs to.
+ * @param label - name of label to update color for.
+ * @param color - the color the labels are updated to
+ */
 function updateCellColors(cat, label, color) {
 	"use strict";
 	var cellRef, cellRefArr, row, column, newContents, catKey, labKey;
 	// update all cells with cat and label (messy?)
-	if (catLegend[cat] !== undefined && catLegend[cat].labels[label] !== undefined) {
+	if (catLegend[cat] !== undefined && catLegend[cat] !== null && catLegend[cat].labels[label] !== undefined && catLegend[cat].labels[label] !== null) {
 		for (cellRef in catLegend[cat].labels[label].cellref) {			//change iteration method !!!
 			// what are you doing here ??, define some sort of structure !!!
 			cellRefArr = catLegend[cat].labels[label].cellref[cellRef].split("-");
@@ -170,11 +183,18 @@ function updateCellColors(cat, label, color) {
 	}
 }
 
+/**
+ * Updates cells in the grid with the current visibility stored in catLegend[catKey].
+ * If a cell contains a cat/label where the categories visibility is false then it will
+ * not be shown in the grid. If its visibility is true it will be shown.
+ * Only updates the cells containing the category passed as a param.
+ * @param cat - name of category to update cells for.
+ */
 function updateCatVisibility(cat) {
 	"use strict";
 	var legLab, cellRef, cellRefArr, row, column, newContents, catKey, labKey;
 	// update all cells with cat
-	if (catLegend[cat] !== undefined) {
+	if (catLegend[cat] !== undefined && catLegend[cat] !== null) {
 		for (legLab in catLegend[cat].labels) {
 			for (cellRef in catLegend[cat].labels[legLab].cellref) {
 				cellRefArr = catLegend[cat].labels[legLab].cellref[cellRef].split("-");
@@ -196,32 +216,42 @@ function updateCatVisibility(cat) {
 	}
 }
 
+/**
+ * Creates a label and text input for each wellgroup/compound
+ * @param wellGroup - name of the wellgrouping/compound to create input for.
+ */
 function createCompoundInput(wellGroup) {
 	"use strict";
 	var newInput = document.createElement("input");
-	newInput.id = "wellGroup-" + wellGroup;
+	newInput.id = "wellGroup_-_" + wellGroup;
 	newInput.type = "text";
 	return newInput;
 }
 
+/**
+ * Creates a new div containing a label and color picker.
+ * @param cat - name of category to create a label for.
+ * @param label - name of label to create.
+ * @returns cpDiv - div containing new label and color picker.
+ */
 function createColorPicker(cat, label) {
 	"use strict";
 	var cpDiv, newInput, editLabelBtn, deleteLabelBtn;
 	cpDiv = document.createElement("span");
 	newInput = document.createElement("input");
-	newInput.id = "color-" + cat + "-" + label;
+	newInput.id = "color_-_" + cat + "_-_" + label;
 	newInput.type = "color";
 	newInput.className = "btn-default glyphicon color-p";
 	newInput.defaultValue = catLegend[cat].labels[label].color;
 	newInput.value = catLegend[cat].labels[label].color;
 
 	editLabelBtn = document.createElement("button");
-	editLabelBtn.id = "edit-" + cat + "-" + label;
+	editLabelBtn.id = "edit_-_" + cat + "_-_" + label;
 	editLabelBtn.type = "button";
 	editLabelBtn.className = "btn btn-default btn-xs glyphicon glyphicon-pencil";
 
 	deleteLabelBtn = document.createElement("button");
-	deleteLabelBtn.id = "delete-" + cat + "-" + label;
+	deleteLabelBtn.id = "delete_-_" + cat + "_-_" + label;
 	deleteLabelBtn.type = "button";
 	deleteLabelBtn.value = "Delete Label";
 	deleteLabelBtn.className = "btn btn-default btn-xs glyphicon glyphicon-trash";
@@ -233,32 +263,43 @@ function createColorPicker(cat, label) {
 	return cpDiv;
 }
 
+/**
+ * Updates the list of compounds displayed beside the preview grid with 
+ * the current compound values stored in groupNames.
+ */
 function updateCompoundList() {
 	"use strict";
 	var newDiv, wellGroup, innerDiv, newLabel, newInput;
 	newDiv = document.createElement("div");
 	for (wellGroup in groupNames) {
-		innerDiv = document.createElement("div");
-		innerDiv.className = "col-xs-12";
-		newLabel = document.createElement("label");
-		newLabel.appendChild(document.createTextNode(wellGroup));
+		if (wellGroup !== null) {
+			innerDiv = document.createElement("div");
+			innerDiv.className = "col-xs-12";
+			newLabel = document.createElement("label");
+			newLabel.appendChild(document.createTextNode(wellGroup));
 
-		newInput = createCompoundInput(wellGroup);
-		innerDiv.appendChild(newLabel);
-		innerDiv.appendChild(newInput);
-		newDiv.appendChild(innerDiv);
+			newInput = createCompoundInput(wellGroup);
+			innerDiv.appendChild(newLabel);
+			innerDiv.appendChild(newInput);
+			newDiv.appendChild(innerDiv);
+		}
 	}
 	document.getElementById("compoundList").innerHTML = newDiv.innerHTML;
 
 	// won't seem to take value for input until created ??
 	for (wellGroup in groupNames) {			// USED a second time ?? // does this need to be re-inited ?? ( it's prob ok?)
-		if (groupNames[wellGroup] !== undefined && groupNames[wellGroup] !== null) {
-			document.getElementById("wellGroup-" + wellGroup).value = groupNames[wellGroup];
+		if (wellGroup !== null) {
+			if (groupNames[wellGroup] !== undefined && groupNames[wellGroup] !== null) {
+				document.getElementById("wellGroup_-_" + wellGroup).value = groupNames[wellGroup];
+			}
 		}
 	}
 }
 
-
+/**
+ * Updates the list of Plate level labels displayed beside the preview grid
+ * with the labels stored in plateModel.labels.
+ */
 function updatePlateLabelList() {
 	"use strict";
 	var pLabels, newDiv, i, newH;
@@ -276,6 +317,11 @@ function updatePlateLabelList() {
 }
 
 
+/**
+ * Creates a new div containing a category label and visibility toggle.
+ * @param catKey - name of category to create a label for.
+ * @returns labDiv - div containing new category label structure.
+ */
 function createCatLabel(catKey) {
 	"use strict";
 	var labDiv, newCheckbox, newLabel, convCat;
@@ -284,10 +330,10 @@ function createCatLabel(catKey) {
 	newCheckbox = document.createElement("input");
 	newCheckbox.type = "checkbox";
 	newCheckbox.checked = true;
-	newCheckbox.id = "vischeck-" + catKey;
+	newCheckbox.id = "vischeck_-_" + catKey;
 	labDiv.appendChild(newCheckbox);
 	newLabel = document.createElement("label");
-	newLabel.setAttribute("for", "vischeck-" + catKey);
+	newLabel.setAttribute("for", "vischeck_-_" + catKey);
 	// if category has been converted from a decimal, then convert it back for display!!
 	convCat = catKey.toString().split('__dot__').join('.');
 	newLabel.appendChild(document.createTextNode(convCat));
@@ -296,44 +342,66 @@ function createCatLabel(catKey) {
 	return labDiv;
 }
 
-// event handlers
+/**
+ * Event handler for category color picker change.
+ * Calls updateCellColors to update the categories with that label
+ * currently displayed in the grid.
+ */
 function onCatColorChange(event) {
 	"use strict";
 	var idArr, cat, label;
-	idArr = event.currentTarget.id.split("-");
+	idArr = event.currentTarget.id.split("_-_");
 	cat = idArr[1];
 	label = idArr[2];
 	updateCellColors(cat, label, event.currentTarget.value);
 }
 
+/**
+ * Event handler for category visibility checkbox.
+ * Calls updateCatVisibility to update the visibility of the labels currently
+ * in the gird that belong to the in question category.
+ */
 function onCatVisCheck(event) {
 	"use strict";
 	var idArr, cat;
-	idArr = event.currentTarget.id.split("-");		// investigate use of "event.currentTarget"
+	idArr = event.currentTarget.id.split("_-_");		// investigate use of "event.currentTarget"
 	cat = idArr[1];
 	catLegend[cat].visible = event.currentTarget.checked;
 	updateCatVisibility(cat);
 }
 
+/**
+ * Event handler for label edit button.
+ * Opens edit dialog box for category/label in question.
+ */
 function onEditLabelChange(event) {	// some issues here !! (when editing 1st label in cat, it actually changes 2nd !!)
 	"use strict";
-	var idArr = event.currentTarget.id.split("-");		// investigate use of "event.currentTarget"
+	var idArr = event.currentTarget.id.split("_-_");		// investigate use of "event.currentTarget"
 	tmpEditCat = idArr[1];
 	tmpEditOldLabel = idArr[2];
 	console.log("editLabel: " + tmpEditCat + ";" + tmpEditOldLabel);
 	$("#editLabelDialog").dialog("open");
 }
 
+/**
+ * Event handler for label delete button.
+ * Deletes the category/label in question from the grid and model
+ * by calling removeLabel function.
+ */
 function onDeleteLabelChange(event) {
 	"use strict";
 	var idArr, cat, label;
-	idArr = event.currentTarget.id.split("-");
+	idArr = event.currentTarget.id.split("_-_");
 	cat = idArr[1];
 	label = idArr[2];
 	console.log("deleteLabel: " + cat + ";" + label);
 	removeLabel(cat, label);
 }
 
+/**
+ * Updates the list of well labels displayed beside the preview grid with 
+ * the current well values stored in catLegend.
+ */
 function updateCategoryList() {
 	"use strict";
 	var newDiv, catKey, labelKey, newLi, convLab, newInput;
@@ -355,16 +423,20 @@ function updateCategoryList() {
 
 	// apply events with a redundant nested loop. only seems to work when part of dom. fix!!(remove loop)
 	for (catKey in catLegend) {
-		$("#vischeck-" + catKey).attr('checked', 'checked');
-		$("#vischeck-" + catKey).change(onCatVisCheck);
+		$("#vischeck_-_" + catKey).attr('checked', 'checked');
+		$("#vischeck_-_" + catKey).change(onCatVisCheck);
 		for (labelKey in catLegend[catKey].labels) {
-			$("#color-" + catKey + "-" + labelKey).change(onCatColorChange);
-			$("#edit-" + catKey + "-" + labelKey).click(onEditLabelChange);
-			$("#delete-" + catKey + "-" + labelKey).click(onDeleteLabelChange);
+			$("#color_-_" + catKey + "_-_" + labelKey).change(onCatColorChange);
+			$("#edit_-_" + catKey + "_-_" + labelKey).click(onEditLabelChange);
+			$("#delete_-_" + catKey + "_-_" + labelKey).click(onDeleteLabelChange);
 		}
 	}
 }
 
+/**
+ * Removes the current selection of cells and enables
+ * the ability to make selections on the grid. 
+ */
 function enableGridSelection() {
 	"use strict";
 	if (grid !== undefined) {
@@ -372,6 +444,10 @@ function enableGridSelection() {
 	}
 }
 
+/**
+ * Removes the current selection of cells and enables
+ * the ability to make selections on the grid. 
+ */
 function disableGridSelection() {
 	"use strict";
 	if (grid !== undefined) {
@@ -380,7 +456,14 @@ function disableGridSelection() {
 	}
 }
 
-// remove and cleanup references to cat and label
+/**
+ * Deletes the label passed as a param to the function. Removes labels
+ * from the grid, and from plateModel. Also removes any references to
+ * label and grid cells in catLegend. Removes category if label is the
+ * only label in that category. 
+ * @param cat - name of category in which the label belongs to.
+ * @param label - name of label to remove.
+ */
 function removeLabel(cat, label) {
 	"use strict";
 	var cellRef, cellRefArr, row, column, newContents, catKey, labKey;
@@ -416,8 +499,14 @@ function removeLabel(cat, label) {
 	updateCategoryList();
 }
 
-// remove and cleanup references to cat and label
-function updateLabelName(cat, oldLabel, label) {	// should we allow for change of category also ??
+/**
+ * Renames an existing label. Updates all references to the existing label to
+ * instead reference the new label name.
+ * @param cat - name of category in which the label belongs to.
+ * @param oldLabel - name of the existing label whose name will be changed.
+ * @param label - new name of label.
+ */
+function updateLabelName(cat, oldLabel, label) {
 	"use strict";
 	// remove spaces from the names (replacing with '_')
 	cat = cat.toString().split(' ').join('_');
@@ -448,6 +537,13 @@ function updateLabelName(cat, oldLabel, label) {	// should we allow for change o
 	}
 }
 
+/**
+ * Returns a color that is a percentage ligher/darker than the passed color.
+ * code sample from:  http://stackoverflow.com/questions/5560248/programmatically-lighten-or-darken-a-hex-color-or-rgb-and-blend-colors
+ * @param color - the value of the color to lighten/darken.
+ * @param percent - new percentage to lighten/darken color.
+ * @returns the value of the lightened/darkened color.
+ */
 // code sample from http://stackoverflow.com/questions/5560248/programmatically-lighten-or-darken-a-hex-color-or-rgb-and-blend-colors
 function shadeColor2(color, percent) {
 	"use strict";
@@ -455,7 +551,13 @@ function shadeColor2(color, percent) {
 	return "#" + (0x1000000 + (Math.round((t - R) * p) + R) * 0x10000 + (Math.round((t - G) * p) + G) * 0x100 + (Math.round((t - B) * p) + B)).toString(16).slice(1);
 }
 
-function shade(color, percent) {
+/**
+ * Returns a color that is a percentage ligher/darker than the passed color.
+ * @param color - the value of the color to lighten/darken.
+ * @param percent - new percentage to lighten/darken color.
+ * @returns the value of the lightened/darkened color.
+ */
+function shade(color, percent) {		// TODO, combine with the above method
 	"use strict";
 	if (color.length > 7) {
 		//return shadeRGBColor(color, percent);		// THIS FUNCTION is not defined !!, need to throw exception instead !!
@@ -465,7 +567,16 @@ function shade(color, percent) {
 	}
 }
 
-
+/**
+ * Creates a new label in the specified category. Applies the new label to
+ * the specified grid cells. Updates the grid, plate model, and well labels 
+ * panel with the values for the new label
+ * @param cat - name of the category of the new label.
+ * @param label - name of the new label.
+ * @param units - name of the units of the new label.
+ * @param color - color of the new label.
+ * @param applyToCells - list of grid cells to apply the label to.
+ */
 function createNewLabel(cat, label, units, color, applyToCells) {
 	"use strict";
 	var cell, row, column, oldLab, pos, newContents, catKey, labKey;
@@ -559,8 +670,13 @@ function createNewLabel(cat, label, units, color, applyToCells) {
 	}
 }
 
-// SOME ISSUE OCCURS with dose step (Problem is with'.' in the name of label !!)
-// replicates is realistically off by 1 probably as it should start at zero ??
+/**
+ * Adds a new dose gradient to the wells currently selected in the grid.
+ * Value starts at the top dose specified, and each well after has its
+ * dose equal to the dilution factor of the previous one. If replicates
+ * are specified than the selected cells are split that number of separate 
+ * dose gradients.
+ */
 function addDoseStep() {
 	"use strict";
 	var selCells, cat, topDose, units, dilution, replicates, topColor, wellGroupLength, doseStepLength, currentDose, currentColor, i, j;
@@ -596,7 +712,8 @@ function addDoseStep() {
 
 
 /**
- * This function changes the style of a particular cell
+ * Adds a new label by calling createNewLabel. The values for
+ * the new label are taken from the inputs on the new label panel.
  */
 function addNewLabel() {
 	"use strict";
@@ -619,6 +736,10 @@ function addNewLabel() {
 	removeAllHighlightedCells();
 }
 
+/**
+ * Adds a new plate level. The values for the new label is taken
+ * from the inputs on the new plate label panel.
+ */
 function addNewPlateLabel() {
 	"use strict";
 	var cat, label, pLabel;
@@ -639,7 +760,9 @@ function addNewPlateLabel() {
 }
 
 /**
- * This function changes the style of a particular cell
+ * Adds a new dosage. The values for the new dose is taken
+ * from the inputs on the dose label panel. 'Dosage' is a 
+ * reserved category name and is automatically applied here.
  */
 function addNewDose() {
 	"use strict";
@@ -664,7 +787,11 @@ function addNewDose() {
 	removeAllHighlightedCells();
 }
 
-function addNewControlLabel() {
+/**
+ * Adds a new control label. The control specifies whether the
+ * well is either compound/empty/positive/negative.
+ */
+function addNewControlLabel() {		// TODO move this to createTemplate screen
 	"use strict";
 	var selCells, cat, label, color;
 	selCells = highlightedCoords;
@@ -686,7 +813,7 @@ function addNewControlLabel() {
 }
 
 /**
- * addEvent - This function adds an event handler to an html element in
+ * This function adds an event handler to an html element in
  * a way that covers many browser types.
  * @param elementId - the string id of the element to attach the handler to
  * or a reference to the element itself.
@@ -709,7 +836,7 @@ function addEvent(elementId, eventType, handlerFunction) {
 	} else if (window.attachEvent) {
 		element.attachEvent("on" + eventType, handlerFunction);
 	}
-} // end of function addEvent
+}
 
 /**
  * importCompoundsFromFile - Reads compounds from a local list, maps them to
@@ -748,9 +875,16 @@ function importCompoundsFromFile() {
     reader.readAsText($('#compoundsFile')[0].files[0]);
 }
 
-
-
-//data format translation
+/**
+ * This function is used to convert the internal data structure json format into
+ * a data structure json format that is expected by the server when sending the 
+ * template json to be saved by the back-end. This allows for differences between
+ * the 2 models. The internal model providing a more efficient referencing structure
+ * for the client-side tasks, and allows for quick changes to either model while
+ * maintaining the contract with the server.
+ * @param pModel - a data structure in the format of the internal data model.
+ * @returns plateJson - a data structure in the format excepted by the server.
+ */
 function translateModelToOutputJson(pModel) {
 	"use strict";
 	var plateJson, plate, wellGroup, cmpdValue, row, column, well, labels, catKey, labKey, label, convCat, convLab, cmpdLabel, i, j;
@@ -773,8 +907,8 @@ function translateModelToOutputJson(pModel) {
 
 	// take the values from the compound input text fields (could do this at input onChange event also)
 	for (wellGroup in groupNames) {
-		if (groupNames[wellGroup] !== undefined) {
-			cmpdValue = document.getElementById("wellGroup-" + wellGroup).value;
+		if (groupNames[wellGroup] !== undefined && groupNames[wellGroup] !== null) {
+			cmpdValue = document.getElementById("wellGroup_-_" + wellGroup).value;
 			if (cmpdValue === undefined || cmpdValue === null || cmpdValue === "") {
 				// !!! THROW ERROR DIALOG HERE ASKING TO FILL OUT THIS FIELD !!!
 				groupNames[wellGroup] = "SOME_COMPOUND";
@@ -790,8 +924,8 @@ function translateModelToOutputJson(pModel) {
 		// need null check here !!
 		for (j = 1; j <= pModel.grid_width; j++) {
 			well = {};
-			well.row = i;
-			well.column = j;
+			well.row = i - 1;
+			well.column = j - 1;
 			labels = [];
 			
 			if (pModel.rows[i] !== undefined && pModel.rows[i].columns[j] !== undefined) {
@@ -822,7 +956,7 @@ function translateModelToOutputJson(pModel) {
 					}
 				}
 				
-				if (well.groupName !== undefined) {
+				if (well.groupName !== undefined && well.groupName !== null && well.groupName !== "") {
 					cmpdLabel = {};
 					cmpdLabel.category = "compound";
 					cmpdLabel.name = groupNames[well.groupName];
@@ -851,7 +985,17 @@ function translateModelToOutputJson(pModel) {
 	return plateJson;
 }
 
-// data format translation
+/**
+ * This function is used to convert a json data structure in the format that is 
+ * sent by the server, into the json data structure that is expected by the
+ * client-side JavaScript. This allows for differences between
+ * the 2 models. This is used when loading data received from the server into 
+ * the grid and associated internal data model. The internal model providing a 
+ * more efficient referencing structure for the client-side tasks, and allows 
+ * for quick changes to either model while maintaining the contract with the server.
+ * @param plateJson - a data structure in the format sent by the server.
+ * @returns pModel - a data structure in the format expected by the internal data model.
+ */
 function translateInputJsonToModel(plateJson) {
 	"use strict";
 	var pModel, plate, i, j, row, column, groupName, labels, convCat, convLab;
@@ -871,9 +1015,14 @@ function translateInputJsonToModel(plateJson) {
 	pModel.grid_height = plate.height;
 
 	for (i = 0; i < plate.wells.length; i++) {
-		row = plate.wells[i].row;
-		column = plate.wells[i].column;
-		groupName = plate.wells[i].groupName;
+		row = plate.wells[i].row + 1;
+		column = plate.wells[i].column + 1;
+		if (plate.wells[i].groupName !== undefined && plate.wells[i].groupName !== null) {
+			groupName = plate.wells[i].groupName;
+		} else {
+			groupName = "";
+		}
+		
 		labels = plate.wells[i].labels;
 
 		if (pModel.rows[row] === undefined) {
@@ -894,7 +1043,9 @@ function translateInputJsonToModel(plateJson) {
 
 			if (convCat === "compound") {
 				// deal with special 'compound' category !
-				groupNames[groupName] = convLab;		// should do null check ??
+				if (groupName !== null && groupName !== "") {
+					groupNames[groupName] = convLab;		// should do null check ??
+				}
 			} else {
 				// other labels
 				if (pModel.rows[row].columns[column].categories[convCat] === undefined) {
@@ -913,7 +1064,12 @@ function translateInputJsonToModel(plateJson) {
 	return pModel;
 }
 
-// ajax save object call
+/**
+ * Ajax call to the server. Translates the current saved data model to a format
+ * expected by the server. Then sends the template data to be saved.
+ * If successfully saved it transitions to the next page.
+ * If saving fails it displays and appropriate indication to the user.
+ */
 function saveConfigToServer() {
 	"use strict";
 	var plateJson, jqxhr;
@@ -949,6 +1105,7 @@ function saveConfigToServer() {
 	});
 }
 
+// TODO -- comment these out to see where they are referenced. If not needed just use jquery command instead.
 function hideLabelPanel() {
 	"use strict";
 	$("#addLabelPanel").hide();
@@ -994,6 +1151,10 @@ function showPlateLabelCatPanel() {
 	$("#plateLabelCatPanel").show();
 }
 
+/**
+ * Makes new label panel visible. Hides other panels
+ * Enables grid selection. Display well label category panel.
+ */
 function showLabelPanel() {
 	"use strict";
 	hideDosePanel();
@@ -1006,6 +1167,10 @@ function showLabelPanel() {
 	showCategoryPanel();
 }
 
+/**
+ * Makes dose label panel visible. Hides other panels
+ * Enables grid selection. Display well label category panel.
+ */
 function showDosePanel() {
 	"use strict";
 	hideLabelPanel();
@@ -1018,6 +1183,10 @@ function showDosePanel() {
 	showCategoryPanel();
 }
 
+/**
+ * Makes dose step label panel visible. Hides other panels
+ * Enables grid selection. Display well label category panel.
+ */
 function showDoseStepPanel() {
 	"use strict";
 	hideLabelPanel();
@@ -1030,6 +1199,10 @@ function showDoseStepPanel() {
 	showCategoryPanel();
 }
 
+/**
+ * Makes control label panel visible. Hides other panels
+ * Enables grid selection. Display well label category panel.
+ */
 function showControlWellPanel() {
 	"use strict";
 	hideLabelPanel();
@@ -1042,6 +1215,10 @@ function showControlWellPanel() {
 	showCategoryPanel();
 }
 
+/**
+ * Makes plate level label panel visible. Hides other panels
+ * Disables grid selection. Displays plate label category panel.
+ */
 function showPlateLabelPanel() {
 	"use strict";
 	hideLabelPanel();
@@ -1057,7 +1234,9 @@ function showPlateLabelPanel() {
 }
 
 
-// jQuery ui stuff
+/**
+ * jQuery setup commands.
+ */
 $(function() {
 	"use strict";
 	$("input[name=labeltype]").on("change", function () {
@@ -1110,12 +1289,12 @@ $(function() {
 
 
 /**
- * This function creates a new grid applying it to the "myGrid" div on the
+ * Creates a new grid applying it to the "myGrid" div on the
  * page. It then creates a blank data set and displays it in the grid.
  * It also registers the handleSelectedCells function as a listener for
  * the event that user selected cell ranges in the grid change.
  */
-function createGrid() {
+function createGrid() {		//TODO - perhaps change grid to not be myGrid ??
 	"use strict";
 	// construct the Grid object with the id of the html container element
 	// where it should be placed (probably a div) as an argument
@@ -1136,7 +1315,10 @@ function createGrid() {
 }
 
 /**
- * Loads a json plate model and updates the grid and category legend
+ * Loads a json data structure received from the server. It is translated into 
+ * a format understood by the local internal plate model and updates the grid
+ * with the data received.
+ * @param plateJson - a data structure in the format sent by the server.
  */
 function loadJsonData(plateJson) {
 	"use strict";
@@ -1159,8 +1341,10 @@ function loadJsonData(plateJson) {
 	for (row in plateModel.rows) {
 		for (column in plateModel.rows[row].columns) {
 			wellgrp = plateModel.rows[row].columns[column].wellGroupName;
-			//groupNames[wellgrp] = "SOME_COMPOUND";
-			groupNames[wellgrp] = "";
+			if (wellgrp !== undefined && wellgrp !== null && wellgrp !== "") {
+				//groupNames[wellgrp] = "SOME_COMPOUND";
+				groupNames[wellgrp] = "";
+			}
 
 			newContents = wellgrp;
 
@@ -1209,7 +1393,12 @@ function loadJsonData(plateJson) {
 	updateCompoundList();
 }
 
-//ajax save object call
+/**
+ * Makes an ajax call to the server to retrieve the json data model containing
+ * the information about a single stored template.
+ * If successful it calls loadJsonData to update the grid with the new model.
+ * @param tId - ID of template to retrieve the json data model for. 
+ */
 function fetchTemplateData(tId) {
 	"use strict";
 	var jqxhr = $.ajax({		// need to update to save plate instead of template
@@ -1236,7 +1425,7 @@ function fetchTemplateData(tId) {
 
 /**
  * This function handles the window load event. It initializes and fills the
- * grid with blank data and sets up the event handlers on the
+ * grid with the template that is specified in the url params.
  */
 function init() {
 	"use strict";
@@ -1247,7 +1436,7 @@ function init() {
 	hidePlateLabelPanel();
 
 	// fetch templateJson
-	fetchTemplateData(window.templateId); // should set flag to say if recieved model was ok!, inform user otherwise
+	fetchTemplateData(window.templateId); // TODO - should set flag to say if recieved model was ok!, inform user otherwise // confirm correct id is sent
 	console.log("templateId:" + window.templateId);
 
 	addEvent("addNewLabel", "click", addNewLabel);

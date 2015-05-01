@@ -16,8 +16,8 @@ var currentHighlightColor = "#D5E3E3";
 var highlightedCoords = [];
 
 /**
- * A function that creates a blank data set for initializing the grid example
- * page. The data set is of dimension DIMENSION x DIMENSION.
+ * Creates a blank data set for initializing the grid data set. 
+ * The data set is of dimension GRID_HEIGHT x GRID_WIDTH.
  */
 function createBlankData() {
 	"use strict";
@@ -34,8 +34,8 @@ function createBlankData() {
 }
 
 /**
- * A function that creates a random data set for displaying in the grid example
- * page. The data set is of dimension DIMENSION x DIMENSION.
+ * Creates a random data set for displaying in the grid example
+ * page. The data set is of dimension GRID_HEIGHT x GRID_WIDTH.
  */
 function createRandomData() {
 	"use strict";
@@ -51,6 +51,9 @@ function createRandomData() {
 	return result;
 }
 
+/**
+ * Focuses on the text field 'newlabelValue'.
+ */
 function txtFieldFocus() {
 	"use strict";
 	$("#newLabelValue").focus();
@@ -61,7 +64,12 @@ function txtFieldFocus() {
  * function is registered to listen for these events in the createGrid
  * function using the registerSelectedCellsCallBack function of the Grid
  * Class. This function changes the background color of all selected cells
- * to the currentHighlightColor.
+ * to the currentHighlightColor. 
+ * Then causes the cursor to focus in the textField.
+ * @param startRow - the row index of top left cell of the selecting box
+ * @param startCol - the column index of top left cell of the selecting box
+ * @param endRow - the row index of bottom right cell of the selecting box
+ * @param endCol - the column index of bottom right cell of the selecting box
  */
 function handleSelectedCells(startRow, startCol, endRow, endCol) {
 	"use strict";
@@ -88,8 +96,7 @@ function handleSelectedCells(startRow, startCol, endRow, endCol) {
 }
 
 /**
- * This function handles the event that the removeHighlighting button is
- * clicked by removing the most recent cell background color change. This
+ * Removes the most recent cell background color change. This
  * is achieved by calling the removeCellColors method of the Grid class with
  * the most key used to create the most recent background color change as
  * stored in the currentHighlightKeys array.
@@ -106,9 +113,8 @@ function removeHighlightedArea() {
 }
 
 /**
- * This function handles the event that the removeHighlighting button is
- * clicked by removing the most recent cell background color change. This
- * is achieved by calling the removeCellColors method of the Grid class with
+ * Removes all the current cell selections and related background color 
+ * change. This is achieved by calling the removeCellColors method of the Grid class with
  * the most key used to create the most recent background color change as
  * stored in the currentHighlightKeys array.
  */
@@ -122,7 +128,7 @@ function removeAllHighlightedCells() {
 }
 
 /**
- * This function creates a new grid applying it to the "myGrid" div on the
+ * Creates a new grid applying it to the "myGrid" div on the
  * page. It then creates a blank data set and displays it in the grid.
  * It also registers the handleSelectedCells function as a listener for
  * the event that user selected cell ranges in the grid change.
@@ -145,12 +151,20 @@ function createGrid() {
 
 }
 
+/**
+ * Removes the current selection of cells and enables
+ * the ability to make selections on the grid. 
+ */
 function enableGridSelection() {
 	"use strict";
 	removeAllHighlightedCells();
 	grid.enableCellSelection();
 }
 
+/**
+ * Removes the current selection of cells and enables
+ * the ability to make selections on the grid. 
+ */
 function disableGridSelection() {
 	"use strict";
 	removeAllHighlightedCells();
@@ -158,7 +172,9 @@ function disableGridSelection() {
 }
 
 /**
- * This function changes the style of a particular cell
+ * This function reads the current value in 'newLabelValue'. This value
+ * is then added to the plateModel as the groupName for any currently selected
+ * grid cells. It then removes any highlighting/selection from the grid.
  */
 function addTemplateValue() {
 	"use strict";
@@ -192,16 +208,16 @@ function addTemplateValue() {
 
 			if (plateModel.rows[row].columns[column] === undefined) {
 				plateModel.rows[row].columns[column] = {};
-				plateModel.rows[row].columns[column].wellGroupName = cellValue;
 			}
+			plateModel.rows[row].columns[column].wellGroupName = cellValue;
 
 			grid.updateCellContents(row, column, cellValue);
 		}
 	}
 
-	console.log("plateModel1:" + JSON.stringify(plateModel));
+	console.log("plateModel1:" + JSON.stringify(plateModel));		// TODO Remove console log
 
-	wgs = document.getElementById("wellGroupSpan");
+	wgs = document.getElementById("wellGroupSpan");		// TODO WHAT IS THIS USED FOR ???
 	wgs.innerHTML = wellGroupings;
 
 	// clear current selection
@@ -209,9 +225,8 @@ function addTemplateValue() {
 }
 
 
-
 /**
- * addEvent - This function adds an event handler to an html element in
+ * This function adds an event handler to an html element in
  * a way that covers many browser types.
  * @param elementId - the string id of the element to attach the handler to
  * or a reference to the element itself.
@@ -234,9 +249,19 @@ function addEvent(elementId, eventType, handlerFunction) {
 	} else if (window.attachEvent) {
 		element.attachEvent("on" + eventType, handlerFunction);
 	}
-} // end of function addEvent
+}
 
-//data format translation
+
+/**
+ * This function is used to convert the internal data structure json format into
+ * a data structure json format that is expected by the server when sending the 
+ * template json to be saved by the back-end. This allows for differences between
+ * the 2 models. The internal model providing a more efficient referencing structure
+ * for the client-side tasks, and allows for quick changes to either model while
+ * maintaining the contract with the server.
+ * @param pModel - a data structure in the format of the internal data model.
+ * @returns plateJson - a data structure in the format excepted by the server.
+ */
 function translateModelToOutputJson(pModel) {
 	'use strict';
 	var plateJson, plate, i, j, well, labels, catKey, labKey, label;
@@ -254,8 +279,8 @@ function translateModelToOutputJson(pModel) {
 	for (i = 1; i <= plate.height; i++) {
 		for (j = 1; j <= plate.width; j++) {
 			well = {};
-			well.row = i;
-			well.column = j;
+			well.row = i - 1;
+			well.column = j - 1;
 			
 			labels = [];
 			if (pModel.rows[i] !== undefined && pModel.rows[i].columns[j] !== undefined) {
@@ -284,7 +309,18 @@ function translateModelToOutputJson(pModel) {
 	return plateJson;
 }
 
-// data format translation
+
+/**
+ * This function is used to convert a json data structure in the format that is 
+ * sent by the server, into the json data structure that is expected by the
+ * client-side JavaScript. This allows for differences between
+ * the 2 models. This is used when loading data received from the server into 
+ * the grid and associated internal data model. The internal model providing a 
+ * more efficient referencing structure for the client-side tasks, and allows 
+ * for quick changes to either model while maintaining the contract with the server.
+ * @param plateJson - a data structure in the format sent by the server.
+ * @returns pModel - a data structure in the format expected by the internal data model.
+ */
 function translateInputJsonToModel(plateJson) {
 	"use strict";
 	var pModel, plate, i, j, row, column, groupName, labels;
@@ -293,8 +329,8 @@ function translateInputJsonToModel(plateJson) {
 	plate = plateJson.plate;
 
 	for (i = 0; i < plate.wells.length; i++) {
-		row = plate.wells[i].row;
-		column = plate.wells[i].column;
+		row = plate.wells[i].row + 1;
+		column = plate.wells[i].column + 1;
 		groupName = plate.wells[i].groupName;
 		labels = plate.wells[i].labels;
 
@@ -320,7 +356,13 @@ function translateInputJsonToModel(plateJson) {
 	return pModel;
 }
 
-// ajax save object call
+
+/**
+ * Ajax call to the server. Translates the current saved data model to a format
+ * expected by the server. Then sends the template data to be saved.
+ * If successfully saved it transitions to the next page.
+ * If saving fails it displays and appropriate indication to the user.
+ */
 function saveConfigToServer() {
 	"use strict";
 	var plateJson, jqxhr;
@@ -367,7 +409,10 @@ function saveConfigToServer() {
 }
 
 /**
- * Loads a json plate model and updates the grid and category legend
+ * Loads a json data structure received from the server. It is translated into 
+ * a format understood by the local internal plate model and updates the grid
+ * with the data received.
+ * @param plateJson - a data structure in the format sent by the server.
  */
 function loadJsonData(plateJson) {
 	"use strict";
@@ -389,7 +434,7 @@ function loadJsonData(plateJson) {
 
 /**
  * This function handles the window load event. It initializes and fills the
- * grid with blank data and sets up the event handlers on the
+ * grid with blank data and sets up the event handlers.
  */
 function init() {
 	"use strict";

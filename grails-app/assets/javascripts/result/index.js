@@ -92,10 +92,12 @@ function plateSelected(plateID) {
     loadGrid(experiment.data);
 
     $('#rawNormToggle').bootstrapToggle('on');
-    $('#zFactor').text(experiment.zFactor());
-    $('#zPrimeFactor').text(experiment.zPrimeFactor());
-    $('#negativeControl').text(experiment.meanNegativeControl());
-    $('#positiveControl').text(experiment.meanPositiveControl());
+    $('#zFactor').text(experiment.zFactor() || '');
+    $('#zPrimeFactor').text(experiment.zPrimeFactor() || '');
+    var negativeControl = experiment.meanNegativeControl();
+    $('#negativeControl').text(negativeControl === null ? '' : negativeControl);
+    var positiveControl = experiment.meanPositiveControl();
+    $('#positiveControl').text(positiveControl === null ? '' : positiveControl);
 }
 
 
