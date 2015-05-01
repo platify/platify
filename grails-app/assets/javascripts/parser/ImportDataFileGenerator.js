@@ -37,9 +37,12 @@ function ImportDataFileGenerator(){
     this.matrix = null;
 
 
-    function createMatrixHeaderRow(wellCategories, plateCategories, experimentCategories){
+    function createMatrixHeaderRow(importData){
         var result = [];
         var headerIndex = 0;
+        var wellCategories = importData.getWellLevelCategories();
+        var plateCategories = importData.getPlateLevelCategories();
+        var experimentCategories = importData.getExperimentLevelCategories();
 
         result[headerIndex++] = PLATE_COLUMN_HEADER;
         result[headerIndex++] = WELL_COLUMN_HEADER;
@@ -64,41 +67,65 @@ function ImportDataFileGenerator(){
     }
 
 
-    function createMatrixDataRow(plateID, wellID, wellLabels, plateLabels,
-                                 experimentLabels, wellCategories, plateCategories,
-                                 experimentCategories){
+    function createMatrixDataRow(importData, plateIndex, row, col){
         var result = [];
         var matrixColumnIndex = 0;
 
+
+        var wellLevelCategories = importData.getWellLevelCategories();
+        var plateLevelCategories = importData.getPlateLevelCategories();
+        var experimentLevelCategories = importData.getExperimentLevelCategories();
+        var value;
+
+        var plateID = importData.getPlateIdentifier(plateIndex);
+
+        if (!plateID || plateID === NO_PLATE_ID){
+            plateID = "plate " + (plateIndex + 1);
+        }
+
         result[matrixColumnIndex++] = plateID;
-        result[matrixColumnIndex++] = wellID;
+        result[matrixColumnIndex++] = Grid.getRowLabel(row + 1) + (col+1);
 
         // fill in the well level labels
-        for(var p = 0; p < wellCategories.length; p++){
-            result[matrixColumnIndex++]
-                = wellLabels[wellCategories[p]]
-                ? wellLabels[wellCategories[p]] : BLANK_CELL;
+        for(var p = 0; p < wellLevelCategories.length; p++){
+            value = importData.getWellLevelLabelForSinglePlate(plateIndex,
+                                                               row,
+                                                               col,
+                                                               wellLevelCategories[p]);
+            if (!value && value !== 0){
+                value = BLANK_CELL;
+            }
+
+            result[matrixColumnIndex++] = value;
         }
 
         // blank spaces
-        if (plateCategories.length + experimentCategories.length > 0){
+        if (plateLevelCategories.length + experimentLevelCategories.length > 0){
             for (var m = 0; m<NUM_BLANK_COLUMNS_BETWEEN_WELL_AND_PLATE_LEVEL_DATA; m++){
                 result[matrixColumnIndex++] = BLANK_CELL;
             }
         }
 
         // fill in the plate level labels
-        for(var l = 0; l < plateCategories.length; l++){
-            result[matrixColumnIndex++]
-                = plateLabels[plateCategories[l]]
-                ? plateLabels[plateCategories[l]] : BLANK_CELL;
+        for(var l = 0; l < plateLevelCategories.length; l++){
+            value = importData.getPlateLevelLabelForSinglePlate(plateIndex,
+                                                                plateLevelCategories[l]);
+            if (!value && value !== 0){
+                value = BLANK_CELL;
+            }
+
+            result[matrixColumnIndex++] = value;
         }
 
         // fill in the experiment level labels
-        for(var q = 0; q < experimentCategories.length; q++){
-            result[matrixColumnIndex++]
-                = experimentLabels[experimentCategories[q]]
-                ? experimentLabels[experimentCategories[q]] : BLANK_CELL;
+        for(var q = 0; q < experimentLevelCategories.length; q++){
+            value = importData.getExperimentLevelLabels(experimentLevelCategories[q]);
+
+            if (!value && value !== 0){
+                value = BLANK_CELL;
+            }
+
+            result[matrixColumnIndex++] = value;
         }
 
         return result;
@@ -133,40 +160,22 @@ function ImportDataFileGenerator(){
         }
 
         // create the header row
-        result[0] = createMatrixHeaderRow(wellLevelCategories,
-                                          plateLevelCategories,
-                                          experimentLevelCategories);
+        result[0] = createMatrixHeaderRow(importData);
 
         // create the data rows
         matrixRowIndex = 1;
-        for(var plateIndex = 0; plateIndex < importData.plates.length; plateIndex++){
-            plate = importData.plates[plateIndex];
+        for(var plateIndex = 0; plateIndex < importData.numPlates(); plateIndex++){
 
-            if (importData.plates[plateIndex].plateID
-                && importData.plates[plateIndex].plateID != NO_PLATE_ID){
-                plateID = importData.plates[plateIndex].plateID;
-            } else {
-                plateID = "plate " + (plateIndex + 1);
-            }
+            for (var rowIndex = 0; rowIndex < importData.numberOfPlateRows(); rowIndex++){
 
-            for (var rowIndex = 0; rowIndex < plate.rows.length; rowIndex++){
-                row = plate.rows[rowIndex];
-                rowLabel = Grid.getRowLabel(rowIndex + 1);
+                for (var columnIndex = 0;
+                     columnIndex < importData.numberOfPlateColumns();
+                     columnIndex++){
 
-                for (var columnIndex = 0; columnIndex < row.columns.length; columnIndex++){
-                    well = row.columns[columnIndex];
-                    wellID = rowLabel + (columnIndex + 1);
-                    wellLabels = well.labels;
-                    plateLabels = plate.labels;
-
-                    result[matrixRowIndex++] = createMatrixDataRow(plateID,
-                                                                   wellID,
-                                                                   wellLabels,
-                                                                   plateLabels,
-                                                                   experimentLabels,
-                                                                   wellLevelCategories,
-                                                                   plateLevelCategories,
-                                                               experimentLevelCategories);
+                    result[matrixRowIndex++] = createMatrixDataRow(importData,
+                                                                   plateIndex,
+                                                                   rowIndex,
+                                                                   columnIndex);
                 }
             }
 
@@ -259,7 +268,8 @@ function ImportDataFileGenerator(){
      * @returns {string} - the string representing the
      */
     this.createDSVString = function(cellTerminator, lineTerminator){
-        var result = "";
+        var lines = [];
+        var result;
 
         var numRows;
 
@@ -285,20 +295,18 @@ function ImportDataFileGenerator(){
             return "";
         }
 
-        // fill out the DSV string with the values of the matrix
+        // create the lines
         for (var row = 0; row<numRows; row++){
-            for (var col = 0; col<numColumns; col++){
-                if (typeof this.matrix[row][col] != "undefined"){
-                    result += this.matrix[row][col]
-                }
-
-                if (col != numColumns - 1){
-                    result += cellTerminator;
-                } else {
-                    result += lineTerminator;
+            if (this.matrix[row].length !== numColumns){
+                while(this.matrix[row.length] < numColumns){
+                    this.matrix[row].push(BLANK_CELL);
                 }
             }
+
+            lines[row] = this.matrix[row].join(cellTerminator);
         }
+
+        result = lines.join(lineTerminator);
 
         return result;
     };

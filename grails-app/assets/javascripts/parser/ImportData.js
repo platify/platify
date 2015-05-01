@@ -87,6 +87,9 @@ function ImportData(numPlates, numRows, numCols){
                                       "initialize an import data object");
         }
 
+        _self.experimentID = ImportData.NO_ID;
+        _self.parsingID = ImportData.NO_ID;
+
         _self.numRows = numRows;
         _self.numCols = numCols;
 
@@ -122,7 +125,7 @@ function ImportData(numPlates, numRows, numCols){
      * A getter for the ImportData object experiment identifier
      *
      * @returns {null|*} - the experiment identifier for the ImportData object, this
-     *                  will be null if the experiment identifier has not been previously
+     *                  will be NO_ID if the experiment identifier has not been previously
      *                  set.
      */
     this.getExperimentID = function(){
@@ -153,7 +156,7 @@ function ImportData(numPlates, numRows, numCols){
      * identifier of the parsing configuration used to parse the assay results data.
      *
      * @returns {null|*} - the parsing configuration identifier for the ImportData object,
-     * this will be null if the parsing configuration identifier has not been previously
+     * this will be NO_ID if the parsing configuration identifier has not been previously
      * set.
      */
     this.getParsingID = function(){
@@ -169,7 +172,7 @@ function ImportData(numPlates, numRows, numCols){
      *      INVALID_PARSING_ID error.
      */
     this.setParsingID = function(parsingID){
-        if (!parsingID){
+        if (!parsingID && parsingID !== 0){
             throw new ImportDataError(ImportDataError.INVALID_PARSING_ID,
                                       parsingID,
                                       "general",
@@ -791,6 +794,15 @@ function ImportData(numPlates, numRows, numCols){
         }
     };
 
+    /**
+     * This method is a getter for a plate identifier.
+     * @param plateIndex - the index of the plate for which the identifier is desired
+     * @returns {*} - the identifier of the specified plate, this will be NO_ID, if no
+     *              plate identifier has been previously specified.
+     *
+     * Note: - This method throws a NO_SUCH_PLATE error if the calling ImportData object
+     *      has not plate for the give plate index.
+     */
     this.getPlateIdentifier = function(plateIndex){
         if (!this.plates[plateIndex]){
             throw new ImportDataError(ImportDataError.NO_SUCH_PLATE,
@@ -806,6 +818,12 @@ function ImportData(numPlates, numRows, numCols){
         }
     };
 
+    /**
+     * This method is a getter for all of the plate identifiers of the calling ImportData
+     * object.
+     * @returns {Array} - an array of all of the specified plate identifiers, in the same
+     *                  order as they are listed in the calling ImportData object.
+     */
     this.getPlateIdentifierArray = function(){
         var result = [];
 
@@ -816,8 +834,23 @@ function ImportData(numPlates, numRows, numCols){
         return result;
     };
 
+    /**
+     * This method sets the plate identifier of a specific plate in the calling ImportData
+     * object.
+     * @param plateIndex - the index of the plate for which the plate identifier is to be
+     *                  set
+     * @param identifier - the identifier that the specified plate is to have its plate
+     *                  identifier set to
+     *
+     * Note: - This method throws an ILLEGAL_ARGUMENT error if the given identifier is
+     *      undefined, null, NaN, or the empty string.
+     *       - This method throws a NO_SUCH_PLATE error if the calling ImportData object
+     *      has no plate for the give plate index.
+     *       - This method throws a REPEATED_PLATE_ID error if another plate in the
+     *      calling ImportData object already has the same identifier.
+     */
     this.setPlateIdentifier = function(plateIndex, identifier){
-        if (!identifier){
+        if (!identifier && identifier !== 0){
             throw new ImportDataError(ImportDataError.ILLEGAL_ARGUMENT,
                 identifier,
                 "plate identifier",
@@ -847,12 +880,29 @@ function ImportData(numPlates, numRows, numCols){
         this.plates[plateIndex].plateID = identifier;
     };
 
+    /**
+     * This method sets the plate identifiers of an import data object with the values
+     * given in an array.
+     * @param identifierArray - an array of plate identifiers to use for setting the
+     *                      plate identifiers of the calling ImportData object.
+     *
+     * Note: - This method throws an ILLEGAL_ARGUMENT error if any of the given
+     *      identifiers is undefined, null, NaN, or the empty string.
+     *       - This method throws a NO_SUCH_PLATE error if the calling ImportData object
+     *      has less plates than the length of the given identifiers array.
+     *       - This method throws a REPEATED_PLATE_ID error if another plate in the
+     *      calling ImportData object already has the same identifier.
+     */
     this.setPlateIdentifiersWithArray = function(identifierArray){
         for (var i=0; i<identifierArray.length; i++){
             _self.setPlateIdentifier(i, identifierArray[i]);
         }
     };
 
+    /**
+     * This method examines the calling ImportData object to see if all of its plate
+     * identifiers are set, and if not it throws a PLATE_ID_NOT_SET error.
+     */
     this.throwErrorIfAnyPlateIDsNotSet = function(){
         var unsetPlateIndices = [];
         var descriptor = "";
@@ -881,10 +931,12 @@ function ImportData(numPlates, numRows, numCols){
                 "plate",
                 "check plate identifiers as set");
         }
-
-
     };
 
+    /**
+     * This method returns the number of plates in the calling ImportData object.
+     * @returns {number} - the number of plates in the calling ImportData object
+     */
     this.numPlates = function(){
         if (this.plates && this.plates.length){
             return this.plates.length;
@@ -893,6 +945,10 @@ function ImportData(numPlates, numRows, numCols){
         }
     };
 
+    /**
+     * This method returns the number of plate rows in the calling ImportData object.
+     * @returns {number} - the number of plate rows in the calling ImportData object
+     */
     this.numberOfPlateRows = function(){
         if (this.numRows){
             return this.numRows;
@@ -901,6 +957,10 @@ function ImportData(numPlates, numRows, numCols){
         }
     };
 
+    /**
+     * This method returns the number of plate columns in the calling ImportData object.
+     * @returns {number} - the number of plate columns in the calling ImportData object
+     */
     this.numberOfPlateColumns = function(){
         if (this.numCols){
             return this.numCols;
@@ -909,6 +969,12 @@ function ImportData(numPlates, numRows, numCols){
         }
     };
 
+    /**
+     * This method returns a DTO of the calling ImportData object, for storing on the
+     * server.
+     * @returns {object} - a DTO of the calling ImportData object, for storing on the
+     *                  server
+     */
     this.getJSONImportDataObject = function(){
         var object = {};
 
@@ -921,6 +987,16 @@ function ImportData(numPlates, numRows, numCols){
     }
 }
 
+/**
+ * This "static" method creates an returns a full ImportData object from a DTO of an
+ * ImportData object retrieved from the server.
+ * @param JSONObject - the DTO of an ImportData object retrieved from the server
+ * @returns {ImportData} - a fully functional ImportData object with all of the
+ *                      information from the given DTO
+ * Note: - That many different ImportDataObject errors could be thrown if the JSONObject
+ *      is malformed.
+ *
+ */
 ImportData.createImportDataObjectFromJSON = function(JSONObject){
     var result;
 
@@ -938,14 +1014,17 @@ ImportData.createImportDataObjectFromJSON = function(JSONObject){
     var experimentLevelCategories = findExperimentLevelCategories(JSONObject);
     var categoryName;
 
-    result = new ImportData(JSONObject.experimentID,
-                            JSONObject.parsingID,
-                            numberOfPlates,
+    result = new ImportData(numberOfPlates,
                             plateDimensions[0],
                             plateDimensions[1]);
 
     // load the result ImportData object up with data from the JSON object
+    // starting with the experiment and parsing IDs
 
+    result.setExperimentID(JSONObject.experimentID);
+    result.setParsingID(JSONObject.parsingID);
+
+    // now add the label categories for each level
     for (categoryName in wellLevelCategories){
         var numeric = wellLevelCategories[categoryName];
         result.addWellLevelCategory(categoryName, numeric);
@@ -963,16 +1042,20 @@ ImportData.createImportDataObjectFromJSON = function(JSONObject){
                                       JSONObject.experimentFeatures.labels[categoryName]);
     }
 
+    // now add the labels for each level and category
     if (numberOfPlates) {
         for (var plateIndex = 0; plateIndex < numberOfPlates; plateIndex++){
             var plate = JSONObject.plates[plateIndex];
+
+            // set the plate identifier
+            result.setPlateIdentifier(plateIndex, plate.plateID);
+
             for (j=0; j<plateLevelCategories.length; j++){
                 categoryName = plateLevelCategories[j];
                 result.setPlateLevelLabel(plateIndex,
                                           categoryName,
                                           plate.labels[categoryName]);
             }
-
 
             if (plateDimensions[0] && plateDimensions[1]){
                 for(var rowIndex = 0; rowIndex < plate.rows.length ; rowIndex++){
@@ -1004,7 +1087,7 @@ ImportData.createImportDataObjectFromJSON = function(JSONObject){
             && dataObject.experimentFeatures
             && dataObject.experimentFeatures.labels) {
 
-            for (var category in importData.experimentFeatures.labels){
+            for (var category in dataObject.experimentFeatures.labels){
                 result.push(category);
             }
         }
@@ -1053,13 +1136,14 @@ ImportData.createImportDataObjectFromJSON = function(JSONObject){
                             if (well.labels){
                                 for (var category in well.labels){
                                     if (!result[category]){
-                                        result[category] = ImportData.NUMERIC;
+                                        result[category] = true;
                                     }
 
                                     if (well.rawData
                                         && !well.rawData[category]
-                                        && well.rawData[category] !== ImportData.BLANK){
-                                        result[category] = ImportData.NON_NUMERIC;
+                                        && well.rawData[category] !== ImportData.BLANK
+                                        && well.rawData[category] !== 0){
+                                        result[category] = false;
                                     }
                                 }
                             }
@@ -1078,16 +1162,21 @@ ImportData.createImportDataObjectFromJSON = function(JSONObject){
         if (dataObject && dataObject.plates && dataObject.plates.length) {
             for (var plateIndex = 0; plateIndex < dataObject.plates.length; plateIndex++){
                 var plate = dataObject.plates[plateIndex];
+                var numRowsOnPlate = 0;
 
                 if (plate.rows && plate.rows.length){
                     for(var rowIndex = 0; rowIndex < plate.rows.length ; rowIndex++){
                         var row = plate.rows[rowIndex];
 
-                        result[0]++;
+                        numRowsOnPlate++;
 
                         if (row.columns && row.columns.length && row.columns.length > result[1]){
                             result[1] = row.columns.length;
                         }
+                    }
+
+                    if (numRowsOnPlate > result[0]){
+                        result[0] = numRowsOnPlate;
                     }
                 }
             }
@@ -1107,6 +1196,9 @@ ImportData.createImportDataObjectFromJSON = function(JSONObject){
     }
 };
 
+
+
+
 ImportDataError.NO_SUCH_CATEGORY = "no such category";
 ImportDataError.CATEGORY_ALREADY_DEFINED = "category already defined";
 ImportDataError.NO_SUCH_PLATE = "no such plate";
@@ -1121,6 +1213,17 @@ ImportDataError.INVALID_EXPERIMENT_ID = "invalid experiment ID";
 ImportDataError.INVALID_PARSING_ID = "invalid parsing ID";
 ImportDataError.PLATE_ID_NOT_SET = "plate ID not set";
 
+/**
+ * ImportDataError objects store an represent the conditions under which an exceptional
+ * event occurred in the manipulation of ImportData objects.
+ * @param type - a constant that represents the reason that an ImportDataError occurred
+ * @param descriptor - a description of the error situation
+ * @param level - a description of the level (well, plate, or experiment) that the
+ *              ImportDataError occurred under
+ * @param attemptedAction - a string description of the action that was being attempted
+ *                      when the ImportDataError occured.
+ * @constructor
+ */
 function ImportDataError(type, descriptor, level, attemptedAction){
     this.type = type;
     this.descriptor = descriptor;

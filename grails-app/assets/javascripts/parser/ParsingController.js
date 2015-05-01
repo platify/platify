@@ -220,6 +220,9 @@ function ParsingController(){
             // clear all selected feature info
             _self.parserUI.clearFeatureInfo();
 
+            // disable the delete feature button
+            _self.parserUI.disableDeleteFeatureButton();
+
             // set feature range display/input on the feature page
             _self.parserUI.setFeatureCellRange(range);
 
@@ -450,9 +453,9 @@ function ParsingController(){
         var filename;
         var experimentName = _self.parserUI.getSelectedExperimentName();
         if (experimentName){
-            filename = experimentName + "_results.txt";
+            filename = experimentName + "_results.csv";
         } else {
-            filename = "experiment_results.txt"
+            filename = "experiment_results.csv"
         }
 
         importFileDataGenerator.forceCSVDownload(filename);
