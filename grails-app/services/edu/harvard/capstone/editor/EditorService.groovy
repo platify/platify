@@ -50,8 +50,8 @@ class EditorService {
     	def wellsLabelsList = []    		
 
 		// iterate throught the labels and create if it's a new one
+		labelsList = []
 		data.plate.labels.each{ label ->
-			labelsList = []
 			if (label){
 				def labelInstance = Label.get(label.id)
 				if (!labelInstance){
@@ -62,12 +62,14 @@ class EditorService {
 					}
 				}
 				// add it to the labels that will be assigned to the plate
+
 				labelsList << labelInstance
 			}
 		}
 
 		// link the plate to the labels
 		labelsList.each{ plateLabel ->
+
 			def plateLabelInstance = new DomainLabel(label: plateLabel, domainId: plateInstance.id, labelType: DomainLabel.LabelType.PLATE)
 			plateLabelInstance.save()
 			if (plateLabelInstance.hasErrors()){
@@ -124,7 +126,7 @@ class EditorService {
     }
 
     def getTemplate(PlateTemplate plateTemplateInstance){
-	
+		
     	if (!plateTemplateInstance)
     		return
    		
@@ -137,11 +139,13 @@ class EditorService {
 
     	def plateLabels = DomainLabel.findAllByDomainIdAndLabelTypeAndPlateIsNull(plateTemplateInstance.id, DomainLabel.LabelType.PLATE).collect{it.label}
     	plateLabels.each{ 
+    		
     		def label = [:]
     		label.category = it.category
     		label.name = it.name
     		label.value = it.value
-    		label.id = it.id    	    
+    		label.id = it.id    	
+
     		template.labels << label
     	}
 
@@ -201,11 +205,11 @@ class EditorService {
 		}
 
 		// for storing the created objects
-    	def labelsList		
+    	def labelsList = []	
 
 		// iterate throught the labels and create if it's a new one
 		data.plate.labels.each{ label ->
-			labelsList = []  
+			  
 			if (label){
 				def labelInstance = Label.get(label.id)
 				if (!labelInstance){
@@ -398,7 +402,10 @@ class EditorService {
 			    				plateRow = plateRow + label.category + "," + label.name + ","
 			    				plateRow = plateRow + compound.name + ","
 			    				if (dosage){
-			    					plateRow = plateRow + dosage[0].name + "," + dosage[0].units
+			    					plateRow = plateRow + dosage[0].name + ","
+			    					if (dosage[0].units)
+			    						plateRow = plateRow + dosage[0].units
+
 			    				} else {
 			    					plateRow = plateRow + "1.0,"
 			    				}
@@ -409,7 +416,10 @@ class EditorService {
 		    				plateRow = plateRow + label.category + "," + label.name + ","
 		    				plateRow = plateRow + ","
 		    				if (dosage){
-		    					plateRow = plateRow + dosage[0].name + "," + dosage[0].units
+		    					plateRow = plateRow + dosage[0].name + ","
+		    					if (dosage[0].units)
+		    						plateRow = plateRow + dosage[0].units
+
 		    				} else {
 		    					plateRow = plateRow + "1.0,"
 		    				}
@@ -423,7 +433,10 @@ class EditorService {
 			    				plateRow = plateRow + "," + ","
 			    				plateRow = plateRow + compound.name + ","
 			    				if (dosage){
-			    					plateRow = plateRow + dosage[0].name + "," + dosage[0].units
+			    					plateRow = plateRow + dosage[0].name + ","
+			    					if (dosage[0].units)
+			    						plateRow = plateRow + dosage[0].units
+
 			    				} else {
 			    					plateRow = plateRow + "1.0,"
 			    				}
@@ -434,7 +447,10 @@ class EditorService {
 	    				plateRow = plateRow + "," + ","
 	    				plateRow = plateRow + ","
 	    				if (dosage){
-	    					plateRow = plateRow + dosage[0].name + "," + dosage[0].units
+	    					plateRow = plateRow + dosage[0].name + ","
+	    					if (dosage[0].units)
+	    						plateRow = plateRow + dosage[0].units
+
 	    				} else {
 	    					plateRow = plateRow + "1.0,"
 	    				}

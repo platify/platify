@@ -30,7 +30,7 @@ class ExperimentSpec extends Specification {
 
 	void "Create a plate template"() {
 	   when: "A new template is created"
-			SpringSecurityUtils.doWithAuth('andres@gmail.com'){
+			SpringSecurityUtils.doWithAuth('admin@gmail.com'){
 				def data = JSON.parse("""
 					{plate: {
 						name: 'test name', 
@@ -48,24 +48,13 @@ class ExperimentSpec extends Specification {
 	void "Retrieve my templates"() {
 	   when: "Retreive the list of my templates"
 	   	def myTemplates
-	   	SpringSecurityUtils.doWithAuth('nico'){
+	   	SpringSecurityUtils.doWithAuth('admin@gmail.com'){
 	   		def scientist = Scientist.get(springSecurityService.principal.id)
 	      	myTemplates = PlateTemplate.findAllByOwner(scientist)
 	  	}
 
-	  then: "I should get one barter"
+	  then: "I should get one template"
 	  	myTemplates.size() == 1
 	}
 
-	void "Retrieve my templates"() {
-	   when: "Retreive the list of my templates"
-	   	def myTemplates
-	   	SpringSecurityUtils.doWithAuth('nico'){
-	   		def scientist = Scientist.get(springSecurityService.principal.id)
-	      	myTemplates = PlateTemplate.findAllByOwner(scientist)
-	  	}
-
-	  then: "I should get one barter"
-	  	myTemplates.size() == 1
-	}
 }

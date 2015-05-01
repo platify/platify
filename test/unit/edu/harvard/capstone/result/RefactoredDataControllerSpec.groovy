@@ -44,14 +44,14 @@ class RefactoredDataControllerSpec extends Specification {
             Scientist owner = new Scientist(firstName: "Test", lastName: "User", email:"my@email.com", password:"test")
             Equipment equipment = new Equipment(name: "Test Equipment")
             ExperimentalPlateSet experiment = new ExperimentalPlateSet(owner: owner, name: "Test Experiment", description: "Test Description")
-            resultInstance = new Result(owner: owner, equipment: equipment, experiment: experiment, name: "Test Results", description: "Result Description")
+            resultInstance = new Result(owner: owner, equipment: equipment, experiment: experiment, name: "Test Results", description: "Result Description").save()
 
             def springSecurityService = mockFor(SpringSecurityService)
             springSecurityService.demandExplicit.isLoggedIn {  -> false }
 
             controller.springSecurityService = springSecurityService.createMock()
 
-            controller.save(resultInstance)
+            controller.save(resultInstance.id)
 
         then:"The create view is rendered again with the correct model"
             response.json.error == 'User not logged in'
@@ -64,13 +64,13 @@ class RefactoredDataControllerSpec extends Specification {
             Scientist owner = new Scientist(firstName: "Test", lastName: "User", email:"my@email.com", password:"test")
             Equipment equipment = new Equipment(name: "Test Equipment")
             ExperimentalPlateSet experiment = new ExperimentalPlateSet(owner: owner, name: "Test Experiment", description: "Test Description")
-            resultInstance = new Result(owner: owner, equipment: equipment, experiment: experiment, name: "Test Results", description: "Result Description")        
+            resultInstance = new Result(owner: owner, equipment: equipment, experiment: experiment, name: "Test Results", description: "Result Description").save()        
             def springSecurityService = mockFor(SpringSecurityService)
             springSecurityService.demandExplicit.isLoggedIn {  -> true }
 
             controller.springSecurityService = springSecurityService.createMock()
 
-            controller.save(resultInstance)
+            controller.save(resultInstance.id)
 
         then:"The create view is rendered again with the correct model"
             response.json.error == 'No data received'
@@ -82,7 +82,7 @@ class RefactoredDataControllerSpec extends Specification {
             Scientist owner = new Scientist(firstName: "Test", lastName: "User", email:"my@email.com", password:"test")
             Equipment equipment = new Equipment(name: "Test Equipment")
             ExperimentalPlateSet experiment = new ExperimentalPlateSet(owner: owner, name: "Test Experiment", description: "Test Description")
-            resultInstance = new Result(owner: owner, equipment: equipment, experiment: experiment, name: "Test Results", description: "Result Description")        
+            resultInstance = new Result(owner: owner, equipment: equipment, experiment: experiment, name: "Test Results", description: "Result Description").save()        
 
             def springSecurityService = mockFor(SpringSecurityService)
             springSecurityService.demandExplicit.isLoggedIn {  -> true }
@@ -95,7 +95,7 @@ class RefactoredDataControllerSpec extends Specification {
             controller.resultService = resultService.createMock()            
 
             request.json = "{data: true}"
-            controller.save(resultInstance)
+            controller.save(resultInstance.id)
 
         then:"The create view is rendered again with the correct model"
             response.json.error == 'Error!'
@@ -107,7 +107,7 @@ class RefactoredDataControllerSpec extends Specification {
             Scientist owner = new Scientist(firstName: "Test", lastName: "User", email:"my@email.com", password:"test")
             Equipment equipment = new Equipment(name: "Test Equipment")
             ExperimentalPlateSet experiment = new ExperimentalPlateSet(owner: owner, name: "Test Experiment", description: "Test Description")
-            resultInstance = new Result(owner: owner, equipment: equipment, experiment: experiment, name: "Test Results", description: "Result Description")        
+            resultInstance = new Result(owner: owner, equipment: equipment, experiment: experiment, name: "Test Results", description: "Result Description").save()        
 
             def springSecurityService = mockFor(SpringSecurityService)
             springSecurityService.demandExplicit.isLoggedIn {  -> true }
@@ -120,7 +120,7 @@ class RefactoredDataControllerSpec extends Specification {
             controller.resultService = resultService.createMock()            
 
             request.json = "{data: true}"
-            controller.save(resultInstance)
+            controller.save(resultInstance.id)
 
         then:"The create view is rendered again with the correct model"
             response.json.error == 'Error storing the normalized data'
@@ -133,7 +133,7 @@ class RefactoredDataControllerSpec extends Specification {
             Scientist owner = new Scientist(firstName: "Test", lastName: "User", email:"my@email.com", password:"test")
             Equipment equipment = new Equipment(name: "Test Equipment")
             ExperimentalPlateSet experiment = new ExperimentalPlateSet(owner: owner, name: "Test Experiment", description: "Test Description")
-            resultInstance = new Result(owner: owner, equipment: equipment, experiment: experiment, name: "Test Results", description: "Result Description")        
+            resultInstance = new Result(owner: owner, equipment: equipment, experiment: experiment, name: "Test Results", description: "Result Description").save()        
 
             def springSecurityService = mockFor(SpringSecurityService)
             springSecurityService.demandExplicit.isLoggedIn {  -> true }
@@ -150,7 +150,7 @@ class RefactoredDataControllerSpec extends Specification {
             controller.resultService = resultService.createMock()            
 
             request.json = "{data: true}"
-            controller.save(resultInstance)
+            controller.save(resultInstance.id)
 
         then:"The create view is rendered again with the correct model"
             response.json.error != null
@@ -163,7 +163,7 @@ class RefactoredDataControllerSpec extends Specification {
             Scientist owner = new Scientist(firstName: "Test", lastName: "User", email:"my@email.com", password:"test")
             Equipment equipment = new Equipment(name: "Test Equipment")
             ExperimentalPlateSet experiment = new ExperimentalPlateSet(owner: owner, name: "Test Experiment", description: "Test Description")
-            resultInstance = new Result(owner: owner, equipment: equipment, experiment: experiment, name: "Test Results", description: "Result Description")        
+            resultInstance = new Result(owner: owner, equipment: equipment, experiment: experiment, name: "Test Results", description: "Result Description").save()        
 
 
             def springSecurityService = mockFor(SpringSecurityService)
@@ -184,7 +184,7 @@ class RefactoredDataControllerSpec extends Specification {
             controller.resultService = resultService.createMock()            
 
             request.json = "{data: true}"
-            controller.save(resultInstance)
+            controller.save(resultInstance.id)
 
         then:"The create view is rendered again with the correct model"
             response.json.resultInstance != null

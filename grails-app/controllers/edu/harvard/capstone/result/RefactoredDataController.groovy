@@ -16,8 +16,8 @@ class RefactoredDataController {
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
 
-    def save() {
-        def resultInstance = Result.get(params.id)
+    def save(Long id) {
+        def resultInstance = Result.get(id)
 
         if (!resultInstance){
             render(contentType: "application/json") {
@@ -44,7 +44,7 @@ class RefactoredDataController {
         }
 
         try{
-            resultService.storeNormalizedData(resultInstance, data)
+            resultInstance = resultService.storeNormalizedData(resultInstance, data)
         }
         catch (ValidationException e) {
             render(contentType: "application/json") {

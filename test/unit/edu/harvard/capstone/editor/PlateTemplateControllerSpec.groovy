@@ -1,12 +1,14 @@
 package edu.harvard.capstone.editor
 
+import grails.plugin.springsecurity.SpringSecurityService
+
 import edu.harvard.capstone.user.Scientist
 
 import grails.test.mixin.*
 import spock.lang.*
 
 @TestFor(PlateTemplateController)
-@Mock(PlateTemplate)
+@Mock([PlateTemplate, Scientist, SpringSecurityService, ExperimentalPlateSet, EditorService])
 class PlateTemplateControllerSpec extends Specification {
 
     def populateValidParams(params) {
@@ -24,6 +26,14 @@ class PlateTemplateControllerSpec extends Specification {
     void "Test the index action returns the correct model"() {
 
         when:"The index action is executed"
+            controller.springSecurityService = [principal: [id:1, getAuthorities: { -> 
+                    def authorities = []
+                    def a  = [:]
+                    a.authority =[]
+                    a.authority << "ROLE_ADMIN"                 
+                    authorities << a
+                    return authorities
+                }]]
             controller.index()
 
         then:"The model is correct"
