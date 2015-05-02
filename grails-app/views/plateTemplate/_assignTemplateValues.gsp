@@ -1,6 +1,6 @@
 <%@ page import="edu.harvard.capstone.parser.Equipment" %>
 
-	<div class="col-sm-6">
+	<div class="col-sm-9">
 		<div id="labelPanel" class="panel panel-default">
 			<div class="panel-heading">
 				<h4 class="panel-title">Add Well Group</h4>
@@ -9,11 +9,26 @@
 				<label>Template Value:</label>
 				<input type="text" id="newLabelValue"></input>
 				<button id="addTemplateValueBtn" class="btn btn-default btn-xs glyphicon glyphicon-plus"></button>
+				<label> Well Type:</label>
+					<div class="btn-group" data-toggle="buttons">
+		                <label class="btn btn-default btn-xs active">
+		                    <input type="radio" name="wellType" id="compoundType" value="compound" checked/>Compound
+		                </label>
+		                <label class="btn btn-default btn-xs">
+		                    <input type="radio" name="wellType" id="posType" value="positive"/>Positive Control
+		                </label>
+		                <label class="btn btn-default btn-xs">
+		                    <input type="radio" name="wellType" id="negType" value="negative"/>Negative Control
+		                </label>
+		                <label class="btn btn-default btn-xs">
+		                    <input type="radio" name="wellType" id="emptyType" value="empty"/>Empty
+		                </label>
+		            </div>
 			</div>
 		</div>
 	</div>
 	
-	<div class="col-sm-6">
+	<div class="col-sm-3">
 		<div id="labelPanel" class="panel panel-default">
 			<div class="panel-heading">
 				<h4 class="panel-title">Other Actions<span class="pull-right"></span></h4>

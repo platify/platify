@@ -178,10 +178,11 @@ function disableGridSelection() {
  */
 function addTemplateValue() {
 	"use strict";
-	var selCells, cellValue, cell, row, column, wgs;
+	var selCells, cellValue, wellType, cell, row, column, wgs;
 	selCells = highlightedCoords;
 	// console.log(selCells);
 	cellValue = document.getElementById("newLabelValue").value;
+	wellType = $("input[name=wellType]:checked").val();
 
 	// just keeping list of well values
 	if (wellGroupings.indexOf(cellValue) === -1) {
@@ -210,6 +211,7 @@ function addTemplateValue() {
 				plateModel.rows[row].columns[column] = {};
 			}
 			plateModel.rows[row].columns[column].wellGroupName = cellValue;
+			plateModel.rows[row].columns[column].wellType = wellType;
 
 			grid.updateCellContents(row, column, cellValue);
 		}
@@ -296,7 +298,7 @@ function translateModelToOutputJson(pModel) {
 				}
 				
 				well.groupName = pModel.rows[i].columns[j].wellGroupName;
-				well.control = "compound";
+				well.control = pModel.rows[i].columns[j].wellType;
 			} else {
 				well.control = "empty";
 			}

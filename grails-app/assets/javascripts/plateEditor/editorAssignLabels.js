@@ -788,31 +788,6 @@ function addNewDose() {
 }
 
 /**
- * Adds a new control label. The control specifies whether the
- * well is either compound/empty/positive/negative.
- */
-function addNewControlLabel() {		// TODO move this to createTemplate screen
-	"use strict";
-	var selCells, cat, label, color;
-	selCells = highlightedCoords;
-	console.log(selCells);
-	cat = "control";
-	
-	if (document.getElementById("negWellType").checked) {
-		label = "negative";
-	} else {
-		label = "positive";
-	}
-	//label = document.getElementById("newControlWellType").value;
-	color = document.getElementById("newControlWellValue").value;
-
-	createNewLabel(cat, label, "", color, selCells);
-
-	updateCategoryList();
-	removeAllHighlightedCells();
-}
-
-/**
  * This function adds an event handler to an html element in
  * a way that covers many browser types.
  * @param elementId - the string id of the element to attach the handler to
@@ -930,6 +905,8 @@ function translateModelToOutputJson(pModel) {
 			
 			if (pModel.rows[i] !== undefined && pModel.rows[i].columns[j] !== undefined) {
 				well.groupName = pModel.rows[i].columns[j].wellGroupName;
+				well.control = pModel.rows[i].columns[j].wellType;		// TODO - null check ??
+				
 				for (catKey in pModel.rows[i].columns[j].categories) {
 					for (labKey in pModel.rows[i].columns[j].categories[catKey]) {
 						label = {};
@@ -937,22 +914,11 @@ function translateModelToOutputJson(pModel) {
 						convCat = catKey.toString().split('__dot__').join('.');
 						convLab = labKey.toString().split('__dot__').join('.');
 						
-						// TEMP, fix to add control wells!
-						if (convCat === "control") {
-							if (convLab === "positive") {
-								well.control = "positive";
-							} else if (convLab === "negative") {
-								well.control = "negative";
-							} else {
-								// ignoring other labels with control: something ??
-							}
-						} else {
-							label.category = convCat;
-							label.name = convLab;
-							label.value = pModel.rows[i].columns[j].categories[catKey][labKey].color;
-							label.units = pModel.rows[i].columns[j].categories[catKey][labKey].units;
-							labels.push(label);
-						}
+						label.category = convCat;
+						label.name = convLab;
+						label.value = pModel.rows[i].columns[j].categories[catKey][labKey].color;
+						label.units = pModel.rows[i].columns[j].categories[catKey][labKey].units;
+						labels.push(label);
 					}
 				}
 				
@@ -961,16 +927,7 @@ function translateModelToOutputJson(pModel) {
 					cmpdLabel.category = "compound";
 					cmpdLabel.name = groupNames[well.groupName];
 					labels.push(cmpdLabel);
-					if (well.control !== "positive" && well.control !== "negative") {
-						well.control = "compound";		// could also be a control !!!
-					}
-				} else {
-					// default to empty control
-					if (well.control !== "positive" && well.control !== "negative") {
-						well.control = "empty";
-					}
 				}
-				
 			} else {
 				// check for empty well:
 				well.groupName = "";
@@ -998,7 +955,7 @@ function translateModelToOutputJson(pModel) {
  */
 function translateInputJsonToModel(plateJson) {
 	"use strict";
-	var pModel, plate, i, j, row, column, groupName, labels, convCat, convLab;
+	var pModel, plate, i, j, row, column, groupName, wellType, labels, convCat, convLab;
 	pModel = {};
 	groupNames = {};
 	pModel.rows = {};
@@ -1019,8 +976,14 @@ function translateInputJsonToModel(plateJson) {
 		column = plate.wells[i].column + 1;
 		if (plate.wells[i].groupName !== undefined && plate.wells[i].groupName !== null) {
 			groupName = plate.wells[i].groupName;
+			if (plate.wells[i].control !== undefined && plate.wells[i].control !== null) {
+				wellType = plate.wells[i].control;
+			} else {
+				wellType = "compound";		// fail back to compound ??
+			}
 		} else {
 			groupName = "";
+			wellType = "empty";
 		}
 		
 		labels = plate.wells[i].labels;
@@ -1033,6 +996,7 @@ function translateInputJsonToModel(plateJson) {
 		if (pModel.rows[row].columns[column] === undefined) {
 			pModel.rows[row].columns[column] = {};
 			pModel.rows[row].columns[column].wellGroupName = groupName;
+			pModel.rows[row].columns[column].wellType = wellType;
 			pModel.rows[row].columns[column].categories = {};
 		}
 
@@ -1121,11 +1085,6 @@ function hideDoseStepPanel() {
 	$("#addDoseStepPanel").hide();
 }
 
-function hideControlWellPanel() {
-	"use strict";
-	$("#addControlWellPanel").hide();
-}
-
 function hidePlateLabelPanel() {
 	"use strict";
 	$("#addPlateLabelPanel").hide();
@@ -1159,7 +1118,6 @@ function showLabelPanel() {
 	"use strict";
 	hideDosePanel();
 	hideDoseStepPanel();
-	hideControlWellPanel();
 	hidePlateLabelPanel();
 	hidePlateLabelCatPanel();
 	$("#addLabelPanel").show();
@@ -1175,7 +1133,6 @@ function showDosePanel() {
 	"use strict";
 	hideLabelPanel();
 	hideDoseStepPanel();
-	hideControlWellPanel();
 	hidePlateLabelPanel();
 	hidePlateLabelCatPanel();
 	$("#addDosePanel").show();
@@ -1191,26 +1148,9 @@ function showDoseStepPanel() {
 	"use strict";
 	hideLabelPanel();
 	hideDosePanel();
-	hideControlWellPanel();
 	hidePlateLabelPanel();
 	hidePlateLabelCatPanel();
 	$("#addDoseStepPanel").show();
-	enableGridSelection();
-	showCategoryPanel();
-}
-
-/**
- * Makes control label panel visible. Hides other panels
- * Enables grid selection. Display well label category panel.
- */
-function showControlWellPanel() {
-	"use strict";
-	hideLabelPanel();
-	hideDosePanel();
-	hideDoseStepPanel();
-	hidePlateLabelPanel();
-	hidePlateLabelCatPanel();
-	$("#addControlWellPanel").show();
 	enableGridSelection();
 	showCategoryPanel();
 }
@@ -1224,7 +1164,6 @@ function showPlateLabelPanel() {
 	hideLabelPanel();
 	hideDosePanel();
 	hideDoseStepPanel();
-	hideControlWellPanel();
 	hideCategoryPanel();
 	$("#addPlateLabelPanel").show();
 
@@ -1246,8 +1185,6 @@ $(function() {
 			showDosePanel();
 		} else if ($(this).prop('id') === "doseStepLabType") {
 			showDoseStepPanel();
-		} else if ($(this).prop('id') === "controlType") {
-			showControlWellPanel();
 		} else if ($(this).prop('id') === "plateLabType") {
 			showPlateLabelPanel();
 		}
@@ -1432,7 +1369,6 @@ function init() {
 	hidePlateLabelCatPanel();
 	hideDosePanel();
 	hideDoseStepPanel();
-	hideControlWellPanel();
 	hidePlateLabelPanel();
 
 	// fetch templateJson
@@ -1442,7 +1378,6 @@ function init() {
 	addEvent("addNewLabel", "click", addNewLabel);
 	addEvent("addNewDose", "click", addNewDose);
 	addEvent("addDoseStep", "click", addDoseStep);
-	addEvent("addNewControlWell", "click", addNewControlLabel);
 	addEvent("addNewPlateLabel", "click", addNewPlateLabel);
 	addEvent("clearAllSelection", "click", removeAllHighlightedCells);
 
