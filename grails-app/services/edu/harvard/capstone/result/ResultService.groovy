@@ -212,11 +212,23 @@ class ResultService {
 
     			}
     		}
+
+            // plate level
+            dataPlate.rawData?.each { key, value ->
+                def resultData = new ResultLabel(name: key,
+                                                 value: value,
+                                                 labelType: ResultLabel.LabelType.RAW_DATA,
+                                                 scope: ResultLabel.LabelScope.PLATE,
+                                                 domainId: plateInstance.id)
+                resultData.save()
+                if (resultData.hasErrors()) {
+                    throw new ValidationException('Plate-level raw data is not valid',
+                                                  resultData.errors)
+                }
+            }
 		}
 
-
     	return resultInstance
-
     }    
 
     def getResults(Result resultInstance) {
@@ -380,6 +392,14 @@ class ResultService {
             // now the results
             def resultPlate = resultPlatesByBarcode[barcode]
             if (resultPlate) {
+                // plate-level results
+                def plateResultLabels = ResultLabel.findAllByDomainIdAndLabelTypeAndScope(
+                                            resultPlate.id,
+                                            ResultLabel.LabelType.RAW_DATA,
+                                            ResultLabel.LabelScope.PLATE)
+                plate.rawData = plateResultLabels.collectEntries{plateResultLabel -> [plateResultLabel.name, plateResultLabel.value]}
+
+                // well-level results
                 def resultWells = ResultWell.findAllByPlate(resultPlate)
                 def resultWellsByCoords = resultWells.collectEntries {resultWell -> [[resultWell.well.row, resultWell.well.column], resultWell]}
                 for (x in 0 .. resultPlate.rows-1) {

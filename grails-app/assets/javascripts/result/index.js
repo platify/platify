@@ -116,14 +116,6 @@ function loadGrid(dataSet) {
 function plateSelected(plateID) {
     experiment.selectPlate(plateID);
     loadGrid(experiment.data);
-
-    //$('#rawNormToggle').bootstrapToggle('on');
-    $('#zFactor').text(experiment.zFactor(plateID) || '');
-    $('#zPrimeFactor').text(experiment.zPrimeFactor(plateID) || '');
-    var negativeControl = experiment.meanNegativeControl(plateID);
-    $('#negativeControl').text(negativeControl === null ? '' : negativeControl);
-    var positiveControl = experiment.meanPositiveControl(plateID);
-    $('#positiveControl').text(positiveControl === null ? '' : positiveControl);
 }
 
 
