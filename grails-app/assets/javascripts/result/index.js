@@ -53,15 +53,15 @@ function createGrid() {
 
 function experimentSelected(experimentId) {
     experiment = new ExperimentModel(experimentId);
-    experiment.getData().done(function () {
+    experiment.getData().always(function () {
         if (Object.keys(experiment.plates).length > 0) {
             plateData = Object.keys(experiment.plates).map(function(plateID) {
                 var row = [
                            plateID,
-                           experiment.zFactor(),
-                           experiment.zPrimeFactor(),
-                           experiment.meanNegativeControl(),
-                           experiment.meanPositiveControl()];
+                           experiment.zFactor(plateID),
+                           experiment.zPrimeFactor(plateID),
+                           experiment.meanNegativeControl(plateID),
+                           experiment.meanPositiveControl(plateID)];
                 return row;
             });
             plateTable.clear().rows.add(plateData).draw();
@@ -117,12 +117,12 @@ function plateSelected(plateID) {
     experiment.selectPlate(plateID);
     loadGrid(experiment.data);
 
-    $('#rawNormToggle').bootstrapToggle('on');
-    $('#zFactor').text(experiment.zFactor() || '');
-    $('#zPrimeFactor').text(experiment.zPrimeFactor() || '');
-    var negativeControl = experiment.meanNegativeControl();
+    //$('#rawNormToggle').bootstrapToggle('on');
+    $('#zFactor').text(experiment.zFactor(plateID) || '');
+    $('#zPrimeFactor').text(experiment.zPrimeFactor(plateID) || '');
+    var negativeControl = experiment.meanNegativeControl(plateID);
     $('#negativeControl').text(negativeControl === null ? '' : negativeControl);
-    var positiveControl = experiment.meanPositiveControl();
+    var positiveControl = experiment.meanPositiveControl(plateID);
     $('#positiveControl').text(positiveControl === null ? '' : positiveControl);
 }
 
