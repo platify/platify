@@ -72,7 +72,7 @@ TestUtilities.getRandomImportDataObject = function(){
         }
 
         category = TestUtilities.getRandomString(1, 16);
-        if (!wellLevelCategories[category]){
+        if (wellLevelCategories[category] !== true && wellLevelCategories[category] !== false){
             wellLevelCategories[category] = numeric;
             importData.addWellLevelCategory(category, numeric);
         } else {

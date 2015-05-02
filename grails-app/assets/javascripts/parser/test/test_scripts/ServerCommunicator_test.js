@@ -396,10 +396,10 @@ test("ImportData save", function(assert){
 
         assert.ok(
             jqxhr.successCallback === serverCommunicator.handleSuccessImportDataSaveRequest,
-            "The success callback should be set to handleSuccessPlateIDArrayRequest.");
+            "The success callback should be set to handleSuccessImportDataSaveRequest.");
         assert.ok(
             jqxhr.failureCallback === serverCommunicator.handleFailureImportDataSaveRequest,
-            "The failure callback should be set to handleSuccessPlateIDArrayRequest.");
+            "The failure callback should be set to handleFailureImportDataSaveRequest.");
     }
 });
 
@@ -540,7 +540,9 @@ test("ParsingConfig save", function(assert){
         var parsingID = TestUtilities.getRandomInt(0, 5);
         var serverCommunicator = new ServerCommunicator("hostname");
 
-        var jqxhr = serverCommunicator.(parsingConfig, ServerCommunicator.SAVE_NEW, null);
+        var jqxhr = serverCommunicator.saveParsingConfigToServer(parsingConfig,
+                                                                 ServerCommunicator.SAVE_NEW,
+                                                                 null);
 
         var options = this.ajaxMock.options;
         var url = options.url;
@@ -563,14 +565,16 @@ test("ParsingConfig save", function(assert){
         assert.ok(type === "POST", "Type should be \"POST\"");
 
         assert.ok(
-            jqxhr.successCallback === serverCommunicator.handleSuccessImportDataSaveRequest,
-            "The success callback should be set to handleSuccessPlateIDArrayRequest.");
+            jqxhr.successCallback === serverCommunicator.handleSuccessParsingConfigSaveRequest,
+            "The success callback should be set to handleSuccessParsingConfigSaveRequest.");
         assert.ok(
-            jqxhr.failureCallback === serverCommunicator.handleFailureImportDataSaveRequest,
-            "The failure callback should be set to handleSuccessPlateIDArrayRequest.");
+            jqxhr.failureCallback === serverCommunicator.handleFailureParsingConfigSaveRequest,
+            "The failure callback should be set to handleFailureParsingConfigSaveRequest.");
 
 
-        jqxhr = serverCommunicator.(parsingConfig, ServerCommunicator.SAVE_UPDATE, parsingID);
+        jqxhr = serverCommunicator.saveParsingConfigToServer(parsingConfig,
+                                                             ServerCommunicator.SAVE_UPDATE,
+                                                             parsingID);
 
         options = this.ajaxMock.options;
         url = options.url;
@@ -594,11 +598,10 @@ test("ParsingConfig save", function(assert){
         assert.ok(type === "PUT", "Type should be \"PUT\"");
 
         assert.ok(
-            jqxhr.successCallback === serverCommunicator.handleSuccessImportDataSaveRequest,
-            "The success callback should be set to handleSuccessPlateIDArrayRequest.");
+            jqxhr.successCallback === serverCommunicator.handleSuccessParsingConfigSaveRequest,
+            "The success callback should be set to handleSuccessParsingConfigSaveRequest.");
         assert.ok(
-            jqxhr.failureCallback === serverCommunicator.handleFailureImportDataSaveRequest,
-            "The failure callback should be set to handleSuccessPlateIDArrayRequest.");
+            jqxhr.failureCallback === serverCommunicator.handleFailureParsingConfigSaveRequest,
+            "The failure callback should be set to handleFailureParsingConfigSaveRequest.");
     }
 });
-

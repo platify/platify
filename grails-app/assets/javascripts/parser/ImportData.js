@@ -1214,7 +1214,7 @@ ImportDataError.INVALID_PARSING_ID = "invalid parsing ID";
 ImportDataError.PLATE_ID_NOT_SET = "plate ID not set";
 
 /**
- * ImportDataError objects store an represent the conditions under which an exceptional
+ * ImportDataError objects store and represent the conditions under which an exceptional
  * event occurred in the manipulation of ImportData objects.
  * @param type - a constant that represents the reason that an ImportDataError occurred
  * @param descriptor - a description of the error situation

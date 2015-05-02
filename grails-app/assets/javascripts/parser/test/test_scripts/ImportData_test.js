@@ -259,7 +259,7 @@ test("add categories errors", function(assert){
     var j;
     var category;
 
-    for (var i=0; i<20; i++){
+    for (var i=0; i<50; i++){
         var importData = TestUtilities.getRandomImportDataObject();
         var wellLevelCategories = importData.getWellLevelCategories();
         var plateLevelCategories = importData.getPlateLevelCategories();
@@ -304,7 +304,7 @@ test("add categories errors", function(assert){
             } catch (error){
                 assert.ok(error.type = ImportDataError.CATEGORY_ALREADY_DEFINED,
                     "Adding a category that already exists should throw a " +
-                    "CATEGORY_ALREADY_DEFINED error.")
+                    "CATEGORY_ALREADY_DEFINED error.a")
             }
         }
 
@@ -347,7 +347,7 @@ test("add categories errors", function(assert){
             } catch (error){
                 assert.ok(error.type = ImportDataError.CATEGORY_ALREADY_DEFINED,
                     "Adding a category that already exists should throw a " +
-                    "CATEGORY_ALREADY_DEFINED error.")
+                    "CATEGORY_ALREADY_DEFINED error.b")
             }
         }
 
@@ -390,7 +390,7 @@ test("add categories errors", function(assert){
             } catch (error){
                 assert.ok(error.type = ImportDataError.CATEGORY_ALREADY_DEFINED,
                     "Adding a category that already exists should throw a " +
-                    "CATEGORY_ALREADY_DEFINED error.")
+                    "CATEGORY_ALREADY_DEFINED error.c")
             }
         }
     }
@@ -507,7 +507,7 @@ test("remove categories", function(assert){
 
 test("Convert to DTO and back", function(assert){
 
-    for (var i=0; i<10; i++){
+    for (var i=0; i<20; i++){
         var importData = TestUtilities.getRandomImportDataObject();
         assert.ok(importData);
 
