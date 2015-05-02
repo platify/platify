@@ -484,6 +484,282 @@ class ResultServiceSpec extends Specification {
 	}	
 
 
+
+/*****************************/
+
+	void "Test Normalized Data object null"() {
+		when: "Data object null"
+			def resultInstance = service.storeNormalizedData(null, null)
+
+		then:
+			def ex = thrown(RuntimeException)
+			ex.message.contains("Incorrect Data")			
+			resultInstance == null
+	}
+	
+	void "Test wrong Normalized Data object param"() {
+		when: "Data object incorrect"
+			def normalizedData = JSON.parse("{plate: ''}")
+			resultInstance = service.storeNormalizedData(null, normalizedData)
+
+		then:
+			def ex = thrown(RuntimeException)
+			ex.message.contains("Incorrect Data")			
+	}
+
+	
+	void "Test Normalized Data user not logged in"() {
+		when: "Data object correct"
+	    	// Fake springSecurityService - login as id 1
+			service.springSecurityService = [principal: [id: null]]
+
+			def data = JSON.parse("{experimentID: 'experiment', parsingID: 'parsing'}")
+			def resultInstance = service.storeNormalizedData(null, data)
+
+		then:
+			def ex = thrown(RuntimeException)
+			ex.message.contains("Scientist does not exist")			
+			resultInstance == null
+	}	
+
+	
+	void "Test Normalized Data wrong user"() {
+		when: "Data object correct"
+	    	// Fake springSecurityService - login as id 1
+			service.springSecurityService = [principal: [id: 1]]
+
+			def data = JSON.parse("{experimentID: 'experiment', parsingID: 'parsing'}")
+			def resultInstance = service.storeNormalizedData(null, data)
+
+		then:
+			def ex = thrown(RuntimeException)
+			ex.message.contains("Scientist does not exist")				
+			resultInstance == null
+	}	
+
+	
+	void "Test Normalized Data no experiment object"() {
+		when: "Data object correct"
+
+			Scientist scientistInstance = new Scientist(firstName: "Test", lastName: "User", email:"my@email.com", password:"test")
+			scientistInstance.save()
+			service.springSecurityService = [principal: [id: scientistInstance.id]]
+			ExperimentalPlateSet experimentInstance = new ExperimentalPlateSet(owner: scientistInstance, name: "my experiment", description: "my description")
+			experimentInstance.save()
+
+			def data = JSON.parse("{experimentID: '${experimentInstance.id}', parsingID: 'parsing'}")
+			def resultInstance = service.storeNormalizedData(null, data)
+
+		then:
+			def ex = thrown(RuntimeException)
+			ex.message.contains("Either the equipment or the experiment does not exist")				
+			resultInstance == null
+	}	
+
+	
+	void "Test Normalized Data no equipment object"() {
+		when: "Data object correct"
+
+			Scientist scientistInstance = new Scientist(firstName: "Test", lastName: "User", email:"my@email.com", password:"test")
+			scientistInstance.save()
+			service.springSecurityService = [principal: [id: scientistInstance.id]]
+			Equipment equipmentInstance = new Equipment(name: "my equipment", machineName: "my machine name", description: "my description", config: "my config")
+			equipmentInstance.save()
+
+
+			def data = JSON.parse("{experimentID: 'experiment', parsingID: '${equipmentInstance.id}'}")
+			def resultInstance = service.storeNormalizedData(null, data)
+
+		then:
+			def ex = thrown(RuntimeException)
+			ex.message.contains("Either the equipment or the experiment does not exist")			
+			resultInstance == null
+	}	
+
+	
+	void "Test Normalized Data no plates object"() {
+		when: "Data object correct"
+
+			Scientist scientistInstance = new Scientist(firstName: "Test", lastName: "User", email:"my@email.com", password:"test")
+			scientistInstance.save()
+			service.springSecurityService = [principal: [id: scientistInstance.id]]
+			Equipment equipmentInstance = new Equipment(name: "my equipment", machineName: "my machine name", description: "my description", config: "my config")
+			equipmentInstance.save()
+			ExperimentalPlateSet experimentInstance = new ExperimentalPlateSet(owner: scientistInstance, name: "my experiment", description: "my description")
+			experimentInstance.save()
+
+			def data = JSON.parse("{experimentID: '${experimentInstance.id}', parsingID: '${equipmentInstance.id}'}")
+			def resultInstance = service.storeNormalizedData(null, data)
+
+		then:
+			def ex = thrown(RuntimeException)
+			ex.message.contains("No plates")			
+			resultInstance == null
+	}			
+
+	
+	void "Test Normalized Data existing PlateSets but JSON data has different amount of plates"() {
+		when: "Data object correct"
+
+			Scientist scientistInstance = new Scientist(firstName: "Test", lastName: "User", email:"my@email.com", password:"test")
+			scientistInstance.save()
+			service.springSecurityService = [principal: [id: scientistInstance.id]]
+			Equipment equipmentInstance = new Equipment(name: "my equipment", machineName: "my machine name", description: "my description", config: "my config")
+			equipmentInstance.save()
+			ExperimentalPlateSet experimentInstance = new ExperimentalPlateSet(owner: scientistInstance, name: "my experiment", description: "my description")
+			experimentInstance.save()
+			PlateTemplate templateInstance = new PlateTemplate(owner: scientistInstance, name: "my template")
+			templateInstance.save()
+			new PlateSet(plate: templateInstance, experiment: experimentInstance, barcode: 'barcode').save()
+
+			def data = JSON.parse("{experimentID: '${experimentInstance.id}', parsingID: '${equipmentInstance.id}'}")
+			def resultInstance = service.storeNormalizedData(null, data)
+
+		then:
+			def ex = thrown(RuntimeException)
+			ex.message.contains("Plates of the JSON do not match with the template")					
+			resultInstance == null
+	}
+
+	
+
+	void "Test incorrect normalized data"() {
+		when: "Data object correct"
+
+			Scientist scientistInstance = new Scientist(firstName: "Test", lastName: "User", email:"my@email.com", password:"test")
+			scientistInstance.save()
+			service.springSecurityService = [principal: [id: scientistInstance.id]]
+			Equipment equipmentInstance = new Equipment(name: "my equipment", machineName: "my machine name", description: "my description", config: "my config")
+			equipmentInstance.save()
+			ExperimentalPlateSet experimentInstance = new ExperimentalPlateSet(owner: scientistInstance, name: "my experiment", description: "my description")
+			experimentInstance.save()
+			PlateTemplate templateInstance = new PlateTemplate(owner: scientistInstance, name: "my template")
+			templateInstance.save()
+			new PlateSet(plate: templateInstance, experiment: experimentInstance, barcode: 'barcode').save()
+			new Well(plate: templateInstance, column: '0', row: '0', groupName: 'my group').save()
+
+
+			def resultData = JSON.parse("""
+				{
+					experimentID: '${experimentInstance.id}', 
+					parsingID: '${equipmentInstance.id}',
+					plates: [{
+						plateID: 'barcode',
+						labels: {key: 'value'},
+						rows: [ 
+							{
+								columns: [
+									{
+										labels: {key: 'value'}
+									}
+								]
+							} 
+						]
+					}],
+					experimentFeatures: {labels: {key: 'val', secondKey: 'second val'}}
+				}
+			""")
+			def resultInstance = service.newRawData(resultData)
+
+
+
+			def data = JSON.parse("""
+				{
+					experimentID: '${experimentInstance.id}', 
+					parsingID: '${equipmentInstance.id}',
+					plates: [{
+						plateID: 'barcode',
+						labels: {key: 'value'},
+						rows: [ 
+							{
+								columns: [
+									{
+										normalizedData: {key: ''}
+									}
+								]
+							} 
+						]
+					}],
+					experimentFeatures: {labels: {key: 'val', secondKey: 'second val'}}
+				}
+			""")
+			def normalizedInstance = service.storeNormalizedData(resultInstance, data)
+
+		then:
+			def ex = thrown(ValidationException)
+			ex.message.contains("Normalized Data is not valid")
+			normalizedInstance == null
+
+	}
+
+	void "Test Normalized Data everything working"() {
+		when: "Data object correct"
+
+			Scientist scientistInstance = new Scientist(firstName: "Test", lastName: "User", email:"my@email.com", password:"test")
+			scientistInstance.save()
+			service.springSecurityService = [principal: [id: scientistInstance.id]]
+			Equipment equipmentInstance = new Equipment(name: "my equipment", machineName: "my machine name", description: "my description", config: "my config")
+			equipmentInstance.save()
+			ExperimentalPlateSet experimentInstance = new ExperimentalPlateSet(owner: scientistInstance, name: "my experiment", description: "my description")
+			experimentInstance.save()
+			PlateTemplate templateInstance = new PlateTemplate(owner: scientistInstance, name: "my template")
+			templateInstance.save()
+			new PlateSet(plate: templateInstance, experiment: experimentInstance, barcode: 'barcode').save()
+			new Well(plate: templateInstance, column: '0', row: '0', groupName: 'my group').save()
+
+			def resultData = JSON.parse("""
+				{
+					experimentID: '${experimentInstance.id}', 
+					parsingID: '${equipmentInstance.id}',
+					plates: [{
+						plateID: 'barcode',
+						labels: {key: 'value'},
+						rows: [ 
+							{
+								columns: [
+									{
+										labels: {key: 'value'}
+									}
+								]
+							} 
+						]
+					}],
+					experimentFeatures: {labels: {key: 'val', secondKey: 'second val'}}
+				}
+			""")
+			def resultInstance = service.newRawData(resultData)
+
+
+
+			def data = JSON.parse("""
+				{
+					experimentID: '${experimentInstance.id}', 
+					parsingID: '${equipmentInstance.id}',
+					plates: [{
+						plateID: 'barcode',
+						labels: {key: 'value'},
+						rows: [ 
+							{
+								columns: [
+									{
+										labels: {key: 'value'}
+									}
+								]
+							} 
+						]
+					}],
+					experimentFeatures: {labels: {key: 'val', secondKey: 'second val'}}
+				}
+			""")
+			def normalizedInstance = service.storeNormalizedData(resultInstance, data)
+
+		then:
+			notThrown ValidationException
+			normalizedInstance != null
+	}		
+
+
+
 }
 
 

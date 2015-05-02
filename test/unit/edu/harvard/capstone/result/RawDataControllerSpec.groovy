@@ -115,7 +115,7 @@ class RawDataControllerSpec extends Specification {
 
     void "Test everything working"() {
 
-        when:"Data has incorrect information"
+        when:"Data has correct information"
             def springSecurityService = mockFor(SpringSecurityService)
             springSecurityService.demandExplicit.isLoggedIn {  -> true }
 
