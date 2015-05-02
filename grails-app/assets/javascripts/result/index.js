@@ -1,5 +1,7 @@
 var experiment;
 var grid;
+var plateTable;
+var plateTableTools;
 
 
 function createBlankData(width, height) {
@@ -19,6 +21,11 @@ function createBlankData(width, height) {
  * in the cell.
  */
 function colorGrid(dataSet) {
+    // short-circuit if there's no data
+    if (dataSet.length === 0) {
+        return;
+    }
+
     // first get a color quantizer
     var flattened = dataSet.reduce(function(a, b) {
         return a.concat(b);
@@ -46,22 +53,23 @@ function createGrid() {
 
 function experimentSelected(experimentId) {
     experiment = new ExperimentModel(experimentId);
-    experiment.getData().done(function () {
-        var select = $('#plateSelect');
-        select.children('option').remove();
+    experiment.getData().always(function () {
         if (Object.keys(experiment.plates).length > 0) {
-            var options = $.map(experiment.plates, function(p) {
-                var option = $('<option />').text(p.plateID);
-                if (p.plateID === experiment.currentPlateBarcode) {
-                    option[0].selected = true;
-                }
-                return option;
+            plateData = Object.keys(experiment.plates).map(function(plateID) {
+                var row = [
+                           plateID,
+                           experiment.zFactor(plateID),
+                           experiment.zPrimeFactor(plateID),
+                           experiment.meanNegativeControl(plateID),
+                           experiment.meanPositiveControl(plateID)];
+                return row;
             });
-            select.append(options);
-            plateSelected(experiment.currentPlateBarcode);
+            plateTable.clear().rows.add(plateData).draw();
+            plateTableTools.fnSelect(plateTable.row(0).nodes());
         }
         else {
             loadGrid([]);
+            plateTable.clear().draw();
         }
     });
 }
@@ -72,6 +80,24 @@ function init() {
     $('#rawNormToggle').change(function() {
         toggleRawOrNorm($(this).prop('checked') ? 'raw' : 'norm');
     });
+
+    // set up plate table
+    plateTable = $('#plateTable').DataTable({
+        bootstrap: true,
+        dom: 'T<"clear">lfrtip',
+        info: false,
+        paging: false,
+        scrollY: '150px',
+        searching: false,
+        tableTools: {
+            aButtons: [],
+            sRowSelect: 'single',
+            fnRowSelected: function (nodes) {
+                plateSelected(nodes[0].children[0].textContent);
+            },
+        },
+    });
+    plateTableTools = TableTools.fnGetInstance('plateTable');
 
     // set up grid
     createGrid();
@@ -91,12 +117,12 @@ function plateSelected(plateID) {
     experiment.selectPlate(plateID);
     loadGrid(experiment.data);
 
-    $('#rawNormToggle').bootstrapToggle('on');
-    $('#zFactor').text(experiment.zFactor() || '');
-    $('#zPrimeFactor').text(experiment.zPrimeFactor() || '');
-    var negativeControl = experiment.meanNegativeControl();
+    //$('#rawNormToggle').bootstrapToggle('on');
+    $('#zFactor').text(experiment.zFactor(plateID) || '');
+    $('#zPrimeFactor').text(experiment.zPrimeFactor(plateID) || '');
+    var negativeControl = experiment.meanNegativeControl(plateID);
     $('#negativeControl').text(negativeControl === null ? '' : negativeControl);
-    var positiveControl = experiment.meanPositiveControl();
+    var positiveControl = experiment.meanPositiveControl(plateID);
     $('#positiveControl').text(positiveControl === null ? '' : positiveControl);
 }
 
