@@ -1,5 +1,6 @@
 var experiment;
 var grid;
+var plateTable;
 
 
 function createBlankData(width, height) {
@@ -50,6 +51,18 @@ function experimentSelected(experimentId) {
         var select = $('#plateSelect');
         select.children('option').remove();
         if (Object.keys(experiment.plates).length > 0) {
+            plateData = Object.keys(experiment.plates).map(function(plateID) {
+                var row = [
+                           plateID,
+                           experiment.zFactor(),
+                           experiment.zPrimeFactor(),
+                           experiment.meanNegativeControl(),
+                           experiment.meanPositiveControl()];
+                return row;
+            });
+            plateTable.clear().rows.add(plateData).draw();
+
+
             var options = $.map(experiment.plates, function(p) {
                 var option = $('<option />').text(p.plateID);
                 if (p.plateID === experiment.currentPlateBarcode) {
@@ -61,6 +74,7 @@ function experimentSelected(experimentId) {
             plateSelected(experiment.currentPlateBarcode);
         }
         else {
+            plateTable.clear().draw();
             loadGrid([]);
         }
     });
@@ -71,6 +85,16 @@ function init() {
     // set up handlers
     $('#rawNormToggle').change(function() {
         toggleRawOrNorm($(this).prop('checked') ? 'raw' : 'norm');
+    });
+
+    // set up plate table
+    plateTable = $('#plateTable').DataTable({
+        bootstrap: true,
+        dom: 't',
+        info: false,
+        paging: false,
+        scrollY: '150px',
+        searching: false,
     });
 
     // set up grid

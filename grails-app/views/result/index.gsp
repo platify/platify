@@ -15,42 +15,36 @@
 		<asset:stylesheet href="grid/Grid.css"/>
 		<asset:stylesheet href="colorbrewer.css"/>
 		<asset:stylesheet href="bootstrap-toggle.min.css"/>
+		<asset:stylesheet href="dataTables.bootstrap.css"/>
 	</head>
 	<body>
 		<div class="content-fluid">
-			<div class="row">
-				<!-- Left Column -->
-				<div class="col-sm-2">
-					<div>
-					<g:select
-						id="experimentSelect"
-						name="name"
-						from="${edu.harvard.capstone.editor.ExperimentalPlateSet.list()}"
-						optionKey="id"
-						optionValue="${{it.name + " - " + it.id}}"
-						onChange="experimentSelected(this.value)"
-					/>
-					</div>
-					<select id="plateSelect" onChange="plateSelected(this.value)" size="5" style="width: 90%"></select>
-					<input id="rawNormToggle" type="checkbox" data-toggle="toggle" data-onstyle="primary" data-offstyle="primary" data-on="Raw" data-off="Normalized" data-size="small">
-					<dl>
-						<dt>Z-Factor</dt>
-						<dd id="zFactor"></dd>
+			<div class="row col-sm-12">
+				<strong>Assay:</strong>
+				<g:select
+					id="experimentSelect"
+					name="name"
+					from="${edu.harvard.capstone.editor.ExperimentalPlateSet.list()}"
+					optionKey="id"
+					optionValue="${{it.name + " - " + it.id}}"
+					onChange="experimentSelected(this.value)"
+				/>
 
-					        <dt>Z'-Factor</dt>
-						<dd id="zPrimeFactor"></dd>
-
-					        <dt>Mean Negative Control</dt>
-						<dd id="negativeControl"></dd>
-
-					        <dt>Mean Positive Control</dt>
-						<dd id="positiveControl"></dd>
-					</dl>
-				</div> <!-- Left Column END -->
-				<!-- Right Column -->
-				<div class="col-sm-10">
+<table id="plateTable" class="table table-bordered table-condensed">
+<thead>
+<tr>
+<th>Plate ID</th>
+<th>Z-Factor</th>
+<th>Z'-Factor</th>
+<th>Mean Negative Control</th>
+<th>Mean Positive Control</th>
+</tr>
+</thead>
+</table>
+			</div>
+				
+			<div class="row col-sm-12">
 				<div id="resultGrid" class="Blues" style="width:100%;height:650px;"></div>
-				</div> <!-- Right Column END -->	
 			</div>
 		</div>
 
@@ -76,6 +70,7 @@
 	<!-- results-specific js -->
 	<asset:javascript src="bootstrap-toggle.min.js" />
 	<asset:javascript src="plate-statistics/statistics.js" />
+	<asset:javascript src="jquery.dataTables.js" />
 	<g:javascript>
 	var RESULT_KITCHEN_SINK_URL = "${createLink(action: 'kitchenSink', experimentInstance: null)}";
 	var RESULT_SAVE_REFACTORED_DATA_URL = "${createLink(controller: 'refactoredData', action: 'save', resultInstance: null)}";
