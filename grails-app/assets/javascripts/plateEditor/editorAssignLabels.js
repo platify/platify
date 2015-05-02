@@ -754,8 +754,8 @@ function addNewDose() {
 	color = document.getElementById("newDoseColorValue").value;
 	
 	// validate input
-	if (!isNumeric(label)) {
-       alert('Dosage must be a number: '+ label);
+	if (!isNumeric(label) || label < 0) {
+       alert('Dosage must be a positive number: '+ label);
     } else if (isReservedValue(units)) {
        alert('Units contains reserved value: '+ units);
     } else {
@@ -792,24 +792,27 @@ function addDoseStep() {
 	dilution = document.getElementById("stepDilutionValue").value;
 	replicates = document.getElementById("replicatesValue").value;
 	topColor = document.getElementById("tDoseColorValue").value;
+	wellGroupLength = selCells.length;
 	
 	// validate input
-	if (!isNumeric(topDose)) {
-		alert('Top Dose must be a number: '+ topDose);
+	if (!isNumeric(topDose) || topDose < 0) {
+		alert('Top Dose must be a positive number: '+ topDose);
 	} else if (isReservedValue(units)) {
        alert('Units contains reserved value: '+ units);
-    } else if (!isNumeric(dilution)) {
-		alert('Dilution Factor must be a number: '+ dilution);
-	} else if (!isInteger(replicates)) {
-		alert('# of Replicates must be an Integer: '+ replicates);
+    } else if (!isNumeric(dilution) || dilution < 0) {
+		alert('Dilution Factor must be a positive number: '+ dilution);
+	} else if (!isInteger(replicates) || replicates < 0) {
+		alert('# of Replicates must be a positive integer: '+ replicates);
+	} else if (wellGroupLength <= replicates) {
+		alert('# of Replicates cannot be <= # of wells selected. Wells Selected: '+ wellGroupLength + '; Replicates: '+ replicates);
 	} else {
-		wellGroupLength = selCells.length;
-		doseStepLength = wellGroupLength / replicates;		// need some validation !!
+		replicates++;
+		//doseStepLength = wellGroupLength / replicates;
 		currentDose = topDose;
 		currentColor = topColor;
 
 		for (i = 0; i < wellGroupLength; i++) {
-			for (j = 0; j < replicates; j++) {
+			for (j = 0; j < replicates && ((i + j) < wellGroupLength); j++) {
 				console.log("i+j:" + (i + j));
 				createNewLabel(cat, currentDose, units, currentColor, [selCells[i + j]]);
 			}

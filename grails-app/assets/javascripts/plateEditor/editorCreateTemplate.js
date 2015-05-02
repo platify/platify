@@ -27,7 +27,7 @@ function createBlankData() {
 	for (i = 0; i < GRID_HEIGHT; i++) {
 		result[i] = [];
 		for (j = 0; j < GRID_WIDTH; j++) {
-			result[i][j] = null;
+			result[i][j] = "";
 		}
 	}
 	return result;

@@ -85,7 +85,7 @@
 						</div>
 						<label for="replicatesValue" class="col-xs-1 control-label" style="padding:0px; text-align: right">Replicates:</label>
 						<div class="col-xs-1" style="padding:0px">
-							<input type="text" id="replicatesValue" class="input-sm form-control" value="1"/>		<!-- Add spinner ?? -->
+							<input type="text" id="replicatesValue" class="input-sm form-control" value="0"/>		<!-- Add spinner ?? -->
 						</div>
 						<label for="tDoseColorValue" class="col-xs-1 control-label" style="padding:0px; text-align: right">Top Dose Color:</label>
 						<div class="col-xs-2" style="padding:0px">
