@@ -5,25 +5,33 @@
 			<div class="panel-heading">
 				<h4 class="panel-title">Add Well Group</h4>
 			</div>
-			<div class="panel-body ">
-				<label>Template Value:</label>
-				<input type="text" id="newLabelValue"></input>
-				<button id="addTemplateValueBtn" class="btn btn-default btn-xs glyphicon glyphicon-plus"></button>
-				<label> Well Type:</label>
-					<div class="btn-group" data-toggle="buttons">
-		                <label class="btn btn-default btn-xs active">
-		                    <input type="radio" name="wellType" id="compoundType" value="compound" checked/>Compound
-		                </label>
-		                <label class="btn btn-default btn-xs">
-		                    <input type="radio" name="wellType" id="posType" value="positive"/>Positive Control
-		                </label>
-		                <label class="btn btn-default btn-xs">
-		                    <input type="radio" name="wellType" id="negType" value="negative"/>Negative Control
-		                </label>
-		                <label class="btn btn-default btn-xs">
-		                    <input type="radio" name="wellType" id="emptyType" value="empty"/>Empty
-		                </label>
-		            </div>
+			<div class="panel-body" style="padding:8px">
+					<label for="newLabelValue" class="col-xs-2 control-label">Template Value:</label>
+					<div class="col-xs-2">
+						<div class="input-group">
+						<input type="text" id="newLabelValue" class="input-sm form-control" required maxlength="3" 
+							title="Use up to 3 alphanumeric characters for well group reference."></input>
+							<span class="input-group-btn"><button id="addTemplateValueBtn" class="btn btn-default btn-sm glyphicon glyphicon-plus"></button></span>
+						</div>
+					</div>
+					
+					<div class="col-xs-6">
+						<label for="wellTypeGrp" class="control-label"> Well Type:</label>
+						<div class="btn-group" data-toggle="buttons" id="wellTypeGrp">
+			                <label class="btn btn-default btn-xs active">
+			                    <input type="radio" name="wellType" id="compoundType" value="compound" checked/>Compound
+			                </label>
+			                <label class="btn btn-default btn-xs">
+			                    <input type="radio" name="wellType" id="posType" value="positive"/>Pos Control
+			                </label>
+			                <label class="btn btn-default btn-xs">
+			                    <input type="radio" name="wellType" id="negType" value="negative"/>Neg Control
+			                </label>
+			                <label class="btn btn-default btn-xs">
+			                    <input type="radio" name="wellType" id="emptyType" value="empty"/>Empty
+			                </label>
+			            </div>
+					</div>
 			</div>
 		</div>
 	</div>
@@ -35,7 +43,7 @@
 			</div>
 			<div class="panel-body ">
 				<button id="importTemplateValueListBtn" class="btn btn-info btn-xs ui-state-disabled">Import Template Values</button>
-				<button id="resetTemplateBtn" class="btn btn-info btn-xs ui-state-disabled">Reset Template</button>
+				<!-- <button id="resetTemplateBtn" class="btn btn-info btn-xs ui-state-disabled">Reset Template</button> -->
 			</div>
 		</div>
 	</div>
