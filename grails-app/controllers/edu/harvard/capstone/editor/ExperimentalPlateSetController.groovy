@@ -13,7 +13,6 @@ class ExperimentalPlateSetController {
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
-
     @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
     def index(Integer max) {
         if (!springSecurityService.isLoggedIn())
@@ -26,6 +25,41 @@ class ExperimentalPlateSetController {
         params.max = Math.min(max ?: 10, 100)
         respond ExperimentalPlateSet.list(params), model:[experimentalPlateSetInstanceCount: ExperimentalPlateSet.count()]
     }
+	
+	@Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
+	def showactions(ExperimentalPlateSet experimentalPlateSetInstance) {
+		if (!springSecurityService.isLoggedIn())
+		return
+
+		if(!springSecurityService.principal?.getAuthorities().any { it.authority == "ROLE_ADMIN" || it.authority == "ROLE_SUPER_ADMIN"}){
+			params.owner = springSecurityService.principal
+		}
+		
+		def plateSetList = PlateSet.findAllByExperiment(experimentalPlateSetInstance);
+		respond experimentalPlateSetInstance, model:[plateSetlist: plateSetList]
+	}
+	
+	@Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
+	def createPlate() {
+		if (!springSecurityService.isLoggedIn())
+		return
+
+		if(!springSecurityService.principal?.getAuthorities().any { it.authority == "ROLE_ADMIN" || it.authority == "ROLE_SUPER_ADMIN"}){
+			params.owner = springSecurityService.principal
+		}
+		respond new PlateTemplate(params), model:[expId: params.expid, templateId: params.tmpid]
+	}
+	
+	@Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
+	def selectTemplate(ExperimentalPlateSet experimentalPlateSetInstance) {
+		if (!springSecurityService.isLoggedIn())
+		return
+
+		if(!springSecurityService.principal?.getAuthorities().any { it.authority == "ROLE_ADMIN" || it.authority == "ROLE_SUPER_ADMIN"}){
+			params.owner = springSecurityService.principal
+		}
+		respond experimentalPlateSetInstance
+	}
 
     def barcodes(ExperimentalPlateSet experimentalPlateSetInstance){
         if (!experimentalPlateSetInstance) {
@@ -72,19 +106,6 @@ class ExperimentalPlateSetController {
     def create() {
         respond new ExperimentalPlateSet(params)
     }
-	
-	def showactions(ExperimentalPlateSet experimentalPlateSetInstance) {
-		def plateSetList = PlateSet.findAllByExperiment(experimentalPlateSetInstance);
-		respond experimentalPlateSetInstance, model:[plateSetlist: plateSetList]
-	}
-	
-	def createPlate() {
-		respond new PlateTemplate(params), model:[expId: params.expid, templateId: params.tmpid]
-	}
-	
-	def selectTemplate(ExperimentalPlateSet experimentalPlateSetInstance) {
-		respond experimentalPlateSetInstance
-	}
 
     def save(String name, String description) {
 
