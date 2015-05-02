@@ -1,6 +1,7 @@
 var experiment;
 var grid;
 var plateTable;
+var plateTableTools;
 
 
 function createBlankData(width, height) {
@@ -20,6 +21,11 @@ function createBlankData(width, height) {
  * in the cell.
  */
 function colorGrid(dataSet) {
+    // short-circuit if there's no data
+    if (dataSet.length === 0) {
+        return;
+    }
+
     // first get a color quantizer
     var flattened = dataSet.reduce(function(a, b) {
         return a.concat(b);
@@ -59,6 +65,7 @@ function experimentSelected(experimentId) {
                 return row;
             });
             plateTable.clear().rows.add(plateData).draw();
+            plateTableTools.fnSelect(plateTable.row(0).nodes());
         }
         else {
             loadGrid([]);
@@ -83,9 +90,14 @@ function init() {
         scrollY: '150px',
         searching: false,
         tableTools: {
+            aButtons: [],
             sRowSelect: 'single',
+            fnRowSelected: function (nodes) {
+                plateSelected(nodes[0].children[0].textContent);
+            },
         },
     });
+    plateTableTools = TableTools.fnGetInstance('plateTable');
 
     // set up grid
     createGrid();
