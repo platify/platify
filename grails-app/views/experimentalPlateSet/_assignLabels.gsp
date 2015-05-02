@@ -114,10 +114,6 @@
 					</div>
 				</div>				
 			</div>
-		    
-			<div id="editLabelDialog" title="New Label Name">
-				<input type="text" id="editNewLabelValue"/>
-			</div>
 		</div>
 	</div>
 
@@ -215,8 +211,64 @@
       		</div>
       </div>
       <div class="modal-footer">
+      	<button type="button" class="btn btn-default" onclick="saveConfigToServer()" data-dismiss="modal">Save</button>
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-default" onclick="saveConfigToServer()" data-dismiss="modal">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Label Modal -->
+<div class="modal fade" id="editLabelModal" tabindex="-1" role="dialog" aria-labelledby="modalHeaderLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="modalHeaderLabel">Edit Label</h4>
+      </div>
+      <div class="modal-body">
+      		<div class="container-fluid">
+      			<form class="form-horizontal">
+      				<div class="form-group">
+					    <label class="control-label col-sm-3" for="templateName">New Label Name:</label>
+					    <div class="col-sm-9">
+							<input type="text" class="form-control" id="editNewLabelValue"/>
+						</div>
+					</div>
+				</form>
+      		</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" onclick="editLabelName()">Save New Name</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Dose Modal -->
+<div class="modal fade" id="editDoseModal" tabindex="-1" role="dialog" aria-labelledby="modalHeaderLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="modalHeaderLabel">Edit Dosage</h4>
+      </div>
+      <div class="modal-body">
+      		<div class="container-fluid">
+      			<form class="form-horizontal">
+      				<div class="form-group">
+					    <label class="control-label col-sm-3" for="templateName">New Dosage:</label>
+					    <div class="col-sm-9">
+							<input type="text" class="form-control" id="editNewDoseValue"/>
+						</div>
+					</div>
+				</form>
+      		</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" onclick="editDoseValue()">Save New Dosage</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
       </div>
     </div>
   </div>

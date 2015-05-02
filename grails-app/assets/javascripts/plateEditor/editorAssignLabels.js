@@ -338,7 +338,7 @@ function createCatLabel(catKey) {
 	labDiv.appendChild(newCheckbox);
 	newLabel = document.createElement("label");
 	newLabel.setAttribute("for", "vischeck__sep__" + catKey);
-	// if category has been converted from a decimal, then convert it back for display!!
+	// if category has been converted from a decimal, then convert it back for display
 	convCat = catKey.toString().split('__dot__').join('.');
 	newLabel.appendChild(document.createTextNode(convCat));
 	labDiv.appendChild(newLabel);
@@ -368,7 +368,7 @@ function onCatColorChange(event) {
 function onCatVisCheck(event) {
 	"use strict";
 	var idArr, cat;
-	idArr = event.currentTarget.id.split("__sep__");		// investigate use of "event.currentTarget"
+	idArr = event.currentTarget.id.split("__sep__");
 	cat = idArr[1];
 	catLegend[cat].visible = event.currentTarget.checked;
 	updateCatVisibility(cat);
@@ -378,13 +378,32 @@ function onCatVisCheck(event) {
  * Event handler for label edit button.
  * Opens edit dialog box for category/label in question.
  */
-function onEditLabelChange(event) {	// some issues here !! (when editing 1st label in cat, it actually changes 2nd !!)
+function onEditLabelChange(event) {					// TODO - some issues here !! (when editing 1st label in cat, it actually changes 2nd !!)
 	"use strict";
-	var idArr = event.currentTarget.id.split("__sep__");		// investigate use of "event.currentTarget"
+	var idArr = event.currentTarget.id.split("__sep__");
 	tmpEditCat = idArr[1];
 	tmpEditOldLabel = idArr[2];
 	console.log("editLabel: " + tmpEditCat + ";" + tmpEditOldLabel);
-	$("#editLabelDialog").dialog("open");
+	// disaply current label, with special chars converted for display
+	document.getElementById("editNewLabelValue").value = tmpEditOldLabel.toString().split('__dot__').join('.');
+	
+	$('#editLabelModal').modal('show');
+}
+
+/**
+ * Event handler for label edit button.
+ * Opens edit dialog box for category/label in question.
+ */
+function onEditDoseChange(event) {					// TODO - need to add units ???
+	"use strict";
+	var idArr = event.currentTarget.id.split("__sep__");
+	tmpEditCat = idArr[1];
+	tmpEditOldLabel = idArr[2];
+	console.log("editDose: " + tmpEditCat + ";" + tmpEditOldLabel);
+	// disaply current label, with special chars converted for display
+	document.getElementById("editNewDoseValue").value = tmpEditOldLabel.toString().split('__dot__').join('.');
+	
+	$('#editDoseModal').modal('show');
 }
 
 /**
@@ -414,7 +433,7 @@ function updateCategoryList() {
 		newDiv.appendChild(createCatLabel(catKey));
 		for (labelKey in catLegend[catKey].labels) {
 			newLi = document.createElement("div");
-			// if label has been converted from a decimal, then convert it back for display!!
+			// if label has been converted from a decimal, then convert it back for display
 			convLab = labelKey.toString().split('__dot__').join('.');
 			newLi.appendChild(document.createTextNode(convLab));
 
@@ -425,13 +444,17 @@ function updateCategoryList() {
 	}
 	document.getElementById("categoryList").innerHTML = newDiv.innerHTML;
 
-	// apply events with a redundant nested loop. only seems to work when part of dom. fix!!(remove loop)
+	// apply events after they are part of dom.
 	for (catKey in catLegend) {
 		$("#vischeck__sep__" + catKey).attr('checked', 'checked');
 		$("#vischeck__sep__" + catKey).change(onCatVisCheck);
 		for (labelKey in catLegend[catKey].labels) {
 			$("#color__sep__" + catKey + "__sep__" + labelKey).change(onCatColorChange);
-			$("#edit__sep__" + catKey + "__sep__" + labelKey).click(onEditLabelChange);
+			if (catKey === "dosage") {
+				$("#edit__sep__" + catKey + "__sep__" + labelKey).click(onEditDoseChange);
+			} else {
+				$("#edit__sep__" + catKey + "__sep__" + labelKey).click(onEditLabelChange);
+			}		
 			$("#delete__sep__" + catKey + "__sep__" + labelKey).click(onDeleteLabelChange);
 		}
 	}
@@ -540,6 +563,52 @@ function updateLabelName(cat, oldLabel, label) {
 		// throw exception or something !!!
 		// ERROR!!
 		console.log("stop it !");
+	}
+}
+
+/**
+ * Validates a rename of a label. If valid it updates the label.
+ */
+function editLabelName() {
+	var newLabel = document.getElementById("editNewLabelValue").value;
+	
+	// validation new label name
+	if (newLabel === undefined || newLabel === "") {			// TODO - deal with case of renaming to existing label !!!
+       alert('Label cannot be blank');
+    } else if (isReservedValue(newLabel)) {
+       alert('New Label contains reserved value: ' + newLabel);
+    } else {
+		// remove spaces from the names (replacing with '_')
+		newLabel = newLabel.toString().split(' ').join('_');
+
+		// remove decimal point from the names (replacing with '_|_')
+		newLabel = newLabel.toString().split('.').join('__dot__');
+		updateLabelName(tmpEditCat, tmpEditOldLabel, newLabel);
+		tmpEditCat = "";
+		tmpEditOldLabel = "";
+		$('#editLabelModal').modal('hide');
+	}
+}
+
+/**
+ * Validates a rename of a dosage. If valid it updates the dosage.
+ */
+function editDoseValue() {
+	var newDosage = document.getElementById("editNewDoseValue").value;		// TODO - need to add units
+	
+	// validation new doage
+    if (!isNumeric(newDosage) || newDosage < 0) {						// TODO - deal with case of renaming to existing dosage !!!
+       alert('Dosage must be a positive number: '+ newDosage);
+    } else {
+		// remove spaces from the names (replacing with '_')
+		newDosage = newDosage.toString().split(' ').join('_');
+
+		// remove decimal point from the names (replacing with '_|_')
+		newDosage = newDosage.toString().split('.').join('__dot__');
+		updateLabelName(tmpEditCat, tmpEditOldLabel, newDosage);
+		tmpEditCat = "";
+		tmpEditOldLabel = "";
+		$('#editDoseModal').modal('hide');
 	}
 }
 
@@ -1262,30 +1331,6 @@ $(function() {
 	$('[data-toggle="popover').popover({
 		trigger: 'hover',
 		'placement': 'top'
-	});
-
-	$("#editLabelDialog").dialog({
-		autoOpen: false,
-		resizable: false,
-		height: 140,
-		modal: true,
-		buttons: {
-			"Save New Name": function() {
-				updateLabelName(tmpEditCat, tmpEditOldLabel, document.getElementById("editNewLabelValue").value);
-				//delete tmpEditCat;
-				//delete tmpEditOldLabel;		// reconsider this delete !!! -> can only delete properties not vars ?
-				tmpEditCat = "";
-				tmpEditOldLabel = "";		// perhaps null instead ??
-				$(this).dialog("close");
-			},
-			Cancel: function() {
-				//delete tmpEditCat;
-				//delete tmpEditOldLabel;
-				tmpEditCat = "";
-				tmpEditOldLabel = "";
-				$(this).dialog("close");
-			}
-		}
 	});
 
 	$('#importCompoundsModal').on('hidden.bs.modal', function (e) {
