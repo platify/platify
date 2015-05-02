@@ -69,13 +69,28 @@ function Grid(containerID){
 			var colnum = Math.sqrt(colorArray.length - 1);
 			colnum = Math.floor(colnum);
 			var rownum = Math.ceil((colorArray.length - 1) / colnum);
-			
 			var cellStr = "<div style='width:100%;height:100%'>";
-			cellStr += "<div style='float:left; width:28%; height:100%'>" + colorArray[0] + "</div>";
+			var colorIdx = 1;
+			var celColor = "black";
+			
+			if (colorArray.length > 1) {
+				// if 2nd value passed is a color, then not a control well
+				if( /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(colorArray[1])) {
+					colorIdx = 1;
+				} else {
+					colorIdx = 2;
+					if("positive" === colorArray[1]) {
+						celColor = "green";
+					} else if ("negative" === colorArray[1]) {
+						celColor = "red";
+					}
+				}
+			}
+			
+			cellStr += "<div style='float:left; width:28%; height:100%;color:" + celColor + ";'>" + colorArray[0] + "</div>";
 			cellStr += "<div style='float:right; width:72%; height:100%'>";
 			cellStr += "<table style='width:100%;height:100%'>";
 			var i, j = 0;
-			var colorIdx = 1;
 			for (i = 0; i < colnum; i++) {
 				cellStr += "<tr>";
 				for (j = 0; (j < rownum) && (colorIdx < colorArray.length); j++) {

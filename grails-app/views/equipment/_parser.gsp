@@ -15,7 +15,7 @@
                     </ul>
                     <div id="parsingTab">
                     	<div>
-                    		<h4>
+                    		<h5>
                     			<table class="table"  >
 								  <tr >
 								    <th style="padding-bottom:7px;width:50%;" colspan="2">
@@ -43,7 +43,7 @@
 								    <td  colspan="3"><textarea rows="2" cols="100" id="parsingDescription" ></textarea> </td>
 								  </tr>
 								</table>
-                    		</h4>
+                    		</h5>
                     	</div>
                     </div>
                     <div id="plateTab">
@@ -63,14 +63,14 @@
                     </div>
                     <div id="featuresTab">
                         <div>
-                        	<h4>
+                        	<h5>
                         		<table class="table" >
 								  <tr >
 								    <th colspan="8">
-								    	<button class="btn btn-info btn-sm" id="newFeature">New feature</button>
-			                            <button class="btn btn-info btn-sm" id="saveFeature">Add feature</button>
-			                            <button class="btn btn-info btn-sm" id="deleteFeature">Delete feature</button>
-			                            <button class="btn btn-info btn-sm" id="applyFeatures">Apply</button>
+								    	<button class="btn btn-info btn-xs" id="newFeature">New feature</button>
+			                            <button class="btn btn-info btn-xs" id="saveFeature">Add feature</button>
+			                            <button class="btn btn-info btn-xs" id="deleteFeature">Delete feature</button>
+			                            <button class="btn btn-info btn-xs" id="applyFeatures">Apply</button>
 								    </th>
 								  </tr>
 								  <tr >
@@ -88,7 +88,7 @@
 								    <td><select name="labelList" id="labelList" size="5"><option>---labels---</option></select></td>
 								  </tr>
 								</table>	  
-                        	</h4>
+                        	</h5>
                         </div>
                     </div>
                     
@@ -99,9 +99,9 @@
 								  <tr >
 								    <th colspan="8">
 								    	<%--<button id="returnToConfig">Go back to parsing configuration</button>--%>
-								    	<button class="btn btn-info btn-sm" id="sendImportDataToServer">Import and save the data</button>
-	                    				<button class="btn btn-info btn-sm" id="downloadFileImport">Download file import</button>
-                                        <button class="btn btn-info btn-sm" id="downloadIntergroupFile">Download inter-group data format</button>
+								    	<button class="btn btn-info btn-xs" id="sendImportDataToServer">Import and save the data</button>
+	                    				<button class="btn btn-info btn-xs" id="downloadFileImport">Download file import</button>
+                                        <button class="btn btn-info btn-xs" id="downloadIntergroupFile">Download inter-group data format</button>
 								    </th>
 								  </tr>
 								  <tr  >
@@ -142,7 +142,7 @@
 					                            in the field below and hitting the "set plate id" button.
 					                        </p>    
 					                        <select id="plateID" name="plateID"><option>--Plate ID--<option></select>
-					                        <button class="btn btn-info btn-sm" id="setPlateID">Set Plate Id</button>
+					                        <button class="btn btn-info btn-xs" id="setPlateID">Set Plate Id</button>
 					                    </div>									    
 								    </td>
 								    <td >&nbsp;</td>

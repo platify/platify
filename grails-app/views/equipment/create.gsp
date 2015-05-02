@@ -13,9 +13,7 @@
     <asset:stylesheet href="selectize.css"/>
 </head>
 <body class="container">
-	<div class="">
-		
-	</div>
+	<div class=""></div>
 
 	<div class="content-fluid">
 			<div class="row">

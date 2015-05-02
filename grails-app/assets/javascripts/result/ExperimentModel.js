@@ -1,9 +1,14 @@
-// HACK - this module assumes RESULT_READ_EXPERIMENT_URL is set globally
-// 	  when rendering the template for the page.
+// HACK - this module assumes several urls are set as globals by grails
+// 	      when rendering the template for the page.
 
 /**
  * Aggregates template, plate set, and result data from an experiment
- * for display and download.
+ * for display and download.  Most functions operate on the "current"
+ * plate by default, but will also accept a plateID as an argument.
+ * Notable exceptions are the load*DataForGrid() functions.
+ *
+ * TODO - remove concept of current plate, refactor to operate on
+ *        Plate objects instead.
  */
 function ExperimentModel(experimentId) {
     // experiment-wide data
@@ -13,7 +18,7 @@ function ExperimentModel(experimentId) {
     // updated every time we change plates
     this.controls = {'negative': null, 'positive': null};
     this.currentPlate = null;
-    this.currentPlateBarcode = null;
+    this.currentPlateID = null;
     this.data = null;
     this.normalizedData = null;
 
@@ -21,18 +26,29 @@ function ExperimentModel(experimentId) {
     /**
      * Retrieves the details for the experiment, template, plate set,
      * and results.
+     *
+     * TODO - move this back out of the model.  what was i thinking?
      */
     this.getData = function() {
         var that = this; // blegh, js binding hack
         var url = RESULT_KITCHEN_SINK_URL + '/' + this.experimentId;
-        return $.getJSON(url, function(result) {
+        var jqxhr = $.ajax({
+            url: url,
+            dataType: 'json',
+        });
+        jqxhr.done(function(data, textStatus, jqxhr) {
+            that.experiment = {plates: {}};
             that.plates = {};
+            if (data.error) {
+                console.log(data.error);
+            }
+
             try {
-                that.experiment = result.ImportData || {plates: {}};
+                that.experiment = data.ImportData || {plates: {}};
             }
             catch (e) {
                 console.log('getData got unexpected ajax response from url '
-                        + url + '\n' + result);
+                            + url + '\n' + data);
                 console.log(e);
                 return;
             }
@@ -47,6 +63,12 @@ function ExperimentModel(experimentId) {
                 }
             }
         });
+        jqxhr.fail(function(jqxhr, textStatus, errorThrown) {
+            that.experiment = {plates: {}};
+            that.plates = {};
+        });
+
+        return jqxhr;
     }
 
 
@@ -94,66 +116,104 @@ function ExperimentModel(experimentId) {
      * Walks the current plate, stores the coordinates of the negative
      * and positive control wells.
      */
-    this.locateControls = function() {
-        this.controls = {'negative': [], 'positive': []};
+    this.locateControls = function(plateID) {
+        var plate = this.plates[plateID || this.currentPlateID];
+        var controls = {'negative': [], 'positive': []};
 
-        for (var x=0; x<this.currentPlate.rows.length; x++) {
-            for (var y=0; y<this.currentPlate.rows[x].columns.length; y++) {
-                var controlType = this.currentPlate.rows[x].columns[y].control;
+        for (var x=0; x<plate.rows.length; x++) {
+            for (var y=0; y<plate.rows[x].columns.length; y++) {
+                var controlType = plate.rows[x].columns[y].control;
                 switch (controlType) {
                     case 'NEGATIVE':
                     case 'POSITIVE':
-                        this.controls[controlType.toLowerCase()].push([x, y]);
+                        controls[controlType.toLowerCase()].push([x, y]);
                         break;
                 }
             }
         }
+       
+        if (plateID === this.currentPlateID) {
+            this.controls = controls;
+        }
+        return controls;
     }
 
 
     /**
-     * Returns the mean of the negative control values
+     * Returns the mean of the negative control values.
      */
-    this.meanNegativeControl = function() {
-        var label = this.rawDataLabel();
+    this.meanNegativeControl = function(plateID) {
+        var label = this.rawDataLabel(plateID);
         if (!label) {
             return null;
         }
 
-        var plate = this.currentPlate;
-        return d3.mean(this.controls.negative.map(function(coords) {
+        var plate;
+        var controls;
+        if (plateID === this.currentPlateID) {
+            plate = this.currentPlate;
+            controls = this.controls;
+        }
+        else {
+            plate = this.plates[plateID];
+            controls = this.locateControls(plateID);
+        }
+
+        return d3.mean(controls.negative.map(function(coords) {
             return plate.rows[coords[0]].columns[coords[1]].rawData[label];
         }));
     }
 
 
     /**
-     * Returns the mean of the positive control values
+     * Returns the mean of the positive control values.
      */
-    this.meanPositiveControl = function() {
-        var label = this.rawDataLabel();
+    this.meanPositiveControl = function(plateID) {
+        var label = this.rawDataLabel(plateID);
         if (!label) {
             return null;
         }
 
-        var plate = this.currentPlate;
-        return d3.mean(this.controls.positive.map(function(coords) {
+        var plate;
+        var controls;
+        if (plateID === this.currentPlateID) {
+            plate = this.currentPlate;
+            controls = this.controls;
+        }
+        else {
+            plate = this.plates[plateID];
+            controls = this.locateControls(plateID);
+        }
+
+        return d3.mean(controls.positive.map(function(coords) {
             return plate.rows[coords[0]].columns[coords[1]].rawData[label];
         }));
     }
 
 
     /**
-     * Normalizes the data for the current plate, and saves it back to the 
+     * Normalizes the data for the given plate, and saves it back to the 
      * server.
      */
-    this.normalizeAndSave = function() {
-        var label = this.rawDataLabel();
-        var normalized = normalize(this.currentPlate, label,
-                                   this.controls.negative, this.controls.positive);
-        for (var x=0; x<this.currentPlate.rows.length; x++) {
-            for (var y=0; y<this.currentPlate.rows[0].columns.length; y++) {
-                this.currentPlate.rows[x].columns[y].normalizedData[label]
+    this.normalizeAndSave = function(plateID) {
+        var label = this.rawDataLabel(plateID);
+        var plate;
+        var controls;
+
+        if (plateID === this.currentPlateID) {
+            plate = this.currentPlate;
+            controls = this.controls;
+        }
+        else {
+            plate = this.plates[plateID];
+            controls = this.locateControls(plateID);
+        }
+
+        var normalized = normalize(plate, label,
+                                   controls.negative, controls.positive);
+        for (var x=0; x<plate.rows.length; x++) {
+            for (var y=0; y<plate.rows[0].columns.length; y++) {
+                plate.rows[x].columns[y].normalizedData[label]
                     = normalized[x][y].toString();
             }
         }
@@ -168,7 +228,7 @@ function ExperimentModel(experimentId) {
         });
         jqxhr.done(function() {
             console.log('POST of normalized data for plate '
-                        + this.currentPlateBarcode + ' complete');
+                        + plateID + ' complete');
         });
     }
 
@@ -179,9 +239,18 @@ function ExperimentModel(experimentId) {
      * Our backend supports more than one data value per well, but our
      * qa/qc and results display doesn't.
      */
-    this.rawDataLabel = function() {
-        if (this.currentPlate.rows[0].columns[0].rawData) {
-            return Object.keys(this.currentPlate.rows[0].columns[0].rawData).sort()[0];
+    this.rawDataLabel = function(plateID) {
+        var plate = this.plates[plateID || this.currentPlateID];
+        if (plate.rows[0].columns[0].rawData) {
+            try {
+                return Object.keys(plate.rows[0].columns[0].rawData).sort()[0];
+            }
+            catch (e) {
+                console.log('rawDataLabel couldn\'t find rawData for plate '
+                            + plateID);
+                console.log(e);
+                return null;
+            }
         }
         else {
             return null;
@@ -200,14 +269,15 @@ function ExperimentModel(experimentId) {
      */
     this.selectPlate = function(plateID) {
         if (this.plates) {
-            this.currentPlateBarcode = plateID;
             this.currentPlate = this.plates[plateID];
-            this.locateControls();
+            this.currentPlateID = plateID;
+            this.locateControls(plateID);
             this.loadDataForGrid();
             this.loadNormalizedDataForGrid();
         }
         else {
             this.currentPlate = null;
+            this.currentPlateID = null;
             this.data = [];
             this.normalizedData = [];
         }
@@ -217,9 +287,22 @@ function ExperimentModel(experimentId) {
     /**
      * Calculates the z-factor value for the current plate.
      */
-    this.zFactor = function() {
-        var rv = zFactor(this.currentPlate, this.rawDataLabel(),
-                         this.controls.negative, this.controls.positive);
+    this.zFactor = function(plateID) {
+        var label = this.rawDataLabel(plateID);
+        var plate;
+        var controls;
+
+        if (plateID === this.currentPlateID) {
+            plate = this.currentPlate;
+            controls = this.controls;
+        }
+        else {
+            plate = this.plates[plateID];
+            controls = this.locateControls(plateID);
+        }
+
+        var rv = zFactor(plate, label,
+                         controls.negative, controls.positive);
         return isNaN(rv) ? null : rv;
     }
 
@@ -227,9 +310,22 @@ function ExperimentModel(experimentId) {
     /**
      * Calculates the z'-factor value for the current plate.
      */
-    this.zPrimeFactor = function() {
-        var rv = zPrimeFactor(this.currentPlate, this.rawDataLabel(),
-                              this.controls.negative, this.controls.positive);
+    this.zPrimeFactor = function(plateID) {
+        var label = this.rawDataLabel(plateID);
+        var plate;
+        var controls;
+
+        if (plateID === this.currentPlateID) {
+            plate = this.currentPlate;
+            controls = this.controls;
+        }
+        else {
+            plate = this.plates[plateID];
+            controls = this.locateControls(plateID);
+        }
+
+        var rv = zPrimeFactor(plate, label,
+                         controls.negative, controls.positive);
         return isNaN(rv) ? null : rv;
     }
 }

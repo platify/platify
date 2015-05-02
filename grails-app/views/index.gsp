@@ -8,7 +8,7 @@
 		<div class="content-fluid">
 			<div class="row">
 				<div class="col-sm-12 content-body">
-					<h3 style="margin-left:15px">Home (Assay Management System Title)</h3>
+					<h3 style="margin-left:15px">Surnote Asset Management System</h3>
 					<ol class="breadcrumb">
 						<li><a class="home" href="#">Home</a></li>
 					</ol>

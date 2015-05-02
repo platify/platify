@@ -27,7 +27,7 @@ function createBlankData() {
 	for (i = 0; i < GRID_HEIGHT; i++) {
 		result[i] = [];
 		for (j = 0; j < GRID_WIDTH; j++) {
-			result[i][j] = null;
+			result[i][j] = "";
 		}
 	}
 	return result;
@@ -182,48 +182,57 @@ function addTemplateValue() {
 	selCells = highlightedCoords;
 	// console.log(selCells);
 	cellValue = document.getElementById("newLabelValue").value;
-	wellType = $("input[name=wellType]:checked").val();
+	
+	// validate input
+	if( /[^a-zA-Z0-9]/.test(cellValue)) {
+       alert('Input is not alphanumeric');
+    } else {
+		wellType = $("input[name=wellType]:checked").val();
 
-	// just keeping list of well values
-	if (wellGroupings.indexOf(cellValue) === -1) {
-		wellGroupings.push(cellValue);
-	}
-
-	// update selected grid cells with label
-	for (cell in selCells) {
-		if (selCells.hasOwnProperty(cell)) {
-			row = selCells[cell][0];
-			column = selCells[cell][1];
-
-			if (plateModel.rows === undefined) {
-				plateModel.rows = {};
-			}
-
-			if (plateModel.rows[row] === undefined) {
-				plateModel.rows[row] = {};
-			}
-
-			if (plateModel.rows[row].columns === undefined) {
-				plateModel.rows[row].columns = {};
-			}
-
-			if (plateModel.rows[row].columns[column] === undefined) {
-				plateModel.rows[row].columns[column] = {};
-			}
-			plateModel.rows[row].columns[column].wellGroupName = cellValue;
-			plateModel.rows[row].columns[column].wellType = wellType;
-
-			grid.updateCellContents(row, column, cellValue);
+		// just keeping list of well values
+		if (wellGroupings.indexOf(cellValue) === -1) {
+			wellGroupings.push(cellValue);
 		}
+
+		// update selected grid cells with label
+		for (cell in selCells) {
+			if (selCells.hasOwnProperty(cell)) {
+				row = selCells[cell][0];
+				column = selCells[cell][1];
+
+				if (plateModel.rows === undefined) {
+					plateModel.rows = {};
+				}
+
+				if (plateModel.rows[row] === undefined) {
+					plateModel.rows[row] = {};
+				}
+
+				if (plateModel.rows[row].columns === undefined) {
+					plateModel.rows[row].columns = {};
+				}
+
+				if (plateModel.rows[row].columns[column] === undefined) {
+					plateModel.rows[row].columns[column] = {};
+				}
+				plateModel.rows[row].columns[column].wellGroupName = cellValue;
+				plateModel.rows[row].columns[column].wellType = wellType;
+
+				// add control to well
+				var wellStr = cellValue + "," + wellType;
+				
+				grid.updateCellContents(row, column, wellStr);
+			}
+		}
+
+		console.log("plateModel1:" + JSON.stringify(plateModel));		// TODO Remove console log
+
+		wgs = document.getElementById("wellGroupSpan");		// TODO WHAT IS THIS USED FOR ???
+		wgs.innerHTML = wellGroupings;
+
+		// clear current selection
+		removeAllHighlightedCells();
 	}
-
-	console.log("plateModel1:" + JSON.stringify(plateModel));		// TODO Remove console log
-
-	wgs = document.getElementById("wellGroupSpan");		// TODO WHAT IS THIS USED FOR ???
-	wgs.innerHTML = wellGroupings;
-
-	// clear current selection
-	removeAllHighlightedCells();
 }
 
 

@@ -25,39 +25,94 @@
 				</span>
             </div>
 		</div>
-		<div class="panel-body">
+		<div class="panel-body" style="padding:7px">
             <div class="toggler">
 	            <div id="addLabelPanel">
-		            <label>Category:</label> <input type="text" id="newCatValue"/>
-					<label>Label:</label><input type="text" id="newLabelValue"/>
-					<label>Color:</label><input type="color" class="btn-default glyphicon color-p" id="newColorValue" value="#FFFF00" styl/>
-					<button id="addNewLabel" class="btn btn-default btn-xs glyphicon glyphicon-plus"></button>
+	            	<div class="row">
+			            <label for="newCatValue" class="col-xs-1 control-label">Category:</label>
+			            <div class="col-xs-3">
+			            	<input type="text" id="newCatValue" class="input-sm form-control"/>
+			            </div>
+						<label for="newLabelValue" class="col-xs-1 control-label">Label:</label>
+						<div class="col-xs-3">
+							<input type="text" id="newLabelValue" class="input-sm form-control"/>
+						</div>
+						<label for="newColorValue" class="col-xs-1 control-label">Color:</label>
+						<div class="col-xs-3">
+							<div class="input-group">
+								<input type="color" class="btn-default glyphicon color-p" id="newColorValue" value="#FFFF00"/>
+								<button id="addNewLabel" class="btn btn-default btn-xs glyphicon glyphicon-plus"></button>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 			<div class="toggler">
 				<div id="addDosePanel">
-					<label>Dosage:</label><input type="text" id="newDoseValue"/>
-					<label>Units:</label><input type="text" id="newDoseUnits"/>
-					<label>Color:</label><input type="color" class="btn-default glyphicon color-p" id="newDoseColorValue" value="#FFFF00"/>
-					<button id="addNewDose" class="btn btn-default btn-xs glyphicon glyphicon-plus"></button>
+					<div class="row">
+			            <label for="newDoseValue" class="col-xs-1 control-label">Dosage:</label>
+			            <div class="col-xs-3">
+			            	<input type="text" id="newDoseValue" class="input-sm form-control"/>
+			            </div>
+						<label for="newDoseUnits" class="col-xs-1 control-label">Units:</label>
+						<div class="col-xs-3">
+							<input type="text" id="newDoseUnits" class="input-sm form-control"/>
+						</div>
+						<label for="newDoseColorValue" class="col-xs-1 control-label">Color:</label>
+						<div class="col-xs-3">
+							<div class="input-group">
+								<input type="color" class="btn-default glyphicon color-p" id="newDoseColorValue" value="#FFFF00"/>
+								<button id="addNewDose" class="btn btn-default btn-xs glyphicon glyphicon-plus"></button>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 			<div class="toggler">
 				<div id="addDoseStepPanel">
-					<label>Top Dose:</label><input type="text" id="topDoseValue"/>
-					<label>Units:</label><input type="text" id="doseStepUnits"/>
-					<label>Step Dilution:</label><input type="text" id="stepDilutionValue"/>
-					<label># of Replicates:</label><input type="text" id="replicatesValue" value="1"/>
-					<label>Top Dose Color:</label><input type="color" class="btn-default glyphicon color-p" id="tDoseColorValue" value="#FFFF00"/>
-					<button id="addDoseStep" class="btn btn-default btn-xs glyphicon glyphicon-plus"></button>
+					<div class="row">
+			            <label for="topDoseValue" class="col-xs-1 control-label" style="padding-right:0px; text-align: right">Top Dose:</label>
+			            <div class="col-xs-1" style="padding:0px">
+			            	<input type="text" id="topDoseValue" class="input-sm form-control"/>
+			            </div>
+						<label for="doseStepUnits" class="col-xs-1 control-label" style="padding:0px; text-align: right">Units:</label>
+						<div class="col-xs-2" style="padding:0px">
+							<input type="text" id="doseStepUnits" class="input-sm form-control"/>
+						</div>
+						<label for="stepDilutionValue" class="col-xs-1 control-label" style="padding:0px; text-align: right">Step Dilution:</label>
+						<div class="col-xs-1" style="padding:0px">
+							<input type="text" id="stepDilutionValue" class="input-sm form-control"/>
+						</div>
+						<label for="replicatesValue" class="col-xs-1 control-label" style="padding:0px; text-align: right">Replicates:</label>
+						<div class="col-xs-1" style="padding:0px">
+							<input type="text" id="replicatesValue" class="input-sm form-control" value="0"/>		<!-- Add spinner ?? -->
+						</div>
+						<label for="tDoseColorValue" class="col-xs-1 control-label" style="padding:0px; text-align: right">Top Dose Color:</label>
+						<div class="col-xs-2" style="padding:0px">
+							<div class="input-group" style="padding:0px">
+								<input type="color" class="btn-default glyphicon color-p" id="tDoseColorValue" value="#FFFF00"/>
+								<button id="addDoseStep" class="btn btn-default btn-xs glyphicon glyphicon-plus"></button>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 			<div class="toggler">
 				<div id="addPlateLabelPanel">
-					<label>Category:</label> <input type="text" id="newPlateCatValue"/>
-					<label>Label:</label><input type="text" id="newPlateLabelValue"/>
-					<button id="addNewPlateLabel" class="btn btn-default btn-xs glyphicon glyphicon-plus"></button>
-				</div>
+	            	<div class="row">
+			            <label for="newPlateCatValue" class="col-xs-1 control-label">Category:</label>
+			            <div class="col-xs-4">
+			            	<input type="text" id="newPlateCatValue" class="input-sm form-control"/>
+			            </div>
+						<label for="newPlateLabelValue" class="col-xs-1 control-label">Label:</label>
+						<div class="col-xs-4">
+							<input type="text" id="newPlateLabelValue" class="input-sm form-control"/>
+						</div>
+						<div class="col-xs-1">
+							<button id="addNewPlateLabel" class="btn btn-default btn-xs glyphicon glyphicon-plus"></button>
+						</div>
+					</div>
+				</div>				
 			</div>
 		    
 			<div id="editLabelDialog" title="New Label Name">

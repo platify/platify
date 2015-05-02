@@ -22,14 +22,22 @@ class PlateTemplateController {
         params.max = Math.min(max ?: 10, 100)
         respond PlateTemplate.list(params), model:[plateTemplateInstanceCount: PlateTemplate.count()]
     }
+	
+	@Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
+	def create() {
+		if (!springSecurityService.isLoggedIn())
+		return
+
+		if(!springSecurityService.principal?.getAuthorities().any { it.authority == "ROLE_ADMIN" || it.authority == "ROLE_SUPER_ADMIN"}){
+			params.owner = springSecurityService.principal
+		}
+		
+		respond new PlateTemplate(params), model:[expId: params.expid, templateName: params.name,
+			gridWidth: params.width, gridHeight: params.height]
+	}
 
     def show(PlateTemplate plateTemplateInstance) {
         respond plateTemplateInstance
-    }
-
-	def create() {
-        respond new PlateTemplate(params), model:[expId: params.expid, templateName: params.name, 
-			gridWidth: params.width, gridHeight: params.height]
     }
 
     def getPlate(PlateTemplate plateTemplateInstance){

@@ -173,6 +173,8 @@ function updateCellColors(cat, label, color) {
 
 			// update actual grid cell
 			newContents = plateModel.rows[row].columns[column].wellGroupName;
+			newContents += "," + plateModel.rows[row].columns[column].wellType;
+			
 			for (catKey in plateModel.rows[row].columns[column].categories) {
 				for (labKey in plateModel.rows[row].columns[column].categories[catKey]) {
 					newContents += "," + plateModel.rows[row].columns[column].categories[catKey][labKey].color;
@@ -203,6 +205,8 @@ function updateCatVisibility(cat) {
 
 				// update actual grid cell
 				newContents = plateModel.rows[row].columns[column].wellGroupName;
+				newContents += "," + plateModel.rows[row].columns[column].wellType;
+				
 				for (catKey in plateModel.rows[row].columns[column].categories) {
 					if (catLegend[catKey].visible === true) {
 						for (labKey in plateModel.rows[row].columns[column].categories[catKey]) {
@@ -223,7 +227,7 @@ function updateCatVisibility(cat) {
 function createCompoundInput(wellGroup) {
 	"use strict";
 	var newInput = document.createElement("input");
-	newInput.id = "wellGroup_-_" + wellGroup;
+	newInput.id = "wellGroup__sep__" + wellGroup;
 	newInput.type = "text";
 	return newInput;
 }
@@ -239,19 +243,19 @@ function createColorPicker(cat, label) {
 	var cpDiv, newInput, editLabelBtn, deleteLabelBtn;
 	cpDiv = document.createElement("span");
 	newInput = document.createElement("input");
-	newInput.id = "color_-_" + cat + "_-_" + label;
+	newInput.id = "color__sep__" + cat + "__sep__" + label;
 	newInput.type = "color";
 	newInput.className = "btn-default glyphicon color-p";
 	newInput.defaultValue = catLegend[cat].labels[label].color;
 	newInput.value = catLegend[cat].labels[label].color;
 
 	editLabelBtn = document.createElement("button");
-	editLabelBtn.id = "edit_-_" + cat + "_-_" + label;
+	editLabelBtn.id = "edit__sep__" + cat + "__sep__" + label;
 	editLabelBtn.type = "button";
 	editLabelBtn.className = "btn btn-default btn-xs glyphicon glyphicon-pencil";
 
 	deleteLabelBtn = document.createElement("button");
-	deleteLabelBtn.id = "delete_-_" + cat + "_-_" + label;
+	deleteLabelBtn.id = "delete__sep__" + cat + "__sep__" + label;
 	deleteLabelBtn.type = "button";
 	deleteLabelBtn.value = "Delete Label";
 	deleteLabelBtn.className = "btn btn-default btn-xs glyphicon glyphicon-trash";
@@ -290,7 +294,7 @@ function updateCompoundList() {
 	for (wellGroup in groupNames) {			// USED a second time ?? // does this need to be re-inited ?? ( it's prob ok?)
 		if (wellGroup !== null) {
 			if (groupNames[wellGroup] !== undefined && groupNames[wellGroup] !== null) {
-				document.getElementById("wellGroup_-_" + wellGroup).value = groupNames[wellGroup];
+				document.getElementById("wellGroup__sep__" + wellGroup).value = groupNames[wellGroup];
 			}
 		}
 	}
@@ -330,10 +334,10 @@ function createCatLabel(catKey) {
 	newCheckbox = document.createElement("input");
 	newCheckbox.type = "checkbox";
 	newCheckbox.checked = true;
-	newCheckbox.id = "vischeck_-_" + catKey;
+	newCheckbox.id = "vischeck__sep__" + catKey;
 	labDiv.appendChild(newCheckbox);
 	newLabel = document.createElement("label");
-	newLabel.setAttribute("for", "vischeck_-_" + catKey);
+	newLabel.setAttribute("for", "vischeck__sep__" + catKey);
 	// if category has been converted from a decimal, then convert it back for display!!
 	convCat = catKey.toString().split('__dot__').join('.');
 	newLabel.appendChild(document.createTextNode(convCat));
@@ -350,7 +354,7 @@ function createCatLabel(catKey) {
 function onCatColorChange(event) {
 	"use strict";
 	var idArr, cat, label;
-	idArr = event.currentTarget.id.split("_-_");
+	idArr = event.currentTarget.id.split("__sep__");
 	cat = idArr[1];
 	label = idArr[2];
 	updateCellColors(cat, label, event.currentTarget.value);
@@ -364,7 +368,7 @@ function onCatColorChange(event) {
 function onCatVisCheck(event) {
 	"use strict";
 	var idArr, cat;
-	idArr = event.currentTarget.id.split("_-_");		// investigate use of "event.currentTarget"
+	idArr = event.currentTarget.id.split("__sep__");		// investigate use of "event.currentTarget"
 	cat = idArr[1];
 	catLegend[cat].visible = event.currentTarget.checked;
 	updateCatVisibility(cat);
@@ -376,7 +380,7 @@ function onCatVisCheck(event) {
  */
 function onEditLabelChange(event) {	// some issues here !! (when editing 1st label in cat, it actually changes 2nd !!)
 	"use strict";
-	var idArr = event.currentTarget.id.split("_-_");		// investigate use of "event.currentTarget"
+	var idArr = event.currentTarget.id.split("__sep__");		// investigate use of "event.currentTarget"
 	tmpEditCat = idArr[1];
 	tmpEditOldLabel = idArr[2];
 	console.log("editLabel: " + tmpEditCat + ";" + tmpEditOldLabel);
@@ -391,7 +395,7 @@ function onEditLabelChange(event) {	// some issues here !! (when editing 1st lab
 function onDeleteLabelChange(event) {
 	"use strict";
 	var idArr, cat, label;
-	idArr = event.currentTarget.id.split("_-_");
+	idArr = event.currentTarget.id.split("__sep__");
 	cat = idArr[1];
 	label = idArr[2];
 	console.log("deleteLabel: " + cat + ";" + label);
@@ -423,12 +427,12 @@ function updateCategoryList() {
 
 	// apply events with a redundant nested loop. only seems to work when part of dom. fix!!(remove loop)
 	for (catKey in catLegend) {
-		$("#vischeck_-_" + catKey).attr('checked', 'checked');
-		$("#vischeck_-_" + catKey).change(onCatVisCheck);
+		$("#vischeck__sep__" + catKey).attr('checked', 'checked');
+		$("#vischeck__sep__" + catKey).change(onCatVisCheck);
 		for (labelKey in catLegend[catKey].labels) {
-			$("#color_-_" + catKey + "_-_" + labelKey).change(onCatColorChange);
-			$("#edit_-_" + catKey + "_-_" + labelKey).click(onEditLabelChange);
-			$("#delete_-_" + catKey + "_-_" + labelKey).click(onDeleteLabelChange);
+			$("#color__sep__" + catKey + "__sep__" + labelKey).change(onCatColorChange);
+			$("#edit__sep__" + catKey + "__sep__" + labelKey).click(onEditLabelChange);
+			$("#delete__sep__" + catKey + "__sep__" + labelKey).click(onDeleteLabelChange);
 		}
 	}
 }
@@ -480,6 +484,8 @@ function removeLabel(cat, label) {
 
 		// update actual grid cell
 		newContents = plateModel.rows[row].columns[column].wellGroupName;
+		newContents += "," + plateModel.rows[row].columns[column].wellType;
+		
 		for (catKey in plateModel.rows[row].columns[column].categories) {
 			for (labKey in plateModel.rows[row].columns[column].categories[catKey]) {
 				newContents += "," + plateModel.rows[row].columns[column].categories[catKey][labKey].color;
@@ -647,6 +653,7 @@ function createNewLabel(cat, label, units, color, applyToCells) {
 		plateModel.rows[row].columns[column].categories[cat][label].color = color;
 		plateModel.rows[row].columns[column].categories[cat][label].units = units;
 		newContents = plateModel.rows[row].columns[column].wellGroupName;
+		newContents += "," + plateModel.rows[row].columns[column].wellType;
 
 		for (catKey in plateModel.rows[row].columns[column].categories) {
 			for (labKey in plateModel.rows[row].columns[column].categories[catKey]) {
@@ -670,6 +677,101 @@ function createNewLabel(cat, label, units, color, applyToCells) {
 	}
 }
 
+
+/**
+ * Checks if the string matches an reserved value
+ */
+function isReservedValue(testStr) {
+	if (testStr === "compound" || testStr === "dosage" || testStr.indexOf("__dot__") > -1  || testStr.indexOf("__sep__") > -1) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+/**
+ * Checks if the string is numeric
+ */
+function isNumeric(testStr) {
+    return !jQuery.isArray(testStr) && (testStr - parseFloat(testStr) + 1) >= 0;
+}
+
+/**
+ * Checks if the string is an integer
+ */
+function isInteger(testStr) {
+    if (isNaN(testStr)) {
+		return false;
+	}
+	var x = parseFloat(testStr);
+	return (x | 0) === x;
+}
+
+/**
+ * Adds a new label by calling createNewLabel. The values for
+ * the new label are taken from the inputs on the new label panel.
+ */
+function addNewLabel() {
+	"use strict";
+	var selCells, cat, label, color;
+	selCells = highlightedCoords;
+	console.log(selCells);
+	cat = document.getElementById("newCatValue").value;
+	label = document.getElementById("newLabelValue").value;
+	color = document.getElementById("newColorValue").value;
+	
+	// validate input
+	if(isReservedValue(cat)) {
+       alert('Category contains reserved value: '+ cat);
+    } else if (isReservedValue(label)) {
+       alert('Label contains reserved value: '+ label);
+    } else {
+		createNewLabel(cat, label, "", color, selCells);
+		updateCategoryList();
+		// output current object model to console
+		console.log("plateModel:" + JSON.stringify(plateModel));
+		console.log("catLegend:" + JSON.stringify(catLegend));
+
+		//var jsonPlate = translateModelToOutputJson(plateModel);
+		//console.log("jsonPlate:" + JSON.stringify(jsonPlate));
+		removeAllHighlightedCells();
+	}
+}
+
+/**
+ * Adds a new dosage. The values for the new dose is taken
+ * from the inputs on the dose label panel. 'Dosage' is a 
+ * reserved category name and is automatically applied here.
+ */
+function addNewDose() {
+	"use strict";
+	var selCells, cat, label, units, color;
+	selCells = highlightedCoords;
+	console.log(selCells);
+	cat = "dosage";
+	label = document.getElementById("newDoseValue").value;
+	units = document.getElementById("newDoseUnits").value;
+	color = document.getElementById("newDoseColorValue").value;
+	
+	// validate input
+	if (!isNumeric(label) || label < 0) {
+       alert('Dosage must be a positive number: '+ label);
+    } else if (isReservedValue(units)) {
+       alert('Units contains reserved value: '+ units);
+    } else {
+		createNewLabel(cat, label, units, color, selCells);
+		updateCategoryList();
+
+		// output current object model to console
+		console.log("plateModel:" + JSON.stringify(plateModel));
+		console.log("catLegend:" + JSON.stringify(catLegend));
+
+		//var jsonPlate = translateModelToOutputJson(plateModel);
+		//console.log("jsonPlate:" + JSON.stringify(jsonPlate));
+		removeAllHighlightedCells();
+	}
+}
+
 /**
  * Adds a new dose gradient to the wells currently selected in the grid.
  * Value starts at the top dose specified, and each well after has its
@@ -690,50 +792,38 @@ function addDoseStep() {
 	dilution = document.getElementById("stepDilutionValue").value;
 	replicates = document.getElementById("replicatesValue").value;
 	topColor = document.getElementById("tDoseColorValue").value;
-
 	wellGroupLength = selCells.length;
-	doseStepLength = wellGroupLength / replicates;		// need some validation !!
-	currentDose = topDose;
-	currentColor = topColor;
+	
+	// validate input
+	if (!isNumeric(topDose) || topDose < 0) {
+		alert('Top Dose must be a positive number: '+ topDose);
+	} else if (isReservedValue(units)) {
+       alert('Units contains reserved value: '+ units);
+    } else if (!isNumeric(dilution) || dilution < 0) {
+		alert('Dilution Factor must be a positive number: '+ dilution);
+	} else if (!isInteger(replicates) || replicates < 0) {
+		alert('# of Replicates must be a positive integer: '+ replicates);
+	} else if (wellGroupLength <= replicates) {
+		alert('# of Replicates cannot be <= # of wells selected. Wells Selected: '+ wellGroupLength + '; Replicates: '+ replicates);
+	} else {
+		replicates++;
+		//doseStepLength = wellGroupLength / replicates;
+		currentDose = topDose;
+		currentColor = topColor;
 
-	for (i = 0; i < wellGroupLength; i++) {
-		for (j = 0; j < replicates; j++) {
-			console.log("i+j:" + (i + j));
-			createNewLabel(cat, currentDose, units, currentColor, [selCells[i + j]]);
+		for (i = 0; i < wellGroupLength; i++) {
+			for (j = 0; j < replicates && ((i + j) < wellGroupLength); j++) {
+				console.log("i+j:" + (i + j));
+				createNewLabel(cat, currentDose, units, currentColor, [selCells[i + j]]);
+			}
+			i += (replicates - 1);
+			currentColor = shade(currentColor, 0.2); // should we use 1/dilution instead ?? (might be too dramatic a difference !!
+			currentDose = currentDose / dilution;
 		}
-		i += (replicates - 1);
-		currentColor = shade(currentColor, 0.2); // should we use 1/dilution instead ?? (might be too dramatic a difference !!
-		currentDose = currentDose / dilution;
+
+		updateCategoryList();
+		removeAllHighlightedCells();
 	}
-
-	updateCategoryList();
-	removeAllHighlightedCells();
-}
-
-
-/**
- * Adds a new label by calling createNewLabel. The values for
- * the new label are taken from the inputs on the new label panel.
- */
-function addNewLabel() {
-	"use strict";
-	var selCells, cat, label, color;
-	selCells = highlightedCoords;
-	console.log(selCells);
-	cat = document.getElementById("newCatValue").value;
-	label = document.getElementById("newLabelValue").value;
-	color = document.getElementById("newColorValue").value;
-
-	createNewLabel(cat, label, "", color, selCells);
-
-	updateCategoryList();
-	// output current object model to console
-	console.log("plateModel:" + JSON.stringify(plateModel));
-	console.log("catLegend:" + JSON.stringify(catLegend));
-
-	//var jsonPlate = translateModelToOutputJson(plateModel);
-	//console.log("jsonPlate:" + JSON.stringify(jsonPlate));
-	removeAllHighlightedCells();
 }
 
 /**
@@ -745,46 +835,25 @@ function addNewPlateLabel() {
 	var cat, label, pLabel;
 	cat = document.getElementById("newPlateCatValue").value;
 	label = document.getElementById("newPlateLabelValue").value;
+	
+	// validate input
+	if(isReservedValue(cat)) {
+       alert('Category contains reserved value: '+ cat);
+    } else if (isReservedValue(label)) {
+       alert('Label contains reserved value: '+ label);
+    } else {
+		if (plateModel.labels === undefined) {
+			plateModel.labels = [];
+		}
 
-	if (plateModel.labels === undefined) {
-		plateModel.labels = [];
+		pLabel = {};
+		pLabel.category = cat;
+		pLabel.name = label;
+
+		plateModel.labels.push(pLabel);
+
+		updatePlateLabelList();
 	}
-
-	pLabel = {};
-	pLabel.category = cat;
-	pLabel.name = label;
-
-	plateModel.labels.push(pLabel);
-
-	updatePlateLabelList();
-}
-
-/**
- * Adds a new dosage. The values for the new dose is taken
- * from the inputs on the dose label panel. 'Dosage' is a 
- * reserved category name and is automatically applied here.
- */
-function addNewDose() {
-	"use strict";
-	var selCells, cat, label, units, color;
-	selCells = highlightedCoords;
-	console.log(selCells);
-	cat = "dosage";
-	label = document.getElementById("newDoseValue").value;
-	units = document.getElementById("newDoseUnits").value;
-	color = document.getElementById("newDoseColorValue").value;
-
-	createNewLabel(cat, label, units, color, selCells);
-
-	updateCategoryList();
-
-	// output current object model to console
-	console.log("plateModel:" + JSON.stringify(plateModel));
-	console.log("catLegend:" + JSON.stringify(catLegend));
-
-	//var jsonPlate = translateModelToOutputJson(plateModel);
-	//console.log("jsonPlate:" + JSON.stringify(jsonPlate));
-	removeAllHighlightedCells();
 }
 
 /**
@@ -883,7 +952,7 @@ function translateModelToOutputJson(pModel) {
 	// take the values from the compound input text fields (could do this at input onChange event also)
 	for (wellGroup in groupNames) {
 		if (groupNames[wellGroup] !== undefined && groupNames[wellGroup] !== null) {
-			cmpdValue = document.getElementById("wellGroup_-_" + wellGroup).value;
+			cmpdValue = document.getElementById("wellGroup__sep__" + wellGroup).value;
 			if (cmpdValue === undefined || cmpdValue === null || cmpdValue === "") {
 				// !!! THROW ERROR DIALOG HERE ASKING TO FILL OUT THIS FIELD !!!
 				groupNames[wellGroup] = "SOME_COMPOUND";
@@ -1259,7 +1328,7 @@ function createGrid() {		//TODO - perhaps change grid to not be myGrid ??
  */
 function loadJsonData(plateJson) {
 	"use strict";
-	var row, column, wellgrp, catKey, labKey, color, newContents;
+	var row, column, wellgrp, wellType, catKey, labKey, color, newContents;
 	// translate the json received to the internal models structure
 	plateModel = translateInputJsonToModel(plateJson);
 
@@ -1278,12 +1347,16 @@ function loadJsonData(plateJson) {
 	for (row in plateModel.rows) {
 		for (column in plateModel.rows[row].columns) {
 			wellgrp = plateModel.rows[row].columns[column].wellGroupName;
+			wellType = plateModel.rows[row].columns[column].wellType;
 			if (wellgrp !== undefined && wellgrp !== null && wellgrp !== "") {
 				//groupNames[wellgrp] = "SOME_COMPOUND";
 				groupNames[wellgrp] = "";
 			}
 
 			newContents = wellgrp;
+			if (wellType !== undefined && wellType !== null && wellType !== "") {
+				newContents += "," + wellType;
+			}
 
 			for (catKey in plateModel.rows[row].columns[column].categories) {
 				for (labKey in plateModel.rows[row].columns[column].categories[catKey]) {
