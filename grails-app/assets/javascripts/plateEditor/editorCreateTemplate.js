@@ -218,7 +218,10 @@ function addTemplateValue() {
 				plateModel.rows[row].columns[column].wellGroupName = cellValue;
 				plateModel.rows[row].columns[column].wellType = wellType;
 
-				grid.updateCellContents(row, column, cellValue);
+				// add control to well
+				var wellStr = cellValue + "," + wellType;
+				
+				grid.updateCellContents(row, column, wellStr);
 			}
 		}
 

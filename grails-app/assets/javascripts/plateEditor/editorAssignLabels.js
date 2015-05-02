@@ -173,6 +173,8 @@ function updateCellColors(cat, label, color) {
 
 			// update actual grid cell
 			newContents = plateModel.rows[row].columns[column].wellGroupName;
+			newContents += "," + plateModel.rows[row].columns[column].wellType;
+			
 			for (catKey in plateModel.rows[row].columns[column].categories) {
 				for (labKey in plateModel.rows[row].columns[column].categories[catKey]) {
 					newContents += "," + plateModel.rows[row].columns[column].categories[catKey][labKey].color;
@@ -203,6 +205,8 @@ function updateCatVisibility(cat) {
 
 				// update actual grid cell
 				newContents = plateModel.rows[row].columns[column].wellGroupName;
+				newContents += "," + plateModel.rows[row].columns[column].wellType;
+				
 				for (catKey in plateModel.rows[row].columns[column].categories) {
 					if (catLegend[catKey].visible === true) {
 						for (labKey in plateModel.rows[row].columns[column].categories[catKey]) {
@@ -480,6 +484,8 @@ function removeLabel(cat, label) {
 
 		// update actual grid cell
 		newContents = plateModel.rows[row].columns[column].wellGroupName;
+		newContents += "," + plateModel.rows[row].columns[column].wellType;
+		
 		for (catKey in plateModel.rows[row].columns[column].categories) {
 			for (labKey in plateModel.rows[row].columns[column].categories[catKey]) {
 				newContents += "," + plateModel.rows[row].columns[column].categories[catKey][labKey].color;
@@ -647,6 +653,7 @@ function createNewLabel(cat, label, units, color, applyToCells) {
 		plateModel.rows[row].columns[column].categories[cat][label].color = color;
 		plateModel.rows[row].columns[column].categories[cat][label].units = units;
 		newContents = plateModel.rows[row].columns[column].wellGroupName;
+		newContents += "," + plateModel.rows[row].columns[column].wellType;
 
 		for (catKey in plateModel.rows[row].columns[column].categories) {
 			for (labKey in plateModel.rows[row].columns[column].categories[catKey]) {
@@ -1259,7 +1266,7 @@ function createGrid() {		//TODO - perhaps change grid to not be myGrid ??
  */
 function loadJsonData(plateJson) {
 	"use strict";
-	var row, column, wellgrp, catKey, labKey, color, newContents;
+	var row, column, wellgrp, wellType, catKey, labKey, color, newContents;
 	// translate the json received to the internal models structure
 	plateModel = translateInputJsonToModel(plateJson);
 
@@ -1278,12 +1285,16 @@ function loadJsonData(plateJson) {
 	for (row in plateModel.rows) {
 		for (column in plateModel.rows[row].columns) {
 			wellgrp = plateModel.rows[row].columns[column].wellGroupName;
+			wellType = plateModel.rows[row].columns[column].wellType;
 			if (wellgrp !== undefined && wellgrp !== null && wellgrp !== "") {
 				//groupNames[wellgrp] = "SOME_COMPOUND";
 				groupNames[wellgrp] = "";
 			}
 
 			newContents = wellgrp;
+			if (wellType !== undefined && wellType !== null && wellType !== "") {
+				newContents += "," + wellType;
+			}
 
 			for (catKey in plateModel.rows[row].columns[column].categories) {
 				for (labKey in plateModel.rows[row].columns[column].categories[catKey]) {
