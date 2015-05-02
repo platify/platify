@@ -2,7 +2,7 @@
  * Created by zacharymartin on 4/28/15.
  */
 
-QUnit.module("ImportDataFileGenerator", {
+QUnit.module("ServerCommunicator", {
     beforeEach: function(){
 
         // create JQuery ajax mock;
@@ -40,7 +40,6 @@ test('server communicator construction throws error when hostname not defined', 
         assert.ok(false, "constructing a server communicator with undefined hostname" +
         " should throw an error");
     } catch (error){
-        console.log(error);
         assert.ok(error.type === ServerCommunicatorError.HOSTNAME_NOT_DEFINED,
         "A ServerCommunicatorError of type HOSTNAME_NOT_DEFINED should be thrown when " +
         "a ServerCommunicator object is constructed with an undefined hostname");

@@ -37,6 +37,12 @@ function ImportDataFileGenerator(){
     this.matrix = null;
 
 
+    /**
+     * This private method generates the header row in the matrix field for the first
+     * file format, not the inter-group format.
+     * @param importData - the import data object that the file is being generated for
+     * @returns {Array} - an array of the cell contents for the first row of the file
+     */
     function createMatrixHeaderRow(importData){
         var result = [];
         var headerIndex = 0;
@@ -67,6 +73,17 @@ function ImportDataFileGenerator(){
     }
 
 
+    /**
+     * This private method generates a single data row in the first file format, not the
+     * inter-group format. This single row represents all of the label information for
+     * a well
+     * @param importData - the importData object for which the file is being generated
+     * @param plateIndex - the plate index for the plate on which the well is located
+     * @param row - the row index for the row in which the well is located
+     * @param col - the column index fot the column in which the well is located
+     * @returns {Array} - an array of the cell contents for the data row representing a
+     *                  well in the first supported file format
+     */
     function createMatrixDataRow(importData, plateIndex, row, col){
         var result = [];
         var matrixColumnIndex = 0;
@@ -131,7 +148,11 @@ function ImportDataFileGenerator(){
         return result;
     }
 
-
+    /**
+     * This method sets the ImportDataFileGenerator to a specific ImportData object for
+     * the first file format, not the inter-group format.
+     * @param importData - the importData object for which the file is being generated
+     */
     this.createImportDataMatrix = function(importData){
         var result = [];
         var plate;
@@ -184,7 +205,19 @@ function ImportDataFileGenerator(){
         this.matrix = result;
     };
 
-
+    /**
+     * This method creates several rows in the second file format (inter-group) in 2D
+     * array matrix form. These rows represent the labels applied to a single well in
+     * the importData object, one row per label.
+     * @param wellRow - the index (starting at 0) of the row of the well to which the
+     *              labels pertain
+     * @param wellCol - the index (starting at 0) of the column of the well to which the
+     *              labels pertain
+     * @param plateIndex - the index (starting at 0) of the plate of the well to which
+     *              the labels pertain
+     * @param importData  - the importData object for which the file is being generated
+     * @param matrix - the matrix of data to which the rows are being appended
+     */
     this.addWellDataToMatrix = function(wellRow, wellCol, plateIndex, importData, matrix){
         var wellLevelCategories = importData.getWellLevelCategories();
         var plateLevelCategories = importData.getPlateLevelCategories();
@@ -233,6 +266,11 @@ function ImportDataFileGenerator(){
     };
 
 
+    /**
+     * This method sets the ImportDataFileGenerator to a specific ImportData object for
+     * the second file format (the inter-group format).
+     * @param importData - the importData object for which the file is being generated
+     */
     this.createIntergroupInterchangeFormatMatrix = function(importData){
         var result = [];
         var numPlates = importData.numPlates();
@@ -311,12 +349,22 @@ function ImportDataFileGenerator(){
         return result;
     };
 
+    /**
+     * This method forces a Tab Separated Value(TSV) download of the currently loaded
+     * file in the ImportDataFileGenerator.
+     * @param filename - the name to give the file that is downloaded to the client
+     */
     this.forceTSVDownload = function(filename){
         var TSVString = this.createDSVString("\t", "\n");
 
         ImportDataFileGenerator.forceFileDownload(filename, TSVString);
     };
 
+    /**
+     * This method forces a Comma Separated Value(CSV) download of the currently loaded
+     * file in the ImportDataFileGenerator.
+     * @param filename - the name to give the file that is downloaded to the client
+     */
     this.forceCSVDownload = function(filename){
         var CSVString = this.createDSVString(" , ", "\n");
 

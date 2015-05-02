@@ -49,15 +49,21 @@ TestUtilities.getRandomImportDataObject = function(){
     var experimentLevelCategories = [];
     var plateLevelCategories = [];
     var wellLevelCategories = {};
+    var category;
 
     var importData = new ImportData(numPlates, numRows, numCols);
 
+    // create numPlates unique plate IDs
     for (i=0; i<numPlates; i++){
-        plateIDs.push(TestUtilities.getRandomString(1, 16));
+        var plateID = TestUtilities.getRandomString(1, 16);
+        if (TestUtilities.arrayContainsElement(plateIDs, plateID)){
+            i--;
+        } else {
+            plateIDs.push(plateID);
+        }
     }
     for (i=0; i<numWellLevelCategories; i++){
         var numeric;
-        var category;
 
         if (TestUtilities.getRandomInt(0,1)){
             numeric = true;
@@ -65,18 +71,33 @@ TestUtilities.getRandomImportDataObject = function(){
             numeric = false;
         }
 
-        var category = TestUtilities.getRandomString(1, 16);
-
-        wellLevelCategories[category] = numeric;
-        importData.addWellLevelCategory(category, numeric);
+        category = TestUtilities.getRandomString(1, 16);
+        if (!wellLevelCategories[category]){
+            wellLevelCategories[category] = numeric;
+            importData.addWellLevelCategory(category, numeric);
+        } else {
+            i--;
+        }
     }
     for (i=0; i<numPlateLevelCategories; i++){
-        plateLevelCategories.push(TestUtilities.getRandomString(1, 16));
-        importData.addPlateLevelCategory(plateLevelCategories[i]);
+        category = TestUtilities.getRandomString(1, 16);
+
+        if (!TestUtilities.arrayContainsElement(plateLevelCategories, category)){
+            plateLevelCategories.push(category);
+            importData.addPlateLevelCategory(category);
+        } else {
+            i--;
+        }
     }
     for (i=0; i<numExperimentLevelCategories; i++){
-        experimentLevelCategories.push(TestUtilities.getRandomString(1, 16));
-        importData.addExperimentLevelCategory(experimentLevelCategories[i]);
+        category = TestUtilities.getRandomString(1, 16);
+
+        if (!TestUtilities.arrayContainsElement(experimentLevelCategories, category)){
+            experimentLevelCategories.push(category);
+            importData.addExperimentLevelCategory(category);
+        } else {
+            i--;
+        }
     }
 
 
@@ -129,4 +150,15 @@ TestUtilities.getRandomImportDataObject = function(){
     }
 
     return importData;
+};
+
+
+TestUtilities.arrayContainsElement = function(array, element){
+    for (var i=0; i<array.length; i++){
+        if (array[i] === element){
+            return true;
+        }
+    }
+
+    return false;
 };
