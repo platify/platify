@@ -176,6 +176,12 @@ class ResultService {
 			throw new RuntimeException("Plates of the JSON do not match with the template")
 		}	
 		
+
+        if (!resultInstance){
+            throw new RuntimeException("A result set must be specified")
+        }
+
+
 		// create the result plates
 		data.plates.eachWithIndex{ dataPlate, plateIndex ->
 
