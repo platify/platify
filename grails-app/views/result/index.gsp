@@ -16,7 +16,9 @@
 		<asset:stylesheet href="colorbrewer.css"/>
 		<asset:stylesheet href="bootstrap-toggle.min.css"/>
 		<asset:stylesheet href="dataTables.bootstrap.css"/>
+		<asset:stylesheet href="dataTables.tableTools.css"/>
 	</head>
+
 	<body>
 		<div class="content-fluid">
 			<div class="row col-sm-12">
@@ -30,17 +32,17 @@
 					onChange="experimentSelected(this.value)"
 				/>
 
-<table id="plateTable" class="table table-bordered table-condensed">
-<thead>
-<tr>
-<th>Plate ID</th>
-<th>Z-Factor</th>
-<th>Z'-Factor</th>
-<th>Mean Negative Control</th>
-<th>Mean Positive Control</th>
-</tr>
-</thead>
-</table>
+				<table id="plateTable" class="table table-bordered table-condensed table-striped display">
+					<thead>
+						<tr>
+							<th>Plate ID</th>
+							<th>Z-Factor</th>
+							<th>Z'-Factor</th>
+							<th>Mean Negative Control</th>
+							<th>Mean Positive Control</th>
+						</tr>
+					</thead>
+				</table>
 			</div>
 				
 			<div class="row col-sm-12">
@@ -71,6 +73,7 @@
 	<asset:javascript src="bootstrap-toggle.min.js" />
 	<asset:javascript src="plate-statistics/statistics.js" />
 	<asset:javascript src="jquery.dataTables.js" />
+	<asset:javascript src="dataTables.tableTools.js" />
 	<g:javascript>
 	var RESULT_KITCHEN_SINK_URL = "${createLink(action: 'kitchenSink', experimentInstance: null)}";
 	var RESULT_SAVE_REFACTORED_DATA_URL = "${createLink(controller: 'refactoredData', action: 'save', resultInstance: null)}";

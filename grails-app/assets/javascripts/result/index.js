@@ -48,8 +48,6 @@ function createGrid() {
 function experimentSelected(experimentId) {
     experiment = new ExperimentModel(experimentId);
     experiment.getData().done(function () {
-        var select = $('#plateSelect');
-        select.children('option').remove();
         if (Object.keys(experiment.plates).length > 0) {
             plateData = Object.keys(experiment.plates).map(function(plateID) {
                 var row = [
@@ -61,21 +59,10 @@ function experimentSelected(experimentId) {
                 return row;
             });
             plateTable.clear().rows.add(plateData).draw();
-
-
-            var options = $.map(experiment.plates, function(p) {
-                var option = $('<option />').text(p.plateID);
-                if (p.plateID === experiment.currentPlateBarcode) {
-                    option[0].selected = true;
-                }
-                return option;
-            });
-            select.append(options);
-            plateSelected(experiment.currentPlateBarcode);
         }
         else {
-            plateTable.clear().draw();
             loadGrid([]);
+            plateTable.clear().draw();
         }
     });
 }
@@ -90,11 +77,14 @@ function init() {
     // set up plate table
     plateTable = $('#plateTable').DataTable({
         bootstrap: true,
-        dom: 't',
+        dom: 'T<"clear">lfrtip',
         info: false,
         paging: false,
         scrollY: '150px',
         searching: false,
+        tableTools: {
+            sRowSelect: 'single',
+        },
     });
 
     // set up grid
