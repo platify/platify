@@ -1,6 +1,9 @@
 /**
  * ServerCommunicator.js
  *
+ * ServerCommunicator objects handle all communication with the server for the assay
+ * machine output file parser.
+ *
  * @author Team SurNorte
  * CSCI-E99
  * May 7, 2015
@@ -16,6 +19,9 @@ ServerCommunicator.UPDATE_PARSING_CONFIG_URL_SUFFIX = "/equipment/update/";
 // save types
 ServerCommunicator.SAVE_NEW = "save new";
 ServerCommunicator.SAVE_UPDATE = "save update";
+
+// other constants
+ServerCommunicator.CONTENT_TYPE = "application/json; charset=UTF-8";
 
 /**
  * ServerCommunicator objects handle all communication with the server for the assay
@@ -48,11 +54,13 @@ function ServerCommunicator(hostname) {
             type: "POST",
             data: experimentID,
             processData: false,
-            contentType: "application/json; charset=UTF-8"
+            contentType: ServerCommunicator.CONTENT_TYPE
         });
 
         jqxhr.done(_self.handleSuccessPlateIDArrayRequest);
         jqxhr.fail(_self.handleFailurePlateIDArrayRequest);
+
+        return jqxhr;
     };
 
     this.registerPlateIDArrayCallback = function(callback){
@@ -101,11 +109,13 @@ function ServerCommunicator(hostname) {
             type: "POST",
             data: JSON.stringify(importData.getJSONImportDataObject()),
             processData: false,
-            contentType: "application/json; charset=UTF-8"
+            contentType: ServerCommunicator.CONTENT_TYPE
         });
 
         jqxhr.done(_self.handleSuccessImportDataSaveRequest);
         jqxhr.fail(_self.handleFailureImportDataSaveRequest);
+
+        return jqxhr;
     };
 
     this.registerImportDataSaveCallback = function(callback){
@@ -164,11 +174,13 @@ function ServerCommunicator(hostname) {
             type: verb,
             data: JSON.stringify(parsingConfig.getJSONObject()),
             processData: false,
-            contentType: "application/json; charset=UTF-8"
+            contentType: ServerCommunicator.CONTENT_TYPE
         });
 
         jqxhr.done(_self.handleSuccessParsingConfigSaveRequest);
         jqxhr.fail(_self.handleFailureParsingConfigSaveRequest);
+
+        return jqxhr;
     };
 
     this.registerParsingConfigSaveCallback = function(callback){

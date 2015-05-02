@@ -514,7 +514,7 @@ function ImportData(numPlates, numRows, numCols){
      */
     this.addWellLevelCategory = function(categoryName, numeric){
         // first some error checking
-        if (!categoryName){
+        if (!categoryName && categoryName !== "0"){
             throw new ImportDataError(ImportDataError.ILLEGAL_ARGUMENT,
                 categoryName,
                 "well level category name",

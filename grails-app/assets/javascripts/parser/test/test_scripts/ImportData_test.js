@@ -255,9 +255,259 @@ test("get and set parsing ID", function(assert){
     }
 });
 
+test("add categories errors", function(assert){
+    var j;
+    var category;
+
+    for (var i=0; i<20; i++){
+        var importData = TestUtilities.getRandomImportDataObject();
+        var wellLevelCategories = importData.getWellLevelCategories();
+        var plateLevelCategories = importData.getPlateLevelCategories();
+        var experimentLevelCategories = importData.getExperimentLevelCategories();
+
+        try{
+            importData.addWellLevelCategory(undefined, true);
+            assert.ok(false, "Adding an undefined category should throw a " +
+            "ILLEGAL_ARGUMENT error.");
+        } catch (error){
+            assert.ok(error.type = ImportDataError.ILLEGAL_ARGUMENT,
+                "Adding an undefined category should throw a " +
+                "ILLEGAL_ARGUMENT error.")
+        }
+
+        try{
+            importData.addWellLevelCategory(null, true);
+            assert.ok(false, "Adding a null category should throw a " +
+            "ILLEGAL_ARGUMENT error.");
+        } catch (error){
+            assert.ok(error.type = ImportDataError.ILLEGAL_ARGUMENT,
+                "Adding a null category should throw a " +
+                "ILLEGAL_ARGUMENT error.")
+        }
+
+        try{
+            importData.addWellLevelCategory("", true);
+            assert.ok(false, "Adding an empty string category should throw a " +
+            "ILLEGAL_ARGUMENT error.");
+        } catch (error){
+            assert.ok(error.type = ImportDataError.ILLEGAL_ARGUMENT,
+                "Adding an empty string category should throw a " +
+                "ILLEGAL_ARGUMENT error.")
+        }
+
+        for (j=0; j<wellLevelCategories.length; j++){
+            category = wellLevelCategories[j];
+            try{
+                importData.addWellLevelCategory(category, true);
+                assert.ok(false, "Adding a category that already exists should throw a " +
+                "CATEGORY_ALREADY_DEFINED error.");
+            } catch (error){
+                assert.ok(error.type = ImportDataError.CATEGORY_ALREADY_DEFINED,
+                    "Adding a category that already exists should throw a " +
+                    "CATEGORY_ALREADY_DEFINED error.")
+            }
+        }
+
+        try{
+            importData.addPlateLevelCategory(undefined);
+            assert.ok(false, "Adding an undefined category should throw a " +
+            "ILLEGAL_ARGUMENT error.");
+        } catch (error){
+            assert.ok(error.type = ImportDataError.ILLEGAL_ARGUMENT,
+                "Adding an undefined category should throw a " +
+                "ILLEGAL_ARGUMENT error.")
+        }
+
+        try{
+            importData.addPlateLevelCategory(null);
+            assert.ok(false, "Adding a null category should throw a " +
+            "ILLEGAL_ARGUMENT error.");
+        } catch (error){
+            assert.ok(error.type = ImportDataError.ILLEGAL_ARGUMENT,
+                "Adding a null category should throw a " +
+                "ILLEGAL_ARGUMENT error.")
+        }
+
+        try{
+            importData.addPlateLevelCategory("");
+            assert.ok(false, "Adding an empty string category should throw a " +
+            "ILLEGAL_ARGUMENT error.");
+        } catch (error){
+            assert.ok(error.type = ImportDataError.ILLEGAL_ARGUMENT,
+                "Adding an empty string category should throw a " +
+                "ILLEGAL_ARGUMENT error.")
+        }
+
+        for (j=0; j<plateLevelCategories.length; j++){
+            category = plateLevelCategories[j];
+            try{
+                importData.addPlateLevelCategory(category);
+                assert.ok(false, "Adding a category that already exists should throw a " +
+                "CATEGORY_ALREADY_DEFINED error.");
+            } catch (error){
+                assert.ok(error.type = ImportDataError.CATEGORY_ALREADY_DEFINED,
+                    "Adding a category that already exists should throw a " +
+                    "CATEGORY_ALREADY_DEFINED error.")
+            }
+        }
+
+        try{
+            importData.addExperimentLevelCategory(undefined);
+            assert.ok(false, "Adding an undefined category should throw a " +
+            "ILLEGAL_ARGUMENT error.");
+        } catch (error){
+            assert.ok(error.type = ImportDataError.ILLEGAL_ARGUMENT,
+                "Adding an undefined category should throw a " +
+                "ILLEGAL_ARGUMENT error.")
+        }
+
+        try{
+            importData.addExperimentLevelCategory(null);
+            assert.ok(false, "Adding a null category should throw a " +
+            "ILLEGAL_ARGUMENT error.");
+        } catch (error){
+            assert.ok(error.type = ImportDataError.ILLEGAL_ARGUMENT,
+                "Adding a null category should throw a " +
+                "ILLEGAL_ARGUMENT error.")
+        }
+
+        try{
+            importData.addExperimentLevelCategory("");
+            assert.ok(false, "Adding an empty string category should throw a " +
+            "ILLEGAL_ARGUMENT error.");
+        } catch (error){
+            assert.ok(error.type = ImportDataError.ILLEGAL_ARGUMENT,
+                "Adding an empty string category should throw a " +
+                "ILLEGAL_ARGUMENT error.")
+        }
+
+        for (j=0; j<experimentLevelCategories.length; j++){
+            category = experimentLevelCategories[j];
+            try{
+                importData.addExperimentLevelCategory(category);
+                assert.ok(false, "Adding a category that already exists should throw a " +
+                "CATEGORY_ALREADY_DEFINED error.");
+            } catch (error){
+                assert.ok(error.type = ImportDataError.CATEGORY_ALREADY_DEFINED,
+                    "Adding a category that already exists should throw a " +
+                    "CATEGORY_ALREADY_DEFINED error.")
+            }
+        }
+    }
+});
+
+
+test("add categories", function(assert){
+    var j;
+    var category;
+    var numeric;
+
+    for (var i=0; i<10; i++){
+        var importData = TestUtilities.getRandomImportDataObject();
+        var wellLevelCategories = importData.getWellLevelCategories();
+        var plateLevelCategories = importData.getPlateLevelCategories();
+        var experimentLevelCategories = importData.getExperimentLevelCategories();
+
+        for (j=0; j<10; j++){
+            category = TestUtilities.getRandomString(1, 16);
+            numeric = TestUtilities.getRandomInt(0,1);
+
+            if (!TestUtilities.arrayContainsElement(wellLevelCategories, category)){
+                importData.addWellLevelCategory(category, numeric);
+                wellLevelCategories.push(category);
+            }
+        }
+
+        assert.ok(TestUtilities.arraysContainSameElements(
+                                                     importData.getWellLevelCategories(),
+                                                     wellLevelCategories),
+            "The import data object should have all of the categories that were added.");
+
+        for (j=0; j<10; j++){
+            category = TestUtilities.getRandomString(1, 16);
+
+            if (!TestUtilities.arrayContainsElement(plateLevelCategories, category)){
+                importData.addPlateLevelCategory(category);
+                plateLevelCategories.push(category);
+            }
+        }
+
+        assert.ok(TestUtilities.arraysContainSameElements(
+                importData.getPlateLevelCategories(),
+                plateLevelCategories),
+            "The import data object should have all of the categories that were added.");
+
+        for (j=0; j<10; j++){
+            category = TestUtilities.getRandomString(1, 16);
+
+            if (!TestUtilities.arrayContainsElement(experimentLevelCategories, category)){
+                importData.addExperimentLevelCategory(category);
+                experimentLevelCategories.push(category);
+            }
+        }
+
+        assert.ok(TestUtilities.arraysContainSameElements(
+                importData.getExperimentLevelCategories(),
+                experimentLevelCategories),
+            "The import data object should have all of the categories that were added.");
+    }
+});
+
+
+test("remove categories", function(assert){
+    var j;
+    var category;
+    var length;
+
+    for (var i=0; i<10; i++){
+        var importData = TestUtilities.getRandomImportDataObject();
+        var wellLevelCategories = importData.getWellLevelCategories();
+        var plateLevelCategories = importData.getPlateLevelCategories();
+        var experimentLevelCategories = importData.getExperimentLevelCategories();
+
+        length = wellLevelCategories.length;
+        for (j=0; j<length; j++){
+            category = wellLevelCategories.pop();
+
+            importData.removeWellLevelCategory(category);
+            assert.ok(TestUtilities.arraysContainSameElements(
+                                                      importData.getWellLevelCategories(),
+                                                      wellLevelCategories),
+                "The category " + category + "should be removed from the ImportData" +
+                " object at the well level.");
+        }
+
+        length = plateLevelCategories.length;
+        for (j=0; j<length; j++){
+            category = plateLevelCategories.pop();
+
+            importData.removePlateLevelCategory(category);
+            assert.ok(TestUtilities.arraysContainSameElements(
+                    importData.getPlateLevelCategories(),
+                    plateLevelCategories),
+                "The category " + category + "should be removed from the ImportData" +
+                " object at the plate level.");
+        }
+
+        length = experimentLevelCategories.length;
+        for (j=0; j<length; j++){
+            category = experimentLevelCategories.pop();
+
+            importData.removeExperimentLevelCategory(category);
+            assert.ok(TestUtilities.arraysContainSameElements(
+                    importData.getExperimentLevelCategories(),
+                    experimentLevelCategories),
+                "The category " + category + "should be removed from the ImportData" +
+                " object at the experiment level.");
+        }
+
+    }
+});
+
+
 test("Convert to DTO and back", function(assert){
 
-    for (var i=0; i<50; i++){
+    for (var i=0; i<10; i++){
         var importData = TestUtilities.getRandomImportDataObject();
         assert.ok(importData);
 
@@ -267,6 +517,4 @@ test("Convert to DTO and back", function(assert){
         assert.deepEqual(importData, reconstitutedImportData,
             "A reconstituted ImportData object should be the same as the original.");
     }
-
-
 });

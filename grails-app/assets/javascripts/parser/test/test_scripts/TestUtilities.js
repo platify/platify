@@ -162,3 +162,18 @@ TestUtilities.arrayContainsElement = function(array, element){
 
     return false;
 };
+
+TestUtilities.arraysContainSameElements = function(array1, array2){
+    if (array1.length !== array2.length){
+        return false;
+    }
+
+    for (var i=0; i<array1.length; i++){
+        var element = array1[i];
+
+        if (!TestUtilities.arrayContainsElement(array2, element)){
+            return false;
+        }
+    }
+    return true;
+};
