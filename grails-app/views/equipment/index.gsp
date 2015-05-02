@@ -41,6 +41,8 @@
 									<g:sortableColumn property="dateCreated" title="${message(code: 'equipment.date.label', default: 'Date')}" />
 																
 									<th>Parse</th>
+									
+									<th>Update</th>
 								
 								</tr>
 							</thead>
@@ -60,8 +62,14 @@
 									<td>${fieldValue(bean: equipmentInstance, field: "dateCreated")}</td>
 								
 									<td>
-										<g:link id="${equipmentInstance.id}" action="selectexperiment"><i class="fa fa-check parse-btn"></i></g:link>
+										<g:link id="${equipmentInstance.id}" action="selectexperiment"><button class="btn btn-info btn-xs">Experiment</button></g:link>
 									</td>
+									
+									<td>
+										<g:link id="${equipmentInstance.id}" action="load"><button class="btn btn-info btn-xs">View</button></g:link>
+										
+										
+									</td>	
 								
 								</tr>
 
