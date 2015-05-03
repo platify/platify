@@ -426,6 +426,8 @@ function ParsingController(){
                 console.log("response:");
                 console.log(response);
                 window.canUpdate = false;
+                _self.parserUI.displayMessage("Your assay machine output file data was "+
+                "successfully stored on server.");
                 _self.parserUI.disableSaveButton();
             }
         });

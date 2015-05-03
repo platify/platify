@@ -356,6 +356,9 @@ function ParsingConfig(name,
      * @param color - the hex color string to use when highlighting the feature on the
      *              Grid
      * @returns {ParsingConfig.BioFeature} - the new BioFeature object
+     *
+     * Note: - This method throws a DUPLICATE_FEATURE_NAME error if there is already a
+     *      feature with the same name added to the calling ParsingConfig object.
      */
     this.addFeature = function(name, range, isParent, parent, typeOfFeature, color){
         if (this.features[name.trim()]){
@@ -428,6 +431,8 @@ function ParsingConfig(name,
      *      not already been set for the calling ParsingConfig object
      *       - This method throws a FEATURE_TYPE_DOES_NOT_SUPPORT_MULTIPLE_CELLS error if
      *      the given cell range covers more than one cell.
+     *       - This method throws a DUPLICATE_FEATURE_NAME error if there is already a
+     *      feature with the same name added to the calling ParsingConfig object.
      */
     this.addExperimentLevelFeature = function(name, range, color){
         if (!this.plate){
@@ -457,7 +462,24 @@ function ParsingConfig(name,
         return feature;
     };
 
-
+    /**
+     * This method adds a plate level feature to the calling ParsingConfig object.
+     * @param name - the name of the new plate level feature
+     * @param range - the CellRange on the Grid of the feature on the first plate
+     * @param color - the hex color string that should be used to highlight the feature
+     *              on the grid
+     * @returns {ParsingConfig.BioFeature} - a reference to the BioFeature object
+     *                                    representing the new feature
+     *
+     * Note: - This method throws a FIRST_PLATE_NOT_DEFINED error if the first plate has
+     *      not already been set for the calling ParsingConfig object
+     *       - This method throws a NOT_ON_FIRST_PLATE error if the range of the new
+     *      feature is not entirely contained in the range of the first plate.
+     *       - This method throws a FEATURE_TYPE_DOES_NOT_SUPPORT_MULTIPLE_CELLS error if
+     *      the given cell range covers more than one cell.
+     *       - This method throws a DUPLICATE_FEATURE_NAME error if there is already a
+     *      feature with the same name added to the calling ParsingConfig object.
+     */
     this.addPlateLevelFeature = function(name, range, color){
         if (!this.plate){
             throw new ParsingConfigError(ParsingConfigError.FIRST_PLATE_NOT_DEFINED,
@@ -493,6 +515,22 @@ function ParsingConfig(name,
         return feature;
     };
 
+    /**
+     * This method adds a well level feature to the calling ParsingConfig object.
+     * @param name - the name of the new well level feature
+     * @param range - the CellRange on the Grid of the feature on the first plate
+     * @param color - the hex color string that should be used to highlight the feature
+     *              on the grid
+     * @returns {ParsingConfig.BioFeature} - a reference to the BioFeature object
+     *                                    representing the new feature
+     *
+     * Note: - This method throws a FIRST_PLATE_NOT_DEFINED error if the first plate has
+     *      not already been set for the calling ParsingConfig object
+     *       - This method throws a NOT_ON_FIRST_PLATE error if the range of the new
+     *      feature is not entirely contained in the range of the first plate.
+     *       - This method throws a DUPLICATE_FEATURE_NAME error if there is already a
+     *      feature with the same name added to the calling ParsingConfig object.
+     */
     this.addWellLevelFeature = function(name, range, color){
         if (!this.plate){
             throw new ParsingConfigError(ParsingConfigError.FIRST_PLATE_NOT_DEFINED,
@@ -518,6 +556,24 @@ function ParsingConfig(name,
         return feature;
     };
 
+    /**
+     * This method creates and adds a new feature to the calling ParsingConfig object.
+     * @param name - the name of the new well level feature
+     * @param range - the CellRange on the Grid of the feature on the first plate
+     * @param level - the level of the new feature : WELL_LEVEL, PLATE_LEVEL,
+     *              or EXPERIMENT_LEVEL
+     * @param color - the hex color string that should be used to highlight the feature
+     *              on the grid
+     * @returns {*} - a reference to the BioFeature object representing the new feature
+     *
+     * Note: - This method throws a FEATURE_NAME_NOT_SPECIFIED error if the given name is
+     *      undefined, null, is not a string, or an empty string or consists entirely of
+     *      whitespace.
+     *       - This method throws a FEATURE_RANGE_NOT_SPECIFIED error if the
+     *       - This method may throw a variety of errors. Please see the documentation for
+     *      addWellLevelFeature(), addPlateLevelFeature, and addExperimentLevelFeature for
+     *      the details of the level specific error possibilities
+     */
     this.createFeature = function(name, range, level, color){
         if (!name || !name.trim || !name.trim()){
             throw new ParsingConfigError(ParsingConfigError.FEATURE_NAME_NOT_SPECIFIED,
