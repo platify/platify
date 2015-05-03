@@ -2,18 +2,8 @@ var experiment;
 var grid;
 var plateTable;
 var plateTableTools;
-
-
-function createBlankData(width, height) {
-    var result = [];
-    for (var i=0; i<width; i++) {
-        result[i] = [];
-        for (var j=0; j<height; j++) {
-            result[i][j] = null;
-        }
-    }
-    return result;
-}
+var showHeatMap = true;
+var showNormalized = false;
 
 
 /**
@@ -45,12 +35,59 @@ function colorGrid(dataSet) {
 }
 
 
-function createGrid() {
-    grid  = new Grid("resultGrid");
-    loadGrid(createBlankData(100,100));
+/**
+ * Generate a set of blank data.
+ */
+function createBlankData(width, height) {
+    var result = [];
+    for (var x=0; x<width; x++) {
+        result[x] = [];
+        for (var y=0; y<height; y++) {
+            result[x][y] = null;
+        }
+    }
+    return result;
 }
 
 
+/**
+ * Create a Grid object, and load in blank data.
+ */
+function createGrid() {
+    grid  = new Grid("resultGrid");
+    loadGrid(createBlankData(100,100), false);
+}
+
+
+/**
+ * Format the experiment data as a csv and trigger a download of it in the
+ * browser.
+ */
+function downloadExperiment(fileformat) {
+    var importData = ImportData.createImportDataObjectFromJSON(experiment.experiment);
+    var generator = new ImportDataFileGenerator();
+    //generator.createIntergroupInterchangeFormatMatrix(importData);
+    generator.createImportDataMatrix(importData);
+
+    fileformat = fileformat || 'csv';
+    var filename = 'assay_results.' + fileformat;
+    switch (fileformat) {
+        case 'tsv':
+            generator.forceTSVDownload(filename);
+            break;
+
+        case 'csv':
+        default:
+            generator.forceCSVDownload(filename);
+            break;
+    }
+}
+
+
+/**
+ * Read the data for the indicated experiment from the server, display
+ * the plates on the page, and select the first one.
+ */
 function experimentSelected(experimentId) {
     experiment = new ExperimentModel(experimentId);
     experiment.getData().always(function () {
@@ -68,7 +105,9 @@ function experimentSelected(experimentId) {
             plateTableTools.fnSelect(plateTable.row(0).nodes());
         }
         else {
-            loadGrid([]);
+            loadGrid(createBlankData(experiment.numRows,
+                                     experiment.numColumns),
+                     false);
             plateTable.clear().draw();
         }
     });
@@ -76,11 +115,6 @@ function experimentSelected(experimentId) {
 
 
 function init() {
-    // set up handlers
-    $('#rawNormToggle').change(function() {
-        toggleRawOrNorm($(this).prop('checked') ? 'raw' : 'norm');
-    });
-
     // set up plate table
     plateTable = $('#plateTable').DataTable({
         bootstrap: true,
@@ -103,32 +137,43 @@ function init() {
     createGrid();
     var experimentId = $('#experimentSelect option:selected')[0].value;
     experimentSelected(experimentId); // calls plateSelected for us
+
+    // add download buttons listener
+    $('#downloadButtons button').on('click', function(event) {
+        downloadExperiment(event.target.dataset.fileformat);
+    });
+
+    // add normalize button listener
+    $('#normalizeButton').on('click', function(event) {
+        showNormalized = $(event.target)[0].checked;
+        reloadGrid();
+    });
+
+    // add heatmap button listener
+    $('#heatMapButton').on('click', function(event) {
+        showHeatMap = $(event.target)[0].checked;
+        reloadGrid();
+    });
 }
 
 
 function loadGrid(dataSet) {
     grid.setData(dataSet);
     grid.fillUpGrid();
-    colorGrid(dataSet);
+    if (showHeatMap) {
+        colorGrid(dataSet);
+    }
 }
 
 
 function plateSelected(plateID) {
     experiment.selectPlate(plateID);
-    loadGrid(experiment.data);
-
-    //$('#rawNormToggle').bootstrapToggle('on');
-    $('#zFactor').text(experiment.zFactor(plateID) || '');
-    $('#zPrimeFactor').text(experiment.zPrimeFactor(plateID) || '');
-    var negativeControl = experiment.meanNegativeControl(plateID);
-    $('#negativeControl').text(negativeControl === null ? '' : negativeControl);
-    var positiveControl = experiment.meanPositiveControl(plateID);
-    $('#positiveControl').text(positiveControl === null ? '' : positiveControl);
+    loadGrid(showNormalized ? experiment.normalizedData : experiment.data);
 }
 
 
-function toggleRawOrNorm(value) {
-    if (value === 'norm') {
+function reloadGrid() {
+    if (showNormalized) {
         loadGrid(experiment.normalizedData);
     }
     else {

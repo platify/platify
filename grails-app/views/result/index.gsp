@@ -22,16 +22,25 @@
 	<body>
 		<div class="content-fluid">
 			<div class="row col-sm-12">
-				<strong>Assay:</strong>
-				<g:select
-					id="experimentSelect"
-					name="name"
-					from="${edu.harvard.capstone.editor.ExperimentalPlateSet.list()}"
-					optionKey="id"
-					optionValue="${{it.name + " - " + it.id}}"
-					onChange="experimentSelected(this.value)"
-				/>
+				<div class="pull-left">
+					<strong>Assay:</strong>
+					<g:select
+						id="experimentSelect"
+						name="name"
+						from="${edu.harvard.capstone.editor.ExperimentalPlateSet.list()}"
+						optionKey="id"
+						optionValue="${{it.name + " - " + it.id}}"
+						onChange="experimentSelected(this.value)"
+					/>
+				</div>
+				<div id="downloadButtons" class="pull-right">
+					<strong>Download:</strong>
+					<button class="btn btn-info btn-xs" type="submit" data-fileformat="csv">CSV</button>
+					<button class="btn btn-info btn-xs" type="submit" data-fileformat="tsv">TSV</button>
+				</div>
+			</div>
 
+			<div class="row col-sm-12">
 				<table id="plateTable" class="table table-bordered table-condensed table-striped display">
 					<thead>
 						<tr>
@@ -43,6 +52,20 @@
 						</tr>
 					</thead>
 				</table>
+			</div>
+
+			<div class="row col-sm-12">
+				<div class="pull-left">
+					<label class="btn btn-info btn-xs">
+						<input id="normalizeButton" type="checkbox">Normalize Data
+					</label>
+				</div>
+				<div class="pull-right">
+					<label class="btn btn-info btn-xs">
+						<input id="heatMapButton" type="checkbox" checked>Show Heat Map
+					</label>
+				</div>
+
 			</div>
 				
 			<div class="row col-sm-12">
@@ -69,11 +92,16 @@
 	<!-- d3 -->
 	<asset:javascript src="d3.v3.min.js" />
 
-	<!-- results-specific js -->
-	<asset:javascript src="bootstrap-toggle.min.js" />
-	<asset:javascript src="plate-statistics/statistics.js" />
+	<!-- datatables -->
 	<asset:javascript src="jquery.dataTables.js" />
 	<asset:javascript src="dataTables.tableTools.js" />
+
+	<!-- importData forked from the parser -->
+	<asset:javascript src="result/ImportData.js" />
+	<asset:javascript src="result/ImportDataFileGenerator.js" />
+
+	<!-- results-specific js -->
+	<asset:javascript src="plate-statistics/statistics.js" />
 	<g:javascript>
 	var RESULT_KITCHEN_SINK_URL = "${createLink(action: 'kitchenSink', experimentInstance: null)}";
 	var RESULT_SAVE_REFACTORED_DATA_URL = "${createLink(controller: 'refactoredData', action: 'save', resultInstance: null)}";

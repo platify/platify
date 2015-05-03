@@ -14,19 +14,15 @@ class ResultController {
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
+
+    @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
         respond Result.list(params), model:[resultInstanceCount: Result.count()]
     }
 
-    def show(Result resultInstance) {
-        respond resultInstance
-    }
 
-    def create() {
-        respond new Result(params)
-    }
-
+    @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
     def kitchenSink(ExperimentalPlateSet experiment) {
         if (!springSecurityService.isLoggedIn()){
             render(contentType: "application/json") {
@@ -49,38 +45,18 @@ class ResultController {
             return   
         }
 
-	def result = [ImportData: resultService.getKitchenSink(experiment)]
+        def result = [ImportData: resultService.getKitchenSink(experiment)]
         render result as JSON
     }
 
 
-    def readExperiment(ExperimentalPlateSet experiment) {
-        if (!springSecurityService.isLoggedIn()){
-            render(contentType: "application/json") {
-                [error: "User not logged in"]
-            }
-            return
-        } 
-
-        if (experiment == null) {
-            render(contentType: "application/json") {
-                [error: "Result not found"]
-            }
-            return
-        }
-
-        if (experiment.hasErrors()) {
-            render(contentType: "application/json") {
-                [error: experiment.errors]
-            }
-            return   
-        }
-
-	def resultInstance = Result.findByExperiment(experiment)
-        return read(resultInstance)
+    @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
+    def create() {
+        respond new Result(params)
     }
 
 
+    @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
     def read(Result resultInstance){
         if (!springSecurityService.isLoggedIn()){
             render(contentType: "application/json") {
@@ -125,6 +101,7 @@ class ResultController {
     }
 
 
+    @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
     def save(Result resultInstance) {
         if (resultInstance == null) {
             notFound()
@@ -147,10 +124,8 @@ class ResultController {
         }
     }
 
-    def edit(Result resultInstance) {
-        respond resultInstance
-    }
 
+    @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
     def update(Result resultInstance) {
         if (resultInstance == null) {
             notFound()
@@ -173,8 +148,8 @@ class ResultController {
         }
     }
 
+    @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
     def delete(Result resultInstance) {
-
         if (resultInstance == null) {
             notFound()
             return

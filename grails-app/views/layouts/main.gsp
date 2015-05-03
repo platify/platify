@@ -47,9 +47,9 @@
 							<li class="plate-editor">
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Plate Editor <span class="caret"></span></a>
 								<ul class="dropdown-menu" role="menu">
-									<li><a href="#">Templates</a></li>
+									<li><g:link controller="experimentalPlateSet" action="index">View Assays</g:link></li>
 									<li class="divider"></li>
-									<li><g:link controller="experimentalPlateSet" action="index">Experiment</g:link></li>
+									<li><g:link controller="experimentalPlateSet" action="create">Create Assay</g:link></li>
 								</ul>
 							</li>
 							<li class="output-parser">

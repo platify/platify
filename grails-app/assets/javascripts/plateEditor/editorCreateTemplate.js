@@ -444,6 +444,21 @@ function loadJsonData(plateJson) {
 }
 
 /**
+ * jQuery setup commands.
+ */
+$(function() {
+	"use strict";
+	$("input[name=wellType]").on("change", function () {
+		if ($(this).prop('id') === "emptyType") {
+			document.getElementById("newLabelValue").value = "";
+			document.getElementById("newLabelValue").disabled = true;
+		} else {
+			document.getElementById("newLabelValue").disabled = false;
+		}
+	});
+});
+
+/**
  * This function handles the window load event. It initializes and fills the
  * grid with blank data and sets up the event handlers.
  */

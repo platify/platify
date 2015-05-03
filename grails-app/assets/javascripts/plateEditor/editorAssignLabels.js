@@ -226,10 +226,15 @@ function updateCatVisibility(cat) {
  */
 function createCompoundInput(wellGroup) {
 	"use strict";
-	var newInput = document.createElement("input");
+	var newDiv, newInput;
+	newDiv = document.createElement("div");
+	newDiv.className = "col-xs-9";
+	newInput = document.createElement("input");
 	newInput.id = "wellGroup__sep__" + wellGroup;
 	newInput.type = "text";
-	return newInput;
+	newInput.className = "form-control";
+	newDiv.appendChild(newInput);
+	return newDiv;
 }
 
 /**
@@ -280,7 +285,9 @@ function updateCompoundList() {
 			innerDiv = document.createElement("div");
 			innerDiv.className = "col-xs-12";
 			newLabel = document.createElement("label");
-			newLabel.appendChild(document.createTextNode(wellGroup));
+			newLabel.setAttribute("for", "wellGroup__sep__" + wellGroup);
+			newLabel.className = "col-xs-1 control-label";
+			newLabel.appendChild(document.createTextNode(wellGroup + ": "));
 
 			newInput = createCompoundInput(wellGroup);
 			innerDiv.appendChild(newLabel);
@@ -427,7 +434,7 @@ function onDeleteLabelChange(event) {
  */
 function updateCategoryList() {
 	"use strict";
-	var newDiv, catKey, labelKey, newLi, convLab, newInput;
+	var newDiv, catKey, labelKey, newLi, convLab, newInput, units, convUnits;
 	newDiv = document.createElement("div");
 	for (catKey in catLegend) {
 		newDiv.appendChild(createCatLabel(catKey));
@@ -435,7 +442,14 @@ function updateCategoryList() {
 			newLi = document.createElement("div");
 			// if label has been converted from a decimal, then convert it back for display
 			convLab = labelKey.toString().split('__dot__').join('.');
-			newLi.appendChild(document.createTextNode(convLab));
+			newLi.appendChild(document.createTextNode(convLab + " "));
+			
+			units = catLegend[catKey].labels[labelKey].units;
+			if (units !== undefined && units !== null && units !== "") {
+				// if label has been converted from a decimal, then convert it back for display
+				convUnits = units.toString().split('__dot__').join('.');
+				newLi.appendChild(document.createTextNode(convUnits));
+			}
 
 			newInput = createColorPicker(catKey, labelKey);
 			newLi.appendChild(newInput);
@@ -575,8 +589,8 @@ function editLabelName() {
 	// validation new label name
 	if (newLabel === undefined || newLabel === "") {			// TODO - deal with case of renaming to existing label !!!
        alert('Label cannot be blank');
-    } else if (isReservedValue(newLabel)) {
-       alert('New Label contains reserved value: ' + newLabel);
+    } else if (isReservedValue(units)) {
+       alert('Units contains reserved value: '+ units);
     } else {
 		// remove spaces from the names (replacing with '_')
 		newLabel = newLabel.toString().split(' ').join('_');
@@ -594,17 +608,20 @@ function editLabelName() {
  * Validates a rename of a dosage. If valid it updates the dosage.
  */
 function editDoseValue() {
-	var newDosage = document.getElementById("editNewDoseValue").value;		// TODO - need to add units
+	var newDosage = document.getElementById("editNewDoseValue").value;
+	var newUnits = document.getElementById("editNewUnitsValue").value;
 	
 	// validation new doage
     if (!isNumeric(newDosage) || newDosage < 0) {						// TODO - deal with case of renaming to existing dosage !!!
        alert('Dosage must be a positive number: '+ newDosage);
+    } else if (!isReserved(newUnits)) {
+       alert('Dosage must be a positive number: '+ newDosage);
     } else {
 		// remove spaces from the names (replacing with '_')
 		newDosage = newDosage.toString().split(' ').join('_');
-
 		// remove decimal point from the names (replacing with '_|_')
 		newDosage = newDosage.toString().split('.').join('__dot__');
+		
 		updateLabelName(tmpEditCat, tmpEditOldLabel, newDosage);
 		tmpEditCat = "";
 		tmpEditOldLabel = "";
@@ -673,8 +690,10 @@ function createNewLabel(cat, label, units, color, applyToCells) {
 	if (catLegend[cat].labels[label] === undefined) {
 		catLegend[cat].labels[label] = {};
 		catLegend[cat].labels[label].color = color;
+		catLegend[cat].labels[label].units = units;
 	} else {
 		catLegend[cat].labels[label].color = color;
+		catLegend[cat].labels[label].units = units;
 		// category and label already exist, just changing color,
 		// in this case cells which already have this label need their color updated also!!
 		updateCellColors(cat, label, color);
@@ -1406,6 +1425,7 @@ function loadJsonData(plateJson) {
 			for (catKey in plateModel.rows[row].columns[column].categories) {
 				for (labKey in plateModel.rows[row].columns[column].categories[catKey]) {
 					color = plateModel.rows[row].columns[column].categories[catKey][labKey].color;
+					units = plateModel.rows[row].columns[column].categories[catKey][labKey].units;
 					newContents += "," + color;
 
 					// cat legend part !! --> only needed for assignlabels page ??
@@ -1419,8 +1439,10 @@ function loadJsonData(plateJson) {
 					if (catLegend[catKey].labels[labKey] === undefined) {
 						catLegend[catKey].labels[labKey] = {};
 						catLegend[catKey].labels[labKey].color = color;
+						catLegend[catKey].labels[labKey].units = units;
 					} else {
 						catLegend[catKey].labels[labKey].color = color;
+						catLegend[catKey].labels[labKey].units = units;
 						// category and label already exist, just changing color,
 						// in this case cells which already have this label need their color updated also!!
 						updateCellColors(catKey, labKey, color);
