@@ -41,8 +41,9 @@
 									<g:sortableColumn property="dateCreated" title="${message(code: 'equipment.date.label', default: 'Date')}" />
 																
 									<th>Parse</th>
-									
 									<th>Update</th>
+									<th>Delete</th>
+									
 								
 								</tr>
 							</thead>
@@ -67,8 +68,15 @@
 									
 									<td>
 										<g:link id="${equipmentInstance.id}" action="load"><button class="btn btn-info btn-xs">View</button></g:link>
-										
-										
+									</td>	
+
+									<td>
+										<g:if test="${equipmentInstance?.canUpdate()}">
+											<g:link id="${equipmentInstance.id}" action="erase"><button class="btn btn-info btn-xs">Delete</button></g:link>
+										</g:if>
+										<g:if test="${!equipmentInstance?.canUpdate()}">
+											<button class="btn btn-xs">--NA--</button>
+										</g:if>	
 									</td>	
 								
 								</tr>
