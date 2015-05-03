@@ -158,6 +158,26 @@ class EquipmentController {
         }
     }
 
+	
+	@Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
+	def erase(Long id){
+		
+		if (!id) {
+			notFound()
+			return
+		}
+
+		def equipmentInstance = Equipment.get(id)
+		
+		if (!equipmentInstance) {
+			notFound()
+			return
+		}
+
+		respond equipmentInstance, model:[equipmentInstance: equipmentInstance]
+		
+	}
+	
     def delete(Equipment equipmentInstance) {
 
         if (equipmentInstance == null) {
