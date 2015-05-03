@@ -883,11 +883,11 @@ function addDoseStep() {
 	wellGroupLength = selCells.length;
 	
 	// validate input
-	if (!isNumeric(topDose) || topDose < 0) {
+	if (!isNumeric(topDose) || topDose <= 0) {
 		alert('Top Dose must be a positive number: '+ topDose);
 	} else if (isReservedValue(units)) {
        alert('Units contains reserved value: '+ units);
-    } else if (!isNumeric(dilution) || dilution < 0) {
+    } else if (!isNumeric(dilution) || dilution <= 0) {
 		alert('Dilution Factor must be a positive number: '+ dilution);
 	} else if (!isInteger(replicates) || replicates < 0) {
 		alert('# of Replicates must be a positive integer: '+ replicates);

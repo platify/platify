@@ -61,7 +61,7 @@ function Grid(containerID){
     };
 	
 	function editorCellFormatter(row, cell, value, columnDef, dataContext) {
-		//var inputStr = "A3, #FF0000, #00FF00, #0000FF, #9966FF, #66FF99, #99CCFF, #FF99CC, #FF9933, #66CCFF, #FFFF99";
+		//var inputStr = "A3, positive, #FF0000, #00FF00, #0000FF, #9966FF, #66FF99, #99CCFF, #FF99CC, #FF9933, #66CCFF, #FFFF99";
 		//console.log("value"+value);
 		var inputStr = value;
 		if (inputStr != null) {

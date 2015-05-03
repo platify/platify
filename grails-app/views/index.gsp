@@ -8,7 +8,7 @@
 		<div class="content-fluid">
 			<div class="row">
 				<div class="col-sm-12 content-body">
-					<h3 style="margin-left:15px">Surnote Asset Management System</h3>
+					<h3 style="margin-left:15px">Surnote Assay Management System</h3>
 					<ol class="breadcrumb">
 						<li><a class="home" href="#">Home</a></li>
 					</ol>
@@ -20,6 +20,7 @@
 							<div class="panel-body ">
 								<g:link class="btn btn-info btn-sm" controller="experimentalPlateSet" action="index">View Assays</g:link>
 								<g:link class="btn btn-info btn-sm" controller="experimentalPlateSet" action="create">Create New Assay</g:link>
+								<g:link class="btn btn-info btn-sm">Export Plate</g:link>
 							</div>
 						</div>
 					</div>
@@ -30,6 +31,7 @@
 							</div>
 							<div class="panel-body ">							
 								<button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#createTemplateModal">Create New Template</button>
+								<g:link class="btn btn-info btn-sm">Export Template</g:link>
 							</div>
 						</div>
 					</div>

@@ -145,7 +145,7 @@ function addEvent(elementId, eventType, handlerFunction) {
  * @param pModel - a data structure in the format of the internal data model.
  * @returns plateJson - a data structure in the format excepted by the server.
  */
-function translateModelToOutputJson(pModel) {
+function translateModelToOutputJson(pModel) {		// TODO - this is not called here !!! - remove!!
 	'use strict';
 	var plateJson, plate, row, column, well, labels, catKey, labKey, label;
 	plateJson = {};
@@ -192,7 +192,7 @@ function translateModelToOutputJson(pModel) {
  */
 function translateInputJsonToModel(plateJson) {
 	'use strict';
-	var pModel, plate, i, j, row, column, groupName, labels;
+	var pModel, plate, i, j, row, column, groupName, labels, wellType;
 	pModel = {};
 	pModel.rows = {};
 	plate = plateJson.plate;
@@ -203,7 +203,19 @@ function translateInputJsonToModel(plateJson) {
 	for (i = 0; i < plate.wells.length; i++) {
 		row = plate.wells[i].row + 1;
 		column = plate.wells[i].column + 1;
-		groupName = plate.wells[i].groupName;
+		
+		if (plate.wells[i].groupName !== undefined && plate.wells[i].groupName !== null) {
+			groupName = plate.wells[i].groupName;
+			if (plate.wells[i].control !== undefined && plate.wells[i].control !== null) {
+				wellType = plate.wells[i].control;
+			} else {
+				wellType = "compound";		// fail back to compound ??
+			}
+		} else {
+			groupName = "";
+			wellType = "empty";
+		}
+		
 		labels = plate.wells[i].labels;
 		
 		if (pModel.rows[row] === undefined) {
@@ -214,6 +226,7 @@ function translateInputJsonToModel(plateJson) {
 		if (pModel.rows[row].columns[column] === undefined) {
 			pModel.rows[row].columns[column] = {};
 			pModel.rows[row].columns[column].wellGroupName = groupName;
+			pModel.rows[row].columns[column].wellType = wellType;
 			pModel.rows[row].columns[column].categories = {};
 		}
 
@@ -256,7 +269,8 @@ function loadJsonData(plateJson) {
 		if (plateModel.rows.hasOwnProperty(row)) {
 			for (column in plateModel.rows[row].columns) {
 				if (plateModel.rows[row].columns.hasOwnProperty(column)) {
-					newContents = plateModel.rows[row].columns[column].wellGroupName; 
+					newContents = plateModel.rows[row].columns[column].wellGroupName;
+					newContents += "," + plateModel.rows[row].columns[column].wellType;
 					
 					if (newContents !== null && newContents !== undefined) {
 						newData[row - 1][column - 1] = newContents;
