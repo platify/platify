@@ -101,7 +101,6 @@ function ParserUI(parsingController){
     };
 
     this.setParsingName = function(parsingName){
-        console.log("name = " + parsingName);
         if (_self.parseOnlyModeOn){
             parsingNameElement.innerHTML = parsingName;
         } else {
@@ -124,8 +123,6 @@ function ParserUI(parsingController){
         } else {
             machineNameElement.value = machineName;
         }
-
-        console.log(typeof machineNameElement.innerHTML);
     };
 
     this.getParsingDescription = function(){

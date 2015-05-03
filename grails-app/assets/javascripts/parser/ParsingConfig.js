@@ -1,5 +1,14 @@
 /**
- * Created by zacharymartin on 3/22/15.
+ * ParsingConfig.js
+ *
+ * ParsingConfig objects store and manage all of the information necessary to parse one
+ * type of assay machine output file. These objects store the information to recognize
+ * different plates within the files and then locate important features on these plates
+ * that provide label data at the well, plate, and experiment level.
+ *
+ * @author Team SurNorte
+ * CSCI-E99
+ * May 7, 2015
  */
 // type of feature values
 var PLATE = "plate";
@@ -43,7 +52,12 @@ function ParsingConfig(name,
 
     var _self = this;
 
-
+    /**
+     * This is the constructor for BioFeature objects which represent both plates and
+     * features at the experiment, plate, and well levels
+     * @param feaLabel - the name of the feature
+     * @constructor
+     */
     function BioFeature(feaLabel){
         this.featureLabel = feaLabel;
         this.coordinateRange = null;
@@ -53,18 +67,40 @@ function ParsingConfig(name,
         this.typeOfFeature = null;  // PLATE, WELL_LEVEL, PLATE_LEVEL, EXPERIMENT_LEVEL
     }
 
+    /**
+     * A getter for the parsing identifier.
+     * @returns {null|*} - the identifier of the calling ParsingConfig object, will return
+     *                  null if the identifier has not previously been set.
+     */
     this.getID = function(){
         return this.id;
     };
 
+    /**
+     * A setter for the parsing identifier.
+     * @param parsingConfigIdentifier - the identifier of the parsing config object on
+     * which its identifier is to be set.
+     */
     _self.setID = function(parsingConfigIdentifier){
         _self.id = parsingConfigIdentifier;
     };
 
+    /**
+     * A getter for the calling ParsingConfig object's name.
+     * @returns {*} - the name of the calling ParsingConfig object
+     */
     this.getName = function(){
         return this.name;
     };
 
+    /**
+     * A setter for the calling ParsingConfig object's name.
+     * @param nameForParsingConfig - the name to set for the calling ParsingConfig object
+     *
+     * Note: - This method will throw a INVALID_PARSING_NAME error if the given name for
+     *      the parsing configuration is undefined, null, an empty string, or a string
+     *      consisting of only whitespace.
+     */
     this.setName = function(nameForParsingConfig){
         if (!nameForParsingConfig || !nameForParsingConfig.trim()){
             throw new ParsingConfigError(ParsingConfigError.INVALID_PARSING_NAME,
@@ -76,10 +112,23 @@ function ParsingConfig(name,
         this.name = nameForParsingConfig.trim();
     };
 
+    /**
+     * A getter for the machine name of the calling ParsingConfig object.
+     * @returns {*} - the machine name of the calling ParsingConfig object
+     */
     this.getMachineName = function(){
         return this.machineName;
     };
 
+    /**
+     * A setter for the machine name of the calling ParsingConfig object.
+     * @param nameOfAssayMachine - the machine name that the calling ParsingConfig object
+     *                          is to have its machine name set to
+     *
+     * Note: - This method will throw a INVALID_MACHINE_NAME error if the given name of
+     *      the assay machine is undefined, null, an empty string, or a string consisting
+     *      of only whitespace.
+     */
     this.setMachineName = function(nameOfAssayMachine){
         if (!nameOfAssayMachine || !nameOfAssayMachine.trim()){
             throw new ParsingConfigError(ParsingConfigError.INVALID_MACHINE_NAME,
@@ -91,38 +140,92 @@ function ParsingConfig(name,
         this.machineName = nameOfAssayMachine.trim();
     };
 
+    /**
+     * A getter for the description of the calling ParsingConfig object
+     * @returns {*} - the description of the calling ParsingConfig object
+     */
     this.getDescription = function(){
         return this.description;
     };
 
+    /**
+     * A setter for the description of the calling ParsingConfig object
+     * @param parsingDescription - the description to set on the calling ParsingConfig
+     *                          object
+     */
     this.setDescription = function(parsingDescription){
         this.description = parsingDescription;
     };
 
+    /**
+     * A getter for the delimiter of the calling ParsingConfig object
+     * @returns {*} - the delimiter of the calling ParsingConfig object
+     */
     this.getDelimiter = function(){
         return this.delimiter;
     };
 
+    /**
+     * A setter for the delimiter of the calling ParsingConfig object
+     * @param parsingDelimiter - the delimiter to set on the calling ParsingConfig object
+     */
     this.setDelimiter = function(parsingDelimiter){
         this.delimiter = parsingDelimiter;
     };
 
+    /**
+     * A getter for the colorPicker index of the calling ParsingConfig object
+     * @returns {number} - the current index of the colorpicker for the calling parsing
+     *                  config object.
+     */
     this.getColorPickerIndex = function(){
         return this.colorPickerIndex;
     };
 
+    /**
+     * A setter for the colorPicker index of  the calling ParsingConfig object
+     * @param index - the index of the colorPicker to set on the calling ParsingConfig
+     *              object.
+     */
     this.setColorPickerIndex = function(index){
         this.colorPickerIndex = index;
     };
 
+    /**
+     * A getter for the number of plate rows for the calling ParsingConfig object.
+     * @returns {number} - the number of plate rows for the calling ParsingConfig object
+     */
     this.getNumberOfPlateRows = function(){
         return this.numPlateRows;
     };
 
+    /**
+     * A getter for the number of plate columns for the calling ParsingConfig object.
+     * @returns {number} - the number of plate columns for the calling ParsingConfig
+     *                  object
+     */
     this.getNumberOfPlateColumns = function(){
         return this.numPlateCols;
     };
 
+    /**
+     * This method adds a plate anchor to the calling ParsingConfig objects. Plate anchors
+     * consist of a relative row compared to the top left corner cell of the ParsingConfig
+     * plate, relative column compared to the top left corner cell of the ParsingConfig
+     * plate, and a cell value. Plate anchors are used to recognize plates in an assay
+     * machine output file.
+     * @param row - the row number on the grid of the plate anchor
+     * @param column - the column number on the grid of the plate anchor
+     * @param value - the cell value on the grid of the plate anchor.
+     *
+     * Note: - This method throws a FIRST_PLATE_NOT_DEFINED error if the first plate has
+     *      not already been successfully set for the calling parsing config, using the
+     *      addPlate method.
+     *       - This method throws a NOT_ON_FIRST_PLATE error if the anchor is not within
+     *      the coordinate range of the first plate for the ParsingConfig object.
+     *       - This method throws a DUPLICATE_ANCHOR error if the given row and column
+     *      have already been used to add an anchor to the calling ParsingConfig object.
+     */
     this.addPlateAnchor = function(row, column, value){
         if (!this.plate){
             throw new ParsingConfigError(ParsingConfigError.FIRST_PLATE_NOT_DEFINED,
@@ -139,7 +242,11 @@ function ParsingConfig(name,
         }
 
         if (this.findPlateAnchorIndex(row, column) !== null){
-            throw new ParsingConfigError()
+            throw new ParsingConfigError(ParsingConfigError.DUPLICATE_ANCHOR,
+                                         Grid.getRowLabel(row) + column,
+                                         "anchor",
+                                         "add a new plate anchor");
+
         }
 
         this.plateAnchors.push([row - this.plate.coordinateRange.startRow,
@@ -147,18 +254,28 @@ function ParsingConfig(name,
                                 value]);
     };
 
+    /**
+     * This method removes a plate anchor from the calling ParsingConfig object.
+     * @param row - the grid row number of the anchor to remove
+     * @param column - the grid column number of the anchor to remove
+     *
+     * Note: - If the plate is not defined for the calling ParsingConfig object, then this
+     *      method will throw a FIRST_PLATE_NOT_DEFINED error.
+     *       - If no anchor exists for the given row and column, then this method will
+     *      throw a NO_SUCH_ANCHOR error.
+     */
     this.removePlateAnchor = function(row, column){
-        var anchorIndex = this.findPlateAnchorIndex(row, column);
-
         if (!this.plate){
             throw new ParsingConfigError(ParsingConfigError.FIRST_PLATE_NOT_DEFINED,
-                                         Grid.getRowLabel(row) + column,
-                                         "anchors",
-                                         "remove a plate anchor");
+                Grid.getRowLabel(row) + column,
+                "anchors",
+                "remove a plate anchor");
         }
 
+        var anchorIndex = this.findPlateAnchorIndex(row, column);
+
         if (anchorIndex === null) {
-            throw new ParsingConfigError(ParsingConfigError.DUPLICATE_ANCHOR,
+            throw new ParsingConfigError(ParsingConfigError.NO_SUCH_ANCHOR,
                                          Grid.getRowLabel(row) + column,
                                          "anchors",
                                          "remove a plate anchor")
@@ -167,6 +284,12 @@ function ParsingConfig(name,
         this.plateAnchors.splice(anchorIndex, 1);
     };
 
+    /**
+     * This method returns an array of all of the defined feature names at every level
+     * for the calling ParsingConfig object.
+     * @returns {Array} - an array of all of the defined feature names at every level
+     * for the calling ParsingConfig object.
+     */
     this.getFeatureNames = function(){
         var result = [];
 
@@ -177,6 +300,12 @@ function ParsingConfig(name,
         return result;
     };
 
+    /**
+     * This method returns an array of all of the defined plate level feature names for
+     * the calling ParsingConfig object.
+     * @returns {Array} - an array of all of the defined plate level feature names for
+     * the calling ParsingConfig object.
+     */
     this.getPlateLevelFeatureNames = function(){
         var result = [];
 
@@ -191,6 +320,16 @@ function ParsingConfig(name,
         return result;
     };
 
+    /**
+     * This method returns a reference to a BioFeature object that matches a given
+     * feature name.
+     * @param featureName - the name of the feature that the reference to the
+     * corresponding BioFeature is desired.
+     * @returns {*} - a reference to the desired BioFeature object
+     *
+     * Note: - This method throws a NO_SUCH_FEATURE error if the calling ParsingConfig
+     *      object contains no feature that matches the given feature name.
+     */
     this.getFeature = function(featureName){
         var feature = this.features[featureName.trim()];
 
@@ -204,6 +343,20 @@ function ParsingConfig(name,
         return feature;
     };
 
+    /**
+     * This method creates a new BioFeature object.
+     * @param name - the name of the new BioFeature object
+     * @param range - the cell range on the grid of the new BioFeature object
+     * @param isParent - a boolean for whether or not the new BioFeature object is a plate
+     *                  or experiment level feature
+     * @param parent - the parent of the new BioFeature object. For well and plate level
+     *              features this will be the plate BioFeature and for plates and
+     *              experiment level features this will be null
+     * @param typeOfFeature - PLATE, WELL_LEVEL, PLATE_LEVEL, or EXPERIMENT_LEVEL
+     * @param color - the hex color string to use when highlighting the feature on the
+     *              Grid
+     * @returns {ParsingConfig.BioFeature} - the new BioFeature object
+     */
     this.addFeature = function(name, range, isParent, parent, typeOfFeature, color){
         if (this.features[name.trim()]){
             throw new ParsingConfigError(ParsingConfigError.DUPLICATE_FEATURE_NAME,
@@ -228,6 +381,13 @@ function ParsingConfig(name,
         return newFeature;
     };
 
+    /**
+     * This method removes a feature from the calling ParsingConfig object
+     * @param nameOfFeatureToDelete - the name string of the feature to delete
+     *
+     * Note: - If the given feature name matches no feature contained in the calling
+     *      ParsingConfig object, then this method will throw a NO_SUCH_FEATURE error.
+     */
     this.deleteFeature = function(nameOfFeatureToDelete){
         if (!this.features[nameOfFeatureToDelete.trim()]){
             throw new ParsingConfigError(ParsingConfigError.NO_SUCH_FEATURE,
@@ -239,6 +399,14 @@ function ParsingConfig(name,
         delete this.features[nameOfFeatureToDelete];
     };
 
+    /**
+     * This method sets the plate definition for the calling ParsingConfig object.
+     * @param range - the CellRange of the plate on the Grid
+     * @param examiner - the FileExaminer for the file that the plate is being defined for
+     * @param color - the hex color string that should be used to highlight plates on the
+     *              grid
+     * @returns {null|*} - a reference to the BioFeature object representing the plate
+     */
     this.addPlate = function(range, examiner, color){
         this.plateAnchors = [];
         this.features = {};
@@ -247,6 +415,20 @@ function ParsingConfig(name,
         return this.plate
     };
 
+    /**
+     * This method adds an experiment level feature to the calling ParsingConfig object.
+     * @param name - the name of the new experiment level feature
+     * @param range - the CellRange on the Grid of the feature on the first plate
+     * @param color - the hex color string that should be used to highlight the feature
+     *              on the grid
+     * @returns {ParsingConfig.BioFeature} - a reference to the BioFeature object
+     *                                    representing the new feature
+     *
+     * Note: - This method throws a FIRST_PLATE_NOT_DEFINED error if the first plate has
+     *      not already been set for the calling ParsingConfig object
+     *       - This method throws a FEATURE_TYPE_DOES_NOT_SUPPORT_MULTIPLE_CELLS error if
+     *      the given cell range covers more than one cell.
+     */
     this.addExperimentLevelFeature = function(name, range, color){
         if (!this.plate){
             throw new ParsingConfigError(ParsingConfigError.FIRST_PLATE_NOT_DEFINED,
@@ -275,6 +457,7 @@ function ParsingConfig(name,
         return feature;
     };
 
+    
     this.addPlateLevelFeature = function(name, range, color){
         if (!this.plate){
             throw new ParsingConfigError(ParsingConfigError.FIRST_PLATE_NOT_DEFINED,
@@ -453,6 +636,9 @@ function ParsingConfig(name,
     this.findPlateAnchorIndex = function(row, column){
         result = null;
 
+        row = row - this.plate.coordinateRange.startRow;
+        column = column - this.plate.coordinateRange.startCol;
+
         for (var i=0; i<this.plateAnchors.length; i++){
             var plateAnchorRow = this.plateAnchors[i][0];
             var plateAnchorCol = this.plateAnchors[i][1];
@@ -593,7 +779,7 @@ ParsingConfig.createZeros2DArray = function(rows, columns){
 };
 
 
-
+// types of ParsingConfigErrors
 ParsingConfigError.FEATURE_TYPE_DOES_NOT_SUPPORT_MULTIPLE_CELLS
     = "multiple cells not supported for feature type";
 ParsingConfigError.NOT_ON_FIRST_PLATE = "not on first plate";
@@ -614,6 +800,16 @@ ParsingConfigError.FEATURE_RANGE_NOT_SPECIFIED = "feature range not specified";
 ParsingConfigError.FEATURE_COLOR_NOT_SPECIFIED = "feature color not specified";
 
 
+/**
+ * ParsingConfigError objects store and represent the conditions under which an
+ * exceptional event occurred in the manipulation of ParsingConfig objects.
+ * @param type - a constant describing the reason for the error, possible options listed
+ *              above
+ * @param descriptor - a string describing the circumstance of the error
+ * @param level - the level that the error occurred at
+ * @param attemptedAction - the action that was being attempted when the error occurred
+ * @constructor
+ */
 function ParsingConfigError(type, descriptor, level, attemptedAction){
     this.type = type;
     this.descriptor = descriptor;
@@ -621,6 +817,10 @@ function ParsingConfigError(type, descriptor, level, attemptedAction){
     this.attemptedAction = attemptedAction;
 
 
+    /**
+     * This method returns a human readable message describing the error.
+     * @returns {string} - a human readable string message describing the calling error
+     */
     this.getMessage = function() {
         if (this.type === ParsingConfigError.FEATURE_TYPE_DOES_NOT_SUPPORT_MULTIPLE_CELLS) {
             return "Features at the " + this.level + " level cannot have multiple cells.";
