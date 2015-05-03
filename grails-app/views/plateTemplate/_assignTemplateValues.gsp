@@ -55,7 +55,7 @@
 			<div class="panel-heading">
 				<h4 class="panel-title">Plate Layout<span class="pull-right"><button id="clearAllSelection" class="btn btn-info btn-xs">Clear Selection</button></span></h4>
 			</div>
-			<div class="panel-body">
+			<div class="panel-body" style="padding:0px">
 				<div id="myGrid" style="width:100%; height:650px;"></div>
 			</div>
 		</div>

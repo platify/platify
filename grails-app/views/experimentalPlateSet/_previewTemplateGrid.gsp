@@ -12,7 +12,7 @@
 					    <div class="col-sm-9">
 							 <div id="templateSelection">
 							  	<g:select class="form-control" id="plateSelect" name="plate.id" from="${edu.harvard.capstone.editor.PlateTemplate.list()}" 
-							  		optionKey="id" optionValue="${{it.name + ' - ' + it.id + '; ' + it.width+ ',' + it.height}}"
+							  		optionKey="id" optionValue="${{it.name + ' (id:' + it.id + ')'}}"
 									onchange="onPlateSelectChange(this)" onload="onPlateSelectChange(this)" value="${plateSetInstance?.plate?.id}" class="many-to-one"/> 
 							 </div>
 						</div>						
@@ -58,7 +58,7 @@
 			<div class="panel-heading">
 				<h4 class="panel-title">Preview Grid</h4>
 			</div>
-			<div class="panel-body">
+			<div class="panel-body" style="padding:0px">
 				<div id="myGrid" style="width:100%; height:650px;"></div>
 			</div>
 		</div>
