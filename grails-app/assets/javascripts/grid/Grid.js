@@ -408,6 +408,15 @@ function Grid(containerID){
         this.grid.scrollRowToTop(rowNumber - 1);
     };
 
+    this.getNumberOfRows = function(){
+        return this.rowsSize;
+    };
+
+    this.getNumberOfColumns = function(){
+        return this.colsSize;
+    };
+
+
     /**
      * A private method for converting a 2D data array to the array containing
      * row objects format required by SlickGrid

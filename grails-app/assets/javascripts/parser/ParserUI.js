@@ -280,12 +280,17 @@ function ParserUI(parsingController){
     this.getFirstPlateCellRange = function(){
         var cellRange;
 
-        if (_self.parseOnlyModeOn){
-            cellRange
-                = ParserUI.convertStringToCellRange(firstPlateCellRangeElement.innerHTML);
-        } else {
-            cellRange
-                = ParserUI.convertStringToCellRange(firstPlateCellRangeElement.value);
+        try {
+            if (_self.parseOnlyModeOn){
+                cellRange
+                    = ParserUI.convertStringToCellRange(
+                                                    firstPlateCellRangeElement.innerHTML);
+            } else {
+                cellRange
+                    = ParserUI.convertStringToCellRange(firstPlateCellRangeElement.value);
+            }
+        } catch (error) {
+            _self.displayError(error);
         }
 
         return cellRange;
@@ -304,6 +309,7 @@ function ParserUI(parsingController){
 
     this.handleFirstPlateCellRangeChange = function(){
         var selectedCellRange = _self.getFirstPlateCellRange();
+        console.log(selectedCellRange);
 
         try {
             _self.parsingController.selectCells(selectedCellRange);
@@ -325,11 +331,21 @@ function ParserUI(parsingController){
     // ----------------------- Features tab getters and setters --------------------------
 
     this.getFeatureCellRange = function(){
-        if (_self.parseOnlyModeOn){
-            return ParserUI.convertStringToCellRange(featureCellRangeElement.innerHTML);
-        } else {
-            return ParserUI.convertStringToCellRange(featureCellRangeElement.value);
+        var cellRange;
+
+        try {
+            if (_self.parseOnlyModeOn){
+                cellRange = ParserUI.convertStringToCellRange(
+                                                       featureCellRangeElement.innerHTML);
+            } else {
+                cellRange = ParserUI.convertStringToCellRange(
+                                                           featureCellRangeElement.value);
+            }
+        } catch (error){
+            _self.displayError(error);
         }
+
+        return cellRange;
     };
 
     this.setFeatureCellRange = function(featureRange){

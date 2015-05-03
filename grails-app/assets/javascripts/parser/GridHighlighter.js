@@ -3,6 +3,7 @@
  */
 
 function GridHighlighter(grid){
+    var _self = this;
 
     this.grid = grid;
 
@@ -12,6 +13,14 @@ function GridHighlighter(grid){
     var selectionHighlightKeys = [];
 
     this.selectCellsInRange = function(range, color){
+        if (range.startRow < 1
+                || range.endRow > _self.grid.getNumberOfRows()
+                || range.startCol < 1
+                || range.endCol > _self.grid.getNumberOfColumns()) {
+            throw new GridHighlighterError(GridHighlighterError.RANGE_OUTSIDE_GRID_BOUNDS,
+                                           "select cells in a range");
+        }
+
         // highlight selected cells with the current color
         var coordinatesToHighlight = [];
         for (var i=range.startRow; i<=range.endRow; i++){
@@ -21,7 +30,7 @@ function GridHighlighter(grid){
         }
         var colorKey = getDistinctColorKey();
 
-        grid.setCellColors(coordinatesToHighlight,
+        this.grid.setCellColors(coordinatesToHighlight,
                            color,
                            colorKey);
         selectionHighlightKeys.push(colorKey);
@@ -126,4 +135,18 @@ function GridHighlighter(grid){
         colorKeyCounter++;
         return colorKey;
     }
+}
+
+GridHighlighterError.RANGE_OUTSIDE_GRID_BOUNDS = "range outside grid bounds";
+
+
+function GridHighlighterError(type, attemptedAction){
+    this.type = type;
+    this.attemptedAction = attemptedAction;
+
+    this.getMessage = function(){
+        if (this.type === GridHighlighterError.RANGE_OUTSIDE_GRID_BOUNDS){
+            return "The given range is outside grid bounds.";
+        }
+    };
 }

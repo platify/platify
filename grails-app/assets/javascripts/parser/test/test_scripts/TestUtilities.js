@@ -152,6 +152,17 @@ TestUtilities.getRandomImportDataObject = function(){
     return importData;
 };
 
+TestUtilities.getRandomParsingConfigObject = function(){
+    var name = TestUtilities.getRandomString(1, 16);
+    var machine = TestUtilities.getRandomString(1, 16);
+    var description = TestUtilities.getRandomString(1, 256);
+    var delimiter = TestUtilities.getRandomString(1, 16);
+
+    var parsingConfig = new ParsingConfig(name, machine, description, delimiter);
+
+
+};
+
 
 TestUtilities.arrayContainsElement = function(array, element){
     for (var i=0; i<array.length; i++){
