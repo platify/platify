@@ -397,7 +397,11 @@ function ParserUI(parsingController){
     };
 
     this.setFeatureCategory = function(categoryName){
-        featureCategoryElement.value = categoryName;
+        if (_self.parseOnlyModeOn){
+            featureCategoryElement.innerHTML = categoryName;
+        } else {
+            featureCategoryElement.value = categoryName;
+        }
     };
 
     this.getSelectedFeature = function(){

@@ -457,7 +457,7 @@ function ParsingConfig(name,
         return feature;
     };
 
-    
+
     this.addPlateLevelFeature = function(name, range, color){
         if (!this.plate){
             throw new ParsingConfigError(ParsingConfigError.FIRST_PLATE_NOT_DEFINED,
