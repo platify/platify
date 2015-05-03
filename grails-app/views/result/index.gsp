@@ -69,11 +69,16 @@
 	<!-- d3 -->
 	<asset:javascript src="d3.v3.min.js" />
 
-	<!-- results-specific js -->
-	<asset:javascript src="bootstrap-toggle.min.js" />
-	<asset:javascript src="plate-statistics/statistics.js" />
+	<!-- datatables -->
 	<asset:javascript src="jquery.dataTables.js" />
 	<asset:javascript src="dataTables.tableTools.js" />
+
+	<!-- importData forked from the parser -->
+	<asset:javascript src="result/ImportData.js" />
+	<asset:javascript src="result/ImportDataFileGenerator.js" />
+
+	<!-- results-specific js -->
+	<asset:javascript src="plate-statistics/statistics.js" />
 	<g:javascript>
 	var RESULT_KITCHEN_SINK_URL = "${createLink(action: 'kitchenSink', experimentInstance: null)}";
 	var RESULT_SAVE_REFACTORED_DATA_URL = "${createLink(controller: 'refactoredData', action: 'save', resultInstance: null)}";

@@ -4,18 +4,6 @@ var plateTable;
 var plateTableTools;
 
 
-function createBlankData(width, height) {
-    var result = [];
-    for (var i=0; i<width; i++) {
-        result[i] = [];
-        for (var j=0; j<height; j++) {
-            result[i][j] = null;
-        }
-    }
-    return result;
-}
-
-
 /**
  * Colors each cell in the grid.  The color is determined by the value
  * in the cell.
@@ -45,12 +33,48 @@ function colorGrid(dataSet) {
 }
 
 
+/**
+ * Generate a set of blank data.
+ */
+function createBlankData(width, height) {
+    var result = [];
+    for (var i=0; i<width; i++) {
+        result[i] = [];
+        for (var j=0; j<height; j++) {
+            result[i][j] = null;
+        }
+    }
+    return result;
+}
+
+
+/**
+ * Create a Grid object, and load in blank data.
+ */
 function createGrid() {
     grid  = new Grid("resultGrid");
     loadGrid(createBlankData(100,100));
 }
 
 
+/**
+ * Format the experiment data as a csv and trigger a download of it in the
+ * browser.
+ */
+function downloadExperiment() {
+    var importData = ImportData.createImportDataObjectFromJSON(experiment.experiment);
+    var generator = new ImportDataFileGenerator();
+    generator.createIntergroupInterchangeFormatMatrix(importData);
+
+    filename = 'assay_results.csv';
+    generator.forceCSVDownload(filename);
+}
+
+
+/**
+ * Read the data for the indicated experiment from the server, display
+ * the plates on the page, and select the first one.
+ */
 function experimentSelected(experimentId) {
     experiment = new ExperimentModel(experimentId);
     experiment.getData().always(function () {

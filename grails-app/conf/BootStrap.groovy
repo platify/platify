@@ -181,10 +181,6 @@ class BootStrap {
 	    def resultPlate1 = new ResultPlate(result: result1, rows: 4, columns: 4, barcode: plateSet1.barcode).save(flush: true)
 	    def resultPlateLabel = new ResultLabel(name: "result plate label", value: "result plate label value", labelType: ResultLabel.LabelType.LABEL, scope: ResultLabel.LabelScope.PLATE, domainId: resultPlate1.id).save(flush: true)
 
-	    // apply a plate-level label
-            def junk = new Label(category: "junk", name: "junk").save(flush: true)
-	    def junkLabel = new DomainLabel(label: junk, domainId: plateSet1.plate.id, labelType: DomainLabel.LabelType.PLATE, plate: plateSet1).save(flush: true)
-
             // pick some labels to apply to the wells
             def foo = new Label(category: "foo", name: "foo").save(flush: true)
             def bar = new Label(category: "foo", name: "bar").save(flush: true)
