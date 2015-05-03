@@ -40,10 +40,10 @@ function colorGrid(dataSet) {
  */
 function createBlankData(width, height) {
     var result = [];
-    for (var i=0; i<width; i++) {
-        result[i] = [];
-        for (var j=0; j<height; j++) {
-            result[i][j] = null;
+    for (var x=0; x<width; x++) {
+        result[x] = [];
+        for (var y=0; y<height; y++) {
+            result[x][y] = null;
         }
     }
     return result;
@@ -105,7 +105,9 @@ function experimentSelected(experimentId) {
             plateTableTools.fnSelect(plateTable.row(0).nodes());
         }
         else {
-            loadGrid([], false);
+            loadGrid(createBlankData(experiment.numRows,
+                                     experiment.numColumns),
+                     false);
             plateTable.clear().draw();
         }
     });

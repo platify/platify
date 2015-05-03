@@ -14,6 +14,8 @@ function ExperimentModel(experimentId) {
     // experiment-wide data
     this.experimentId = experimentId;
     this.plates = null; // keyed by plateID
+    this.numRows = 0;
+    this.numColumns = 0;
 
     // updated every time we change plates
     this.controls = {'negative': null, 'positive': null};
@@ -55,9 +57,21 @@ function ExperimentModel(experimentId) {
             if (Object.keys(that.experiment.plates).length > 0) {
                 for (var i=0; i<that.experiment.plates.length; i++) {
                     var plate = that.experiment.plates[i];
+
+                    // we assume this exists elsewhere, add it if not
                     if (!plate.rawData) {
                         plate.rawData = {};
                     }
+
+                    // figure out the size of the plates
+                    that.numRows = Math.max(that.numRows, plate.rows.length);
+                    var columnCounts = plate.rows.map(function (row) {
+                        return row.columns.length;
+                    });
+                    that.numColumns = Math.max(that.numColumns,
+                                               Math.max.apply(null, columnCounts));
+
+                    // store it by plate id
                     that.plates[plate.plateID] = plate;
                 }
                 that.selectPlate(that.experiment.plates[0].plateID);
@@ -76,15 +90,28 @@ function ExperimentModel(experimentId) {
 
 
     /**
+     * Returns empty 2d array in the shape of the plates for this experiment.
+     */
+    this.getEmptyGrid = function() {
+        var empty = [];
+        for (var x=0; x<this.numRows; x++) {
+            empty.push(new Array(this.numColumns));
+        }
+        return empty;
+    }
+
+    /**
      * Copies the raw data on the current plate into a 2d array to supply
      * to slickgrid.
      */
     this.loadDataForGrid = function() {
         var label = this.rawDataLabel();
 
-        this.data = [];
+        // create an empty array no matter what
+        this.data = this.getEmptyGrid();
+
+        // if there's data, fill it in
         for (var x=0; x<this.currentPlate.rows.length; x++) {
-            this.data[x] = [];
             for (var y=0; y<this.currentPlate.rows[0].columns.length; y++) {
                 var well = this.currentPlate.rows[x].columns[y]
                 if (!$.isEmptyObject(well.rawData)) {
@@ -102,9 +129,8 @@ function ExperimentModel(experimentId) {
     this.loadNormalizedDataForGrid = function() {
         var label = this.rawDataLabel();
 
-        this.normalizedData = [];
+        this.normalizedData = this.getEmptyGrid();
         for (var x=0; x<this.currentPlate.rows.length; x++) {
-            this.normalizedData[x] = [];
             for (var y=0; y<this.currentPlate.rows[0].columns.length; y++) {
                 var well = this.currentPlate.rows[x].columns[y];
                 if (!$.isEmptyObject(well.normalizedData)) {
@@ -310,8 +336,8 @@ function ExperimentModel(experimentId) {
         else {
             this.currentPlate = null;
             this.currentPlateID = null;
-            this.data = [];
-            this.normalizedData = [];
+            this.data = this.getEmptyData();
+            this.normalizedData = this.getEmptyData();
         }
     }
 
