@@ -35,8 +35,8 @@
 				</div>
 				<div id="downloadButtons" class="pull-right">
 					<strong>Download:</strong>
-					<button class="btn btn-primary btn-xs" type="submit" data-fileformat="csv">CSV</button>
-					<button class="btn btn-primary btn-xs" type="submit" data-fileformat="tsv">TSV</button>
+					<button class="btn btn-info btn-xs" type="submit" data-fileformat="csv">CSV</button>
+					<button class="btn btn-info btn-xs" type="submit" data-fileformat="tsv">TSV</button>
 				</div>
 			</div>
 
@@ -56,10 +56,13 @@
 
 			<div class="row col-sm-12">
 				<div class="pull-left">
+					<label class="btn btn-info btn-xs">
+						<input id="normalizeButton" type="checkbox">Normalize Data
+					</label>
 				</div>
 				<div class="pull-right">
-					<label>
-						<input id="heatMapButton" type="checkbox" checked>Heat Map
+					<label class="btn btn-info btn-xs">
+						<input id="heatMapButton" type="checkbox" checked>Show Heat Map
 					</label>
 				</div>
 

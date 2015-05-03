@@ -141,6 +141,12 @@ function init() {
         downloadExperiment(event.target.dataset.fileformat);
     });
 
+    // add normalize button listener
+    $('#normalizeButton').on('click', function(event) {
+        showNormalized = $(event.target)[0].checked;
+        reloadGrid();
+    });
+
     // add heatmap button listener
     $('#heatMapButton').on('click', function(event) {
         showHeatMap = $(event.target)[0].checked;
@@ -160,7 +166,7 @@ function loadGrid(dataSet) {
 
 function plateSelected(plateID) {
     experiment.selectPlate(plateID);
-    loadGrid(experiment.data);
+    loadGrid(showNormalized ? experiment.normalizedData : experiment.data);
 }
 
 
