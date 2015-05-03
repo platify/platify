@@ -226,10 +226,15 @@ function updateCatVisibility(cat) {
  */
 function createCompoundInput(wellGroup) {
 	"use strict";
-	var newInput = document.createElement("input");
+	var newDiv, newInput;
+	newDiv = document.createElement("div");
+	newDiv.className = "col-xs-9";
+	newInput = document.createElement("input");
 	newInput.id = "wellGroup__sep__" + wellGroup;
 	newInput.type = "text";
-	return newInput;
+	newInput.className = "form-control";
+	newDiv.appendChild(newInput);
+	return newDiv;
 }
 
 /**
@@ -280,7 +285,9 @@ function updateCompoundList() {
 			innerDiv = document.createElement("div");
 			innerDiv.className = "col-xs-12";
 			newLabel = document.createElement("label");
-			newLabel.appendChild(document.createTextNode(wellGroup));
+			newLabel.setAttribute("for", "wellGroup__sep__" + wellGroup);
+			newLabel.className = "col-xs-1 control-label";
+			newLabel.appendChild(document.createTextNode(wellGroup + ": "));
 
 			newInput = createCompoundInput(wellGroup);
 			innerDiv.appendChild(newLabel);

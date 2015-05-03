@@ -156,7 +156,7 @@
 		<div class="panel-heading">
 			<h4 class="panel-title">Compounds<span class="pull-right"><button id="importCompoundListButton" type="button" class="btn btn-info btn-xs glyphicon glyphicon-import" data-toggle="modal" data-target="#importCompoundsModal"></button></span></h4>
 		</div>
-		<div class="panel-body">
+		<div class="panel-body" style="padding-left:0px; padding-right:0px;">
 			<div id="compoundList"></div>
 		</div>
 	</div>
