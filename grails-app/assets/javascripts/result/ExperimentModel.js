@@ -33,7 +33,7 @@ function ExperimentModel(experimentId) {
      */
     this.getData = function() {
         var that = this; // blegh, js binding hack
-        var url = RESULT_KITCHEN_SINK_URL + '/' + this.experimentId;
+        var url = RESULT_READ_URL + '/' + this.experimentId;
         var jqxhr = $.ajax({
             url: url,
             dataType: 'json',

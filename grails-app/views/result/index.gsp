@@ -56,11 +56,13 @@
 
 			<div class="row col-sm-12">
 				<div class="pull-left">
+					<b>Showing values for: </b>
+					<span id="rawDataLabel"></span>
+				</div>
+				<div class="pull-right">
 					<label class="btn btn-info btn-xs">
 						<input id="normalizeButton" type="checkbox">Normalize Data
 					</label>
-				</div>
-				<div class="pull-right">
 					<label class="btn btn-info btn-xs">
 						<input id="heatMapButton" type="checkbox" checked>Show Heat Map
 					</label>
@@ -103,7 +105,7 @@
 	<!-- results-specific js -->
 	<asset:javascript src="plate-statistics/statistics.js" />
 	<g:javascript>
-	var RESULT_KITCHEN_SINK_URL = "${createLink(action: 'kitchenSink', experimentInstance: null)}";
+	var RESULT_READ_URL = "${createLink(action: 'read', experimentInstance: null)}";
 	var RESULT_SAVE_REFACTORED_DATA_URL = "${createLink(controller: 'refactoredData', action: 'save', resultInstance: null)}";
 	</g:javascript>
 	<asset:javascript src="result/ExperimentModel.js" />

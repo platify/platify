@@ -603,30 +603,48 @@ Grid.coordinateArrayIndexOf = function(coordinateArray, coordinatesToSearchFor){
 };
 
 Grid.editorCellFormatter = function(row, cell, value, columnDef, dataContext) {
-    //var inputStr = "A3, #FF0000, #00FF00, #0000FF, #9966FF, #66FF99, #99CCFF, #FF99CC, #FF9933, #66CCFF, #FFFF99";
-    //console.log("value"+value);
-    var inputStr = value;
-    if (inputStr != null) {
-        var colorArray = inputStr.split(',');
-        var colnum = Math.sqrt(colorArray.length - 1);
-        colnum = Math.floor(colnum);
-        var rownum = Math.ceil((colorArray.length - 1) / colnum);
-
-        var cellStr = "<table style='width:100%;height:100%'>";
-        cellStr += "<th rowspan='" + (rownum+1) + "'>" + colorArray[0] +"</th>";
-        var i, j=0;
-        var colorIdx = 1;
-        for (i=0; i < colnum; i++) {
-            cellStr += "<tr>";
-            for (j=0; (j < rownum) && (colorIdx < colorArray.length); j++) {
-                cellStr += "<td bgcolor='" + colorArray[colorIdx]+ "'> </td>" ;
-                colorIdx++;
-            }
-            cellStr += "</tr>";
-        }
-        cellStr += "</table>";
-        return cellStr;
-    } else {
-        return "<span style='width:100%'>-</span>";
-    }
+    //var inputStr = "A3, positive, #FF0000, #00FF00, #0000FF, #9966FF, #66FF99, #99CCFF, #FF99CC, #FF9933, #66CCFF, #FFFF99";
+	//console.log("value"+value);
+	var inputStr = value;
+	if (inputStr != null) {
+		var colorArray = inputStr.split(',');
+		var colnum = Math.sqrt(colorArray.length - 1);
+		colnum = Math.floor(colnum);
+		var rownum = Math.ceil((colorArray.length - 1) / colnum);
+		var cellStr = "<div style='width:100%;height:100%'>";
+		var colorIdx = 1;
+		var celColor = "black";
+		
+		if (colorArray.length > 1) {
+			// if 2nd value passed is a color, then not a control well
+			if( /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(colorArray[1])) {
+				colorIdx = 1;
+			} else {
+				colorIdx = 2;
+				if("positive" === colorArray[1]) {
+					celColor = "green";
+				} else if ("negative" === colorArray[1]) {
+					celColor = "red";
+				}
+			}
+		}
+		
+		cellStr += "<div style='float:left; width:28%; height:100%;color:" + celColor + ";'>" + colorArray[0] + "</div>";
+		cellStr += "<div style='float:right; width:72%; height:100%'>";
+		cellStr += "<table style='width:100%;height:100%'>";
+		var i, j = 0;
+		for (i = 0; i < colnum; i++) {
+			cellStr += "<tr>";
+			for (j = 0; (j < rownum) && (colorIdx < colorArray.length); j++) {
+				cellStr += "<td bgcolor='" + colorArray[colorIdx] + "'> </td>" ;
+				colorIdx++;
+			}
+			cellStr += "</tr>";
+		}		
+		cellStr += "</table>";
+		cellStr += "</div></div>";
+		return cellStr;
+	} else {
+		return "<span style='width:100%'>-</span>";
+	}	
 };

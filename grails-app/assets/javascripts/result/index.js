@@ -51,15 +51,6 @@ function createBlankData(width, height) {
 
 
 /**
- * Create a Grid object, and load in blank data.
- */
-function createGrid() {
-    grid  = new Grid("resultGrid");
-    loadGrid(createBlankData(100,100), false);
-}
-
-
-/**
  * Format the experiment data as a csv and trigger a download of it in the
  * browser.
  */
@@ -134,7 +125,7 @@ function init() {
     plateTableTools = TableTools.fnGetInstance('plateTable');
 
     // set up grid
-    createGrid();
+    grid  = new Grid("resultGrid");
     var experimentId = $('#experimentSelect option:selected')[0].value;
     experimentSelected(experimentId); // calls plateSelected for us
 
@@ -169,6 +160,7 @@ function loadGrid(dataSet) {
 function plateSelected(plateID) {
     experiment.selectPlate(plateID);
     loadGrid(showNormalized ? experiment.normalizedData : experiment.data);
+    $('#rawDataLabel')[0].textContent = experiment.rawDataLabel();
 }
 
 
