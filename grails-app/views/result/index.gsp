@@ -22,16 +22,25 @@
 	<body>
 		<div class="content-fluid">
 			<div class="row col-sm-12">
-				<strong>Assay:</strong>
-				<g:select
-					id="experimentSelect"
-					name="name"
-					from="${edu.harvard.capstone.editor.ExperimentalPlateSet.list()}"
-					optionKey="id"
-					optionValue="${{it.name + " - " + it.id}}"
-					onChange="experimentSelected(this.value)"
-				/>
+				<div class="pull-left">
+					<strong>Assay:</strong>
+					<g:select
+						id="experimentSelect"
+						name="name"
+						from="${edu.harvard.capstone.editor.ExperimentalPlateSet.list()}"
+						optionKey="id"
+						optionValue="${{it.name + " - " + it.id}}"
+						onChange="experimentSelected(this.value)"
+					/>
+				</div>
+				<div id="downloadButtons" class="pull-right">
+					<strong>Download:</strong>
+					<button class="btn btn-primary btn-xs" type="submit" data-fileformat="csv">CSV</button>
+					<button class="btn btn-primary btn-xs" type="submit" data-fileformat="tsv">TSV</button>
+				</div>
+			</div>
 
+			<div class="row col-sm-12">
 				<table id="plateTable" class="table table-bordered table-condensed table-striped display">
 					<thead>
 						<tr>

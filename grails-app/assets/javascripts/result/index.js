@@ -61,13 +61,24 @@ function createGrid() {
  * Format the experiment data as a csv and trigger a download of it in the
  * browser.
  */
-function downloadExperiment() {
+function downloadExperiment(fileformat) {
     var importData = ImportData.createImportDataObjectFromJSON(experiment.experiment);
     var generator = new ImportDataFileGenerator();
-    generator.createIntergroupInterchangeFormatMatrix(importData);
+    //generator.createIntergroupInterchangeFormatMatrix(importData);
+    generator.createImportDataMatrix(importData);
 
-    filename = 'assay_results.csv';
-    generator.forceCSVDownload(filename);
+    fileformat = fileformat || 'csv';
+    var filename = 'assay_results.' + fileformat;
+    switch (fileformat) {
+        case 'tsv':
+            generator.forceTSVDownload(filename);
+            break;
+
+        case 'csv':
+        default:
+            generator.forceCSVDownload(filename);
+            break;
+    }
 }
 
 
@@ -127,6 +138,11 @@ function init() {
     createGrid();
     var experimentId = $('#experimentSelect option:selected')[0].value;
     experimentSelected(experimentId); // calls plateSelected for us
+
+    // add download button listeners
+    $('#downloadButtons button').on('click', function(event) {
+        downloadExperiment(event.target.dataset.fileformat);
+    });
 }
 
 
