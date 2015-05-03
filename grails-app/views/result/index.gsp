@@ -53,6 +53,17 @@
 					</thead>
 				</table>
 			</div>
+
+			<div class="row col-sm-12">
+				<div class="pull-left">
+				</div>
+				<div class="pull-right">
+					<label>
+						<input id="heatMapButton" type="checkbox" checked>Heat Map
+					</label>
+				</div>
+
+			</div>
 				
 			<div class="row col-sm-12">
 				<div id="resultGrid" class="Blues" style="width:100%;height:650px;"></div>

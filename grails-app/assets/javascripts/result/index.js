@@ -2,6 +2,8 @@ var experiment;
 var grid;
 var plateTable;
 var plateTableTools;
+var showHeatMap = true;
+var showNormalized = false;
 
 
 /**
@@ -53,7 +55,7 @@ function createBlankData(width, height) {
  */
 function createGrid() {
     grid  = new Grid("resultGrid");
-    loadGrid(createBlankData(100,100));
+    loadGrid(createBlankData(100,100), false);
 }
 
 
@@ -103,7 +105,7 @@ function experimentSelected(experimentId) {
             plateTableTools.fnSelect(plateTable.row(0).nodes());
         }
         else {
-            loadGrid([]);
+            loadGrid([], false);
             plateTable.clear().draw();
         }
     });
@@ -111,11 +113,6 @@ function experimentSelected(experimentId) {
 
 
 function init() {
-    // set up handlers
-    $('#rawNormToggle').change(function() {
-        toggleRawOrNorm($(this).prop('checked') ? 'raw' : 'norm');
-    });
-
     // set up plate table
     plateTable = $('#plateTable').DataTable({
         bootstrap: true,
@@ -139,9 +136,15 @@ function init() {
     var experimentId = $('#experimentSelect option:selected')[0].value;
     experimentSelected(experimentId); // calls plateSelected for us
 
-    // add download button listeners
+    // add download buttons listener
     $('#downloadButtons button').on('click', function(event) {
         downloadExperiment(event.target.dataset.fileformat);
+    });
+
+    // add heatmap button listener
+    $('#heatMapButton').on('click', function(event) {
+        showHeatMap = $(event.target)[0].checked;
+        reloadGrid();
     });
 }
 
@@ -149,7 +152,9 @@ function init() {
 function loadGrid(dataSet) {
     grid.setData(dataSet);
     grid.fillUpGrid();
-    colorGrid(dataSet);
+    if (showHeatMap) {
+        colorGrid(dataSet);
+    }
 }
 
 
@@ -159,8 +164,8 @@ function plateSelected(plateID) {
 }
 
 
-function toggleRawOrNorm(value) {
-    if (value === 'norm') {
+function reloadGrid() {
+    if (showNormalized) {
         loadGrid(experiment.normalizedData);
     }
     else {
