@@ -51,9 +51,9 @@ class ResultService {
 		}	
 
 		//verify that the number of plates of the template are = to the result plates
-		if (plateList.size() != data.plates?.size()){
+		/*if (plateList.size() != data.plates?.size()){
 			throw new RuntimeException("Plates of the JSON do not match with the template")
-		}	
+		}	*/
 
     	//create a result instance
 		def resultInstance = new Result(owner: scientistInstance, equipment: equipmentInstance, experiment: experimentInstance)    	
