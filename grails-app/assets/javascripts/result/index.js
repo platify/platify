@@ -169,6 +169,7 @@ function loadGrid(dataSet) {
 function plateSelected(plateID) {
     experiment.selectPlate(plateID);
     loadGrid(showNormalized ? experiment.normalizedData : experiment.data);
+    $('#rawDataLabel')[0].textContent = experiment.rawDataLabel();
 }
 
 

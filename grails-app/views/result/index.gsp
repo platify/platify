@@ -56,11 +56,13 @@
 
 			<div class="row col-sm-12">
 				<div class="pull-left">
+					<b>Showing values for: </b>
+					<span id="rawDataLabel"></span>
+				</div>
+				<div class="pull-right">
 					<label class="btn btn-info btn-xs">
 						<input id="normalizeButton" type="checkbox">Normalize Data
 					</label>
-				</div>
-				<div class="pull-right">
 					<label class="btn btn-info btn-xs">
 						<input id="heatMapButton" type="checkbox" checked>Show Heat Map
 					</label>
