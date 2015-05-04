@@ -75,37 +75,11 @@ function downloadExperiment(fileformat) {
 }
 
 
-/**
- * Read the data for the indicated experiment from the server, display
- * the plates on the page, and select the first one.
- */
-function experimentSelected(experimentId) {
-    experiment = new ExperimentModel(experimentId);
-    experiment.getData().always(function () {
-        if (Object.keys(experiment.plates).length > 0) {
-            plateData = Object.keys(experiment.plates).map(function(plateID) {
-                var row = [
-                           plateID,
-                           experiment.zFactor(plateID),
-                           experiment.zPrimeFactor(plateID),
-                           experiment.meanNegativeControl(plateID),
-                           experiment.meanPositiveControl(plateID)];
-                return row;
-            });
-            plateTable.clear().rows.add(plateData).draw();
-            plateTableTools.fnSelect(plateTable.row(0).nodes());
-        }
-        else {
-            loadGrid(createBlankData(experiment.numRows,
-                                     experiment.numColumns),
-                     false);
-            plateTable.clear().draw();
-        }
-    });
-}
-
-
 function init() {
+    // init the experiment object
+    experiment = new ExperimentModel();
+    experiment.fromJson(IMPORT_DATA_JSON);
+
     // set up plate table
     plateTable = $('#plateTable').DataTable({
         bootstrap: true,
@@ -126,8 +100,27 @@ function init() {
 
     // set up grid
     grid  = new Grid("resultGrid");
-    var experimentId = $('#experimentSelect option:selected')[0].value;
-    experimentSelected(experimentId); // calls plateSelected for us
+
+    // process experiment object
+    if (Object.keys(experiment.plates).length > 0) {
+        var plateData = Object.keys(experiment.plates).map(function(plateID) {
+            var row = [
+                       plateID,
+                       experiment.zFactor(plateID),
+                       experiment.zPrimeFactor(plateID),
+                       experiment.meanNegativeControl(plateID),
+                       experiment.meanPositiveControl(plateID)];
+            return row;
+        });
+        plateTable.clear().rows.add(plateData).draw();
+        plateTableTools.fnSelect(plateTable.row(0).nodes()); // triggers plateSelect()
+    }
+    else {
+        loadGrid(createBlankData(experiment.numRows,
+                                 experiment.numColumns),
+                 false);
+        plateTable.clear().draw();
+    }
 
     // add download buttons listener
     $('#downloadButtons button').on('click', function(event) {
