@@ -103,24 +103,13 @@ class ResultController {
     @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
     def showactions(Result resultInstance){
         if (!springSecurityService.isLoggedIn()){
-            render(contentType: "application/json") {
-                [error: "User not logged in"]
-            }
+            redirect controller: 'experimentalPlateSet', action: 'index', method: 'GET'
             return
         } 
 
         if (resultInstance == null) {
-            render(contentType: "application/json") {
-                [error: "Result not found"]
-            }
+            notFound()
             return
-        }
-
-        if (resultInstance.hasErrors()) {
-            render(contentType: "application/json") {
-                [error: resultInstance.errors]
-            }
-            return   
         }
 
         def importData
@@ -128,14 +117,10 @@ class ResultController {
             importData = resultService.getResults(resultInstance)    
         }
         catch (ValidationException e) {
-            render(contentType: "application/json") {
-                [error: e.errors, message: e.message]
-            }            
+            response.sendError(400)
             return
         } catch (RuntimeException e) {
-            render(contentType: "application/json") {
-                [error: e.message]
-            }  
+            response.sendError(500)
             return                      
         }
 
@@ -212,7 +197,7 @@ class ResultController {
         request.withFormat {
             form multipartForm {
                 flash.message = message(code: 'default.not.found.message', args: [message(code: 'result.label', default: 'Result'), params.id])
-                redirect action: "index", method: "GET"
+                redirect controller: 'experimentalPlateSet', action: "index", method: "GET"
             }
             '*'{ render status: NOT_FOUND }
         }
