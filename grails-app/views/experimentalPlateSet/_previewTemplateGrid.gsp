@@ -89,7 +89,7 @@
     <asset:javascript src="grid/slick.cellselectionmodel.js"/>
     <asset:javascript src="grid/slick.editors.js"/>
     <asset:javascript src="selectize.js"/>
-    <asset:javascript src="grid/Grid2Merge.js"/>
+    <asset:javascript src="grid/Grid.js"/>
     <asset:javascript src="plateEditor/editorPreviewTemplate.js"/>
 
 

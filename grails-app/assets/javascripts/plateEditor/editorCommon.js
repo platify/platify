@@ -142,7 +142,7 @@ function removeAllHighlightedCells() {
  * It also registers the handleSelectedCells function as a listener for
  * the event that user selected cell ranges in the grid change.
  */
-function createGrid() { // TODO -- change to be common, and support grid name ?? -- maybe return grid object ???		// use Grid, not Grid2Merge ??
+function createGrid() { // TODO -- change to be common, and support grid name ?? -- maybe return grid object ???
 	"use strict";
 	// construct the Grid object with the id of the html container element
 	// where it should be placed (probably a div) as an argument

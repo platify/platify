@@ -144,7 +144,7 @@ function loadRandomData() {				// TODO consider removing this, as it is not used
 	"use strict";
 	data = createRandomData();
 	grid.setData(data);
-	grid.fillUpGrid(CELL_WIDTH, CELL_HEIGHT);
+	grid.fillUpGrid(CELL_WIDTH, CELL_HEIGHT, true, Grid.editorCellFormatter, "editor-cell");
 }
 
 /**
@@ -1375,7 +1375,7 @@ function createGrid() {		//TODO - perhaps change grid to not be myGrid ??
 	grid.setData(data);
 
 	// display the data
-	grid.fillUpGrid(CELL_WIDTH, CELL_HEIGHT);
+	grid.fillUpGrid(CELL_WIDTH, CELL_HEIGHT, true, Grid.editorCellFormatter, "editor-cell");
 
 	// register a function to be called each time a new set of cells are
 	// selected by a user
