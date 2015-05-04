@@ -255,7 +255,7 @@ class ResultService {
 
     	ResultPlate.findAllByResult(resultInstance).each{ plateResult ->
     		def plate = [:]
-		plate.plateID = plateResult.barcode
+            plate.plateID = plateResult.barcode
     		def plateLabels = [:]
     		ResultLabel.findAllByDomainIdAndLabelTypeAndScope(plateResult.id, ResultLabel.LabelType.LABEL, ResultLabel.LabelScope.PLATE).each{
     			plateLabels[it.name] = it.value

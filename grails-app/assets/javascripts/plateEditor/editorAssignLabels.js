@@ -834,7 +834,9 @@ function importCompoundsFromFile() {
             case 2:
                 Object.keys(groupNames).forEach(function (group) { groupNames[group] = null; });
                 parsed.data.forEach(function (row) {
-                    groupNames[row[0]] = row[1];
+                    if (row[0] in groupNames) {
+                        groupNames[row[0]] = row[1];
+                    }
                 });
                 break;
 
