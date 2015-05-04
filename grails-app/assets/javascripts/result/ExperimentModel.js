@@ -147,7 +147,7 @@ function ExperimentModel() {
         if (!rawLabel) {
             return null;
         }
-        var meanLabel = rawLabel + '/meanNegativeControl';
+        var meanLabel = rawLabel + '__meanNegativeControl';
 
         var plate;
         var controls;
@@ -183,7 +183,7 @@ function ExperimentModel() {
         if (!rawLabel) {
             return null;
         }
-        var meanLabel = rawLabel + '/meanPositiveControl';
+        var meanLabel = rawLabel + '__meanPositiveControl';
 
         var plate;
         var controls;
@@ -323,7 +323,7 @@ function ExperimentModel() {
         if (!rawLabel) {
             return null;
         }
-        var zFactorLabel = rawLabel + '/zFactor';
+        var zFactorLabel = rawLabel + '__zFactor';
 
         var plate;
         var controls;
@@ -358,7 +358,7 @@ function ExperimentModel() {
         if (!rawLabel) {
             return null;
         }
-        var zPrimeFactorLabel = rawLabel + '/zPrimeFactor';
+        var zPrimeFactorLabel = rawLabel + '__zPrimeFactor';
         var plate;
         var controls;
 

@@ -261,6 +261,12 @@ class ResultService {
     			plateLabels[it.name] = it.value
     		}
     		plate.labels = plateLabels
+            plate.rawData = [:]
+            ResultLabel.findAllByDomainIdAndLabelTypeAndScope(plateResult.id,
+                                                              ResultLabel.LabelType.RAW_DATA,
+                                                              ResultLabel.LabelScope.PLATE).each{
+                plate.rawData[it.name] = it.value
+            }
     		def numberOfRows = plateResult.rows
 
 
