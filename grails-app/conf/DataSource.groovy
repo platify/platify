@@ -13,6 +13,44 @@ hibernate {
     singleSession = true // configure OSIV singleSession mode
 }
 
+def productionDataSource = [
+    url: "jdbc:h2:prodDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE",
+    dbCreate: "create-drop",
+    properties: [ 
+       // See http://grails.org/doc/latest/guide/conf.html#dataSource for documentation
+       jmxEnabled: true,
+       initialSize: 5,
+       maxActive: 50,
+       minIdle: 5,
+       maxIdle: 25,
+       maxWait: 10000,
+       maxAge: 10 * 60000,
+       timeBetweenEvictionRunsMillis: 5000,
+       minEvictableIdleTimeMillis: 60000,
+       validationQuery: "SELECT 1",
+       validationQueryTimeout: 3,
+       validationInterval: 15000,
+       testOnBorrow: true,
+       testWhileIdle: true,
+       testOnReturn: false,
+       jdbcInterceptors: "ConnectionState",
+       defaultTransactionIsolation: java.sql.Connection.TRANSACTION_READ_COMMITTED,
+    ],
+]
+
+if (System.env.DATABASE_URL) {
+    def uri = new URI(System.env.DATABASE_URL)
+    // only look for postgres urls for now
+    if (uri.scheme == 'postgres') {
+        productionDataSource['url'] = 'jdbc:postgresql://' + uri.host + uri.path
+        productionDataSource['username'] = uri.userInfo.split(':')[0]
+        productionDataSource['password'] = uri.userInfo.split(':')[1]
+        productionDataSource['driverClassName'] = 'org.postgresql.Driver'
+        productionDataSource['dialect'] = 'org.hibernate.dialect.PostgreSQLDialect'
+    }
+}
+
+
 // environment specific settings
 environments {
     development {
@@ -28,29 +66,6 @@ environments {
         }
     }
     production {
-        dataSource {
-            dbCreate = "update"
-            url = "jdbc:h2:prodDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
-            properties {
-               // See http://grails.org/doc/latest/guide/conf.html#dataSource for documentation
-               jmxEnabled = true
-               initialSize = 5
-               maxActive = 50
-               minIdle = 5
-               maxIdle = 25
-               maxWait = 10000
-               maxAge = 10 * 60000
-               timeBetweenEvictionRunsMillis = 5000
-               minEvictableIdleTimeMillis = 60000
-               validationQuery = "SELECT 1"
-               validationQueryTimeout = 3
-               validationInterval = 15000
-               testOnBorrow = true
-               testWhileIdle = true
-               testOnReturn = false
-               jdbcInterceptors = "ConnectionState"
-               defaultTransactionIsolation = java.sql.Connection.TRANSACTION_READ_COMMITTED
-            }
-        }
+        dataSource = productionDataSource
     }
 }

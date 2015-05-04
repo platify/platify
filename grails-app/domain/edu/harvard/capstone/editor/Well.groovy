@@ -30,4 +30,7 @@ class Well {
     static constraints = {
     	groupName nullable: true, blank: true
     }
+    static mapping = {
+        column column: '`column`'
+    }
 }
