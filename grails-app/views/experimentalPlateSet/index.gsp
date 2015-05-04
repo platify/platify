@@ -44,6 +44,7 @@
 												<td>${fieldValue(bean: experimentInstance, field: "dateCreated")}</td>
 												<td>
 													<g:link class="btn btn-info btn-xs" id="${experimentInstance.id}" action="showactions">Show Details</g:link>
+													<g:link class="btn btn-info btn-xs ${(hasResults[experimentInstance.id]) ? '' : 'disabled'}" id="${experimentInstance.id}" controller="result" action="showactions">Show Results</g:link>
 												</td>
 											</tr>
 										</g:each>

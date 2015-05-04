@@ -2,54 +2,12 @@
 /*global $, jQuery, alert*/
 
 // constants
-var DIMENSION = 100;
 var GRID_HEIGHT = 100;
 var GRID_WIDTH = 100;
 var CELL_HEIGHT = 25;
 var CELL_WIDTH = 40;
 var plateModel = {};
 var wellGroupings = [];
-var grid;
-var currentHighlightKeys = [];
-var highlightKeyCounter = 0;
-var currentHighlightColor = "#D5E3E3";
-var highlightedCoords = [];
-
-/**
- * Creates a blank data set for initializing the grid data set. 
- * The data set is of dimension GRID_HEIGHT x GRID_WIDTH.
- */
-function createBlankData() {
-	"use strict";
-	var i, j, result;
-	result = [];
-
-	for (i = 0; i < GRID_HEIGHT; i++) {
-		result[i] = [];
-		for (j = 0; j < GRID_WIDTH; j++) {
-			result[i][j] = "";
-		}
-	}
-	return result;
-}
-
-/**
- * Creates a random data set for displaying in the grid example
- * page. The data set is of dimension GRID_HEIGHT x GRID_WIDTH.
- */
-function createRandomData() {
-	"use strict";
-	var i, j, result;
-	result = [];
-
-	for (i = 0; i < GRID_HEIGHT; i++) {
-		result[i] = [];
-		for (j = 0; j < GRID_WIDTH; j++) {
-			result[i][j] = "L" + Math.floor(Math.random() * 100);
-		}
-	}
-	return result;
-}
 
 /**
  * Focuses on the text field 'newlabelValue'.
@@ -57,118 +15,6 @@ function createRandomData() {
 function txtFieldFocus() {
 	"use strict";
 	$("#newLabelValue").focus();
-}
-
-/**
- * A handler function for when the selected cells in the grid changes. This
- * function is registered to listen for these events in the createGrid
- * function using the registerSelectedCellsCallBack function of the Grid
- * Class. This function changes the background color of all selected cells
- * to the currentHighlightColor. 
- * Then causes the cursor to focus in the textField.
- * @param startRow - the row index of top left cell of the selecting box
- * @param startCol - the column index of top left cell of the selecting box
- * @param endRow - the row index of bottom right cell of the selecting box
- * @param endCol - the column index of bottom right cell of the selecting box
- */
-function handleSelectedCells(startRow, startCol, endRow, endCol) {
-	"use strict";
-	var out, i, j, key, coordinatesToHighlight;
-	// write to the selected cells div, the cells that are selected
-	out = document.getElementById("cellRange");
-	out.innerHTML = Grid.getRowLabel(startRow) + startCol + ":" + Grid.getRowLabel(endRow) + endCol;
-
-
-	// highlight those cells with the current color
-	coordinatesToHighlight = [];
-	for (i = startRow; i <= endRow; i++) {
-		for (j = startCol; j <= endCol; j++) {
-			coordinatesToHighlight.push([i, j]);
-			// set global record of highlights
-			highlightedCoords.push([i, j]);
-		}
-	}
-	key = "key" + highlightKeyCounter;
-	grid.setCellColors(coordinatesToHighlight, currentHighlightColor, key);
-	currentHighlightKeys.push(key);
-	highlightKeyCounter++;
-	txtFieldFocus();
-}
-
-/**
- * Removes the most recent cell background color change. This
- * is achieved by calling the removeCellColors method of the Grid class with
- * the most key used to create the most recent background color change as
- * stored in the currentHighlightKeys array.
- */
-function removeHighlightedArea() {
-	"use strict";
-	if (currentHighlightKeys.length > 0) {
-		grid.removeCellColors(currentHighlightKeys.pop());
-
-		// need to decrement highlightedCoords here !! 
-		//(not the same number of items removed !!!)
-		highlightedCoords.pop();	// need to fix !!
-	}
-}
-
-/**
- * Removes all the current cell selections and related background color 
- * change. This is achieved by calling the removeCellColors method of the Grid class with
- * the most key used to create the most recent background color change as
- * stored in the currentHighlightKeys array.
- */
-function removeAllHighlightedCells() {
-	"use strict";
-	while (currentHighlightKeys.length > 0) {
-		grid.removeCellColors(currentHighlightKeys.pop());
-	}
-	// removing all selected cells, so global count disappears
-	highlightedCoords = [];
-}
-
-/**
- * Creates a new grid applying it to the "myGrid" div on the
- * page. It then creates a blank data set and displays it in the grid.
- * It also registers the handleSelectedCells function as a listener for
- * the event that user selected cell ranges in the grid change.
- */
-function createGrid() {
-	"use strict";
-	// construct the Grid object with the id of the html container element
-	// where it should be placed (probably a div) as an argument
-	grid  = new Grid("myGrid");
-
-	// set the data to be displayed which must be in 2D array form
-	grid.setData(createBlankData());
-
-	// display the data
-	grid.fillUpGrid(CELL_WIDTH, CELL_HEIGHT);
-
-	// register a function to be called each time a new set of cells are
-	// selected by a user
-	grid.registerSelectedCellCallBack(handleSelectedCells);
-
-}
-
-/**
- * Removes the current selection of cells and enables
- * the ability to make selections on the grid. 
- */
-function enableGridSelection() {
-	"use strict";
-	removeAllHighlightedCells();
-	grid.enableCellSelection();
-}
-
-/**
- * Removes the current selection of cells and enables
- * the ability to make selections on the grid. 
- */
-function disableGridSelection() {
-	"use strict";
-	removeAllHighlightedCells();
-	grid.disableCellSelection();
 }
 
 /**
@@ -237,33 +83,6 @@ function addTemplateValue() {
 
 
 /**
- * This function adds an event handler to an html element in
- * a way that covers many browser types.
- * @param elementId - the string id of the element to attach the handler to
- * or a reference to the element itself.
- * @param eventType - a string representation of the event to be handled
- * without the "on" prefix
- * @param handlerFunction - the function to handle the event
- */
-function addEvent(elementId, eventType, handlerFunction) {
-	'use strict';
-	var element;
-
-	if (typeof elementId === "string") {
-		element = document.getElementById(elementId);
-	} else {
-		element = elementId;
-	}
-
-	if (element.addEventListener) {
-		element.addEventListener(eventType, handlerFunction, false);
-	} else if (window.attachEvent) {
-		element.attachEvent("on" + eventType, handlerFunction);
-	}
-}
-
-
-/**
  * This function is used to convert the internal data structure json format into
  * a data structure json format that is expected by the server when sending the 
  * template json to be saved by the back-end. This allows for differences between
@@ -318,53 +137,6 @@ function translateModelToOutputJson(pModel) {
 	}
 	plateJson.plate = plate;
 	return plateJson;
-}
-
-
-/**
- * This function is used to convert a json data structure in the format that is 
- * sent by the server, into the json data structure that is expected by the
- * client-side JavaScript. This allows for differences between
- * the 2 models. This is used when loading data received from the server into 
- * the grid and associated internal data model. The internal model providing a 
- * more efficient referencing structure for the client-side tasks, and allows 
- * for quick changes to either model while maintaining the contract with the server.
- * @param plateJson - a data structure in the format sent by the server.
- * @returns pModel - a data structure in the format expected by the internal data model.
- */
-function translateInputJsonToModel(plateJson) {
-	"use strict";
-	var pModel, plate, i, j, row, column, groupName, labels;
-	pModel = {};
-	pModel.rows = {};
-	plate = plateJson.plate;
-
-	for (i = 0; i < plate.wells.length; i++) {
-		row = plate.wells[i].row + 1;
-		column = plate.wells[i].column + 1;
-		groupName = plate.wells[i].groupName;
-		labels = plate.wells[i].labels;
-
-		if (pModel.rows[row] === undefined) {
-			pModel.rows[row] = {};
-			pModel.rows[row].columns = {};
-		}
-
-		if (pModel.rows[row].columns[column] === undefined) {
-			pModel.rows[row].columns[column] = {};
-			pModel.rows[row].columns[column].wellGroupName = groupName;
-			pModel.rows[row].columns[column].categories = {};
-		}
-
-		for (j = 0; j < labels.length; j++) {
-			if (pModel.rows[row].columns[column].categories[labels[j].category] === undefined) {
-				pModel.rows[row].columns[column].categories[labels[j].category] = {};
-			}
-			pModel.rows[row].columns[column].categories[labels[j].category][labels[j].name] = labels[j].color;
-		}
-	}
-
-	return pModel;
 }
 
 
@@ -471,7 +243,7 @@ function init() {
 	if (window.tHeight !== undefined) {
 		GRID_HEIGHT = window.tHeight;
 	}
-	createGrid();
+	createGrid("myGrid", CELL_WIDTH, CELL_HEIGHT, GRID_WIDTH, GRID_HEIGHT);
 
 	// allows for passing input Json, but it not used here. Perhaps refactor!
 	//var testInputJson = {"plate":{"wells":[{"row":"2","column":"2","control":null,"labels":[{"category":"c1","name":"l1","color":"#ffff00"}],"groupName":"L67"},{"row":"2","column":"3","control":null,"labels":[{"category":"c1","name":"l2","color":"#4780b8"}],"groupName":"L5"},{"row":"3","column":"2","control":null,"labels":[{"category":"c1","name":"l1","color":"#ffff00"},{"category":"c2","name":"l3","color":"#8d7278"}],"groupName":"L51"},{"row":"3","column":"3","control":null,"labels":[{"category":"c1","name":"l2","color":"#4780b8"},{"category":"c2","name":"l3","color":"#8d7278"}],"groupName":"L17"},{"row":"4","column":"2","control":null,"labels":[{"category":"c2","name":"l3","color":"#8d7278"}],"groupName":"L2"},{"row":"4","column":"3","control":null,"labels":[{"category":"c2","name":"l3","color":"#8d7278"}],"groupName":"L47"}],"labels":[]}};

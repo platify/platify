@@ -10,12 +10,12 @@
  * TODO - remove concept of current plate, refactor to operate on
  *        Plate objects instead.
  */
-function ExperimentModel(experimentId) {
+function ExperimentModel() {
     // experiment-wide data
-    this.experimentId = experimentId;
-    this.plates = null; // keyed by plateID
-    this.numRows = 0;
+    this.experiment = {plates: {}};
     this.numColumns = 0;
+    this.numRows = 0;
+    this.plates = {}; // keyed by plateID
 
     // updated every time we change plates
     this.controls = {'negative': null, 'positive': null};
@@ -25,67 +25,36 @@ function ExperimentModel(experimentId) {
     this.normalizedData = null;
 
 
-    /**
-     * Retrieves the details for the experiment, template, plate set,
-     * and results.
-     *
-     * TODO - move this back out of the model.  what was i thinking?
-     */
-    this.getData = function() {
-        var that = this; // blegh, js binding hack
-        var url = RESULT_READ_URL + '/' + this.experimentId;
-        var jqxhr = $.ajax({
-            url: url,
-            dataType: 'json',
-        });
-        jqxhr.done(function(data, textStatus, jqxhr) {
-            that.experiment = {plates: {}};
-            that.plates = {};
-            if (data.error) {
-                console.log(data.error);
-            }
+    this.fromJson = function(importDataJson) {
+        if (!importDataJson || $.isEmptyObject(importDataJson)) {
+            return;
+        }
 
-            try {
-                that.experiment = data.ImportData || {plates: {}};
-            }
-            catch (e) {
-                console.log('getData got unexpected ajax response from url '
-                            + url + '\n' + data);
-                console.log(e);
-                return;
-            }
-            if (Object.keys(that.experiment.plates).length > 0) {
-                for (var i=0; i<that.experiment.plates.length; i++) {
-                    var plate = that.experiment.plates[i];
+        // TODO - catch exceptions?
+        this.experiment = JSON.parse(importDataJson);
 
-                    // we assume this exists elsewhere, add it if not
-                    if (!plate.rawData) {
-                        plate.rawData = {};
-                    }
+        if (Object.keys(this.experiment.plates).length > 0) {
+            for (var i=0; i<this.experiment.plates.length; i++) {
+                var plate = this.experiment.plates[i];
 
-                    // figure out the size of the plates
-                    that.numRows = Math.max(that.numRows, plate.rows.length);
-                    var columnCounts = plate.rows.map(function (row) {
-                        return row.columns.length;
-                    });
-                    that.numColumns = Math.max(that.numColumns,
-                                               Math.max.apply(null, columnCounts));
-
-                    // store it by plate id
-                    that.plates[plate.plateID] = plate;
+                // elsewhere, we assume this exists, so make sure it does
+                if (!plate.rawData) {
+                    plate.rawData = {};
                 }
-                that.selectPlate(that.experiment.plates[0].plateID);
-                if ($.isEmptyObject(that.currentPlate.rows[0].columns[0].normalizedData)) {
-                    that.normalizeDeriveAndSave();
-                }
-            }
-        });
-        jqxhr.fail(function(jqxhr, textStatus, errorThrown) {
-            that.experiment = {plates: {}};
-            that.plates = {};
-        });
 
-        return jqxhr;
+                // figure out the size of the plates
+                this.numRows = Math.max(this.numRows, plate.rows.length);
+                var columnCounts = plate.rows.map(function (row) {
+                    return row.columns.length;
+                });
+                this.numColumns = Math.max(this.numColumns,
+                                           Math.max.apply(null, columnCounts));
+
+                // store it by plate id
+                this.plates[plate.plateID] = plate;
+            }
+            this.selectPlate(this.experiment.plates[0].plateID);
+        }
     }
 
 
@@ -178,7 +147,7 @@ function ExperimentModel(experimentId) {
         if (!rawLabel) {
             return null;
         }
-        var meanLabel = rawLabel + '/meanNegativeControl';
+        var meanLabel = rawLabel + '__meanNegativeControl';
 
         var plate;
         var controls;
@@ -214,7 +183,7 @@ function ExperimentModel(experimentId) {
         if (!rawLabel) {
             return null;
         }
-        var meanLabel = rawLabel + '/meanPositiveControl';
+        var meanLabel = rawLabel + '__meanPositiveControl';
 
         var plate;
         var controls;
@@ -326,12 +295,15 @@ function ExperimentModel(experimentId) {
      * 	      parser.
      */
     this.selectPlate = function(plateID) {
-        if (this.plates && plateID) {
+        if (!$.isEmptyObject(this.plates) && (plateID in this.plates)) {
             this.currentPlate = this.plates[plateID];
             this.currentPlateID = plateID;
             this.locateControls(plateID);
             this.loadDataForGrid();
             this.loadNormalizedDataForGrid();
+            if ($.isEmptyObject(this.currentPlate.rows[0].columns[0].normalizedData)) {
+                this.normalizeDeriveAndSave();
+            }
         }
         else {
             this.currentPlate = null;
@@ -351,7 +323,7 @@ function ExperimentModel(experimentId) {
         if (!rawLabel) {
             return null;
         }
-        var zFactorLabel = rawLabel + '/zFactor';
+        var zFactorLabel = rawLabel + '__zFactor';
 
         var plate;
         var controls;
@@ -386,7 +358,7 @@ function ExperimentModel(experimentId) {
         if (!rawLabel) {
             return null;
         }
-        var zPrimeFactorLabel = rawLabel + '/zPrimeFactor';
+        var zPrimeFactorLabel = rawLabel + '__zPrimeFactor';
         var plate;
         var controls;
 

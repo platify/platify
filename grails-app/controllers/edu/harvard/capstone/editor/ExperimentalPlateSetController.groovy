@@ -3,6 +3,7 @@ package edu.harvard.capstone.editor
 
 import static org.springframework.http.HttpStatus.*
 import edu.harvard.capstone.parser.Equipment;
+import edu.harvard.capstone.result.Result;
 import grails.plugin.springsecurity.annotation.Secured
 import grails.converters.JSON
 
@@ -21,9 +22,13 @@ class ExperimentalPlateSetController {
         if(!springSecurityService.principal?.getAuthorities().any { it.authority == "ROLE_ADMIN" || it.authority == "ROLE_SUPER_ADMIN"}){
             params.owner = springSecurityService.principal
         }
-        
+
         params.max = Math.min(max ?: 10, 100)
-        respond ExperimentalPlateSet.list(params), model:[experimentalPlateSetInstanceCount: ExperimentalPlateSet.count()]
+        def experiments = ExperimentalPlateSet.list(params)
+        def resultsByExperiment = Result.list().collectEntries{ result -> [result.experiment, result] }
+        def hasResults = experiments.collectEntries{ experiment -> [experiment.id, (experiment in resultsByExperiment)] }
+        respond experiments, model:[experimentalPlateSetInstanceCount: ExperimentalPlateSet.count(),
+                                    hasResults: hasResults]
     }
 	
 	@Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])

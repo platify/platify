@@ -6,6 +6,34 @@ var showHeatMap = true;
 var showNormalized = false;
 
 
+function cellFormatter(row, cell, value, columnDef, dataContext) {
+    var finalValue = value;
+    var well = experiment.currentPlate.rows[row].columns[cell-1];
+
+    switch (well.control) {
+        case 'NEGATIVE':
+        case 'POSITIVE':
+            finalValue += ',' + well.control.toLowerCase();
+            break;
+    }
+
+    /*
+    if (showHeatMap) {
+        var dataSet = showNormalized ? experiment.normalizedData : experiment.data;
+
+        // first get a color quantizer
+        var flattened = dataSet.reduce(function(a, b) {
+            return a.concat(b);
+        });
+        var colorScale = d3.scale.category20c().domain([d3.min(flattened),
+                                                   d3.max(flattened)]);
+                                          //.range(colorbrewer.Blues[9]);
+        finalValue += ',' + colorScale(value);
+    }
+    */
+    return Grid.editorCellFormatter(row, cell, finalValue, columnDef, dataContext);
+}
+
 /**
  * Colors each cell in the grid.  The color is determined by the value
  * in the cell.
@@ -75,37 +103,11 @@ function downloadExperiment(fileformat) {
 }
 
 
-/**
- * Read the data for the indicated experiment from the server, display
- * the plates on the page, and select the first one.
- */
-function experimentSelected(experimentId) {
-    experiment = new ExperimentModel(experimentId);
-    experiment.getData().always(function () {
-        if (Object.keys(experiment.plates).length > 0) {
-            plateData = Object.keys(experiment.plates).map(function(plateID) {
-                var row = [
-                           plateID,
-                           experiment.zFactor(plateID),
-                           experiment.zPrimeFactor(plateID),
-                           experiment.meanNegativeControl(plateID),
-                           experiment.meanPositiveControl(plateID)];
-                return row;
-            });
-            plateTable.clear().rows.add(plateData).draw();
-            plateTableTools.fnSelect(plateTable.row(0).nodes());
-        }
-        else {
-            loadGrid(createBlankData(experiment.numRows,
-                                     experiment.numColumns),
-                     false);
-            plateTable.clear().draw();
-        }
-    });
-}
-
-
 function init() {
+    // init the experiment object
+    experiment = new ExperimentModel();
+    experiment.fromJson(IMPORT_DATA_JSON);
+
     // set up plate table
     plateTable = $('#plateTable').DataTable({
         bootstrap: true,
@@ -126,8 +128,27 @@ function init() {
 
     // set up grid
     grid  = new Grid("resultGrid");
-    var experimentId = $('#experimentSelect option:selected')[0].value;
-    experimentSelected(experimentId); // calls plateSelected for us
+
+    // process experiment object
+    if (Object.keys(experiment.plates).length > 0) {
+        var plateData = Object.keys(experiment.plates).map(function(plateID) {
+            var row = [
+                       plateID,
+                       experiment.zFactor(plateID),
+                       experiment.zPrimeFactor(plateID),
+                       experiment.meanNegativeControl(plateID),
+                       experiment.meanPositiveControl(plateID)];
+            return row;
+        });
+        plateTable.clear().rows.add(plateData).draw();
+        plateTableTools.fnSelect(plateTable.row(0).nodes()); // triggers plateSelect()
+    }
+    else {
+        loadGrid(createBlankData(experiment.numRows,
+                                 experiment.numColumns),
+                 false);
+        plateTable.clear().draw();
+    }
 
     // add download buttons listener
     $('#downloadButtons button').on('click', function(event) {
@@ -150,7 +171,7 @@ function init() {
 
 function loadGrid(dataSet) {
     grid.setData(dataSet);
-    grid.fillUpGrid();
+    grid.fillUpGrid(null, null, true, cellFormatter, 'result-cell');
     if (showHeatMap) {
         colorGrid(dataSet);
     }

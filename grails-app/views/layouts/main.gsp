@@ -45,7 +45,7 @@
 			    	<sec:ifLoggedIn>
 						<ul class="nav navbar-nav">
 							<li class="plate-editor">
-								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Plate Editor <span class="caret"></span></a>
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Assays<span class="caret"></span></a>
 								<ul class="dropdown-menu" role="menu">
 									<li><g:link controller="experimentalPlateSet" action="index">View Assays</g:link></li>
 									<li class="divider"></li>
@@ -60,7 +60,6 @@
 									<li><a href="#">Parse</a></li>
 								</ul>
 							</li>
-							<li class="result"><g:link controller="result" action="index">Results</g:link></li>
 							<sec:ifAnyGranted roles='ROLE_ADMIN, ROLE_SUPER_ADMIN'>
 								<li class="admin" class="dropdown">
 								  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Admin <span class="caret"></span></a>

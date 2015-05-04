@@ -97,6 +97,8 @@ function ImportData(numPlates, numRows, numCols) {
             _self.plates.push({
                 plateID: ImportData.NO_ID,
                 labels: {},
+                rawData: {},
+                normalizedData: {},
                 rows: []
             });
 
@@ -320,7 +322,7 @@ function ImportData(numPlates, numRows, numCols) {
      *       - If this category name has already been added to the ImportData object, it
      *       will cause a CATEGORY_ALREADY_DEFINED error.
      */
-    this.addPlateLevelCategory = function(categoryName) {
+    this.addPlateLevelCategory = function(categoryName, numeric) {
         // first some error checking
         if (!categoryName) {
             throw new ImportDataError(ImportDataError.ILLEGAL_ARGUMENT,
@@ -336,11 +338,20 @@ function ImportData(numPlates, numRows, numCols) {
                     "add a plate level category");
         }
 
-        this.plateLevelCategories[categoryName] = true;
+        if (numeric) {
+            this.plateLevelCategories[categoryName] = ImportData.NUMERIC;
+        }
+        else {
+            this.plateLevelCategories[categoryName] = ImportData.NON_NUMERIC;
+        }
 
         for (var plateIndex = 0; plateIndex<this.plates.length; plateIndex++) {
             var plate = this.plates[plateIndex];
             plate.labels[categoryName] = ImportData.BLANK;
+            if (numeric) {
+                plate.rawData[categoryName] = ImportData.BLANK;
+                plate.normalizedData[categoryName] = ImportData.BLANK;
+            }
         }
 
     };
@@ -421,8 +432,15 @@ function ImportData(numPlates, numRows, numCols) {
                     "get plate level label value for single plate");
         }
 
+        // prefer results to labels
         var plate = this.plates[plateIndex];
-        result = plate.labels[categoryName];
+        [plate.rawData, plate.labels].every(function(labelBucket) {
+            if (labelBucket && (categoryName in labelBucket)) {
+                result = labelBucket[categoryName];
+                return false;
+            }
+            return true;
+        });
 
         return result;
     };
@@ -499,6 +517,9 @@ function ImportData(numPlates, numRows, numCols) {
 
         var plate = this.plates[plateIndex];
         plate.labels[categoryName] = value;
+        if (this.plateLevelCategories[categoryName] === ImportData.NUMERIC) {
+            plate.rawData[categoryName] = parseFloat(value);
+        }
     };
 
 
@@ -1031,9 +1052,9 @@ ImportData.createImportDataObjectFromJSON = function(JSONObject) {
         result.addWellLevelCategory(categoryName, numeric);
     }
 
-    for (var j=0; j<plateLevelCategories.length; j++) {
-        categoryName = plateLevelCategories[j];
-        result.addPlateLevelCategory(categoryName);
+    for (categoryName in plateLevelCategories) {
+        var numeric = plateLevelCategories[categoryName];
+        result.addPlateLevelCategory(categoryName, numeric);
     }
 
     for (var k=0; k<experimentLevelCategories.length; k++) {
@@ -1051,11 +1072,19 @@ ImportData.createImportDataObjectFromJSON = function(JSONObject) {
             // set the plate identifier
             result.setPlateIdentifier(plateIndex, plate.plateID);
 
-            for (j=0; j<plateLevelCategories.length; j++) {
-                categoryName = plateLevelCategories[j];
+            for (var categoryName in plateLevelCategories) {
+                // prefer results to labels
+                var value = ImportData.BLANK;
+                [plate.rawData, plate.labels].every(function(labelBucket) {
+                    if (labelBucket && (categoryName in labelBucket)) {
+                        value = labelBucket[categoryName];
+                        return false;
+                    }
+                    return true;
+                });
                 result.setPlateLevelLabel(plateIndex,
-                        categoryName,
-                        plate.labels[categoryName]);
+                                          categoryName,
+                                          value);
             }
 
             if (plateDimensions[0] && plateDimensions[1]) {
@@ -1068,9 +1097,10 @@ ImportData.createImportDataObjectFromJSON = function(JSONObject) {
                         for (var categoryName in wellLevelCategories) {
                             // prefer results to labels
                             var value = ImportData.BLANK;
-                            [well.rawData, well.labels].forEach(function(labelBucket) {
+                            [well.rawData, well.labels].every(function(labelBucket) {
                                 if (labelBucket && (categoryName in labelBucket)) {
                                     value = labelBucket[categoryName];
+                                    return false;
                                 }
                             });
                             result.setWellLevelLabel(plateIndex,
@@ -1115,7 +1145,16 @@ ImportData.createImportDataObjectFromJSON = function(JSONObject) {
                     for (var category in plate.labels) {
                         if (!seenCategories[category]) {
                             seenCategories[category] = true;
-                            result.push(category);
+                            result[category] = false;
+                        }
+                    }
+                }
+
+                if (plate.rawData) {
+                    for (var category in plate.rawData) {
+                        if (!seenCategories[category]) {
+                            seenCategories[category] = true;
+                            result[category] = true;
                         }
                     }
                 }

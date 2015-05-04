@@ -23,10 +23,18 @@
 				<!-- Right Column -->
 				<div class="col-sm-9">
 					<div id="list-scientist" class="content scaffold-list" role="main">
-						<h1><g:message code="default.list.label" args="[entityName]" /></h1>
+						<g:form action="index" class="form-inline" >
+							<h1>
+								<g:message code="default.list.label" args="[entityName]" /> -- 
+					        	<input class="form-control search" type="text" name="parseName" value="${params.parseName}" />
+					        	<input class="btn btn-info btn-sm" type="submit" value="Search by Name" />
+					        </h1>
+						</g:form>
+						
 						<g:if test="${flash.message}">
 							<div class="message" role="status">${flash.message}</div>
 						</g:if>
+						
 						<table class="table table-striped table-hover">
 						<thead>
 								<tr>
@@ -40,10 +48,8 @@
 
 									<g:sortableColumn property="dateCreated" title="${message(code: 'equipment.date.label', default: 'Date')}" />
 																
-									<th>Parse</th>
 									<th>Update</th>
 									<th>Delete</th>
-									
 								
 								</tr>
 							</thead>
@@ -63,16 +69,12 @@
 									<td>${fieldValue(bean: equipmentInstance, field: "dateCreated")}</td>
 								
 									<td>
-										<g:link id="${equipmentInstance.id}" action="selectexperiment"><button class="btn btn-info btn-xs">Experiment</button></g:link>
-									</td>
-									
-									<td>
 										<g:link id="${equipmentInstance.id}" action="load"><button class="btn btn-info btn-xs">View</button></g:link>
 									</td>	
 
 									<td>
 										<g:if test="${equipmentInstance?.canUpdate()}">
-											<g:link id="${equipmentInstance.id}" action="erase"><button class="btn btn-info btn-xs">Delete</button></g:link>
+											<g:link id="${equipmentInstance.id}" action="erase"><button class="btn btn-danger btn-xs">Delete</button></g:link>
 										</g:if>
 										<g:if test="${!equipmentInstance?.canUpdate()}">
 											<button class="btn btn-xs">--NA--</button>

@@ -171,10 +171,13 @@ class ResultService {
 			throw new RuntimeException("No plates")
 		}	
 
+        // maybe check to make sure the plates we received are valid for this assay instead?
+        /*
 		//verify that the number of plates of the template are = to the result plates
 		if (plateList.size() != data.plates?.size()){
 			throw new RuntimeException("Plates of the JSON do not match with the template")
 		}	
+        */
 		
 
         if (!resultInstance){
@@ -238,6 +241,7 @@ class ResultService {
 
     	def importData = [:]
 
+        importData.resultID = resultInstance.id
     	importData.experimentID = resultInstance.experiment.id
     	importData.parsingID = resultInstance.equipment.id
     	importData.experimentFeatures = [:]
@@ -251,12 +255,18 @@ class ResultService {
 
     	ResultPlate.findAllByResult(resultInstance).each{ plateResult ->
     		def plate = [:]
-		plate.plateID = plateResult.barcode
+            plate.plateID = plateResult.barcode
     		def plateLabels = [:]
     		ResultLabel.findAllByDomainIdAndLabelTypeAndScope(plateResult.id, ResultLabel.LabelType.LABEL, ResultLabel.LabelScope.PLATE).each{
     			plateLabels[it.name] = it.value
     		}
     		plate.labels = plateLabels
+            plate.rawData = [:]
+            ResultLabel.findAllByDomainIdAndLabelTypeAndScope(plateResult.id,
+                                                              ResultLabel.LabelType.RAW_DATA,
+                                                              ResultLabel.LabelScope.PLATE).each{
+                plate.rawData[it.name] = it.value
+            }
     		def numberOfRows = plateResult.rows
 
 

@@ -18,9 +18,11 @@
 								<h4 class="panel-title">Assays</h4>
 							</div>
 							<div class="panel-body ">
-								<g:link class="btn btn-info btn-sm" controller="experimentalPlateSet" action="index">View Assays</g:link>
-								<g:link class="btn btn-info btn-sm" controller="experimentalPlateSet" action="create">Create New Assay</g:link>
-								<g:link class="btn btn-info btn-sm">Export Plate</g:link>
+								<ul class="list-unstyled">
+									<li><g:link class="btn btn-info btn-sm" controller="experimentalPlateSet" action="index">View Assays</g:link></li>
+									<li><g:link class="btn btn-info btn-sm" controller="experimentalPlateSet" action="create">Create New Assay</g:link></li>
+									<li><g:link class="btn btn-info btn-sm">Export Plate</g:link></li>
+								</ul>
 							</div>
 						</div>
 					</div>
@@ -30,8 +32,10 @@
 								<h4 class="panel-title">Plate Templates</h4>
 							</div>
 							<div class="panel-body ">							
-								<button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#createTemplateModal">Create New Template</button>
-								<g:link class="btn btn-info btn-sm">Export Template</g:link>
+								<ul class="list-unstyled">
+									<li><button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#createTemplateModal">Create New Template</button></li>
+									<li><g:link class="btn btn-info btn-sm">Export Template</g:link></li>
+								</ul>
 							</div>
 						</div>
 					</div>
@@ -41,18 +45,10 @@
 								<h4 class="panel-title">Equipment</h4>
 							</div>
 							<div class="panel-body ">
-								<g:link class="btn btn-info btn-sm" controller="equipment" action="index">View Equipment</g:link>
-								<g:link class="btn btn-info btn-sm" controller="equipment" action="create">Create New Equipment</g:link>
-							</div>
-						</div>
-					</div>
-					<div class="col-sm-3">
-						<div id="resultsPanel" class="panel panel-default">
-							<div class="panel-heading">
-								<h4 class="panel-title">Results</h4>
-							</div>
-							<div class="panel-body ">
-								<g:link class="btn btn-info btn-sm" controller="result" action="index">View Results</g:link>
+								<ul class="list-unstyled">
+									<li><g:link class="btn btn-info btn-sm" controller="equipment" action="index">View Equipment</g:link></li>
+									<li><g:link class="btn btn-info btn-sm" controller="equipment" action="create">Create New Equipment</g:link></li>
+								</ul>
 							</div>
 						</div>
 					</div>
@@ -62,8 +58,10 @@
 								<h4 class="panel-title">Users</h4>
 							</div>
 							<div class="panel-body ">
-								<g:link class="btn btn-info btn-sm" controller="scientist" action="index">View Users</g:link>
-								<g:link class="btn btn-info btn-sm" controller="scientist" action="create">Create New User</g:link>
+								<ul class="list-unstyled">
+									<li><g:link class="btn btn-info btn-sm" controller="scientist" action="index">View Users</g:link></li>
+									<li><g:link class="btn btn-info btn-sm" controller="scientist" action="create">Create New User</g:link></li>
+								</ul>
 							</div>
 						</div>
 					</div>
