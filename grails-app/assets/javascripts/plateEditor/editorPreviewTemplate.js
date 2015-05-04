@@ -12,27 +12,7 @@ var currentHighlightKeys = [];
 var highlightKeyCounter = 0;
 var currentHighlightColor = "#D5E3E3";
 var highlightedCoords = [];
-//var BLANK_CHAR = "-";
 
-/**
- * Creates a blank data set for initializing the grid data set. 
- * The data set is of dimension grid_height x grid_width.
- * @param grid_height - number of rows on the grid
- * @param grid_width - number of columns on the grid
- */
-function createBlankData(grid_height, grid_width) {
-	"use strict";
-	var result, i, j;
-	result = [];
-
-	for (i = 0; i < grid_height; i++) {
-		result[i] = [];
-		for (j = 0; j < grid_width; j++) {
-			result[i][j] = null;
-		}
-	}
-	return result;
-}
 
 /**
  * A handler function for when the selected cells in the grid changes. This
@@ -109,31 +89,6 @@ function disableGridSelection() {
 	grid.disableCellSelection();
 }
 
-/**
- * This function adds an event handler to an html element in
- * a way that covers many browser types.
- * @param elementId - the string id of the element to attach the handler to
- * or a reference to the element itself.
- * @param eventType - a string representation of the event to be handled
- * without the "on" prefix
- * @param handlerFunction - the function to handle the event
- */
-function addEvent(elementId, eventType, handlerFunction) {
-	'use strict';
-	var element;
-
-	if (typeof elementId === "string") {
-		element = document.getElementById(elementId);
-	} else {
-		element = elementId;
-	}
-
-	if (element.addEventListener) {
-		element.addEventListener(eventType, handlerFunction, false);
-	} else if (window.attachEvent) {
-		element.attachEvent("on" + eventType, handlerFunction);
-	}
-}
 
 /**
  * This function is used to convert the internal data structure json format into
@@ -177,68 +132,6 @@ function translateModelToOutputJson(pModel) {		// TODO - this is not called here
 	}
 	plateJson.plate = plate;
 	return plateJson;
-}
-
-/**
- * This function is used to convert a json data structure in the format that is 
- * sent by the server, into the json data structure that is expected by the
- * client-side JavaScript. This allows for differences between
- * the 2 models. This is used when loading data received from the server into 
- * the grid and associated internal data model. The internal model providing a 
- * more efficient referencing structure for the client-side tasks, and allows 
- * for quick changes to either model while maintaining the contract with the server.
- * @param plateJson - a data structure in the format sent by the server.
- * @returns pModel - a data structure in the format expected by the internal data model.
- */
-function translateInputJsonToModel(plateJson) {
-	'use strict';
-	var pModel, plate, i, j, row, column, groupName, labels, wellType;
-	pModel = {};
-	pModel.rows = {};
-	plate = plateJson.plate;
-	
-	pModel.grid_width = plate.width;
-	pModel.grid_height = plate.height;
-	
-	for (i = 0; i < plate.wells.length; i++) {
-		row = plate.wells[i].row + 1;
-		column = plate.wells[i].column + 1;
-		
-		if (plate.wells[i].groupName !== undefined && plate.wells[i].groupName !== null) {
-			groupName = plate.wells[i].groupName;
-			if (plate.wells[i].control !== undefined && plate.wells[i].control !== null) {
-				wellType = plate.wells[i].control;
-			} else {
-				wellType = "compound";		// fail back to compound ??
-			}
-		} else {
-			groupName = "";
-			wellType = "empty";
-		}
-		
-		labels = plate.wells[i].labels;
-		
-		if (pModel.rows[row] === undefined) {
-			pModel.rows[row] = {};
-			pModel.rows[row].columns = {};
-		}
-		
-		if (pModel.rows[row].columns[column] === undefined) {
-			pModel.rows[row].columns[column] = {};
-			pModel.rows[row].columns[column].wellGroupName = groupName;
-			pModel.rows[row].columns[column].wellType = wellType;
-			pModel.rows[row].columns[column].categories = {};
-		}
-
-		for (j = 0; j < labels.length; j++) {
-			if (pModel.rows[row].columns[column].categories[labels[j].category] === undefined) {
-				pModel.rows[row].columns[column].categories[labels[j].category] = {};
-			}
-			pModel.rows[row].columns[column].categories[labels[j].category][labels[j].name] = labels[j].color;
-		}
-	}
-
-	return pModel;
 }
 
 /**
