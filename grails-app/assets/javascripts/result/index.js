@@ -6,6 +6,34 @@ var showHeatMap = true;
 var showNormalized = false;
 
 
+function cellFormatter(row, cell, value, columnDef, dataContext) {
+    var finalValue = value;
+    var well = experiment.currentPlate.rows[row].columns[cell-1];
+
+    switch (well.control) {
+        case 'NEGATIVE':
+        case 'POSITIVE':
+            finalValue += ',' + well.control.toLowerCase();
+            break;
+    }
+
+    /*
+    if (showHeatMap) {
+        var dataSet = showNormalized ? experiment.normalizedData : experiment.data;
+
+        // first get a color quantizer
+        var flattened = dataSet.reduce(function(a, b) {
+            return a.concat(b);
+        });
+        var colorScale = d3.scale.category20c().domain([d3.min(flattened),
+                                                   d3.max(flattened)]);
+                                          //.range(colorbrewer.Blues[9]);
+        finalValue += ',' + colorScale(value);
+    }
+    */
+    return Grid.editorCellFormatter(row, cell, finalValue, columnDef, dataContext);
+}
+
 /**
  * Colors each cell in the grid.  The color is determined by the value
  * in the cell.
@@ -143,7 +171,7 @@ function init() {
 
 function loadGrid(dataSet) {
     grid.setData(dataSet);
-    grid.fillUpGrid();
+    grid.fillUpGrid(null, null, true, cellFormatter, 'result-cell');
     if (showHeatMap) {
         colorGrid(dataSet);
     }
