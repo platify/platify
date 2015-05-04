@@ -6,48 +6,14 @@ var DIMENSION = 100;
 var CELL_HEIGHT = 25;
 var CELL_WIDTH = 40;
 var plateModel = {};
-//var wellGroupings = [];
-var grid;
-var currentHighlightKeys = [];
-var highlightKeyCounter = 0;
-var currentHighlightColor = "#D5E3E3";
-var highlightedCoords = [];
-
 
 /**
- * A handler function for when the selected cells in the grid changes. This
- * function is registered to listen for these events in the createGrid
- * function using the registerSelectedCellsCallBack function of the Grid
- * Class. This function changes the background color of all selected cells
- * to the currentHighlightColor. 
- * Then causes the cursor to focus in the textField.
- * @param startRow - the row index of top left cell of the selecting box
- * @param startCol - the column index of top left cell of the selecting box
- * @param endRow - the row index of bottom right cell of the selecting box
- * @param endCol - the column index of bottom right cell of the selecting box
+ * Focuses on the text field when grid is selected
  */
-function handleSelectedCells(startRow,startCol,endRow, endCol) {
+function txtFieldFocus() {
 	"use strict";
-	var out, coordinatesToHighlight, i, j, key;
-	// write to the selected cells div, the cells that are selected
-	out = document.getElementById("cellRange");
-	out.innerHTML = Grid.getRowLabel(startRow) + startCol + ":" + Grid.getRowLabel(endRow) + endCol;
-
-	// highlight those cells with the current color
-	coordinatesToHighlight = [];
-	for (i = startRow; i <= endRow; i++) {
-		for (j = startCol; j <= endCol; j++) {
-			coordinatesToHighlight.push([i, j]);
-			// set global record of highlights
-			highlightedCoords.push([i, j]);
-		}
-	}
-	key = "key" + highlightKeyCounter;
-	grid.setCellColors(coordinatesToHighlight,currentHighlightColor, key);
-	currentHighlightKeys.push(key);
-	highlightKeyCounter++;
+	// nothing to be focused on here
 }
-
 
 /**
  * Creates a new grid applying it to the "myGrid" div on the

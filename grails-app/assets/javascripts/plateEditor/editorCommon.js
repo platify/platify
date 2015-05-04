@@ -1,7 +1,12 @@
 /*jslint browser:true */
 /*global $, jQuery, alert*/
 
-var groupNames = {};	// tracks imported compounds/wellgroup relationship 
+var grid;								// reference to the instantiated grid object
+var groupNames = {};					// tracks imported compounds/wellgroup relationship 
+var currentHighlightKeys = [];			// array of references to current highlighted grid cells
+var highlightedCoords = [];				// array of currently selected coordinates
+var currentHighlightColor = "#D5E3E3";	// default selection color
+var highlightKeyCounter  = 0;			// counter for number of grid selections
 
 /**
  * This function adds an event handler to an html element in
@@ -153,5 +158,55 @@ function translateInputJsonToModel(plateJson) {
 	}
 
 	return pModel;
+}
+
+/**
+ * A handler function for when the selected cells in the grid changes. This
+ * function is registered to listen for these events in the createGrid
+ * function using the registerSelectedCellsCallBack function of the Grid
+ * Class. This function changes the background color of all selected cells
+ * to the currentHighlightColor. 
+ * Then causes the cursor to focus in the textField.
+ * @param startRow - the row index of top left cell of the selecting box
+ * @param startCol - the column index of top left cell of the selecting box
+ * @param endRow - the row index of bottom right cell of the selecting box
+ * @param endCol - the column index of bottom right cell of the selecting box
+ */
+function handleSelectedCells(startRow, startCol, endRow, endCol) {
+	"use strict";
+	var out, i, j, key, coordinatesToHighlight;
+	// write to the selected cells div, the cells that are selected
+	out = document.getElementById("cellRange");
+	out.innerHTML = Grid.getRowLabel(startRow) + startCol + ":" + Grid.getRowLabel(endRow) + endCol;
+
+	// highlight those cells with the current color
+	coordinatesToHighlight = [];
+	for (i = startRow; i <= endRow; i++) {
+		for (j = startCol; j <= endCol; j++) {
+			coordinatesToHighlight.push([i, j]);
+			// set global record of highlights
+			highlightedCoords.push([i, j]);
+		}
+	}
+	key = "key" + highlightKeyCounter;
+	grid.setCellColors(coordinatesToHighlight, currentHighlightColor, key);
+	currentHighlightKeys.push(key);
+	highlightKeyCounter++;
+	txtFieldFocus();
+}
+
+/**
+ * Removes all the current cell selections and related background color 
+ * change. This is achieved by calling the removeCellColors method of the Grid class with
+ * the most key used to create the most recent background color change as
+ * stored in the currentHighlightKeys array.
+ */
+function removeAllHighlightedCells() {
+	"use strict";
+	while (currentHighlightKeys.length > 0) {
+		grid.removeCellColors(currentHighlightKeys.pop());
+	}
+	// removing all selected cells, so global count disappears
+	highlightedCoords = [];
 }
 
