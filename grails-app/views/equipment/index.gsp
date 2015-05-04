@@ -23,10 +23,18 @@
 				<!-- Right Column -->
 				<div class="col-sm-9">
 					<div id="list-scientist" class="content scaffold-list" role="main">
-						<h1><g:message code="default.list.label" args="[entityName]" /></h1>
+						<g:form action="index" class="form-inline" >
+							<h1>
+								<g:message code="default.list.label" args="[entityName]" /> -- 
+					        	<input class="form-control search" type="text" name="parseName" value="${params.parseName}" />
+					        	<input class="btn btn-info btn-sm" type="submit" value="Search by Name" />
+					        </h1>
+						</g:form>
+						
 						<g:if test="${flash.message}">
 							<div class="message" role="status">${flash.message}</div>
 						</g:if>
+						
 						<table class="table table-striped table-hover">
 						<thead>
 								<tr>

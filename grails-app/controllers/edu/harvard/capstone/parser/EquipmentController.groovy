@@ -14,8 +14,20 @@ class EquipmentController {
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
     def index(Integer max) {
-        params.max = Math.min(max ?: 10, 100)
-        respond Equipment.list(params), model:[equipmentInstanceCount: Equipment.count()]
+		def pList
+		
+		params.max = Math.min(max ?: 10, 100)
+		
+		if (params.parseName == null) {
+			// no filter
+			pList = Equipment.list(params);
+		} else {
+			pList = Equipment.list().findAll {
+				it.name.toUpperCase() =~ params.parseName.toString().toUpperCase()
+			}
+		}
+		
+        respond pList, model:[equipmentInstanceCount: Equipment.count()]
     }
 
     def show(Equipment equipmentInstance) {
