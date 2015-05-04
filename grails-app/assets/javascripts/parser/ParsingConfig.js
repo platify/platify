@@ -569,7 +569,12 @@ function ParsingConfig(name,
      * Note: - This method throws a FEATURE_NAME_NOT_SPECIFIED error if the given name is
      *      undefined, null, is not a string, or an empty string or consists entirely of
      *      whitespace.
-     *       - This method throws a FEATURE_RANGE_NOT_SPECIFIED error if the
+     *       - This method throws a FEATURE_RANGE_NOT_SPECIFIED error if the given range
+     *      is undefined or null.
+     *       - This method throws a FEATURE_LEVEL_NOT_SPECIFIED error if the given level
+     *      is undefined or null.
+     *       - This method throws a FEATURE_COLOR_NOT_SPECIFIED error if the given color
+     *      is undefined, null, or an empty string.
      *       - This method may throw a variety of errors. Please see the documentation for
      *      addWellLevelFeature(), addPlateLevelFeature, and addExperimentLevelFeature for
      *      the details of the level specific error possibilities
@@ -619,6 +624,22 @@ function ParsingConfig(name,
         return feature;
     };
 
+    /**
+     * This method updates the dimensions of plates for the calling ParsingConfig based on
+     * the range of a well level feature that is added to the parsing configuration.
+     * @param rangeOfWellLevelFeature - the range of a well level feature that is added to
+     *                                the calling ParsingConfig object
+     *
+     * Note: - This method throws a NON_STANDARD_PLATE_DIMENSION_RATIO if the dimensions
+     *      of the feature do not match the ratio:
+     *
+     *          ParsingConfig.WELL_ROW_FACTOR : ParsingConfig.WELL_COL_FACTOR
+     *
+     *      of plate rows to columns, which in the standard case is 2:3.
+     *       - This method throws a PLATE_DIMENSION_DIFFERENCE error if the dimensions of
+     *      plates implied by the give range of the well level feature, do not match the
+     *      dimension of plates implied by previously added well level features.
+     */
     this.updatePlateDimensions = function(rangeOfWellLevelFeature){
         var numPlateWells = ParsingConfig.getNumberOfWellsFromFeatureBounds(
                                                         rangeOfWellLevelFeature.startRow,
@@ -654,43 +675,83 @@ function ParsingConfig(name,
 
     };
 
+    /**
+     * This method creates a JSON ready DTO of the calling ParsingConfig object.
+     * @returns {{}} - a JSON ready DTO of the calling ParsingConfig object
+     */
     this.getJSONObject = function(){
         var JSONObject = {};
 
-        JSONObject["id"] = this.id;
-        JSONObject["name"] = this.name;
-        JSONObject["machineName"] = this.machineName;
-        JSONObject["description"] = this.description;
-        JSONObject["delimiter"] = this.delimiter;
+        JSONObject["id"] = this.getID();
+        JSONObject["name"] = this.getName();
+        JSONObject["machineName"] = this.getMachineName();
+        JSONObject["description"] = this.getDescription();
+        JSONObject["delimiter"] = this.getDelimiter();
         JSONObject["plate"] = this.plate;
         JSONObject["plateAnchors"] = this.plateAnchors;
         JSONObject["features"] = this.features;
-        JSONObject["numPlateRows"] = this.numPlateRows;
-        JSONObject["numPlateCols"] = this.numPlateCols;
-        JSONObject["colorPickerIndex"] = this.colorPickerIndex;
+        JSONObject["numPlateRows"] = this.getNumberOfPlateRows();
+        JSONObject["numPlateCols"] = this.getNumberOfPlateColumns();
+        JSONObject["colorPickerIndex"] = this.getColorPickerIndex();
 
         return JSONObject;
     };
 
+    /**
+     * This method returns an array containing all of the possible level constants.
+     * @returns {*[]} - an array containing all of the possible level constants
+     */
     this.getFeatureLevels = function(){
         return [WELL_LEVEL, PLATE_LEVEL, EXPERIMENT_LEVEL];
     };
 
+    /**
+     * This method determines whether the cell specified by a row and column number on the
+     * grid is contained in the first plate coordinate range
+     * @param row - the row number on the grid (starting at 1) of the cell in question
+     * @param col - the column number on the grid (starting at 1) of the cell in question.
+     * @returns {boolean} - a boolean for whether or not the cell is contained on the
+     *      defined first plate, if the first plate has not been defined, this method
+     *      always returns false.
+     */
     this.coordinateIsOnFirstPlate = function(row, col){
-
-        return (row >= this.plate.coordinateRange.startRow)
+        if (!this.plate){
+            return false
+        } else {
+            return (row >= this.plate.coordinateRange.startRow)
                 && (row <= this.plate.coordinateRange.endRow)
                 && (col >= this.plate.coordinateRange.startCol)
                 && (col <= this.plate.coordinateRange.endCol);
+        }
     };
 
+    /**
+     * This method determines whether a cell range is contained entirely on the first
+     * plate defined for the calling ParsingConfig object.
+     * @param range - the CellRange in question
+     * @returns {boolean} - a boolean for whether or not the range is contained entirely
+     *                  on the defined first plate for the calling ParsingConfig object,
+     *                  if the first plate has not been defined, the the method always
+     *                  returns false.
+     */
     this.rangeIsOnFirstPlate = function(range){
         return (this.coordinateIsOnFirstPlate(range.startRow, range.startCol))
                 && (this.coordinateIsOnFirstPlate(range.endRow, range.endCol));
     };
 
+    /**
+     * This method determines the index in the anchors array at which an anchor
+     * representing a cell at a given grid row and column is located. If there is no
+     * anchor for the cell at the given row and column, then null is returned.
+     * @param row - the row of the anchor to find on the grid, not relative to the plate
+     * @param column - the column of the anchor to find on the grid, not relative to the
+     *              plate
+     * @returns {*} - index in the anchors array at which an anchor representing a cell at
+     *              a given grid row and column is located. If there is no anchor for the
+     *              cell at the given row and column, then null is returned
+     */
     this.findPlateAnchorIndex = function(row, column){
-        result = null;
+        var result = null;
 
         row = row - this.plate.coordinateRange.startRow;
         column = column - this.plate.coordinateRange.startCol;
@@ -708,7 +769,9 @@ function ParsingConfig(name,
         return result;
     };
 
-
+    /**
+     * An initializer function for ParsingConfig objects
+     */
     function init(){
         _self.id = null;
         _self.setName(name);
@@ -723,9 +786,17 @@ function ParsingConfig(name,
         _self.colorPickerIndex = 0;
     }
 
+    // the initializer must always be called
     init();
 }
 
+/**
+ * A "static" method for reconstituting a ParsingConfig object from an associated DTO
+ * retrieved from the server.
+ * @param JSONParsingConfig - the DTO to use to create the full featured ParsingConfig
+ *                          object
+ * @returns {ParsingConfig} - a full featured ParsingConfig object based on the given DTO
+ */
 ParsingConfig.loadParsingConfig = function(JSONParsingConfig){
     var rawParsingConfig = JSON.parse(JSONParsingConfig);
 
@@ -763,12 +834,35 @@ ParsingConfig.loadParsingConfig = function(JSONParsingConfig){
     return config;
 };
 
+/**
+ * This "static" method determines whether or not a given number of wells on a plate
+ * matches the assumed row to column number of well ratio on a plate of:
+ *
+ *          rowProportion : colProportion
+ *
+ * @param numberOfWells - the number of wells on a plate
+ * @param rowProportion - the factor of rows on a plate
+ * @param colProportion - the factor of columns on a plate
+ * @returns {boolean} - a boolean for whether or not the number of wells matches the
+ *                  given row:col ratio
+ */
 ParsingConfig.plateDimensionIsCorrect = function(numberOfWells, rowProportion, colProportion){
     var base = Math.sqrt(numberOfWells/(rowProportion * colProportion));
 
     return (base % 1 === 0);
 };
 
+/**
+ * This "static" method determines the dimensions of a plate given a number of wells
+ * and the ration of rows on a plate to columns on a plate of:
+ *
+ *          rowProportion : colProportion
+ * @param numberOfWells - the number of wells on a plate
+ * @param rowProportion - the factor of rows on a plate
+ * @param colProportion - the factor of columns on a plate
+ * @returns {*[]} - an array of length 2, in which the 0th value is the number of rows
+ *          on a plate and the 1st value is the number of columns on a plate
+ */
 ParsingConfig.wellNumberToPlateDimension = function(numberOfWells, rowProportion, colProportion){
     var base = Math.sqrt(numberOfWells/(rowProportion * colProportion));
     var numColumns = base * colProportion;
@@ -777,6 +871,21 @@ ParsingConfig.wellNumberToPlateDimension = function(numberOfWells, rowProportion
     return [numRows, numColumns];
 };
 
+/**
+ * This "static" method determines the coordinates on a plate of a certain well index on
+ * the plate using a given number of wells on the plate and an assumed ration of the
+ * number of plate well rows to plate well columns:
+ *
+ *          rowProportion : colProportion
+ * @param index - the index of the well in a listing of all wells on the plate (starting
+ *              at 0)
+ * @param numberOfWells - the number of wells on a plate
+ * @param rowProportion - the factor of rows on a plate
+ * @param colProportion - the factor of columns on a plate
+ * @returns {*[]} - an array of length 2, in which the 0th value is the row index of the
+ *          well and the 1st value is the column index of the well with both indices
+ *          starting at 0.
+ */
 ParsingConfig.wellNumberToPlateCoords = function(index, numberOfWells, rowProportion, colProportion){
     var base = Math.sqrt(numberOfWells/(rowProportion * colProportion));
     var numColumns = base * colProportion;
@@ -788,6 +897,17 @@ ParsingConfig.wellNumberToPlateCoords = function(index, numberOfWells, rowPropor
     return [row, col];
 };
 
+/**
+ * This 'static' method returns a listing of all of the cells in a range of cells.
+ * @param startRow - the row index of the starting cell in the range
+ * @param startCol - the column index of the starting cell in the range
+ * @param endRow - the row index of the ending cell in the range
+ * @param endCol - the column index of the ending cell in the range
+ * @returns {Array} - an array of arrays. The inner arrays are all of length 2 and
+ *          represent the coordinates of a single cell in the range of cells. The 0th
+ *          value hold the row index of the cell and the 1st value holds the column index
+ *          of the cell.
+ */
 ParsingConfig.getCoordsInARange = function(startRow, startCol, endRow, endCol){
     var coordinates = [];
     for (var row = startRow; row<=endRow; row++){
@@ -798,6 +918,16 @@ ParsingConfig.getCoordsInARange = function(startRow, startCol, endRow, endCol){
     return coordinates;
 };
 
+/**
+ * This "static" method determines the number of wells on a plate from the range of a
+ * feature.
+ * @param startRow - the row index of the starting cell in the range
+ * @param startCol - the column index of the starting cell in the range
+ * @param endRow - the row index of the ending cell in the range
+ * @param endCol - the column index of the ending cell in the range
+ * @returns {number} - the number of wells on the assumed plate for the given well
+ *          level feature range
+ */
 ParsingConfig.getNumberOfWellsFromFeatureBounds = function(startRow,
                                                            startCol,
                                                            endRow,
@@ -808,6 +938,16 @@ ParsingConfig.getNumberOfWellsFromFeatureBounds = function(startRow,
     return width * height;
 };
 
+/**
+ * This "static" method determines if a certain cell, given by its coordinates, is
+ * contained in a range of cells.
+ * @param cellCoords - an array of length 2 representing the coordinates of a cell to
+ *              to determine if the cell is in the given cell range. The form of these
+ *              cell coordinates is [row, column]
+ * @param range - a CellRange representing the range to test the given cell for membership
+ * @returns {boolean} - a boolean for whether or not the given cell is contained in the
+ *                  given range, inclusive of the range bounding cells
+ */
 ParsingConfig.cellIsContainedInRange = function(cellCoords, range){
     var rangeStartRow = range[0];
     var rangeStartCol = range[1];
@@ -821,6 +961,12 @@ ParsingConfig.cellIsContainedInRange = function(cellCoords, range){
         && cellCol >= rangeStartCol && cellCol <= rangeEndCol);
 };
 
+/**
+ * This "static" method creates and returns a 2D array containing all zero values.
+ * @param rows - the number of rows in the 2D array
+ * @param columns - the number of columns in the 2D array
+ * @returns {Array} - a 2D array containing all zero values of the given dimensions
+ */
 ParsingConfig.createZeros2DArray = function(rows, columns){
     var result = [];
 
