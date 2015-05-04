@@ -1,6 +1,7 @@
 /*jslint browser:true */
 /*global $, jQuery, alert*/
 
+var DIMENSION = 100;					// default grid height/width
 var grid;								// reference to the instantiated grid object
 var groupNames = {};					// tracks imported compounds/wellgroup relationship 
 var currentHighlightKeys = [];			// array of references to current highlighted grid cells
@@ -210,3 +211,45 @@ function removeAllHighlightedCells() {
 	highlightedCoords = [];
 }
 
+/**
+ * Enables the ability to make selections on the grid.
+ */
+function enableGridSelection() {
+	"use strict";
+	if (grid !== undefined) {
+		grid.enableCellSelection();
+	}
+}
+
+/**
+ * Disables the ability to make selections on the grid.
+ */
+function disableGridSelection() {
+	"use strict";
+	if (grid !== undefined) {
+		grid.disableCellSelection();
+	}
+}
+
+/**
+ * Creates a new grid applying it to the "myGrid" div on the
+ * page. It then creates a blank data set and displays it in the grid.
+ * It also registers the handleSelectedCells function as a listener for
+ * the event that user selected cell ranges in the grid change.
+ */
+function createGrid(gridName, cell_width, cell_height, grid_width, grid_height) {
+	"use strict";
+	// construct the Grid object with the id of the html container element
+	// where it should be placed (probably a div) as an argument
+	grid = new Grid(gridName);
+
+	// set the data to be displayed which must be in 2D array form
+	grid.setData(createBlankData(grid_height, grid_width));
+
+	// display the data
+	grid.fillUpGrid(cell_width, cell_height, true, Grid.editorCellFormatter, "editor-cell");
+
+	// register a function to be called each time a new set of cells are
+	// selected by a user
+	grid.registerSelectedCellCallBack(handleSelectedCells);
+}

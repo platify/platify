@@ -2,7 +2,6 @@
 /*global $, jQuery, alert, console, Grid*/
 
 // constants
-var DIMENSION = 100;
 var CELL_HEIGHT = 35;
 var CELL_WIDTH = 75;
 var data;
@@ -362,29 +361,6 @@ function updateCategoryList() {
 			}		
 			$("#delete__sep__" + catKey + "__sep__" + labelKey).click(onDeleteLabelChange);
 		}
-	}
-}
-
-/**
- * Removes the current selection of cells and enables
- * the ability to make selections on the grid. 
- */
-function enableGridSelection() {
-	"use strict";
-	if (grid !== undefined) {
-		grid.enableCellSelection();
-	}
-}
-
-/**
- * Removes the current selection of cells and enables
- * the ability to make selections on the grid. 
- */
-function disableGridSelection() {
-	"use strict";
-	if (grid !== undefined) {
-		removeAllHighlightedCells();
-		grid.disableCellSelection();
 	}
 }
 
@@ -1105,6 +1081,7 @@ function showPlateLabelPanel() {
 
 	// disable grid selection !! (labels only apply to plate level)
 	disableGridSelection();
+	removeAllHighlightedCells();
 	showPlateLabelCatPanel();
 }
 
@@ -1136,33 +1113,6 @@ $(function() {
 	});
 });
 
-
-/**
- * Creates a new grid applying it to the "myGrid" div on the
- * page. It then creates a blank data set and displays it in the grid.
- * It also registers the handleSelectedCells function as a listener for
- * the event that user selected cell ranges in the grid change.
- */
-function createGrid() {		//TODO - perhaps change grid to not be myGrid ??
-	"use strict";
-	// construct the Grid object with the id of the html container element
-	// where it should be placed (probably a div) as an argument
-	grid = new Grid("myGrid");
-
-	// set the data to be displayed which must be in 2D array form
-	data = createBlankData(plateModel.grid_height, plateModel.grid_width);
-	grid.setData(data);
-
-	// display the data
-	grid.fillUpGrid(CELL_WIDTH, CELL_HEIGHT, true, Grid.editorCellFormatter, "editor-cell");
-
-	// register a function to be called each time a new set of cells are
-	// selected by a user
-	grid.registerSelectedCellCallBack(handleSelectedCells);
-
-	enableGridSelection();
-}
-
 /**
  * Loads a json data structure received from the server. It is translated into 
  * a format understood by the local internal plate model and updates the grid
@@ -1184,7 +1134,7 @@ function loadJsonData(plateJson) {
 		plateModel.grid_height = 100; // default value
 	}
 
-	createGrid();
+	createGrid("myGrid", CELL_WIDTH, CELL_HEIGHT, plateModel.grid_width, plateModel.grid_height);
 
 	// load data into the grid
 	for (row in plateModel.rows) {

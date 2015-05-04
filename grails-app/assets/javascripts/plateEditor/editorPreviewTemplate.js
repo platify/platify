@@ -2,7 +2,6 @@
 /*global $, jQuery, alert*/
 
 // constants
-var DIMENSION = 100;
 var CELL_HEIGHT = 25;
 var CELL_WIDTH = 40;
 var plateModel = {};
@@ -14,47 +13,6 @@ function txtFieldFocus() {
 	"use strict";
 	// nothing to be focused on here
 }
-
-/**
- * Creates a new grid applying it to the "myGrid" div on the
- * page. It then creates a blank data set and displays it in the grid.
- * It also registers the handleSelectedCells function as a listener for
- * the event that user selected cell ranges in the grid change.
- */
-function createGrid() {
-	"use strict";
-	// construct the Grid object with the id of the html container element
-	// where it should be placed (probably a div) as an argument
-	grid  = new Grid("myGrid");
-
-	// set the data to be displayed which must be in 2D array form
-	grid.setData(createBlankData(DIMENSION, DIMENSION));
-
-	// display the data
-	grid.fillUpGrid(CELL_WIDTH, CELL_HEIGHT, true, Grid.editorCellFormatter, "editor-cell");
-
-	// register a function to be called each time a new set of cells are
-	// selected by a user
-	grid.registerSelectedCellCallBack(handleSelectedCells);
-
-}
-
-/**
- * Enables the ability to make selections on the grid. 
- */
-function enableGridSelection() {
-	"use strict";
-	grid.enableCellSelection();
-}
-
-/**
- * Disables the ability to make selections on the grid. 
- */
-function disableGridSelection() {
-	"use strict";
-	grid.disableCellSelection();
-}
-
 
 /**
  * This function is used to convert the internal data structure json format into
@@ -226,7 +184,7 @@ function selectAndContinue() {
  */
 function init() {
 	"use strict";
-	createGrid();
+	createGrid("myGrid", CELL_WIDTH, CELL_HEIGHT, DIMENSION, DIMENSION);
 
 	// allows for passing input Json, but it not used here. Perhaps refactor!
 	//var testInputJson = {"plate":{"wells":[{"row":"2","column":"2","control":null,"labels":[{"category":"c1","name":"l1","color":"#ffff00"}],"groupName":"L67"},{"row":"2","column":"3","control":null,"labels":[{"category":"c1","name":"l2","color":"#4780b8"}],"groupName":"L5"},{"row":"3","column":"2","control":null,"labels":[{"category":"c1","name":"l1","color":"#ffff00"},{"category":"c2","name":"l3","color":"#8d7278"}],"groupName":"L51"},{"row":"3","column":"3","control":null,"labels":[{"category":"c1","name":"l2","color":"#4780b8"},{"category":"c2","name":"l3","color":"#8d7278"}],"groupName":"L17"},{"row":"4","column":"2","control":null,"labels":[{"category":"c2","name":"l3","color":"#8d7278"}],"groupName":"L2"},{"row":"4","column":"3","control":null,"labels":[{"category":"c2","name":"l3","color":"#8d7278"}],"groupName":"L47"}],"labels":[]}};
