@@ -25,6 +25,7 @@ function FileExaminer(){
     this.rowsSize = -1;
     this.matrix = null;
     this.loadObservers = [];
+    this.errors = [];
 
     /**
      * This public public starts the file examining process for a given set of files in
@@ -44,6 +45,7 @@ function FileExaminer(){
         this.currentFileIndex = 0;
         this.files = files;
         this.fileContents = "";
+        this.errors = [];
 
         // Read the 0th file as text which will trigger the reader's onload event.
         this.reader.readAsText(this.files[0]);
@@ -119,22 +121,31 @@ function FileExaminer(){
      * all of the files
      * @param e - the onload event object for the FileReader
      */
-    this.reader.onload = function(e) {
-        var fileName = _self.files[_self.currentFileIndex].name;
+    this.reader.onloadend = function(e) {
+        var fileName;
+        if (_self.files[_self.currentFileIndex].name){
+            fileName = _self.files[_self.currentFileIndex].name;
+        } else {
+            fileName = "unknown";
+        }
 
-        _self.fileContents += e.target.result + "\n[ end of file: "+ fileName +"]\n";
+        if (e.target.error){
+            console.log(e.target.error);
+            _self.errors.push(e.target.error.message);
+        } else {
+            _self.fileContents += e.target.result + "\n[ end of file: "+ fileName +"]\n";
+        }
 
         _self.currentFileIndex++;
 
         if (_self.currentFileIndex >= _self.numFiles){   // we have read the last file
             // determine the delimiter if necessary
-            if (!_self.delimiter){
+            if (!_self.delimiter && _self.fileContents){
                 _self.delimiter = determineDelimiter(_self.fileContents);
             }
 
 
             // call the parse function with the proper line terminator and cell terminator
-            //parseCSV(e.target.result, '\n', '\t');
             _self.matrix
                 = file2grid(_self.fileContents,
                 _self.LINE_TERMINATOR,
@@ -143,8 +154,6 @@ function FileExaminer(){
         } else {           // we have not read the last file, so read the next one
             _self.reader.readAsText(_self.files[_self.currentFileIndex]);
         }
-
-
     };
 
     /**
@@ -167,8 +176,18 @@ function FileExaminer(){
      * FileExaminer instance.
      */
     function notifyLoadObservers(){
+        var argument;
+
+        if (_self.errors.length){
+            argument = new FileExaminerError(FileExaminerError.PROBLEM_LOADING_FILE,
+                                             _self.errors,
+                                             "load file(s)");
+        } else {
+            argument = _self;
+        }
+
         for (var i=0; i<_self.loadObservers.length; i++){
-            _self.loadObservers[i](_self);
+            _self.loadObservers[i](argument);
         }
     }
 
@@ -254,5 +273,26 @@ function FileExaminer(){
         }
 
         return maxDelimiterName;
+    }
+}
+
+
+FileExaminerError.PROBLEM_LOADING_FILE = "problem loading file";
+
+function FileExaminerError(type, descriptor, attemptedAction){
+    this.type = type;
+    this.descriptor = descriptor;
+    this.attemptedAction = attemptedAction;
+
+    this.getMessage = function(){
+        if (this.type === FileExaminerError.PROBLEM_LOADING_FILE){
+            var result = "There was a problem loading the file(s): ";
+
+            for (var i=0; i<this.descriptor.length; i++){
+                result += this.descriptor[i];
+            }
+
+            return result;
+        }
     }
 }

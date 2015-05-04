@@ -61,22 +61,30 @@ function ParsingController(){
     };
 
 
-    _self.handleExaminerLoad = function(examiner){
-        loadDelimiterList();
+    _self.handleExaminerLoad = function(response){
+        var examiner;
 
-        // show the delimiter used for loading the file in the UI
-        _self.parserUI.setDelimiter(examiner.delimiter);
+        if (response instanceof FileExaminerError){
+            _self.parserUI.displayError(response)
+        } else {
+            examiner = response;
 
-        // display the file in the grid
-        _self.grid.setData(examiner.matrix);
-        _self.grid.fillUpGrid();
+            loadDelimiterList();
+
+            // show the delimiter used for loading the file in the UI
+            _self.parserUI.setDelimiter(examiner.delimiter);
+
+            // display the file in the grid
+            _self.grid.setData(examiner.matrix);
+            _self.grid.fillUpGrid();
 
 
-        // reset the plates on the parsing config
-        if (_self.parsingConfig && _self.parsingConfig.plate){
-            _self.plates = DataExtractor.findPlates(_self.grid,
-                                                    _self.parsingConfig,
-                                                    _self.examiner);
+            // reset the plates on the parsing config
+            if (_self.parsingConfig && _self.parsingConfig.plate){
+                _self.plates = DataExtractor.findPlates(_self.grid,
+                    _self.parsingConfig,
+                    _self.examiner);
+            }
         }
     };
 
@@ -240,7 +248,7 @@ function ParsingController(){
     _self.defineFirstPlate = function(range){
         // set the parsing config plate to the given range and anchor it in its top left
         // corner for later plate finding on the grid.
-        _self.parsingConfig.addPlate(range, _self.examiner, ColorPicker.PLATE_COLOR);
+        _self.parsingConfig.addPlate(range, ColorPicker.PLATE_COLOR);
         _self.parsingConfig.addPlateAnchor(range.startRow,
                                            range.startCol,
                                  _self.grid.getDataPoint(range.startRow, range.startCol));

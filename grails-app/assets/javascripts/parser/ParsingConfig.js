@@ -405,12 +405,11 @@ function ParsingConfig(name,
     /**
      * This method sets the plate definition for the calling ParsingConfig object.
      * @param range - the CellRange of the plate on the Grid
-     * @param examiner - the FileExaminer for the file that the plate is being defined for
      * @param color - the hex color string that should be used to highlight plates on the
      *              grid
      * @returns {null|*} - a reference to the BioFeature object representing the plate
      */
-    this.addPlate = function(range, examiner, color){
+    this.addPlate = function(range, color){
         this.plateAnchors = [];
         this.features = {};
 
@@ -806,13 +805,31 @@ ParsingConfig.loadParsingConfig = function(JSONParsingConfig){
         rawParsingConfig.description,
         rawParsingConfig.delimiter);
 
-    config.id = rawParsingConfig.id;
-    config.plate = rawParsingConfig.plate;
-    config.plateAnchors = rawParsingConfig.plateAnchors;
-    config.features = rawParsingConfig.features;
-    config.numPlateRows = rawParsingConfig.numPlateRows;
-    config.numPlateCols = rawParsingConfig.numPlateCols;
-    config.colorPickerIndex = rawParsingConfig.colorPickerIndex;
+    config.setID(rawParsingConfig.id);
+
+    if (rawParsingConfig.plate){
+        config.addPlate(rawParsingConfig.plate.coordinateRange, rawParsingConfig.plate.color);
+    }
+    for (var i=0; i<rawParsingConfig.plateAnchors.length; i++){
+        var row = rawParsingConfig.plateAnchors[i][0]
+                    + rawParsingConfig.plate.coordinateRange.startRow;
+        var col = rawParsingConfig.plateAnchors[i][1]
+                    + rawParsingConfig.plate.coordinateRange.startCol;
+        var value = rawParsingConfig.plateAnchors[i][2];
+
+        config.addPlateAnchor(row, col, value);
+    }
+
+    for (var featureName in rawParsingConfig.features){
+        var feature = rawParsingConfig.features[featureName];
+        var range = feature.coordinateRange;
+        var level = feature.typeOfFeature;
+        var color = feature.color;
+
+        config.createFeature(featureName, range, level, color);
+    }
+
+    config.setColorPickerIndex(rawParsingConfig.colorPickerIndex);
 
     for (var featureName in config.features){
         var feature = config.getFeature(featureName);
