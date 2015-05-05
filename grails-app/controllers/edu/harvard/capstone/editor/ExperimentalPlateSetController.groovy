@@ -149,7 +149,7 @@ class ExperimentalPlateSetController {
         request.withFormat {
             form multipartForm {
                 flash.message = message(code: 'default.created.message', args: [message(code: 'experimentalPlateSet.label', default: 'ExperimentalPlateSet'), experimentalPlateSetInstance.id])
-                redirect experimentalPlateSetInstance
+                redirect action: 'showactions', id: experimentalPlateSetInstance.id
             }
             '*' { respond experimentalPlateSetInstance, [status: CREATED] }
         }
@@ -199,6 +199,55 @@ class ExperimentalPlateSetController {
             '*'{ render status: NO_CONTENT }
         }
     }
+
+    @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
+    def exportPlate(Integer max) {
+
+        if(!springSecurityService.principal?.getAuthorities().any { it.authority == "ROLE_ADMIN" || it.authority == "ROLE_SUPER_ADMIN"}){
+            params.owner = springSecurityService.principal
+        }
+  
+        params.max = Math.min(max ?: 10, 100)
+        def plateSetList = PlateSet.list(params)
+        log.info plateSetList
+        respond plateSetList, model:[plateSetInstanceCount: PlateSet.count(), plateSetList: plateSetList]
+    }
+
+    def exportPlateSetFile(PlateSet plateSetInstance){
+
+        if (plateSetInstance == null) {
+            notFound()
+            return
+        }
+
+        def file = editorService.exportPlate(plateSetInstance)
+
+        response.setHeader "Content-disposition", "attachment; filename=${file.name}.csv"
+        response.contentType = 'text-plain'
+        response.outputStream << file.text
+        response.outputStream.flush()        
+    }
+
+    @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
+    def exportTemplate() {
+    }
+
+
+    def exportTemplateFile(PlateTemplate plateTemplateInstance){
+
+        if (plateTemplateInstance == null) {
+            notFound()
+            return
+        }
+
+        def file = editorService.exportTemplate(plateTemplateInstance)
+
+        response.setHeader "Content-disposition", "attachment; filename=${file.name}.csv"
+        response.contentType = 'text-plain'
+        response.outputStream << file.text
+        response.outputStream.flush()        
+    }
+
 
     protected void notFound() {
         request.withFormat {

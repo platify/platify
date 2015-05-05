@@ -28,10 +28,12 @@ function addEvent(elementId, eventType, handlerFunction) {
 		element = elementId;
 	}
 
-	if (element.addEventListener) {
-		element.addEventListener(eventType, handlerFunction, false);
-	} else if (window.attachEvent) {
-		element.attachEvent("on" + eventType, handlerFunction);
+	if (typeof element !== 'undefined' && element != null){
+		if (element.addEventListener) {
+			element.addEventListener(eventType, handlerFunction, false);
+		} else if (window.attachEvent) {
+			element.attachEvent("on" + eventType, handlerFunction);
+		}		
 	}
 }
 

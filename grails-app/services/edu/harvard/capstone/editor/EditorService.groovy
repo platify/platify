@@ -330,9 +330,6 @@ class EditorService {
 
     	def wells = Well.findAllByPlate(templateInstance)
 
-    	if (!wells)
-    		return
-
         File file = File.createTempFile("template",".csv")
 
     	wells.each{ well ->
@@ -373,8 +370,6 @@ class EditorService {
 
     	def wells = Well.findAllByPlate(templateInstance)
 
-    	if (!wells)
-    		return
 
         File file = File.createTempFile("plate",".csv")
 

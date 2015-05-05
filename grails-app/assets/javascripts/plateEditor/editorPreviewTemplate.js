@@ -136,6 +136,14 @@ function fetchTemplateData(tId) {
 		$("#gridView").show();
 		loadJsonData(resData);
 	});
+	var exportTemplate = $('.exportTemplate')
+	if (exportTemplate.length > 0){
+		var link = exportTemplate.attr('href').split('/')
+		if (link.length > 0){
+			link[link.length-1] = tId;	
+			exportTemplate.attr('href', link.join('/'))
+		}
+	}	
 }
 
 /**
