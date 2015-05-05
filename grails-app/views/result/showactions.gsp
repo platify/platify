@@ -104,7 +104,7 @@
         var IMPORT_DATA_JSON = '${importData.encodeAsJSON()}';
 	</g:javascript>
 	<asset:javascript src="result/ExperimentModel.js" />
-	<asset:javascript src="result/index.js" />
+	<asset:javascript src="result/showactions.js" />
 
 	</body>
 </html>
