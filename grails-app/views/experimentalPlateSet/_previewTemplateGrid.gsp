@@ -1,5 +1,22 @@
 <%@ page import="edu.harvard.capstone.parser.Equipment" %>
 
+	<style>
+		.glyphicon-refresh-animate {
+		    -animation: spin .7s infinite linear;
+		    -webkit-animation: spin2 .7s infinite linear;
+		}
+		
+		@-webkit-keyframes spin2 {
+		    from { -webkit-transform: rotate(0deg);}
+		    to { -webkit-transform: rotate(360deg);}
+		}
+		
+		@keyframes spin {
+		    from { transform: scale(1) rotate(0deg);}
+		    to { transform: scale(1) rotate(360deg);}
+		}
+	</style>
+
 	<div class="col-sm-6">
 		<div id="labelPanel" class="panel panel-default">
 			<div class="panel-heading">
@@ -59,7 +76,16 @@
 				<h4 class="panel-title">Preview Grid</h4>
 			</div>
 			<div class="panel-body" style="padding:0px">
-				<div id="myGrid" style="width:100%; height:650px;"></div>
+				<div class="toggler" id="loaderView">
+					<div class="col-sm-5"></div>
+					<div class="col-sm-2" style="padding:50px">
+						<button class="btn btn-lg btn-info"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</button>
+					</div>
+					<div class="col-sm-5"></div>
+				</div>
+				<div class="toggler" id="gridView">
+					<div id="myGrid" style="width:100%; height:650px;"></div>
+				</div>
 			</div>
 		</div>
 	</div>

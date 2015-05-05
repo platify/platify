@@ -629,8 +629,8 @@ Grid.editorCellFormatter = function(row, cell, value, columnDef, dataContext) {
 			}
 		}
 		
-		cellStr += "<div style='float:left; width:28%; height:100%;color:" + celColor + ";'>" + colorArray[0] + "</div>";
-		cellStr += "<div style='float:right; width:72%; height:100%'>";
+		cellStr += "<div style='float:left; width:35%; height:100%;color:" + celColor + ";'>" + colorArray[0] + "</div>";
+		cellStr += "<div style='float:right; width:65%; height:100%'>";
 		cellStr += "<table style='width:100%;height:100%'>";
 		var i, j = 0;
 		for (i = 0; i < colnum; i++) {

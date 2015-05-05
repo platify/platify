@@ -73,7 +73,7 @@
 					<div class="col-sm-8" style="padding:0px">
 						<div id="myGrid" style="width:100%; height:500px;"></div>
 					</div>
-					<div class="col-sm-2" style="padding:0px">
+					<div class="col-sm-2" style="padding:0px; height:500px;">
 						<div class="panel panel-default">
 							<div class="panel-heading">
 								<h4 class="panel-title">Well Labels</h4>
@@ -83,7 +83,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-sm-2" style="padding:0px">
+					<div class="col-sm-2" style="padding:0px; height:500px;">
 						<div class="panel panel-default">
 							<div class="panel-heading">
 								<h4 class="panel-title">Compounds</h4>

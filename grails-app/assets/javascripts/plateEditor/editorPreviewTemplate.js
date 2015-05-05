@@ -111,7 +111,10 @@ function loadJsonData(plateJson) {
  */
 function fetchTemplateData(tId) {
 	"use strict";
-	var jqxhr = $.ajax({		// need to update to save plate instead of template
+	// show loading view, until result is returned
+	$("#gridView").hide();
+	$("#loaderView").show();
+	var jqxhr = $.ajax({
 		url: hostname + "/plateTemplate/getPlate/" + tId,
 		type: "POST",
 		data: null,
@@ -129,7 +132,9 @@ function fetchTemplateData(tId) {
 	jqxhr.always(function(resData) {
 		console.log( "second complete" );
 		console.log("templateJson=" + JSON.stringify(resData));
-		loadJsonData(resData);	// note may need to clear grid first !!!
+		$("#loaderView").hide();
+		$("#gridView").show();
+		loadJsonData(resData);
 	});
 }
 

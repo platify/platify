@@ -5,7 +5,7 @@
 var GRID_HEIGHT = 100;
 var GRID_WIDTH = 100;
 var CELL_HEIGHT = 35;
-var CELL_WIDTH = 80;
+var CELL_WIDTH = 85;
 var plateModel = {};
 var catLegend = {};
 
