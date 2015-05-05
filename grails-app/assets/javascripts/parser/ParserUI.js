@@ -306,7 +306,6 @@ function ParserUI(parsingController){
 
     this.handleFirstPlateCellRangeChange = function(){
         var selectedCellRange = _self.getFirstPlateCellRange();
-        console.log(selectedCellRange);
 
         try {
             _self.parsingController.selectCells(selectedCellRange);

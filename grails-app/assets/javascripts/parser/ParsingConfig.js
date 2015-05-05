@@ -380,7 +380,6 @@ function ParsingConfig(name,
             newFeature.importData = true;
         }
 
-        console.log(newFeature);
         return newFeature;
     };
 

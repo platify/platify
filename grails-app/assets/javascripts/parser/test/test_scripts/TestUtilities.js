@@ -225,7 +225,6 @@ TestUtilities.getRandomParsingConfigObject = function(){
 
     parsingConfig.addPlate(plateRange, plateColor);
 
-
     var numAnchors = TestUtilities.getRandomInt(1, 10);
 
     for (i = 0; i<numAnchors; i++){
@@ -353,4 +352,8 @@ TestUtilities.arraysContainSameElements = function(array1, array2){
         }
     }
     return true;
+};
+
+TestUtilities.stringIsValidHexColor = function(string){
+    return /^#[0-9A-Fa-f]{6}$|^#[0-9A-Fa-f]{3}$/.test(string);
 };

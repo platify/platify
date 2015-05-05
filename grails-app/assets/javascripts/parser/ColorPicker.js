@@ -84,6 +84,9 @@ function ColorPicker(){
     };
 
     this.setColorIndex = function(index){
-        colorPointer = index;
+        colorPointer = (index) % distinctColors.length;
+        if (colorPointer < 0){
+            colorPointer = colorPointer + distinctColors.length;
+        }
     };
 }

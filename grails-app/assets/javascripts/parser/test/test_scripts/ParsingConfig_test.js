@@ -13,8 +13,13 @@ QUnit.module("ParsingConfig", {
 
 test("Convert to DTO and back", function(assert){
 
-    for (var i=0; i<20; i++){
-        var parsingConfig = TestUtilities.getRandomParsingConfigObject();
+    for (var i=0; i<100; i++){
+        try{
+            var parsingConfig = TestUtilities.getRandomParsingConfigObject();
+        } catch (error){
+            console.log(error);
+        }
+
         assert.ok(parsingConfig instanceof ParsingConfig);
 
         var DTO = parsingConfig.getJSONObject();

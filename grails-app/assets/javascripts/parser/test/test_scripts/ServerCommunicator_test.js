@@ -535,8 +535,8 @@ test("handle failure ParsingConfig save request", function(assert){
 });
 
 test("ParsingConfig save", function(assert){
-    for (var i=0; i<10; i++){
-        var parsingConfig = new ParsingConfig("name", "machine", "description", "delimiter");
+    for (var i=0; i<30; i++){
+        var parsingConfig = TestUtilities.getRandomParsingConfigObject();
         var parsingID = TestUtilities.getRandomInt(0, 5);
         var serverCommunicator = new ServerCommunicator("hostname");
 

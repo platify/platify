@@ -1,3 +1,5 @@
+CellRange.MINIMUM_VALUE = 1;
+
 /**
  * CellRange.js
  *
@@ -10,12 +12,77 @@
  * @param endCol
  * @constructor
  *
+ * Note: - This constructor throws an ILLEGAL_ARGUMENT error if any of the given arguments
+ *      is not a Number.
+ *       - This constructor throws a NON_POSITIVE_ROW or NON_POSITIVE_COLUMN error if any
+ *      of the given arguments is less than the MINIMUM_VALUE.
+ *       - This constructor throws a STARTING_ROW_GREATER_THAN_ENDING_ROW error if the
+ *       given starting row is greater than the given ending row.
+ *       - This constructor throws a STARTING_COLUMN_GREATER_THAN_ENDING_COLUMN error if
+ *       the given starting column is greater than the given ending column.
+ *
  * @author Team SurNorte
  * CSCI-E99
  * May 7, 2015
  */
 
 function CellRange(startRow, startCol, endRow, endCol){
+    if (!(typeof startRow === "number")){
+        throw new CellRangeError(CellRangeError.ILLEGAL_ARGUMENT,
+                                 startRow,
+                                 "start row",
+                                 "construct a new CellRange object");
+    }
+
+    if (!(typeof startCol === "number")){
+        throw new CellRangeError(CellRangeError.ILLEGAL_ARGUMENT,
+            startCol,
+            "start column",
+            "construct a new CellRange object");
+    }
+
+    if (!(typeof endRow === "number")){
+        throw new CellRangeError(CellRangeError.ILLEGAL_ARGUMENT,
+            endRow,
+            "end row",
+            "construct a new CellRange object");
+    }
+
+    if (!(typeof endCol === "number")){
+        throw new CellRangeError(CellRangeError.ILLEGAL_ARGUMENT,
+            endCol,
+            "end column",
+            "construct a new CellRange object");
+    }
+
+    if (startRow < CellRange.MINIMUM_VALUE){
+        throw new CellRangeError(CellRangeError.NON_POSITIVE_ROW,
+                                 startRow,
+                                 "start",
+                                 "construct a new CellRange object")
+    }
+
+    if (endRow < CellRange.MINIMUM_VALUE){
+        throw new CellRangeError(CellRangeError.NON_POSITIVE_ROW,
+            endRow,
+            "end",
+            "construct a new CellRange object")
+    }
+
+    if (startCol < CellRange.MINIMUM_VALUE){
+        throw new CellRangeError(CellRangeError.NON_POSITIVE_COLUMN,
+            startCol,
+            "start",
+            "construct a new CellRange object")
+    }
+
+    if (endCol < CellRange.MINIMUM_VALUE){
+        throw new CellRangeError(CellRangeError.NON_POSITIVE_COLUMN,
+            endCol,
+            "end",
+            "construct a new CellRange object")
+    }
+
     if (startRow > endRow){
         throw new CellRangeError(CellRangeError.STARTING_ROW_GREATER_THAN_ENDING_ROW,
                                  startRow,
@@ -58,6 +125,9 @@ CellRangeError.STARTING_ROW_GREATER_THAN_ENDING_ROW
     = "starting row greater than ending row";
 CellRangeError.STARTING_COLUMN_GREATER_THAN_ENDING_COLUMN
     = "starting column greater than ending column";
+CellRangeError.NON_POSITIVE_ROW = "non-positive row";
+CellRangeError.NON_POSITIVE_COLUMN = "non-positive column";
+CellRangeError.ILLEGAL_ARGUMENT = "illegal argument";
 
 /**
  *
@@ -82,6 +152,18 @@ function CellRangeError(type, descriptor1, descriptor2, attemptedAction){
             return "The starting column cannot be greater than the ending column for a " +
                 "cell range, in this case " + descriptor1 + " is greater than " +
                 descriptor2 + ".";
+        } else if (this.type === CellRangeError.NON_POSITIVE_ROW){
+            return "Cell range row values must be greater than 0. The given "
+                + this.descriptor2 + " row number, " + this.descriptor1
+                + ", is less than 1.";
+        } else if (this.type === CellRangeError.NON_POSITIVE_COLUMN){
+            return "Cell range row values must be greater than 0. The given "
+                + this.descriptor2 + " column " + "number, " + this.descriptor1
+                + ", is less than 1.";
+        } else if (this.type === CellRangeError.ILLEGAL_ARGUMENT){
+            return "The given " + this.descriptor2 + " must be a number, \""
+                + this.descriptor1
+                + "\" is not an acceptable value to construct a new CellRange object."
         }
     }
 }
