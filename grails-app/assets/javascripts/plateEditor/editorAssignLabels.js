@@ -418,6 +418,7 @@ function removeLabel(cat, label) {
  */
 function updateLabelName(cat, oldLabel, label) {
 	"use strict";
+	var cellRef, cellRefArr, row, column;
 	// remove spaces from the names (replacing with '_')
 	cat = cat.toString().split(' ').join('_');
 	label = label.toString().split(' ').join('_');
@@ -436,8 +437,15 @@ function updateLabelName(cat, oldLabel, label) {
 		console.log("New color:" + catLegend[cat].labels[label].color);
 		
 		// update plateModel references
-		//pModel.rows[i].columns[j].categories[catKey][labKey].color;
-		//label.units = pModel.rows[i].columns[j].categories[catKey][labKey].units;
+		for (cellRef in catLegend[cat].labels[label].cellref) {
+			cellRefArr = catLegend[cat].labels[label].cellref[cellRef].split("-");
+			row = cellRefArr[0];
+			column = cellRefArr[1];
+
+			plateModel.rows[row].columns[column].categories[cat][label] = plateModel.rows[row].columns[column].categories[cat][oldLabel];
+			
+			delete plateModel.rows[row].columns[column].categories[cat][oldLabel];
+		}
 		
 		// remove old label
 		delete catLegend[cat].labels[oldLabel];
