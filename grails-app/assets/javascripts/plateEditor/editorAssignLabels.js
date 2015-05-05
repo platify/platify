@@ -418,6 +418,7 @@ function removeLabel(cat, label) {
  */
 function updateLabelName(cat, oldLabel, label) {
 	"use strict";
+	var cellRef, cellRefArr, row, column;
 	// remove spaces from the names (replacing with '_')
 	cat = cat.toString().split(' ').join('_');
 	label = label.toString().split(' ').join('_');
@@ -434,16 +435,27 @@ function updateLabelName(cat, oldLabel, label) {
 
 		console.log("Old color:" + catLegend[cat].labels[oldLabel].color);
 		console.log("New color:" + catLegend[cat].labels[label].color);
+		
+		// update plateModel references
+		for (cellRef in catLegend[cat].labels[label].cellref) {
+			cellRefArr = catLegend[cat].labels[label].cellref[cellRef].split("-");
+			row = cellRefArr[0];
+			column = cellRefArr[1];
+
+			plateModel.rows[row].columns[column].categories[cat][label] = plateModel.rows[row].columns[column].categories[cat][oldLabel];
+			
+			delete plateModel.rows[row].columns[column].categories[cat][oldLabel];
+		}
+		
 		// remove old label
 		delete catLegend[cat].labels[oldLabel];
-
+		
 		// referesh category elements
 		updateCategoryList();
+		$('#editLabelModal').modal('hide');
 	} else {
 		// other label already exists , can't rename on label to another existing label !!
-		// throw exception or something !!!
-		// ERROR!!
-		console.log("stop it !");
+		alert('Cannot rename "' + oldLabel + '" to "' + label + '" as label with that name already exists.');
 	}
 }
 
@@ -454,10 +466,10 @@ function editLabelName() {
 	var newLabel = document.getElementById("editNewLabelValue").value;
 	
 	// validation new label name
-	if (newLabel === undefined || newLabel === "") {			// TODO - deal with case of renaming to existing label !!!
+	if (newLabel === undefined || newLabel === "") {
        alert('Label cannot be blank');
-    } else if (isReservedValue(units)) {
-       alert('Units contains reserved value: '+ units);
+   // } else if (isReservedValue(units)) {
+   //    alert('Units contains reserved value: '+ units);
     } else {
 		// remove spaces from the names (replacing with '_')
 		newLabel = newLabel.toString().split(' ').join('_');
@@ -467,7 +479,6 @@ function editLabelName() {
 		updateLabelName(tmpEditCat, tmpEditOldLabel, newLabel);
 		tmpEditCat = "";
 		tmpEditOldLabel = "";
-		$('#editLabelModal').modal('hide');
 	}
 }
 

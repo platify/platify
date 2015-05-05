@@ -1,9 +1,28 @@
 <%@ page import="edu.harvard.capstone.parser.Equipment" %>
 
+	<style>
+		.glyphicon-refresh-animate {
+		    -animation: spin .7s infinite linear;
+		    -webkit-animation: spin2 .7s infinite linear;
+		}
+		
+		@-webkit-keyframes spin2 {
+		    from { -webkit-transform: rotate(0deg);}
+		    to { -webkit-transform: rotate(360deg);}
+		}
+		
+		@keyframes spin {
+		    from { transform: scale(1) rotate(0deg);}
+		    to { transform: scale(1) rotate(360deg);}
+		}
+	</style>
+
 	<div class="col-sm-6">
 		<div id="labelPanel" class="panel panel-default">
 			<div class="panel-heading">
-				<h4 class="panel-title">Choose Template (for assay with id: ${experimentalPlateSetInstance.id})</h4>
+				<g:if test="${experimentalPlateSetInstance}">
+					<h4 class="panel-title">Choose Template (for assay with id: ${experimentalPlateSetInstance.id})</h4>
+				</g:if>
 			</div>
 			<div class="panel-body" style="padding:2px">
 				<form class="form-horizontal">
@@ -40,6 +59,13 @@
 										onSuccess: 'updatePlateSelection();'
 				                )}" />
 						</div>
+						<h4><label class="control-label col-sm-4" for="tSizeFilter">Export: </label></h4>
+						<div class="col-sm-2" style="text-align: center;">
+						${plateSetInstance?.plate?.id}
+							<g:link controller="experimentalPlateSet" action="exportTemplateFile" id="111" class="exportTemplate">
+								<i style="font-size: 24px;" class="fa fa-file-excel-o"></i>
+							</g:link>
+				      	</div>
 						<!-- <h4><label class="control-label col-sm-2" for="tTypeFilter">Type: </label></h4>
 					    <div class="col-sm-3">
 							<select class="form-control" id="tTypeFilter">
@@ -59,7 +85,16 @@
 				<h4 class="panel-title">Preview Grid</h4>
 			</div>
 			<div class="panel-body" style="padding:0px">
-				<div id="myGrid" style="width:100%; height:650px;"></div>
+				<div class="toggler" id="loaderView">
+					<div class="col-sm-5"></div>
+					<div class="col-sm-2" style="padding:50px">
+						<button class="btn btn-lg btn-info"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</button>
+					</div>
+					<div class="col-sm-5"></div>
+				</div>
+				<div class="toggler" id="gridView">
+					<div id="myGrid" style="width:100%; height:650px;"></div>
+				</div>
 			</div>
 		</div>
 	</div>

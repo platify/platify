@@ -4,8 +4,8 @@
 // constants
 var GRID_HEIGHT = 100;
 var GRID_WIDTH = 100;
-var CELL_HEIGHT = 25;
-var CELL_WIDTH = 40;
+var CELL_HEIGHT = 35;
+var CELL_WIDTH = 85;
 var plateModel = {};
 var catLegend = {};
 
@@ -70,16 +70,10 @@ function translateModelToOutputJson(pModel) {
  */
 function createColorPicker(cat, label) {
 	"use strict";
-	var cpDiv, newInput, editLabelBtn, deleteLabelBtn;
-	cpDiv = document.createElement("span");
-	newInput = document.createElement("input");
-	newInput.id = "color-" + cat + "-" + label;
-	newInput.type = "color";
-	newInput.className = "btn-default glyphicon color-p";
-	newInput.defaultValue = catLegend[cat].labels[label].color;
-	newInput.value = catLegend[cat].labels[label].color;
-
-	cpDiv.appendChild(newInput);
+	var cpDiv;
+	cpDiv = document.createElement("div");
+	cpDiv.className = "color-box";
+	cpDiv.setAttribute("style", "background-color: "+ catLegend[cat].labels[label].color + ";");
 
 	return cpDiv;
 }
@@ -118,10 +112,9 @@ function updateCategoryList() {
 			newLi = document.createElement("div");
 			// if label has been converted from a decimal, then convert it back for display!!
 			convLab = labelKey.toString().split('__dot__').join('.');
-			newLi.appendChild(document.createTextNode(convLab));
-
 			newInput = createColorPicker(catKey, labelKey);
 			newLi.appendChild(newInput);
+			newLi.appendChild(document.createTextNode("  " + convLab));
 			newDiv.appendChild(newLi);
 		}
 	}
@@ -134,13 +127,15 @@ function updateCategoryList() {
  */
 function updateCompoundList() {
 	"use strict";
-	var newDiv, wellGroup, newLabel;
+	var newDiv, innerDiv, wellGroup, newLabel;
 	newDiv = document.createElement("div");
 	for (wellGroup in groupNames) {
+		innerDiv = document.createElement("div");
 		newLabel = document.createElement("label");
 		newLabel.appendChild(document.createTextNode(wellGroup + ": "));
-		newDiv.appendChild(newLabel);
-		newDiv.appendChild(document.createTextNode(groupNames[wellGroup]));
+		innerDiv.appendChild(newLabel);
+		innerDiv.appendChild(document.createTextNode("  " + groupNames[wellGroup]));
+		newDiv.appendChild(innerDiv);
 	}
 	document.getElementById("compoundList").innerHTML = newDiv.innerHTML;
 }
@@ -233,9 +228,20 @@ function loadJsonData(plateJson) {
 	updateCompoundList();
 }
 
+/**
+ * Forces a refresh of the grid.
+ */
+function forceGridRefresh() {
+	"use strict";
+	// display the data
+	grid.fillUpGrid(CELL_WIDTH, CELL_HEIGHT, true, Grid.editorCellFormatter, "editor-cell");
+}
+
 function onViewSelect(clickedEL) {
 	"use strict";
 	var elValArr, plateId;
+	$("#gridView").hide();
+	$("#loaderView").show();
 	elValArr = clickedEL.value.split("-");
 	plateId = elValArr[0];
 	GRID_WIDTH = elValArr[1];
@@ -248,7 +254,7 @@ function onViewSelect(clickedEL) {
 //ajax save object call
 function fetchTemplateData(tId) {
 	"use strict";
-	var jqxhr = $.ajax({		// need to update to save plate instead of template
+	var jqxhr = $.ajax({
 		url: hostname + "/plate/read/" + tId,
 		type: "POST",
 		data: null,
@@ -266,7 +272,11 @@ function fetchTemplateData(tId) {
 	jqxhr.always(function(resData) {
 		console.log( "second complete" );
 		console.log("templateJson=" + JSON.stringify(resData));
-		loadJsonData(resData);	// note may need to clear grid first !!!
+		$("#loaderView").hide();
+		$("#gridView").show();
+		loadJsonData(resData);
+
+		//forceGridRefresh();
 	});
 }
 

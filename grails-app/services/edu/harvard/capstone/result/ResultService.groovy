@@ -246,6 +246,10 @@ class ResultService {
     	importData.parsingID = resultInstance.equipment.id
     	importData.experimentFeatures = [:]
     	def experimentLabels = [:]
+
+        DomainLabel.findAllByDomainIdAndLabelType(resultInstance.experiment.id, DomainLabel.LabelType.PLATE_SET).each{
+            experimentLabels[it.category] = it.name
+        }
     	ResultLabel.findAllByDomainIdAndLabelTypeAndScope(resultInstance.id, ResultLabel.LabelType.LABEL, ResultLabel.LabelScope.RESULT).each{
     		experimentLabels[it.name] = it.value
     	}
@@ -253,14 +257,29 @@ class ResultService {
     	importData.experimentFeatures.labels = experimentLabels
     	importData.plates = []
 
+        def platesByBarcode = PlateSet.findAllByExperiment(resultInstance.experiment).collectEntries { plate ->
+            [plate.barcode, plate]
+        }
+
     	ResultPlate.findAllByResult(resultInstance).each{ plateResult ->
     		def plate = [:]
             plate.plateID = plateResult.barcode
-    		def plateLabels = [:]
-    		ResultLabel.findAllByDomainIdAndLabelTypeAndScope(plateResult.id, ResultLabel.LabelType.LABEL, ResultLabel.LabelScope.PLATE).each{
-    			plateLabels[it.name] = it.value
+
+            plate.labels = [:]
+            def plateInstance = platesByBarcode.get(plateResult.barcode)
+            if (plateInstance) {
+                DomainLabel.findAllByDomainIdAndLabelTypeAndPlate(plateInstance.plate.id,
+                                                                  DomainLabel.LabelType.PLATE,
+                                                                  plateInstance).each {
+                    plate.labels[it.name] = it.value
+                }
+            }
+    		ResultLabel.findAllByDomainIdAndLabelTypeAndScope(plateResult.id,
+                                                              ResultLabel.LabelType.LABEL,
+                                                              ResultLabel.LabelScope.PLATE).each {
+    			plate.labels[it.name] = it.value
     		}
-    		plate.labels = plateLabels
+
             plate.rawData = [:]
             ResultLabel.findAllByDomainIdAndLabelTypeAndScope(plateResult.id,
                                                               ResultLabel.LabelType.RAW_DATA,

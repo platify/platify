@@ -25,10 +25,25 @@ class ExperimentalPlateSetController {
 
         params.max = Math.min(max ?: 10, 100)
         def experiments = ExperimentalPlateSet.list(params)
-        def resultsByExperiment = Result.list().collectEntries{ result -> [result.experiment, result] }
-        def hasResults = experiments.collectEntries{ experiment -> [experiment.id, (experiment in resultsByExperiment)] }
+        def resultsByExperiment = Result.list().collectEntries{ result ->
+            [result.experiment, result]
+        }
+        def disabled = [:]
+        def resultId = [:]
+        for (experiment in experiments) {
+            if (resultsByExperiment.containsKey(experiment)) {
+                disabled[experiment.id] = ''
+                resultId[experiment.id] = resultsByExperiment[experiment].id
+            }
+            else {
+                disabled[experiment.id] = 'disabled'
+                resultId[experiment.id] = ''
+            }
+        }
+
         respond experiments, model:[experimentalPlateSetInstanceCount: ExperimentalPlateSet.count(),
-                                    hasResults: hasResults]
+                                    disabled: disabled,
+                                    resultId: resultId]
     }
 	
 	@Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
@@ -134,7 +149,7 @@ class ExperimentalPlateSetController {
         request.withFormat {
             form multipartForm {
                 flash.message = message(code: 'default.created.message', args: [message(code: 'experimentalPlateSet.label', default: 'ExperimentalPlateSet'), experimentalPlateSetInstance.id])
-                redirect experimentalPlateSetInstance
+                redirect action: 'showactions', id: experimentalPlateSetInstance.id
             }
             '*' { respond experimentalPlateSetInstance, [status: CREATED] }
         }
@@ -184,6 +199,55 @@ class ExperimentalPlateSetController {
             '*'{ render status: NO_CONTENT }
         }
     }
+
+    @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
+    def exportPlate(Integer max) {
+
+        if(!springSecurityService.principal?.getAuthorities().any { it.authority == "ROLE_ADMIN" || it.authority == "ROLE_SUPER_ADMIN"}){
+            params.owner = springSecurityService.principal
+        }
+  
+        params.max = Math.min(max ?: 10, 100)
+        def plateSetList = PlateSet.list(params)
+        log.info plateSetList
+        respond plateSetList, model:[plateSetInstanceCount: PlateSet.count(), plateSetList: plateSetList]
+    }
+
+    def exportPlateSetFile(PlateSet plateSetInstance){
+
+        if (plateSetInstance == null) {
+            notFound()
+            return
+        }
+
+        def file = editorService.exportPlate(plateSetInstance)
+
+        response.setHeader "Content-disposition", "attachment; filename=${file.name}.csv"
+        response.contentType = 'text-plain'
+        response.outputStream << file.text
+        response.outputStream.flush()        
+    }
+
+    @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
+    def exportTemplate() {
+    }
+
+
+    def exportTemplateFile(PlateTemplate plateTemplateInstance){
+
+        if (plateTemplateInstance == null) {
+            notFound()
+            return
+        }
+
+        def file = editorService.exportTemplate(plateTemplateInstance)
+
+        response.setHeader "Content-disposition", "attachment; filename=${file.name}.csv"
+        response.contentType = 'text-plain'
+        response.outputStream << file.text
+        response.outputStream.flush()        
+    }
+
 
     protected void notFound() {
         request.withFormat {
