@@ -4,8 +4,8 @@
 // constants
 var GRID_HEIGHT = 100;
 var GRID_WIDTH = 100;
-var CELL_HEIGHT = 25;
-var CELL_WIDTH = 40;
+var CELL_HEIGHT = 35;
+var CELL_WIDTH = 80;
 var plateModel = {};
 var catLegend = {};
 
@@ -70,16 +70,10 @@ function translateModelToOutputJson(pModel) {
  */
 function createColorPicker(cat, label) {
 	"use strict";
-	var cpDiv, newInput, editLabelBtn, deleteLabelBtn;
-	cpDiv = document.createElement("span");
-	newInput = document.createElement("input");
-	newInput.id = "color-" + cat + "-" + label;
-	newInput.type = "color";
-	newInput.className = "btn-default glyphicon color-p";
-	newInput.defaultValue = catLegend[cat].labels[label].color;
-	newInput.value = catLegend[cat].labels[label].color;
-
-	cpDiv.appendChild(newInput);
+	var cpDiv;
+	cpDiv = document.createElement("div");
+	cpDiv.className = "color-box";
+	cpDiv.setAttribute("style", "background-color: "+ catLegend[cat].labels[label].color + ";");
 
 	return cpDiv;
 }
@@ -118,10 +112,9 @@ function updateCategoryList() {
 			newLi = document.createElement("div");
 			// if label has been converted from a decimal, then convert it back for display!!
 			convLab = labelKey.toString().split('__dot__').join('.');
-			newLi.appendChild(document.createTextNode(convLab));
-
 			newInput = createColorPicker(catKey, labelKey);
 			newLi.appendChild(newInput);
+			newLi.appendChild(document.createTextNode("  " + convLab));
 			newDiv.appendChild(newLi);
 		}
 	}
@@ -134,13 +127,15 @@ function updateCategoryList() {
  */
 function updateCompoundList() {
 	"use strict";
-	var newDiv, wellGroup, newLabel;
+	var newDiv, innerDiv, wellGroup, newLabel;
 	newDiv = document.createElement("div");
 	for (wellGroup in groupNames) {
+		innerDiv = document.createElement("div");
 		newLabel = document.createElement("label");
 		newLabel.appendChild(document.createTextNode(wellGroup + ": "));
-		newDiv.appendChild(newLabel);
-		newDiv.appendChild(document.createTextNode(groupNames[wellGroup]));
+		innerDiv.appendChild(newLabel);
+		innerDiv.appendChild(document.createTextNode("  " + groupNames[wellGroup]));
+		newDiv.appendChild(innerDiv);
 	}
 	document.getElementById("compoundList").innerHTML = newDiv.innerHTML;
 }
