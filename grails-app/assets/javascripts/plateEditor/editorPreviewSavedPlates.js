@@ -228,9 +228,20 @@ function loadJsonData(plateJson) {
 	updateCompoundList();
 }
 
+/**
+ * Forces a refresh of the grid.
+ */
+function forceGridRefresh() {
+	"use strict";
+	// display the data
+	grid.fillUpGrid(CELL_WIDTH, CELL_HEIGHT, true, Grid.editorCellFormatter, "editor-cell");
+}
+
 function onViewSelect(clickedEL) {
 	"use strict";
 	var elValArr, plateId;
+	$("#gridView").hide();
+	$("#loaderView").show();
 	elValArr = clickedEL.value.split("-");
 	plateId = elValArr[0];
 	GRID_WIDTH = elValArr[1];
@@ -243,7 +254,7 @@ function onViewSelect(clickedEL) {
 //ajax save object call
 function fetchTemplateData(tId) {
 	"use strict";
-	var jqxhr = $.ajax({		// need to update to save plate instead of template
+	var jqxhr = $.ajax({
 		url: hostname + "/plate/read/" + tId,
 		type: "POST",
 		data: null,
@@ -261,7 +272,11 @@ function fetchTemplateData(tId) {
 	jqxhr.always(function(resData) {
 		console.log( "second complete" );
 		console.log("templateJson=" + JSON.stringify(resData));
-		loadJsonData(resData);	// note may need to clear grid first !!!
+		$("#loaderView").hide();
+		$("#gridView").show();
+		loadJsonData(resData);
+
+		//forceGridRefresh();
 	});
 }
 
