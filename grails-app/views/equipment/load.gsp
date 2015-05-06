@@ -28,8 +28,6 @@
 					</div>
 					<div class="pull-right">
 						<h2>
-							<button	id="importResults" class="btn btn-info btn-sm">Import
-							results</button>&nbsp;
 							<button class="btn btn-info btn-sm" id="saveConfigToServer">Save</button>
 							<button class="btn btn-info btn-sm" id="saveAsConfigToServer">Save As</button>
 						</h2>

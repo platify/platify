@@ -1,10 +1,12 @@
 /**
- * Created by zacharymartin on 3/25/15.
- */
-
-/**
+ * ColorPicker.js
+ *
  * An object for picking distinct colors
  * @constructor
+ *
+ * @author Team SurNorte
+ * CSCI-E99
+ * May 7, 2015
  */
 function ColorPicker(){
     ColorPicker.PLATE_COLOR = "#777777";
@@ -75,14 +77,26 @@ function ColorPicker(){
         return distinctColors[index];
     };
 
+    /**
+     * Resets the calling ColorPicker object to the state it is in when it is newly
+     * instantiated.
+     */
     this.resetColorPicker = function(){
         colorPointer = 0;
     };
 
+    /**
+     * Returns the current color index.
+     * @returns {number} - the current color index
+     */
     this.getColorIndex = function(){
         return colorPointer;
     };
 
+    /**
+     * Sets the current color index.
+     * @param index - the index to set the color picker to, wraps as necessary.
+     */
     this.setColorIndex = function(index){
         colorPointer = (index) % distinctColors.length;
         if (colorPointer < 0){
