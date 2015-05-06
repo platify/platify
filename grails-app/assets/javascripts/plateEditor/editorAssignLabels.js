@@ -10,6 +10,7 @@ var catLegend = {};
 
 // tmp editlabel vars
 var tmpEditOldLabel;
+var tmpEditOldUnits;
 var tmpEditCat;
 
 /**
@@ -277,12 +278,23 @@ function onCatVisCheck(event) {
  */
 function onEditLabelChange(event) {					// TODO - some issues here !! (when editing 1st label in cat, it actually changes 2nd !!)
 	"use strict";
-	var idArr = event.currentTarget.id.split("__sep__");
+	var idArr, unit_split;
+	
+	idArr = event.currentTarget.id.split("__sep__");
 	tmpEditCat = idArr[1];
-	tmpEditOldLabel = idArr[2];
+	//tmpEditOldLabel = idArr[2];
+	unit_split = idArr[2].toString().split('__dot__').join('.').split("__lu__");
+	tmpEditOldLabel = unit_split[0];
+	
+	if (unit_split.length > 1) {
+		tmpEditOldUnits = unit_split[1];
+	} else {
+		tmpEditOldUnits = "";
+	}
+	
 	console.log("editLabel: " + tmpEditCat + ";" + tmpEditOldLabel);
 	// disaply current label, with special chars converted for display
-	document.getElementById("editNewLabelValue").value = tmpEditOldLabel.toString().split('__dot__').join('.');
+	document.getElementById("editNewLabelValue").value = tmpEditOldLabel;
 	
 	$('#editLabelModal').modal('show');
 }
@@ -293,12 +305,22 @@ function onEditLabelChange(event) {					// TODO - some issues here !! (when edit
  */
 function onEditDoseChange(event) {					// TODO - need to add units ???
 	"use strict";
+	var idArr, unit_split;
+	
 	var idArr = event.currentTarget.id.split("__sep__");
 	tmpEditCat = idArr[1];
-	tmpEditOldLabel = idArr[2];
+	unit_split = idArr[2].toString().split('__dot__').join('.').split("__lu__");
+	tmpEditOldLabel = unit_split[0];
+	
+	if (unit_split.length > 1) {
+		tmpEditOldUnits = unit_split[1];
+	} else {
+		tmpEditOldUnits = "";
+	}
 	console.log("editDose: " + tmpEditCat + ";" + tmpEditOldLabel);
 	// disaply current label, with special chars converted for display
-	document.getElementById("editNewDoseValue").value = tmpEditOldLabel.toString().split('__dot__').join('.');
+	document.getElementById("editNewDoseValue").value = tmpEditOldLabel;
+	document.getElementById("editNewUnitsValue").value = tmpEditOldUnits;
 	
 	$('#editDoseModal').modal('show');
 }
@@ -324,7 +346,7 @@ function onDeleteLabelChange(event) {
  */
 function updateCategoryList() {
 	"use strict";
-	var newDiv, catKey, labelKey, newLi, convLab, newInput, units, convUnits;
+	var newDiv, catKey, labelKey, newLi, convLab, newInput, unit_split, convUnits;
 	newDiv = document.createElement("div");
 	for (catKey in catLegend) {
 		newDiv.appendChild(createCatLabel(catKey));
@@ -332,14 +354,19 @@ function updateCategoryList() {
 			newLi = document.createElement("div");
 			// if label has been converted from a decimal, then convert it back for display
 			convLab = labelKey.toString().split('__dot__').join('.');
-			newLi.appendChild(document.createTextNode(convLab + " "));
+			unit_split = convLab.toString().split('__lu__');
 			
-			units = catLegend[catKey].labels[labelKey].units;
-			if (units !== undefined && units !== null && units !== "") {
+			newLi.appendChild(document.createTextNode(unit_split[0] + " "));
+			if (unit_split.length > 1) {
+				newLi.appendChild(document.createTextNode(unit_split[1]));
+			}
+			
+			//units = catLegend[catKey].labels[labelKey].units;
+			/*if (units !== undefined && units !== null && units !== "") {
 				// if label has been converted from a decimal, then convert it back for display
 				convUnits = units.toString().split('__dot__').join('.');
 				newLi.appendChild(document.createTextNode(convUnits));
-			}
+			}*/
 
 			newInput = createColorPicker(catKey, labelKey);
 			newLi.appendChild(newInput);
@@ -463,6 +490,7 @@ function updateLabelName(cat, oldLabel, label) {
  * Validates a rename of a label. If valid it updates the label.
  */
 function editLabelName() {
+	var convOld;
 	var newLabel = document.getElementById("editNewLabelValue").value;
 	
 	// validation new label name
@@ -476,7 +504,10 @@ function editLabelName() {
 
 		// remove decimal point from the names (replacing with '_|_')
 		newLabel = newLabel.toString().split('.').join('__dot__');
-		updateLabelName(tmpEditCat, tmpEditOldLabel, newLabel);
+		
+		convOld = tmpEditOldLabel.toString().split(' ').join('_').split('.').join('__dot__') + "__lu__";
+		
+		updateLabelName(tmpEditCat, convOld, newLabel + "__lu__");
 		tmpEditCat = "";
 		tmpEditOldLabel = "";
 	}
@@ -488,19 +519,25 @@ function editLabelName() {
 function editDoseValue() {
 	var newDosage = document.getElementById("editNewDoseValue").value;
 	var newUnits = document.getElementById("editNewUnitsValue").value;
+	var convOld;
 	
 	// validation new doage
     if (!isNumeric(newDosage) || newDosage < 0) {						// TODO - deal with case of renaming to existing dosage !!!
        alert('Dosage must be a positive number: '+ newDosage);
-    } else if (!isReserved(newUnits)) {
-       alert('Dosage must be a positive number: '+ newDosage);
+    } else if (isReservedValue(newUnits)) {
+       alert('Units contains a reserved value: '+ newDosage);
     } else {
 		// remove spaces from the names (replacing with '_')
 		newDosage = newDosage.toString().split(' ').join('_');
+		newUnits = newUnits.toString().split(' ').join('_');
+
 		// remove decimal point from the names (replacing with '_|_')
 		newDosage = newDosage.toString().split('.').join('__dot__');
+		newUnits = newUnits.toString().split('.').join('__dot__');
+
+		convOld = tmpEditOldLabel.toString().split(' ').join('_').split('.').join('__dot__') + "__lu__" + tmpEditOldUnits.toString().split(' ').join('_').split('.').join('__dot__');
 		
-		updateLabelName(tmpEditCat, tmpEditOldLabel, newDosage);
+		updateLabelName(tmpEditCat, convOld, newDosage + "__lu__" + newUnits);
 		tmpEditCat = "";
 		tmpEditOldLabel = "";
 		$('#editDoseModal').modal('hide');
@@ -549,14 +586,19 @@ function shade(color, percent) {		// TODO, combine with the above method
  */
 function createNewLabel(cat, label, units, color, applyToCells) {
 	"use strict";
-	var cell, row, column, oldLab, pos, newContents, catKey, labKey;
+	var cell, row, column, oldLab, pos, newContents, catKey, labKey, l_units;
 	// remove spaces from the names (replacing with '_')
 	cat = cat.toString().split(' ').join('_');
 	label = label.toString().split(' ').join('_');
+	units = units.toString().split(' ').join('_');
 
 	// remove decimal point from the names (replacing with '_|_')
 	cat = cat.toString().split('.').join('__dot__');
 	label = label.toString().split('.').join('__dot__');
+	units = units.toString().split('.').join('__dot__');
+	
+	// temp hack to fix editing of units -- should find better solution
+	l_units = label + "__lu__" + units;
 
 	// update catLegend color
 	if (catLegend[cat] === undefined) {
@@ -565,16 +607,16 @@ function createNewLabel(cat, label, units, color, applyToCells) {
 		catLegend[cat].visible = true;
 	}
 
-	if (catLegend[cat].labels[label] === undefined) {
-		catLegend[cat].labels[label] = {};
-		catLegend[cat].labels[label].color = color;
-		catLegend[cat].labels[label].units = units;
+	if (catLegend[cat].labels[l_units] === undefined) {
+		catLegend[cat].labels[l_units] = {};
+		catLegend[cat].labels[l_units].color = color;
+		//catLegend[cat].labels[l_units].units = units;
 	} else {
-		catLegend[cat].labels[label].color = color;
-		catLegend[cat].labels[label].units = units;
+		catLegend[cat].labels[l_units].color = color;
+		//catLegend[cat].labels[l_units].units = units;
 		// category and label already exist, just changing color,
 		// in this case cells which already have this label need their color updated also!!
-		updateCellColors(cat, label, color);
+		updateCellColors(cat, l_units, color);
 	}
 
 	// update selected grid cells with label
@@ -615,9 +657,9 @@ function createNewLabel(cat, label, units, color, applyToCells) {
 		}
 
 		plateModel.rows[row].columns[column].categories[cat] = {};
-		plateModel.rows[row].columns[column].categories[cat][label] = {};
-		plateModel.rows[row].columns[column].categories[cat][label].color = color;
-		plateModel.rows[row].columns[column].categories[cat][label].units = units;
+		plateModel.rows[row].columns[column].categories[cat][l_units] = {};
+		plateModel.rows[row].columns[column].categories[cat][l_units].color = color;
+		//plateModel.rows[row].columns[column].categories[cat][l_units].units = units;
 		newContents = plateModel.rows[row].columns[column].wellGroupName;
 		newContents += "," + plateModel.rows[row].columns[column].wellType;
 
@@ -630,12 +672,12 @@ function createNewLabel(cat, label, units, color, applyToCells) {
 		grid.updateCellContents(row, column, newContents);
 
 		// update color legend cell reverse lookup
-		if (catLegend[cat].labels[label].cellref === undefined) {
-			catLegend[cat].labels[label].cellref = [];
-			catLegend[cat].labels[label].cellref.push(row + "-" + column);
+		if (catLegend[cat].labels[l_units].cellref === undefined) {
+			catLegend[cat].labels[l_units].cellref = [];
+			catLegend[cat].labels[l_units].cellref.push(row + "-" + column);
 		} else {
-			if (catLegend[cat].labels[label].cellref.indexOf(row + "-" + column) === -1) {
-				catLegend[cat].labels[label].cellref.push(row + "-" + column);
+			if (catLegend[cat].labels[l_units].cellref.indexOf(row + "-" + column) === -1) {
+				catLegend[cat].labels[l_units].cellref.push(row + "-" + column);
 			} else {
 				console.log("already there");
 			}
@@ -648,7 +690,7 @@ function createNewLabel(cat, label, units, color, applyToCells) {
  * Checks if the string matches an reserved value
  */
 function isReservedValue(testStr) {
-	if (testStr === "compound" || testStr === "dosage" || testStr.indexOf("__dot__") > -1  || testStr.indexOf("__sep__") > -1) {
+	if (testStr === "compound" || testStr === "dosage" || testStr.indexOf("__dot__") > -1  || testStr.indexOf("__sep__") > -1 || testStr.indexOf("__lu__") > -1) {
 		return true;
 	} else {
 		return false;
@@ -873,7 +915,7 @@ function importCompoundsFromFile() {
  */
 function translateModelToOutputJson(pModel) {
 	"use strict";
-	var plateJson, plate, wellGroup, cmpdValue, row, column, well, labels, catKey, labKey, label, convCat, convLab, cmpdLabel, i, j;
+	var plateJson, plate, wellGroup, cmpdValue, row, column, well, labels, catKey, labKey, label, convCat, convLab, cmpdLabel, i, j, labelRemovedUnits;
 	plateJson = {};
 	plate = {};
 	plate.name = pModel.name;
@@ -924,11 +966,17 @@ function translateModelToOutputJson(pModel) {
 						// if catKey, or labKey have been converted from a decimal, convert them back for output!
 						convCat = catKey.toString().split('__dot__').join('.');
 						convLab = labKey.toString().split('__dot__').join('.');
+						labelRemovedUnits = labKey.toString().split('__lu__');
 						
 						label.category = convCat;
-						label.name = convLab;
+						label.name = labelRemovedUnits[0];
 						label.value = pModel.rows[i].columns[j].categories[catKey][labKey].color;
-						label.units = pModel.rows[i].columns[j].categories[catKey][labKey].units;
+						if (labelRemovedUnits.length > 1) {
+							label.units = labelRemovedUnits[1];
+						} else {
+							label.units = "";
+						}
+						//label.units = pModel.rows[i].columns[j].categories[catKey][labKey].units;
 						labels.push(label);
 					}
 				}
