@@ -286,62 +286,59 @@ class ResultService {
                                                               ResultLabel.LabelScope.PLATE).each{
                 plate.rawData[it.name] = it.value
             }
+
     		def numberOfRows = plateResult.rows
-
-
-    		plate.rows = []
-
     		def numberOfColumns = plateResult.columns
 
+    		plate.rows = []
     		(0..numberOfRows-1).each{ rowIndex ->
-    			def row = [:]
-    			row.columns = []
+    			def row = [columns: []]
     			(0..numberOfColumns-1).each{ columnIndex ->
-    				def wellInstance = [:]
-    				wellInstance.labels = [:]
+    				def wellInstance = [labels: [:], rawData: [:],
+                                        normalizedData: [:]]
 	
-		    		def wellResult = ResultWell.withCriteria{
+                    if (plateInstance) {
+                        def wellObj = Well.withCriteria{
+                            eq('column', columnIndex)
+                            eq('plate', plateInstance.plate)
+                            eq('row', rowIndex)
+                        }
+                        if (wellObj) {
+                            DomainLabel.findAllByDomainIdAndLabelTypeAndPlate(wellObj.id,
+                                                                              DomainLabel.LabelType.WELL,
+                                                                              plateInstance)?.each{
+                                wellInstance.labels[it.label.category] = it.label.name
+                            }
+                        }
+                    }
+
+		    		def resultWell = ResultWell.withCriteria{
 		    			well{
 		    				eq("row", rowIndex)
 		    				eq("column", columnIndex)
 		    			}
 		    			eq('plate', plateResult)		    			
 		    		}
-				// TODO - why the hell is control an array?
-				wellInstance.control = wellResult.well.control[0].toString()
 
-		    		def wellLabels = [:]
-		    		        
-		    		ResultLabel.findAllByDomainIdAndLabelTypeAndScope(wellResult.id, ResultLabel.LabelType.LABEL, ResultLabel.LabelScope.WELL)?.each{
-		    			wellLabels[it.name] = it.value
+				    // TODO - why the hell is control an array?
+				    wellInstance.control = resultWell.well.control[0].toString()
+
+		    		ResultLabel.findAllByDomainIdAndLabelTypeAndScope(resultWell.id, ResultLabel.LabelType.LABEL, ResultLabel.LabelScope.WELL)?.each{
+		    			wellInstance.labels[it.name] = it.value
 		    		}
-		    		wellInstance.labels = wellLabels
-
-
-		    		def rawData = [:]
-		    		        
-		    		ResultLabel.findAllByDomainIdAndLabelTypeAndScope(wellResult.id, ResultLabel.LabelType.RAW_DATA, ResultLabel.LabelScope.WELL)?.each{
-		    			rawData[it.name] = it.value
+		    		ResultLabel.findAllByDomainIdAndLabelTypeAndScope(resultWell.id, ResultLabel.LabelType.RAW_DATA, ResultLabel.LabelScope.WELL)?.each{
+		    			wellInstance.rawData[it.name] = it.value
 		    		}
-		    		wellInstance.rawData = rawData
-
-
-		    		def normalizedData = [:]
-		    		        
-		    		ResultLabel.findAllByDomainIdAndLabelTypeAndScope(wellResult.id, ResultLabel.LabelType.NORMALIZED_DATA, ResultLabel.LabelScope.WELL)?.each{
-		    			normalizedData[it.name] = it.value
+		    		ResultLabel.findAllByDomainIdAndLabelTypeAndScope(resultWell.id, ResultLabel.LabelType.NORMALIZED_DATA, ResultLabel.LabelScope.WELL)?.each{
+		    			wellInstance.normalizedData[it.name] = it.value
 		    		}
-		    		wellInstance.normalizedData = normalizedData
-
 
     				row.columns << wellInstance
     			}
     			plate.rows << row
     		}
-
     		importData.plates << plate
     	}
-
     	return importData
     }
 
