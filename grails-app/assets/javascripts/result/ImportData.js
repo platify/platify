@@ -1097,17 +1097,20 @@ ImportData.createImportDataObjectFromJSON = function(JSONObject) {
                         for (var categoryName in wellLevelCategories) {
                             // prefer results to labels
                             var value = ImportData.BLANK;
-                            [well.rawData, well.labels].every(function(labelBucket) {
-                                if (labelBucket && (categoryName in labelBucket)) {
-                                    value = labelBucket[categoryName];
-                                    return false;
-                                }
-                            });
-                            result.setWellLevelLabel(plateIndex,
-                                    rowIndex,
-                                    columnIndex,
-                                    categoryName,
-                                    value);
+                            if (categoryName in well.rawData) {
+                                value = well.rawData[categoryName];
+                            }
+                            else if (categoryName in well.labels) {
+                                value = well.labels[categoryName];
+                            }
+
+                            if (value !== ImportData.BLANK) {
+                                result.setWellLevelLabel(plateIndex,
+                                        rowIndex,
+                                        columnIndex,
+                                        categoryName,
+                                        value);
+                            }
                         }
                     }
                 }
