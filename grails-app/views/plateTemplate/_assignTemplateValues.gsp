@@ -7,7 +7,7 @@
 			</div>
 			<div class="panel-body" style="padding:8px">
 				<div class="row">
-					<label for="newLabelValue" class="col-xs-2 control-label">Template Value:</label>
+					<label for="newLabelValue" class="col-xs-2 control-label">Well Group Name:</label>
 					<div class="col-xs-3">
 						<div class="input-group">
 							<input type="text" id="newLabelValue" class="input-sm form-control" required maxlength="3" 
@@ -44,7 +44,7 @@
 				<h4 class="panel-title">Other Actions<span class="pull-right"></span></h4>
 			</div>
 			<div class="panel-body ">
-				<button id="importTemplateValueListBtn" class="btn btn-info btn-xs ui-state-disabled">Import Template Values</button>
+				<button id="importTemplateValueListBtn" class="btn btn-info btn-xs ui-state-disabled">Import Well Groups</button>
 				<!-- <button id="resetTemplateBtn" class="btn btn-info btn-xs ui-state-disabled">Reset Template</button> -->
 			</div>
 		</div>
