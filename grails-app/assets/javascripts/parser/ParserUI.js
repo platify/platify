@@ -307,6 +307,7 @@ function ParserUI(parsingController){
     this.handleFirstPlateCellRangeChange = function(){
         var selectedCellRange = _self.getFirstPlateCellRange();
 
+
         try {
             _self.parsingController.selectCells(selectedCellRange);
         } catch (error){
@@ -1034,11 +1035,23 @@ function ParserUI(parsingController){
     };
 
     this.handleSaveAsConfig = function(){
-        try {
-            _self.parsingController.saveAsParsingConfigToServer();
-        } catch (error){
-            _self.displayError(error);
+        if (_self.parseOnlyModeOn){
+            _self.switchOutOfParseOnlyMode();
+        } else {
+            try {
+                _self.parsingController.saveAsParsingConfigToServer();
+            } catch (error){
+                _self.displayError(error);
+            }
         }
+    };
+
+    this.switchSaveAsButtonToModifyAsNewParsingConfig = function(){
+        saveAsConfigButton.innerHTML = "Modify as new Parsing Configuration";
+    };
+
+    this.switchSaveAsButtonBackToSaveAs = function(){
+        saveAsConfigButton.innerHTML = "Save As";
     };
 
 
@@ -1056,6 +1069,7 @@ function ParserUI(parsingController){
         addFeatureButton.style.display = "none";
         deleteFeatureButton.style.display = "none";
 
+        _self.switchSaveAsButtonToModifyAsNewParsingConfig();
         _self.parseOnlyModeOn = true;
     };
 
@@ -1067,11 +1081,12 @@ function ParserUI(parsingController){
         firstPlateCellRangeElement = switchSpanToTextInput(firstPlateCellRangeElement);
         featureCellRangeElement = switchSpanToTextInput(featureCellRangeElement);
         featureCategoryElement = switchSpanToTextInput(featureCategoryElement);
-        applyFirstPlateButton.style.display = "block";
-        newFeatureButton.style.display = "block";
-        addFeatureButton.style.display = "block";
-        deleteFeatureButton.style.display = "block";
+        applyFirstPlateButton.style.display = "inline";
+        newFeatureButton.style.display = "inline";
+        addFeatureButton.style.display = "inline";
+        deleteFeatureButton.style.display = "inline";
 
+        _self.switchSaveAsButtonBackToSaveAs();
         _self.parseOnlyModeOn = false;
     };
 
@@ -1080,6 +1095,7 @@ function ParserUI(parsingController){
     function switchTextInputToSpan(element){
         var span = document.createElement("span");
         span.innerHTML = element.value;
+        span.id = element.id;
         $(element).replaceWith(span);
         return span;
     }

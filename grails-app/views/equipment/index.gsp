@@ -50,7 +50,7 @@
 			
 												<g:sortableColumn property="dateCreated" title="${message(code: 'equipment.date.label', default: 'Date')}" />
 																			
-												<th>Update</th>
+												<th>Parse</th>
 												<th>Delete</th>
 											
 											</tr>

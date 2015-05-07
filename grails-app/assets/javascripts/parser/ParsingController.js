@@ -105,12 +105,7 @@ function ParsingController(){
 
             _self.createOrUpdateParsingConfig();
         } else if (oldStage === ParsingController.PLATE){
-            if (!_self.parsingConfig.plate){
-                throw new ParsingControllerError(ParsingControllerError.PLATE_NOT_DEFINED,
-                    "leave plate stage",
-                    "general",
-                    "change stages");
-            }
+
         } else if (oldStage === ParsingController.FEATURES){
 
         } else if (oldStage === ParsingController.EXPERIMENT) {
@@ -140,6 +135,13 @@ function ParsingController(){
 
             _self.selectCells = selectCellsPlates;
         } else if (newStage === ParsingController.FEATURES){
+            if (!_self.parsingConfig.plate){
+                throw new ParsingControllerError(ParsingControllerError.PLATE_NOT_DEFINED,
+                    "leave plate stage",
+                    "general",
+                    "change stages");
+            }
+
             // fill the listing of features in the UI and clear fields like for new
             // feature
             if (_self.parsingConfig){
@@ -158,6 +160,13 @@ function ParsingController(){
             _self.parserUI.loadFeatureList(_self.parsingConfig.getFeatureNames());
             _self.selectCells = selectCellsFeatures;
         } else if (newStage === ParsingController.EXPERIMENT) {
+            if (!_self.parsingConfig.plate){
+                throw new ParsingControllerError(ParsingControllerError.PLATE_NOT_DEFINED,
+                    "leave plate stage",
+                    "general",
+                    "change stages");
+            }
+
             if (!_self.parserUI.getParsingID()){
                 throw new ParsingControllerError(
                                 ParsingControllerError.PARSING_CONFIG_NOT_SAVED_TO_SERVER,
@@ -437,6 +446,7 @@ function ParsingController(){
                 _self.parserUI.displayMessage("Your assay machine output file data was "+
                 "successfully stored on server.");
                 _self.parserUI.disableSaveButton();
+                _self.parserUI.switchToParseOnlyMode();
             }
         });
 
@@ -558,6 +568,8 @@ function ParsingController(){
         serverCommunicator.saveParsingConfigToServer(_self.parsingConfig,
                                                      ServerCommunicator.SAVE_NEW,
                                                      null);
+        _self.parserUI.enableSaveButton();
+        window.canUpdate = true;
     };
 
     _self.saveConfigToServerCallback = function(response){
