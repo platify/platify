@@ -1080,11 +1080,7 @@ function ParserUI(parsingController){
     function switchTextInputToSpan(element){
         var span = document.createElement("span");
         span.innerHTML = element.value;
-        console.log(element.id.value);
-        //span.id = element.id;
-        //console.log(span);
         $(element).replaceWith(span);
-        //console.log(span);
         return span;
     }
 
