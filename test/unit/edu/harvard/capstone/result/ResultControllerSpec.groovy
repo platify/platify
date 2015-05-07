@@ -74,37 +74,6 @@ class ResultControllerSpec extends Specification {
             Result.count() == 1
     }
 
-    void "Test that the show action returns the correct model"() {
-        when:"The show action is executed with a null domain"
-            controller.show(null)
-
-        then:"A 404 error is returned"
-            response.status == 404
-
-        when:"A domain instance is passed to the show action"
-            populateValidParams(params)
-            def result = new Result(params)
-            controller.show(result)
-
-        then:"A model is populated containing the domain instance"
-            model.resultInstance == result
-    }
-
-    void "Test that the edit action returns the correct model"() {
-        when:"The edit action is executed with a null domain"
-            controller.edit(null)
-
-        then:"A 404 error is returned"
-            response.status == 404
-
-        when:"A domain instance is passed to the edit action"
-            populateValidParams(params)
-            def result = new Result(params)
-            controller.edit(result)
-
-        then:"A model is populated containing the domain instance"
-            model.resultInstance == result
-    }
 
     void "Test the update action performs an update on a valid domain instance"() {
         when:"Update is called for a domain instance that doesn't exist"
@@ -112,7 +81,7 @@ class ResultControllerSpec extends Specification {
             controller.update(null)
 
         then:"A 404 error is returned"
-            response.redirectedUrl == '/result/index'
+            response.redirectedUrl == '/experimentalPlateSet/index'
             flash.message != null
 
 
@@ -123,7 +92,7 @@ class ResultControllerSpec extends Specification {
             controller.update(result)
 
         then:"The edit view is rendered again with the invalid instance"
-            view == 'edit'
+            view == 'index'
             model.resultInstance == result
 
         when:"A valid domain instance is passed to the update action"
@@ -143,7 +112,7 @@ class ResultControllerSpec extends Specification {
             controller.delete(null)
 
         then:"A 404 is returned"
-            response.redirectedUrl == '/result/index'
+            response.redirectedUrl == '/experimentalPlateSet/index'
             flash.message != null
 
         when:"A domain instance is created"

@@ -116,7 +116,7 @@ class ExperimentalPlateSetControllerSpec extends Specification {
             controller.save(name, description)
 
         then:"A redirect is issued to the show action"
-            response.redirectedUrl == '/experimentalPlateSet/show/1'
+            response.redirectedUrl == '/experimentalPlateSet/showactions/1'
             controller.flash.message != null
             ExperimentalPlateSet.count() == 1
     }

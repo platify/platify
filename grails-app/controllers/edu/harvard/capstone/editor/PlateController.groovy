@@ -15,6 +15,7 @@ class PlateController {
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
     def read(PlateSet plateSetInstance){
+
         if (!springSecurityService.isLoggedIn()){
             render(contentType: "application/json") {
                 [error: "User not logged in"]
