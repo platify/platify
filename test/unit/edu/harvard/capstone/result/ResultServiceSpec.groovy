@@ -17,11 +17,13 @@ import grails.validation.ValidationException
 import org.codehaus.groovy.grails.web.json.JSONObject
 import grails.converters.JSON
 
+import edu.harvard.capstone.editor.DomainLabel
+
 /**
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
  */
 @TestFor(ResultService)
-@Mock([Scientist, Well, PlateTemplate, PlateSet, Result, ResultLabel, ResultWell, ResultPlate, Equipment, ExperimentalPlateSet])
+@Mock([Scientist, Well, PlateTemplate, PlateSet, Result, ResultLabel, ResultWell, ResultPlate, Equipment, ExperimentalPlateSet, DomainLabel])
 class ResultServiceSpec extends Specification {
 
     def setup() {
@@ -184,33 +186,6 @@ class ResultServiceSpec extends Specification {
 			Result.count() == 0
 	}			
 
-	
-	void "Test existing PlateSets but JSON data has different amount of plates"() {
-		when: "Data object correct"
-
-			Scientist scientistInstance = new Scientist(firstName: "Test", lastName: "User", email:"my@email.com", password:"test")
-			scientistInstance.save()
-			service.springSecurityService = [principal: [id: scientistInstance.id]]
-			Equipment equipmentInstance = new Equipment(name: "my equipment", machineName: "my machine name", description: "my description", config: "my config")
-			equipmentInstance.save()
-			ExperimentalPlateSet experimentInstance = new ExperimentalPlateSet(owner: scientistInstance, name: "my experiment", description: "my description")
-			experimentInstance.save()
-			PlateTemplate templateInstance = new PlateTemplate(owner: scientistInstance, name: "my template")
-			templateInstance.save()
-			new PlateSet(plate: templateInstance, experiment: experimentInstance, barcode: 'barcode').save()
-
-			def data = JSON.parse("{experimentID: '${experimentInstance.id}', parsingID: '${equipmentInstance.id}'}")
-			def resultInstance = service.newRawData(data)
-
-		then:
-			def ex = thrown(RuntimeException)
-			ex.message.contains("Plates of the JSON do not match with the template")					
-			resultInstance == null
-			ResultPlate.count() == 0
-			ResultLabel.count() == 0
-			ResultWell.count() == 0
-			Result.count() == 0
-	}
 
 	
 	void "Test incorrect experiment labels"() {
@@ -597,29 +572,6 @@ class ResultServiceSpec extends Specification {
 			resultInstance == null
 	}			
 
-	
-	void "Test Normalized Data existing PlateSets but JSON data has different amount of plates"() {
-		when: "Data object correct"
-
-			Scientist scientistInstance = new Scientist(firstName: "Test", lastName: "User", email:"my@email.com", password:"test")
-			scientistInstance.save()
-			service.springSecurityService = [principal: [id: scientistInstance.id]]
-			Equipment equipmentInstance = new Equipment(name: "my equipment", machineName: "my machine name", description: "my description", config: "my config")
-			equipmentInstance.save()
-			ExperimentalPlateSet experimentInstance = new ExperimentalPlateSet(owner: scientistInstance, name: "my experiment", description: "my description")
-			experimentInstance.save()
-			PlateTemplate templateInstance = new PlateTemplate(owner: scientistInstance, name: "my template")
-			templateInstance.save()
-			new PlateSet(plate: templateInstance, experiment: experimentInstance, barcode: 'barcode').save()
-
-			def data = JSON.parse("{experimentID: '${experimentInstance.id}', parsingID: '${equipmentInstance.id}'}")
-			def resultInstance = service.storeNormalizedData(null, data)
-
-		then:
-			def ex = thrown(RuntimeException)
-			ex.message.contains("Plates of the JSON do not match with the template")					
-			resultInstance == null
-	}
 
 	
 

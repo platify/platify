@@ -160,7 +160,7 @@ class ResultController {
         }
 
         if (resultInstance.hasErrors()) {
-            respond resultInstance.errors, view:'edit'
+            respond resultInstance.errors, view:'index'
             return
         }
 

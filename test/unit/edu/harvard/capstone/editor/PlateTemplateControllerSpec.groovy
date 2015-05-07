@@ -43,6 +43,11 @@ class PlateTemplateControllerSpec extends Specification {
 
     void "Test the create action returns the correct model"() {
         when:"The create action is executed"
+            def springSecurityService = mockFor(SpringSecurityService)
+            springSecurityService.demandExplicit.isLoggedIn {  -> true }
+
+            controller.springSecurityService = springSecurityService.createMock()
+
             controller.create()
 
         then:"The model is correctly created"
