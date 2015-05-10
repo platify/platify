@@ -47,7 +47,7 @@
 													id="${experimentInstance.id}"
 							 						action="showactions">Show Details</g:link>
 												<g:link class="btn btn-info btn-xs ${disabled[experimentInstance.id]}"
-													id="${resultId[experimentInstance.id]}"
+													id="${experimentInstance.id}"
 													controller="result"
 													action="showactions">Show Results</g:link>
 												</td>

@@ -28,22 +28,13 @@ class ExperimentalPlateSetController {
         def resultsByExperiment = Result.list().collectEntries{ result ->
             [result.experiment, result]
         }
-        def disabled = [:]
-        def resultId = [:]
-        for (experiment in experiments) {
-            if (resultsByExperiment.containsKey(experiment)) {
-                disabled[experiment.id] = ''
-                resultId[experiment.id] = resultsByExperiment[experiment].id
-            }
-            else {
-                disabled[experiment.id] = 'disabled'
-                resultId[experiment.id] = ''
-            }
+        def disabled = experiments.collectEntries { experiment ->
+            [experiment.id,
+             resultsByExperiment.containsKey(experiment) ? '' : 'disabled']
         }
 
         respond experiments, model:[experimentalPlateSetInstanceCount: ExperimentalPlateSet.count(),
-                                    disabled: disabled,
-                                    resultId: resultId]
+                                    disabled: disabled]
     }
 	
 	@Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
