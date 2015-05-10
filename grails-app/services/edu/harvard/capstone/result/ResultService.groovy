@@ -265,6 +265,7 @@ class ResultService {
     		def plate = [:]
             plate.plateID = plateResult.barcode
 
+            // fill in the plate-level stuff
             plate.labels = [:]
             def plateInstance = platesByBarcode.get(plateResult.barcode)
             if (plateInstance) {
@@ -287,61 +288,60 @@ class ResultService {
                 plate.rawData[it.name] = it.value
             }
 
-    		def numberOfRows = plateResult.rows
-    		def numberOfColumns = plateResult.columns
 
+            // generate the shape of the plate
     		plate.rows = []
-    		(0..numberOfRows-1).each{ rowIndex ->
-    			def row = [columns: []]
-    			(0..numberOfColumns-1).each{ columnIndex ->
-    				def wellInstance = [labels: [:], rawData: [:],
-                                        normalizedData: [:]]
-	
-                    if (plateInstance) {
-                        def wellObj = Well.withCriteria{
-                            eq('column', columnIndex)
-                            eq('plate', plateInstance.plate)
-                            eq('row', rowIndex)
-                        }
-                        if (wellObj) {
-                            DomainLabel.findAllByDomainIdAndLabelTypeAndPlate(wellObj.id,
-                                                                              DomainLabel.LabelType.WELL,
-                                                                              plateInstance)?.each{
-                                wellInstance.labels[it.label.category] = it.label.name
-                            }
-                        }
-                    }
+    		(0..plateResult.rows-1).each{ rowIndex ->
+                plate.rows << [columns: []]
+    			(0..plateResult.columns-1).each{ columnIndex ->
+                    plate.rows[rowIndex].columns << [
+                        labels: [:],
+                        rawData: [:],
+                        normalizedData: [:],
+                        control: Well.WellControl.EMPTY.toString().toUpperCase()
+                    ]
+                }
+            }
 
-		    		def resultWell = ResultWell.withCriteria{
-		    			well{
-		    				eq("row", rowIndex)
-		    				eq("column", columnIndex)
-		    			}
-		    			eq('plate', plateResult)		    			
-		    		}
+            // now fill it
+            def resultWellsById = [:]
+            ResultWell.findAllByPlate(plateResult).each { well ->
+                resultWellsById[well.id] = well
+                plate.rows[well.well.row].columns[well.well.column].control = well.well.control.toString().toUpperCase()
+            }
 
-				    // TODO - why the hell is control an array?
-				    wellInstance.control = resultWell.well.control[0].toString()
 
-		    		ResultLabel.findAllByDomainIdAndLabelTypeAndScope(resultWell.id, ResultLabel.LabelType.LABEL, ResultLabel.LabelScope.WELL)?.each{
-		    			wellInstance.labels[it.name] = it.value
-		    		}
-		    		ResultLabel.findAllByDomainIdAndLabelTypeAndScope(resultWell.id, ResultLabel.LabelType.RAW_DATA, ResultLabel.LabelScope.WELL)?.each{
-		    			wellInstance.rawData[it.name] = it.value
-		    		}
-		    		ResultLabel.findAllByDomainIdAndLabelTypeAndScope(resultWell.id, ResultLabel.LabelType.NORMALIZED_DATA, ResultLabel.LabelScope.WELL)?.each{
-		    			wellInstance.normalizedData[it.name] = it.value
-		    		}
+            ResultLabel.where { domainId in resultWellsById.keySet()
+                                scope == ResultLabel.LabelScope.WELL }.each { resultLabel ->
+                def resultWell = resultWellsById[resultLabel.domainId]
+                def wellOut = plate.rows[resultWell.well.row].columns[resultWell.well.column]
+                switch (resultLabel.labelType) {
+                    case ResultLabel.LabelType.LABEL:
+                        wellOut.labels[resultLabel.name] = resultLabel.value
+                        break
+                    case ResultLabel.LabelType.RAW_DATA:
+                        wellOut.rawData[resultLabel.name] = resultLabel.value
+                        break
+                    case ResultLabel.LabelType.NORMALIZED_DATA:
+                        wellOut.normalizedData[resultLabel.name] = resultLabel.value
+                        break
+                }
+            }
+                      println plate as JSON
 
-    				row.columns << wellInstance
-    			}
-    			plate.rows << row
-    		}
+            if (plateInstance) {
+                def wellsById = Well.findAllByPlate(plateInstance.plate)
+                                    .collectEntries { well -> [well.id, well] }
+                DomainLabel.where { ((domainId in wellsById.keySet())
+                                     && (labelType == DomainLabel.LabelType.WELL)) }.each { wellLabel ->
+                    def well = wellsById[wellLabel.domainId]
+                    plate.rows[well.row].columns[well.column].labels[wellLabel.label.category] = wellLabel.label.name
+                }
+            }
     		importData.plates << plate
     	}
     	return importData
     }
-
 
     def getKitchenSink(ExperimentalPlateSet experimentInstance){
         if (!experimentInstance)
