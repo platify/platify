@@ -15,50 +15,6 @@ function txtFieldFocus() {
 }
 
 /**
- * This function is used to convert the internal data structure json format into
- * a data structure json format that is expected by the server when sending the 
- * template json to be saved by the back-end. This allows for differences between
- * the 2 models. The internal model providing a more efficient referencing structure
- * for the client-side tasks, and allows for quick changes to either model while
- * maintaining the contract with the server.
- * @param pModel - a data structure in the format of the internal data model.
- * @returns plateJson - a data structure in the format excepted by the server.
- */
-function translateModelToOutputJson(pModel) {		// TODO - this is not called here !!! - remove!!
-	'use strict';
-	var plateJson, plate, row, column, well, labels, catKey, labKey, label;
-	plateJson = {};
-	plate = {};
-	plate.name = document.getElementById("templateName").value;
-	plate.experimentID = window.expId;
-	plate.labels = [];		// plate level labels, should set these if available already !!!
-	plate.wells = [];
-	for (row in pModel.rows) {
-		for (column in pModel.rows[row].columns) {
-			well = {};
-			well.row = row - 1;
-			well.column = column - 1;
-			well.control = null;
-			labels = [];
-			for (catKey in pModel.rows[row].columns[column].categories) {
-				for (labKey in pModel.rows[row].columns[column].categories[catKey]) {
-					label = {};
-					label.category = catKey;
-					label.name = labKey;
-					label.color = pModel.rows[row].columns[column].categories[catKey][labKey];
-					labels.push(label);
-				}
-			}
-			well.labels = labels;
-			well.groupName = pModel.rows[row].columns[column].wellGroupName;
-			plate.wells.push(well);
-		}
-	}
-	plateJson.plate = plate;
-	return plateJson;
-}
-
-/**
  * Loads a json data structure received from the server. It is translated into 
  * a format understood by the local internal plate model and updates the grid
  * with the data received.
@@ -67,8 +23,7 @@ function translateModelToOutputJson(pModel) {		// TODO - this is not called here
 function loadJsonData(plateJson) {
 	"use strict";
 	var g_height, g_width, newData, row, column, newContents;
-	// assuming plate model has all empty rows ??
-	plateModel = translateInputJsonToModel(plateJson);  // TMP	--> should only load plateModel instead,
+	plateModel = translateInputJsonToModel(plateJson);
 	g_height = DIMENSION;
 	g_width = DIMENSION;
 	
@@ -165,7 +120,7 @@ function onPlateSelectChange(selectEl) {
  * template data and update the preview grid.
  * @param selectEl - selected item in the drop-down.
  */
-function updatePlateSelection() {				// TODO can this be combined with the onPlateSelectChange method ??
+function updatePlateSelection() {
 	"use strict";
 	var pSelect, tId;
 	pSelect = document.getElementById("plateSelect");
@@ -183,7 +138,6 @@ function selectAndContinue() {
 	"use strict";
 	var pSelect = document.getElementById("plateSelect");
 	if (pSelect.value !== undefined) {
-		// use less hacky method !!
 		window.location.href = hostname + "/experimentalPlateSet/createPlate" + '?expid=' + window.expId + '&tmpid=' + pSelect.value;
 	} else {
 		alert("An error while selecting the template. TemplateId is null");
@@ -204,7 +158,6 @@ function init() {
 	//loadJsonData(testInputJson);
 	
 	addEvent("saveTemplate", "click", selectAndContinue);
-	//addEvent("plateSelect", "change", onPlateSelectChange);
 
 	// initially disable selection of grid cells
 	disableGridSelection();

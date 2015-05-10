@@ -34,7 +34,7 @@ function translateModelToOutputJson(pModel) {
 	plate = {};
 	plate.name = document.getElementById("templateName").value;
 	plate.experimentID = window.expId;
-	plate.labels = [];		// plate level labels, should set these if available already !!!
+	plate.labels = [];
 	plate.wells = [];
 	for (row in pModel.rows) {
 		for (column in pModel.rows[row].columns) {
@@ -83,14 +83,14 @@ function createColorPicker(cat, label) {
  * @param catKey - name of category to create a label for.
  * @returns labDiv - div containing new category label structure.
  */
-function createCatLabel(catKey) {			// TODO -- update split to deal with "-" !!!!
+function createCatLabel(catKey) {
 	"use strict";
 	var labDiv, newLabel, convCat;
 	labDiv = document.createElement("div");
 	labDiv.className = "button-labels";
 	newLabel = document.createElement("label");
-	newLabel.setAttribute("for", "vischeck-" + catKey);		// TODO -- is vischeck used here ?? !!!!
-	// if category has been converted from a decimal, then convert it back for display!!
+	newLabel.setAttribute("for", "vischeck-" + catKey);	
+	// if category has been converted from a decimal, then convert it back for display
 	convCat = catKey.toString().split('__dot__').join('.');
 	newLabel.appendChild(document.createTextNode(convCat));
 	labDiv.appendChild(newLabel);
@@ -110,7 +110,7 @@ function updateCategoryList() {
 		newDiv.appendChild(createCatLabel(catKey));
 		for (labelKey in catLegend[catKey].labels) {
 			newLi = document.createElement("div");
-			// if label has been converted from a decimal, then convert it back for display!!
+			// if label has been converted from a decimal, then convert it back for display
 			convLab = labelKey.toString().split('__dot__').join('.');
 			newInput = createColorPicker(catKey, labelKey);
 			newLi.appendChild(newInput);
@@ -149,10 +149,9 @@ function updateCompoundList() {
 function loadJsonData(plateJson) {
 	"use strict";
 	var g_height, g_width, newData, row, column, wellgrp, catKey, labKey, color, newContents;
-	// assuming plate model has all empty rows ??
 	plateModel = {};
 	catLegend = {};
-	plateModel = translateInputJsonToModel(plateJson);  // TMP	--> should only load plateModel instead,
+	plateModel = translateInputJsonToModel(plateJson);
 	g_height = DIMENSION;
 	g_width = DIMENSION;
 	
@@ -172,16 +171,13 @@ function loadJsonData(plateJson) {
 			wellgrp = plateModel.rows[row].columns[column].wellGroupName;
 			//groupNames[wellgrp] = "SOME_COMPOUND";
 			//groupNames[wellgrp] = "";
-
 			newContents = wellgrp;
-			// NEED TO PARSE COMPOUND LABELS !!!! 
 
 			for (catKey in plateModel.rows[row].columns[column].categories) {
 				for (labKey in plateModel.rows[row].columns[column].categories[catKey]) {
 					color = plateModel.rows[row].columns[column].categories[catKey][labKey].color;
 					newContents += "," + color;
 
-					// cat legend part !! --> only needed for assignlabels page ??
 					// update catLegend color
 					if (catLegend[catKey] === undefined) {
 						catLegend[catKey] = {};
@@ -196,7 +192,6 @@ function loadJsonData(plateJson) {
 						catLegend[catKey].labels[labKey].color = color;
 						// category and label already exist, just changing color,
 						// in this case cells which already have this label need their color updated also!!
-				//		updateCellColors(catKey, labKey, color);
 					}
 
 					// update color legend cell reverse lookup
@@ -212,7 +207,7 @@ function loadJsonData(plateJson) {
 					}
 				}
 			}
-			//grid.updateCellContents(row, column, newContents);
+
 			if (row > 0 && column > 0) {
 				newData[row - 1][column - 1] = newContents;
 			}
