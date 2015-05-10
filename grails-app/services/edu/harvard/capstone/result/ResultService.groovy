@@ -239,34 +239,35 @@ class ResultService {
     	if (!resultInstance)
     		return
 
-    	def importData = [:]
-
-        importData.resultID = resultInstance.id
-    	importData.experimentID = resultInstance.experiment.id
-    	importData.parsingID = resultInstance.equipment.id
-    	importData.experimentFeatures = [:]
-    	def experimentLabels = [:]
+    	def importData = [
+            resultID: resultInstance.id,
+            experimentID: resultInstance.experiment.id,
+            parsingID: resultInstance.equipment.id,
+            experimentFeatures: [labels: [:]],
+            plates: [],
+        ]
 
         DomainLabel.findAllByDomainIdAndLabelType(resultInstance.experiment.id, DomainLabel.LabelType.PLATE_SET).each{
-            experimentLabels[it.category] = it.name
+            importData.experimentFeatures.labels[it.category] = it.name
         }
     	ResultLabel.findAllByDomainIdAndLabelTypeAndScope(resultInstance.id, ResultLabel.LabelType.LABEL, ResultLabel.LabelScope.RESULT).each{
-    		experimentLabels[it.name] = it.value
+    		importData.experimentFeatures.labels[it.name] = it.value
     	}
-
-    	importData.experimentFeatures.labels = experimentLabels
-    	importData.plates = []
 
         def platesByBarcode = PlateSet.findAllByExperiment(resultInstance.experiment).collectEntries { plate ->
             [plate.barcode, plate]
         }
 
     	ResultPlate.findAllByResult(resultInstance).each{ plateResult ->
-    		def plate = [:]
-            plate.plateID = plateResult.barcode
+    		def plate = [
+                plateID: plateResult.barcode,
+                labels: [:],
+                rawData: [:],
+                normalizedData: [:],
+                rows: [],
+            ]
 
             // fill in the plate-level stuff
-            plate.labels = [:]
             def plateInstance = platesByBarcode.get(plateResult.barcode)
             if (plateInstance) {
                 DomainLabel.findAllByDomainIdAndLabelTypeAndPlate(plateInstance.plate.id,
@@ -281,7 +282,6 @@ class ResultService {
     			plate.labels[it.name] = it.value
     		}
 
-            plate.rawData = [:]
             ResultLabel.findAllByDomainIdAndLabelTypeAndScope(plateResult.id,
                                                               ResultLabel.LabelType.RAW_DATA,
                                                               ResultLabel.LabelScope.PLATE).each{
@@ -290,7 +290,6 @@ class ResultService {
 
 
             // generate the shape of the plate
-    		plate.rows = []
     		(0..plateResult.rows-1).each{ rowIndex ->
                 plate.rows << [columns: []]
     			(0..plateResult.columns-1).each{ columnIndex ->
@@ -309,8 +308,6 @@ class ResultService {
                 resultWellsById[well.id] = well
                 plate.rows[well.well.row].columns[well.well.column].control = well.well.control.toString().toUpperCase()
             }
-
-
             ResultLabel.where { domainId in resultWellsById.keySet()
                                 scope == ResultLabel.LabelScope.WELL }.each { resultLabel ->
                 def resultWell = resultWellsById[resultLabel.domainId]
@@ -327,7 +324,6 @@ class ResultService {
                         break
                 }
             }
-                      println plate as JSON
 
             if (plateInstance) {
                 def wellsById = Well.findAllByPlate(plateInstance.plate)
