@@ -41,6 +41,7 @@
 						<thead>
 							<tr>
 								<th>Plate ID</th>
+								<th>Results Imported</th>
 								<th>Z-Factor</th>
 								<th>Z'-Factor</th>
 								<th>Mean Negative Control</th>

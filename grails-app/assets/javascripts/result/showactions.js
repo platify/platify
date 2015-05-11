@@ -136,6 +136,7 @@ function init() {
         var plateData = Object.keys(experiment.experiment.plates).map(function(plateIndex) {
             var row = [
                        experiment.experiment.plates[plateIndex].plateID,
+                       experiment.experiment.plates[plateIndex].resultCreated,
                        experiment.zFactor(plateIndex),
                        experiment.zPrimeFactor(plateIndex),
                        experiment.meanNegativeControl(plateIndex),
