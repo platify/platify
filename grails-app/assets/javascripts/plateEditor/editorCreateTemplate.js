@@ -162,6 +162,7 @@ function saveConfigToServer() {
 		console.log("success");
 	}).fail(function() {
 		console.log("error");
+		alert("An error while saving the template.");
 	}).always(function() {
 		console.log("complete");
 	});
@@ -169,12 +170,11 @@ function saveConfigToServer() {
 	// Set another completion function for the request above
 	jqxhr.always(function(resData) {
 		var storedTemplate = JSON.stringify(resData);
-		console.log("second complete");
 		console.log("result=" + storedTemplate);
-		console.log("storedTemplate['plateTemplate']=" + resData.plateTemplate);
-		console.log("storedTemplate['plateTemplate']['id']=" + resData.plateTemplate.id);
 
 		if (resData.plateTemplate !== undefined &&  resData.plateTemplate.id !== undefined) {
+			console.log("storedTemplate['plateTemplate']=" + resData.plateTemplate);
+			console.log("storedTemplate['plateTemplate']['id']=" + resData.plateTemplate.id);
 			plateModel.templateID = resData.plateTemplate.id;
 			if (window.expId !== undefined) {
 				// if we're in an assay, then continue to assignlabels page
@@ -186,7 +186,6 @@ function saveConfigToServer() {
 		} else {
 			alert("An error while saving the template: " + storedTemplate);
 		}
-
 	});
 }
 

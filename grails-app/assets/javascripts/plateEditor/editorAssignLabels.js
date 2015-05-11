@@ -912,6 +912,11 @@ function translateModelToOutputJson(pModel) {
 	plate.templateID = window.templateId;
 
 	plate.plateID = document.getElementById("barcode").value;
+	if (plate.plateID === undefined || plate.plateID === null || plate.plateID === "") {
+		alert("Please enter valid non-blank value for barcode.");
+		return null;
+	}
+	
 	plate.wells = [];
 
 	if (pModel.labels !== undefined) {
@@ -925,7 +930,9 @@ function translateModelToOutputJson(pModel) {
 		if (groupNames[wellGroup] !== undefined && groupNames[wellGroup] !== null) {
 			cmpdValue = document.getElementById("wellGroup__sep__" + wellGroup).value;
 			if (cmpdValue === undefined || cmpdValue === null || cmpdValue === "") {
-				groupNames[wellGroup] = "SOME_COMPOUND";
+				//groupNames[wellGroup] = "SOME_COMPOUND";
+				alert("Please enter value for compound: " + wellGroup);
+				return null;
 			} else {
 				groupNames[wellGroup] = cmpdValue;
 			}
@@ -995,34 +1002,38 @@ function translateModelToOutputJson(pModel) {
 function saveConfigToServer() {
 	"use strict";
 	var plateJson, jqxhr;
+	
 	plateJson = translateModelToOutputJson(plateModel);
-	console.log("SendingToServer: " + JSON.stringify(plateJson));
+		
+	if (plateJson !== null) {
+		console.log("SendingToServer: " + JSON.stringify(plateJson));
 
-	jqxhr = $.ajax({		// need to update to save plate instead of template
-		url: hostname + "/plate/save",
-		type: "POST",
-		data: JSON.stringify(plateJson),
-		processData: false,
-		contentType: "application/json; charset=UTF-8"
-	}).done(function() {
-		console.log("success");
-	}).fail(function() {
-		console.log("error");
-	}).always(function() {
-		console.log("complete");
-	});
+		jqxhr = $.ajax({		// need to update to save plate instead of template
+			url: hostname + "/plate/save",
+			type: "POST",
+			data: JSON.stringify(plateJson),
+			processData: false,
+			contentType: "application/json; charset=UTF-8"
+		}).done(function() {
+			console.log("success");
+		}).fail(function() {
+			console.log("error");
+			alert("An error while saving the plate.");
+		}).always(function() {
+			console.log("complete");
+		});
 
-	// Set another completion function for the request above
-	jqxhr.always(function(resData) {
-		console.log("second complete");
-		console.log("result=" + JSON.stringify(resData));
+		// Set another completion function for the request above
+		jqxhr.always(function(resData) {
+			console.log("result=" + JSON.stringify(resData));
 
-		if (resData.plate !== undefined &&  resData.plate.id !== undefined) {
-			window.location.href = hostname + "/experimentalPlateSet/showactions/" + window.expId;
-		} else {
-			alert("An error while saving the template!");
-		}
-	});
+			if (resData.plate !== undefined &&  resData.plate.id !== undefined) {
+				window.location.href = hostname + "/experimentalPlateSet/showactions/" + window.expId;
+			} else {
+				alert("An error while saving the plate: " + JSON.stringify(resData));
+			}
+		});
+	}
 }
 
 function hideLabelPanel() {
@@ -1164,7 +1175,7 @@ $(function() {
  */
 function loadJsonData(plateJson) {
 	"use strict";
-	var row, column, wellgrp, wellType, catKey, labKey, color, newContents;
+	var row, column, wellgrp, wellType, catKey, labKey, color, newContents, units;
 	// translate the json received to the internal models structure
 	plateModel = translateInputJsonToModel(plateJson);
 
@@ -1196,7 +1207,11 @@ function loadJsonData(plateJson) {
 			for (catKey in plateModel.rows[row].columns[column].categories) {
 				for (labKey in plateModel.rows[row].columns[column].categories[catKey]) {
 					color = plateModel.rows[row].columns[column].categories[catKey][labKey].color;
-					units = plateModel.rows[row].columns[column].categories[catKey][labKey].units;
+					if (plateModel.rows[row].columns[column].categories[catKey][labKey].units !== undefined) {
+						units = plateModel.rows[row].columns[column].categories[catKey][labKey].units;
+					} else {
+						units = "";
+					}
 					newContents += "," + color;
 
 					// update catLegend color
@@ -1258,15 +1273,20 @@ function fetchTemplateData(tId) {
 		console.log("success");
 	}).fail(function() {
 		console.log("error");
+		alert("An error while fetching the template from the server.");
 	}).always(function() {
 		console.log("complete");
 	});
 
 	// Set another completion function for the request above
 	jqxhr.always(function(resData) {
-		console.log("second complete");
 		console.log("recievedFromServer:  " + JSON.stringify(resData));
-		loadJsonData(resData);
+		
+		if (resData.error !== undefined && resData.error !== null) {
+			alert("An error has occurred while fetching data from the server: "+ resData.error);
+		} else {
+			loadJsonData(resData);
+		}
 	});
 }
 

@@ -206,14 +206,17 @@ function onViewSelect(clickedEL) {
 	GRID_HEIGHT = elValArr[2];
 	
 	console.log("selectEvent!:" + plateId);
-	fetchTemplateData(plateId);
+	fetchPlateData(plateId);
 }
 
-//ajax save object call
-function fetchTemplateData(tId) {
+/**
+ * Call to server to get plate with specified id.
+ * @param pId - ID of plate to retrieve the json data model for. 
+ */
+function fetchPlateData(pId) {
 	"use strict";
 	var jqxhr = $.ajax({
-		url: hostname + "/plate/read/" + tId,
+		url: hostname + "/plate/read/" + pId,
 		type: "POST",
 		data: null,
 		processData: false,
@@ -222,6 +225,7 @@ function fetchTemplateData(tId) {
 		console.log("success");
 	}).fail(function() {
 		console.log("error");
+		alert("An error has occurred while fetching template data from the server.");
 	}).always(function() {
 		console.log("complete");
 	});

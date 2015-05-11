@@ -79,6 +79,7 @@ function fetchTemplateData(tId) {
 		console.log("success");
 	}).fail(function() {
 		console.log("error");
+		alert("An error has occurred while fetching template data from the server.");
 	}).always(function() {
 		console.log("complete");
 	});
