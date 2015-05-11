@@ -234,108 +234,116 @@ class ResultService {
     	return resultInstance
     }    
 
-    def getResults(Result resultInstance) {
-
-    	if (!resultInstance)
-    		return
-
+    def getResults(ExperimentalPlateSet experiment) {
+    	if (!experiment) {
+			throw new RuntimeException("The experiment does not exist")
+        }
+        
     	def importData = [
-            resultID: resultInstance.id,
-            experimentID: resultInstance.experiment.id,
-            parsingID: resultInstance.equipment.id,
+            experimentID: experiment.id,
+            //resultID: resultInstance.id, // TODO - move to plate
+            //parsingID: resultInstance.equipment.id, // TODO - move to plate
             experimentFeatures: [labels: [:]],
             plates: [],
         ]
 
-        DomainLabel.findAllByDomainIdAndLabelType(resultInstance.experiment.id, DomainLabel.LabelType.PLATE_SET).each{
+        DomainLabel.findAllByDomainIdAndLabelType(experiment.id, DomainLabel.LabelType.PLATE_SET).each{
             importData.experimentFeatures.labels[it.category] = it.name
         }
-    	ResultLabel.findAllByDomainIdAndLabelTypeAndScope(resultInstance.id, ResultLabel.LabelType.LABEL, ResultLabel.LabelScope.RESULT).each{
-    		importData.experimentFeatures.labels[it.name] = it.value
-    	}
 
-        def platesByBarcode = PlateSet.findAllByExperiment(resultInstance.experiment).collectEntries { plate ->
+        def platesByBarcode = PlateSet.findAllByExperiment(experiment).collectEntries { plate ->
             [plate.barcode, plate]
         }
+        
+        Result.findAllByExperiment(experiment).each { resultInstance ->
+            ResultLabel.findAllByDomainIdAndLabelTypeAndScope(resultInstance.id, ResultLabel.LabelType.LABEL, ResultLabel.LabelScope.RESULT).each{
+                importData.experimentFeatures.labels[it.name] = it.value
+            }
 
-    	ResultPlate.findAllByResult(resultInstance).each{ plateResult ->
-    		def plate = [
-                plateID: plateResult.barcode,
-                labels: [:],
-                rawData: [:],
-                normalizedData: [:],
-                rows: [],
-            ]
+            ResultPlate.findAllByResult(resultInstance).each{ resultPlate ->
+                def plate = [
+                    resultCreated: resultInstance.dateCreated,
+                    plateID: resultPlate.barcode,
+                    labels: [:],
+                    rawData: [:],
+                    normalizedData: [:],
+                    rows: [],
+                ]
 
-            // fill in the plate-level stuff
-            def plateInstance = platesByBarcode.get(plateResult.barcode)
-            if (plateInstance) {
-                DomainLabel.findAllByDomainIdAndLabelTypeAndPlate(plateInstance.plate.id,
-                                                                  DomainLabel.LabelType.PLATE,
-                                                                  plateInstance).each {
+                // fill in the plate-level stuff
+                def plateInstance = platesByBarcode.get(resultPlate.barcode)
+                if (plateInstance) {
+                    DomainLabel.findAllByDomainIdAndLabelTypeAndPlate(plateInstance.plate.id,
+                                                                      DomainLabel.LabelType.PLATE,
+                                                                      plateInstance).each {
+                        plate.labels[it.name] = it.value
+                    }
+                }
+                ResultLabel.findAllByDomainIdAndLabelTypeAndScope(resultPlate.id,
+                                                                  ResultLabel.LabelType.LABEL,
+                                                                  ResultLabel.LabelScope.PLATE).each {
                     plate.labels[it.name] = it.value
                 }
-            }
-    		ResultLabel.findAllByDomainIdAndLabelTypeAndScope(plateResult.id,
-                                                              ResultLabel.LabelType.LABEL,
-                                                              ResultLabel.LabelScope.PLATE).each {
-    			plate.labels[it.name] = it.value
-    		}
 
-            ResultLabel.findAllByDomainIdAndLabelTypeAndScope(plateResult.id,
-                                                              ResultLabel.LabelType.RAW_DATA,
-                                                              ResultLabel.LabelScope.PLATE).each{
-                plate.rawData[it.name] = it.value
-            }
-
-
-            // generate the shape of the plate
-    		(0..plateResult.rows-1).each{ rowIndex ->
-                plate.rows << [columns: []]
-    			(0..plateResult.columns-1).each{ columnIndex ->
-                    plate.rows[rowIndex].columns << [
-                        labels: [:],
-                        rawData: [:],
-                        normalizedData: [:],
-                        control: Well.WellControl.EMPTY.toString().toUpperCase()
-                    ]
+                ResultLabel.findAllByDomainIdAndLabelTypeAndScope(resultPlate.id,
+                                                                  ResultLabel.LabelType.RAW_DATA,
+                                                                  ResultLabel.LabelScope.PLATE).each{
+                    plate.rawData[it.name] = it.value
                 }
-            }
-
-            // now fill it
-            def resultWellsById = [:]
-            ResultWell.findAllByPlate(plateResult).each { well ->
-                resultWellsById[well.id] = well
-                plate.rows[well.well.row].columns[well.well.column].control = well.well.control.toString().toUpperCase()
-            }
-            ResultLabel.where { domainId in resultWellsById.keySet()
-                                scope == ResultLabel.LabelScope.WELL }.each { resultLabel ->
-                def resultWell = resultWellsById[resultLabel.domainId]
-                def wellOut = plate.rows[resultWell.well.row].columns[resultWell.well.column]
-                switch (resultLabel.labelType) {
-                    case ResultLabel.LabelType.LABEL:
-                        wellOut.labels[resultLabel.name] = resultLabel.value
-                        break
-                    case ResultLabel.LabelType.RAW_DATA:
-                        wellOut.rawData[resultLabel.name] = resultLabel.value
-                        break
-                    case ResultLabel.LabelType.NORMALIZED_DATA:
-                        wellOut.normalizedData[resultLabel.name] = resultLabel.value
-                        break
+                ResultLabel.findAllByDomainIdAndLabelTypeAndScope(resultPlate.id,
+                                                                  ResultLabel.LabelType.NORMALIZED_DATA,
+                                                                  ResultLabel.LabelScope.PLATE).each{
+                    plate.normalizedData[it.name] = it.value
                 }
-            }
 
-            if (plateInstance) {
-                def wellsById = Well.findAllByPlate(plateInstance.plate)
-                                    .collectEntries { well -> [well.id, well] }
-                DomainLabel.where { ((domainId in wellsById.keySet())
-                                     && (labelType == DomainLabel.LabelType.WELL)) }.each { wellLabel ->
-                    def well = wellsById[wellLabel.domainId]
-                    plate.rows[well.row].columns[well.column].labels[wellLabel.label.category] = wellLabel.label.name
+                // generate the shape of the plate
+                (0..resultPlate.rows-1).each{ rowIndex ->
+                    plate.rows << [columns: []]
+                    (0..resultPlate.columns-1).each{ columnIndex ->
+                        plate.rows[rowIndex].columns << [
+                            labels: [:],
+                            rawData: [:],
+                            normalizedData: [:],
+                            control: Well.WellControl.EMPTY.toString().toUpperCase()
+                        ]
+                    }
                 }
-            }
-    		importData.plates << plate
-    	}
+
+                // now fill it
+                def resultWellsById = [:]
+                ResultWell.findAllByPlate(resultPlate).each { well ->
+                    resultWellsById[well.id] = well
+                    plate.rows[well.well.row].columns[well.well.column].control = well.well.control.toString().toUpperCase()
+                }
+                ResultLabel.where { domainId in resultWellsById.keySet()
+                                    scope == ResultLabel.LabelScope.WELL }.each { resultLabel ->
+                    def resultWell = resultWellsById[resultLabel.domainId]
+                    def wellOut = plate.rows[resultWell.well.row].columns[resultWell.well.column]
+                    switch (resultLabel.labelType) {
+                        case ResultLabel.LabelType.LABEL:
+                            wellOut.labels[resultLabel.name] = resultLabel.value
+                            break
+                        case ResultLabel.LabelType.RAW_DATA:
+                            wellOut.rawData[resultLabel.name] = resultLabel.value
+                            break
+                        case ResultLabel.LabelType.NORMALIZED_DATA:
+                            wellOut.normalizedData[resultLabel.name] = resultLabel.value
+                            break
+                    }
+                }
+
+                if (plateInstance) {
+                    def wellsById = Well.findAllByPlate(plateInstance.plate)
+                                        .collectEntries { well -> [well.id, well] }
+                    DomainLabel.where { ((domainId in wellsById.keySet())
+                                         && (labelType == DomainLabel.LabelType.WELL)) }.each { wellLabel ->
+                        def well = wellsById[wellLabel.domainId]
+                        plate.rows[well.row].columns[well.column].labels[wellLabel.label.category] = wellLabel.label.name
+                    }
+                }
+                importData.plates << plate
+            } // ResultPlate.each{}
+        } // Result.each{}
     	return importData
     }
 
