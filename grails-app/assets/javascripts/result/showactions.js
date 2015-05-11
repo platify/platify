@@ -83,6 +83,9 @@ function createBlankData(width, height) {
  * browser.
  */
 function downloadExperiment(fileformat) {
+    // TODO - HACK - the ImportData library expected a parsingID, but never
+    //               uses it.  supply a dummy one for now.
+    experiment.experiment.parsingID = -1;
     var importData = ImportData.createImportDataObjectFromJSON(experiment.experiment);
     var generator = new ImportDataFileGenerator();
     //generator.createIntergroupInterchangeFormatMatrix(importData);

@@ -30,6 +30,7 @@
 function ImportDataFileGenerator(){
     var NUM_BLANK_COLUMNS_BETWEEN_WELL_AND_PLATE_LEVEL_DATA = 2;
     var PLATE_COLUMN_HEADER = "Plate/Barcode";
+    var PLATE_IMPORTED_TIMESTAMP_HEADER = "Results Imported";
     var WELL_COLUMN_HEADER = "Well";
     var BLANK_CELL = "";
     var NO_PLATE_ID = ImportData.NO_ID;
@@ -51,6 +52,7 @@ function ImportDataFileGenerator(){
         var experimentCategories = importData.getExperimentLevelCategories();
 
         result[headerIndex++] = PLATE_COLUMN_HEADER;
+        result[headerIndex++] = PLATE_IMPORTED_TIMESTAMP_HEADER;
         result[headerIndex++] = WELL_COLUMN_HEADER;
 
         for (var i = 0; i<wellCategories.length; i++){
@@ -95,12 +97,14 @@ function ImportDataFileGenerator(){
         var value;
 
         var plateID = importData.getPlateIdentifier(plateIndex);
+        var plateResultCreated = importData.getPlateResultCreated(plateIndex);
 
         if (!plateID || plateID === NO_PLATE_ID){
             plateID = "plate " + (plateIndex + 1);
         }
 
         result[matrixColumnIndex++] = plateID;
+        result[matrixColumnIndex++] = plateResultCreated;
         result[matrixColumnIndex++] = Grid.getRowLabel(row + 1) + (col+1);
 
         // fill in the well level labels

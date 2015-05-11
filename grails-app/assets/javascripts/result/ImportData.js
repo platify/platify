@@ -817,6 +817,47 @@ function ImportData(numPlates, numRows, numCols) {
     };
 
     /**
+     * This method is a getter for the imported timestamp for a plate.
+     * @param plateIndex - the index of the plate for which the import timestamp is
+     *                     desired.
+     * @returns {*} - the timestamp when the specified plate results were imported.
+     *
+     * Note: - This method throws a NO_SUCH_PLATE error if the calling ImportData object
+     *      has not plate for the give plate index.
+     */
+    this.getPlateResultCreated = function(plateIndex) {
+        if (!this.plates[plateIndex]) {
+            throw new ImportDataError(ImportDataError.NO_SUCH_PLATE,
+                    plateIndex,
+                    "plate",
+                    "get a plate identifier");
+        }
+        if (this.plates && this.plates[plateIndex] && this.plates[plateIndex].resultCreated) {
+            return this.plates[plateIndex].resultCreated;
+        } else {
+            return null;
+        }
+    }
+
+    this.setPlateResultCreated = function(plateIndex, timestamp) {
+        if (!timestamp && timestamp !== 0) {
+            throw new ImportDataError(ImportDataError.ILLEGAL_ARGUMENT,
+                    timestamp,
+                    "plate result created",
+                    "set plate result created");
+        }
+
+        if (!this.plates[plateIndex]) {
+            throw new ImportDataError(ImportDataError.NO_SUCH_PLATE,
+                    plateIndex,
+                    "plate",
+                    "set plate result created");
+        }
+        this.plates[plateIndex].resultCreated = timestamp;
+    }
+
+
+    /**
      * This method is a getter for a plate identifier.
      * @param plateIndex - the index of the plate for which the identifier is desired
      * @returns {*} - the identifier of the specified plate, this will be NO_ID, if no
@@ -884,19 +925,6 @@ function ImportData(numPlates, numRows, numCols) {
                     plateIndex,
                     "plate",
                     "set a plate identifier");
-        }
-
-        // check if plate identifier is unique
-        if (identifier !== ImportData.NO_ID) {
-            for (var i=0; i<this.numPlates(); i++) {
-                if (i !== plateIndex
-                        && identifier.trim() === this.plates[i].plateID.trim()) {
-                    throw new ImportDataError(ImportDataError.REPEATED_PLATE_ID,
-                            identifier,
-                            "plate",
-                            "set a plate identifier");
-                }
-            }
         }
 
         this.plates[plateIndex].plateID = identifier;
@@ -1071,6 +1099,9 @@ ImportData.createImportDataObjectFromJSON = function(JSONObject) {
 
             // set the plate identifier
             result.setPlateIdentifier(plateIndex, plate.plateID);
+
+            // and the result created timestamp
+            result.setPlateResultCreated(plateIndex, plate.resultCreated);
 
             for (var categoryName in plateLevelCategories) {
                 // prefer results to labels
