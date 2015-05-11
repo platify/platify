@@ -102,64 +102,60 @@ function translateInputJsonToModel(plateJson) {
 		pModel.labels = [];
 	}
 	
-	if (plate.name === undefined || plate.name === null) {
-		alert("An error occurred while loading the data for the stored plate received from the server. Please ensure you have specified a correct template/plate id.");
-	} else {
-		pModel.name = plate.name;
-		pModel.grid_width = plate.width;
-		pModel.grid_height = plate.height;
+	pModel.name = plate.name;
+	pModel.grid_width = plate.width;
+	pModel.grid_height = plate.height;
 
-		for (i = 0; i < plate.wells.length; i++) {
-			row = plate.wells[i].row + 1;
-			column = plate.wells[i].column + 1;
-			
-			if (plate.wells[i].groupName !== undefined && plate.wells[i].groupName !== null) {
-				groupName = plate.wells[i].groupName;
-				if (plate.wells[i].control !== undefined && plate.wells[i].control !== null) {
-					wellType = plate.wells[i].control;
-				} else {
-					wellType = "compound";		// fail back to compound
+	for (i = 0; i < plate.wells.length; i++) {
+		row = plate.wells[i].row + 1;
+		column = plate.wells[i].column + 1;
+		
+		if (plate.wells[i].groupName !== undefined && plate.wells[i].groupName !== null) {
+			groupName = plate.wells[i].groupName;
+			if (plate.wells[i].control !== undefined && plate.wells[i].control !== null) {
+				wellType = plate.wells[i].control;
+			} else {
+				wellType = "compound";		// fail back to compound
+			}
+		} else {
+			groupName = "";
+			wellType = "empty";
+		}
+		
+		labels = plate.wells[i].labels;
+
+		if (pModel.rows[row] === undefined) {
+			pModel.rows[row] = {};
+			pModel.rows[row].columns = {};
+		}
+
+		if (pModel.rows[row].columns[column] === undefined) {
+			pModel.rows[row].columns[column] = {};
+			pModel.rows[row].columns[column].wellGroupName = groupName;
+			pModel.rows[row].columns[column].wellType = wellType;
+			pModel.rows[row].columns[column].categories = {};
+		}
+
+		for (j = 0; j < labels.length; j++) {
+			// convert possible disruptive input to safer format !
+			convCat = labels[j].category.toString().split('.').join('__dot__');
+			convLab = labels[j].name.toString().split('.').join('__dot__');
+
+			if (convCat === "compound") {
+				if (groupName !== null && groupName !== "") {
+					groupNames[groupName] = convLab;
 				}
 			} else {
-				groupName = "";
-				wellType = "empty";
-			}
-			
-			labels = plate.wells[i].labels;
-
-			if (pModel.rows[row] === undefined) {
-				pModel.rows[row] = {};
-				pModel.rows[row].columns = {};
-			}
-
-			if (pModel.rows[row].columns[column] === undefined) {
-				pModel.rows[row].columns[column] = {};
-				pModel.rows[row].columns[column].wellGroupName = groupName;
-				pModel.rows[row].columns[column].wellType = wellType;
-				pModel.rows[row].columns[column].categories = {};
-			}
-
-			for (j = 0; j < labels.length; j++) {
-				// convert possible disruptive input to safer format !
-				convCat = labels[j].category.toString().split('.').join('__dot__');
-				convLab = labels[j].name.toString().split('.').join('__dot__');
-
-				if (convCat === "compound") {
-					if (groupName !== null && groupName !== "") {
-						groupNames[groupName] = convLab;
-					}
-				} else {
-					// other labels
-					if (pModel.rows[row].columns[column].categories[convCat] === undefined) {
-						pModel.rows[row].columns[column].categories[convCat] = {};
-					}
-
-					if (pModel.rows[row].columns[column].categories[convCat][convLab] === undefined) {
-						pModel.rows[row].columns[column].categories[convCat][convLab] = {};
-					}
-					pModel.rows[row].columns[column].categories[convCat][convLab].color = labels[j].value;
-					pModel.rows[row].columns[column].categories[convCat][convLab].units = labels[j].units;
+				// other labels
+				if (pModel.rows[row].columns[column].categories[convCat] === undefined) {
+					pModel.rows[row].columns[column].categories[convCat] = {};
 				}
+
+				if (pModel.rows[row].columns[column].categories[convCat][convLab] === undefined) {
+					pModel.rows[row].columns[column].categories[convCat][convLab] = {};
+				}
+				pModel.rows[row].columns[column].categories[convCat][convLab].color = labels[j].value;
+				pModel.rows[row].columns[column].categories[convCat][convLab].units = labels[j].units;
 			}
 		}
 	}
