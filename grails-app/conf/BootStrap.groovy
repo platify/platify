@@ -182,24 +182,23 @@ class BootStrap {
 	    def resultPlateLabel = new ResultLabel(name: "result plate label", value: "result plate label value", labelType: ResultLabel.LabelType.LABEL, scope: ResultLabel.LabelScope.PLATE, domainId: resultPlate1.id).save(flush: true)
 
             // pick some labels to apply to the wells
-            def foo = new Label(category: "foo", name: "foo").save(flush: true)
-            def bar = new Label(category: "foo", name: "bar").save(flush: true)
-            def baz = new Label(category: "foo", name: "baz").save(flush: true)
+            def foo = new Label(category: "foo", name: "foo", value: "#bfcc2f").save(flush: true)
+            def bar = new Label(category: "foo", name: "bar", value: "#bfcc2f").save(flush: true)
+            def baz = new Label(category: "foo", name: "baz", value: "#bfcc2f").save(flush: true)
 
 	    def random = new Random()
 	    def controlWells = []
 	    def controlLabels = []
 	    for (x in 0 .. resultPlate1.rows-1) {
 		for (y in 0 .. resultPlate1.columns-1) {
-		    def well = new Well(plate: template1, column: x, row: y,
-					control: Well.WellControl.EMPTY).save(flush: true)
+		    def well = new Well(plate: template1, column: x, row: y, groupName: "W1", control: Well.WellControl.EMPTY).save(flush: true)
 		    if ((x < 4) && (y == 0)) {
                         controlWells << well
-                        def domainLabel = new DomainLabel(label: foo, domainId: well.id, labelType: DomainLabel.LabelType.WELL).save(flush: true)
+                        def domainLabel = new DomainLabel(label: foo, domainId: well.id, labelType: DomainLabel.LabelType.WELL, plate:resultPlate1).save(flush: true)
                     }
                     else {
                         def thisLabel = ((x % 2) == 1) ? bar : baz;
-                        def domainLabel = new DomainLabel(label: thisLabel, domainId: well.id, labelType: DomainLabel.LabelType.WELL).save(flush: true)
+                        def domainLabel = new DomainLabel(label: thisLabel, domainId: well.id, labelType: DomainLabel.LabelType.WELL, plate:resultPlate1).save(flush: true)
                     }
 		    def resultWell = new ResultWell(plate: resultPlate1, well: well).save(flush: true)
 		    def resultLabel = new ResultLabel(name: "smoots",
@@ -211,16 +210,18 @@ class BootStrap {
 		}
 	    }
 	    for (i in 0 .. 1) {
-		controlWells[i].control = Well.WellControl.NEGATIVE
-		controlWells[i].save(flush: true)
-		controlLabels[i].value = "0"
-		controlLabels[i].save(flush: true)
+			controlWells[i].control = Well.WellControl.NEGATIVE
+			controlWells[i].groupName = "N1"
+			controlWells[i].save(flush: true)
+			controlLabels[i].value = "0"
+			controlLabels[i].save(flush: true)
 	    }
 	    for (i in 2 .. 3) {
-		controlWells[i].control = Well.WellControl.POSITIVE
-		controlWells[i].save(flush: true)
-		controlLabels[i].value = "100"
-		controlLabels[i].save(flush: true)
+			controlWells[i].control = Well.WellControl.POSITIVE
+			controlWells[i].groupName = "P1"
+			controlWells[i].save(flush: true)
+			controlLabels[i].value = "100"
+			controlLabels[i].save(flush: true)
 	    }
 		}
 		log.info "Users: " + Scientist.count()
