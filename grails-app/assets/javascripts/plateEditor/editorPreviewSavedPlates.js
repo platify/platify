@@ -270,10 +270,20 @@ function fetchTemplateData(tId) {
 		$("#loaderView").hide();
 		$("#gridView").show();
 		loadJsonData(resData);
-
-		//forceGridRefresh();
 	});
 }
+
+/**
+ * Event thrown when preview modal is visible. Need to refresh grid so it shows
+ * correctly.
+ */
+$(function(){
+	$('#viewSavedPlateModal').on('shown.bs.modal', function () {
+		// will only come inside after the modal is shown
+		console.log("Grid Refresh");
+		forceGridRefresh();
+	});
+});
 
 /**
  * This function handles the window load event. It initializes and fills the

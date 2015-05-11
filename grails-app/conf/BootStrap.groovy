@@ -143,8 +143,8 @@ class BootStrap {
             new ExperimentalPlateSet(owner: andres, name: "Zero Assay", description: "Zero assay description").save(flush: true)
             def experiment3 = new ExperimentalPlateSet(owner: zach, name: "envision", description: "Envision assay description").save(flush: true)
 
-            def template1 = new PlateTemplate(owner: andres, name: "first template").save(flush: true)
-            def template2 = new PlateTemplate(owner: zach, name: "envision template").save(flush: true)
+            def template1 = new PlateTemplate(owner: andres, name: "first template", width: "24", height: "16").save(flush: true)
+            def template2 = new PlateTemplate(owner: zach, name: "envision template", width: "24", height: "16").save(flush: true)
 
             def plateSet1 = new PlateSet(plate: template1, experiment: experiment1, assay: "my assay", barcode: "10293").save(flush: true)
             def plateSet2 = new PlateSet(plate: template1, experiment: experiment1, assay: "my assay", barcode: "3321").save(flush: true)
