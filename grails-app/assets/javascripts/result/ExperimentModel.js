@@ -4,7 +4,7 @@
 /**
  * Aggregates template, plate set, and result data from an experiment
  * for display and download.  Most functions operate on the "current"
- * plate by default, but will also accept a plateID as an argument.
+ * plate by default, but will also accept a plateIndex as an argument.
  * Notable exceptions are the load*DataForGrid() functions.
  *
  * TODO - remove concept of current plate, refactor to operate on
@@ -15,12 +15,11 @@ function ExperimentModel() {
     this.experiment = {plates: {}};
     this.numColumns = 0;
     this.numRows = 0;
-    this.plates = {}; // keyed by plateID
 
     // updated every time we change plates
     this.controls = {'negative': null, 'positive': null};
     this.currentPlate = null;
-    this.currentPlateID = null;
+    this.currentPlateIndex = null;
     this.data = null;
     this.normalizedData = null;
 
@@ -30,7 +29,7 @@ function ExperimentModel() {
             return;
         }
 
-        // TODO - catch exceptions?
+        // TODO - catch exceptions
         this.experiment = JSON.parse(importDataJson);
 
         if (Object.keys(this.experiment.plates).length > 0) {
@@ -49,11 +48,8 @@ function ExperimentModel() {
                 });
                 this.numColumns = Math.max(this.numColumns,
                                            Math.max.apply(null, columnCounts));
-
-                // store it by plate id
-                this.plates[plate.plateID] = plate;
             }
-            this.selectPlate(this.experiment.plates[0].plateID);
+            this.selectPlate(0);
         }
     }
 
@@ -114,9 +110,9 @@ function ExperimentModel() {
      * Walks the current plate, stores the coordinates of the negative
      * and positive control wells.
      */
-    this.locateControls = function(plateID) {
-        plateID = (plateID === undefined) ? this.currentPlateID : plateID;
-        var plate = this.plates[plateID];
+    this.locateControls = function(plateIndex) {
+        plateIndex = (plateIndex === undefined) ? this.currentPlateIndex : plateIndex;
+        var plate = this.experiment.plates[plateIndex];
         var controls = {'negative': [], 'positive': []};
 
         for (var x=0; x<plate.rows.length; x++) {
@@ -131,7 +127,7 @@ function ExperimentModel() {
             }
         }
        
-        if (plateID === this.currentPlateID) {
+        if (plateIndex === this.currentPlateIndex) {
             this.controls = controls;
         }
         return controls;
@@ -141,9 +137,9 @@ function ExperimentModel() {
     /**
      * returns the mean of the negative control values.
      */
-    this.meanNegativeControl = function(plateID) {
-        plateID = (plateID === undefined) ? this.currentPlateID : plateID;
-        var rawLabel = this.rawDataLabel(plateID);
+    this.meanNegativeControl = function(plateIndex) {
+        plateIndex = (plateIndex === undefined) ? this.currentPlateIndex : plateIndex;
+        var rawLabel = this.rawDataLabel(plateIndex);
         if (!rawLabel) {
             return null;
         }
@@ -151,13 +147,13 @@ function ExperimentModel() {
 
         var plate;
         var controls;
-        if (plateID === this.currentPlateID) {
+        if (plateIndex === this.currentPlateIndex) {
             plate = this.currentPlate;
             controls = this.controls;
         }
         else {
-            plate = this.plates[plateID];
-            controls = this.locateControls(plateID);
+            plate = this.experiment.plates[plateIndex];
+            controls = this.locateControls(plateIndex);
         }
 
         var rv;
@@ -177,9 +173,9 @@ function ExperimentModel() {
     /**
      * returns the mean of the negative control values.
      */
-    this.meanPositiveControl = function(plateID) {
-        plateID = (plateID === undefined) ? this.currentPlateID : plateID;
-        var rawLabel = this.rawDataLabel(plateID);
+    this.meanPositiveControl = function(plateIndex) {
+        plateIndex = (plateIndex === undefined) ? this.currentPlateIndex : plateIndex;
+        var rawLabel = this.rawDataLabel(plateIndex);
         if (!rawLabel) {
             return null;
         }
@@ -187,13 +183,13 @@ function ExperimentModel() {
 
         var plate;
         var controls;
-        if (plateID === this.currentPlateID) {
+        if (plateIndex === this.currentPlateIndex) {
             plate = this.currentPlate;
             controls = this.controls;
         }
         else {
-            plate = this.plates[plateID];
-            controls = this.locateControls(plateID);
+            plate = this.experiment.plates[plateIndex];
+            controls = this.locateControls(plateIndex);
         }
 
         var rv;
@@ -214,19 +210,19 @@ function ExperimentModel() {
      * Normalizes the data for the given plate, and saves it back to the 
      * server.
      */
-    this.normalizeDeriveAndSave = function(plateID) {
-        plateID = (plateID === undefined) ? this.currentPlateID : plateID;
-        var label = this.rawDataLabel(plateID);
+    this.normalizeDeriveAndSave = function(plateIndex) {
+        plateIndex = (plateIndex === undefined) ? this.currentPlateIndex : plateIndex;
+        var label = this.rawDataLabel(plateIndex);
         var plate;
         var controls;
 
-        if (plateID === this.currentPlateID) {
+        if (plateIndex === this.currentPlateIndex) {
             plate = this.currentPlate;
             controls = this.controls;
         }
         else {
-            plate = this.plates[plateID];
-            controls = this.locateControls(plateID);
+            plate = this.experiment.plates[plateIndex];
+            controls = this.locateControls(plateIndex);
         }
 
         var normalized = normalize(plate, label,
@@ -239,22 +235,30 @@ function ExperimentModel() {
         }
 
         // make sure we've also calculated the plate-level derived values as well
-        this.zFactor(plateID);
-        this.zPrimeFactor(plateID);
-        this.meanNegativeControl(plateID);
-        this.meanPositiveControl(plateID);
+        this.zFactor(plateIndex);
+        this.zPrimeFactor(plateIndex);
+        this.meanNegativeControl(plateIndex);
+        this.meanPositiveControl(plateIndex);
 
-        var url = RESULT_SAVE_REFACTORED_DATA_URL + '/' + this.experiment.resultID;
+        // the save endpoint only wants the current plate
+        var data = {
+            experimentID: this.experiment.experimentID,
+            parsingID: this.currentPlate.parsingID,
+            plates: [this.currentPlate],
+        }
+
+        var url = RESULT_SAVE_REFACTORED_DATA_URL + '/' + plate.resultID;
         var jqxhr = $.ajax({
             url: url,
             contentType: 'application/json; charset=UTF-8',
-            data: JSON.stringify(this.experiment),
+            data: JSON.stringify(data),
             method: 'POST',
             processData: false,
         });
         jqxhr.done(function() {
-            console.log('POST of normalized data for plate '
-                        + plateID + ' complete');
+            var plate = experiment.experiment.plates[plateIndex];
+            console.log('POST of normalized data for plate %s, ID %s, result %s complete',
+                        plateIndex, plate.plateID, plate.resultID);
         });
     }
 
@@ -265,16 +269,16 @@ function ExperimentModel() {
      * Our backend supports more than one data value per well, but our
      * qa/qc and results display doesn't.
      */
-    this.rawDataLabel = function(plateID) {
-        plateID = (plateID === undefined) ? this.currentPlateID : plateID;
-        var plate = this.plates[plateID];
+    this.rawDataLabel = function(plateIndex) {
+        plateIndex = (plateIndex === undefined) ? this.currentPlateIndex : plateIndex;
+        var plate = this.experiment.plates[plateIndex];
         if (plate.rows[0].columns[0].rawData) {
             try {
                 return Object.keys(plate.rows[0].columns[0].rawData).sort()[0];
             }
             catch (e) {
                 console.log('rawDataLabel couldn\'t find rawData for plate '
-                            + plateID);
+                            + plateIndex);
                 console.log(e);
                 return null;
             }
@@ -286,7 +290,7 @@ function ExperimentModel() {
 
 
     /**
-     * Marks the plate with plateID plateID as the active one.  Copies data
+     * Marks the plate at index plateIndex as the active one.  Copies data
      * from that plate into a 2d array we can feed to slickgrid.  Locates the
      * control wells for the plate.  Calculates and stores normalized data 
      * into a 2d array we can feed to slickgrid.
@@ -294,11 +298,12 @@ function ExperimentModel() {
      * TODO - put call to normalize and store normalized data into output
      * 	      parser.
      */
-    this.selectPlate = function(plateID) {
-        if (!$.isEmptyObject(this.plates) && (plateID in this.plates)) {
-            this.currentPlate = this.plates[plateID];
-            this.currentPlateID = plateID;
-            this.locateControls(plateID);
+    this.selectPlate = function(plateIndex) {
+        if (!$.isEmptyObject(this.experiment.plates)
+                && (this.experiment.plates.length > plateIndex)) {
+            this.currentPlate = this.experiment.plates[plateIndex];
+            this.currentPlateIndex = plateIndex;
+            this.locateControls(plateIndex);
             this.loadDataForGrid();
             this.loadNormalizedDataForGrid();
             if ($.isEmptyObject(this.currentPlate.rows[0].columns[0].normalizedData)) {
@@ -307,9 +312,9 @@ function ExperimentModel() {
         }
         else {
             this.currentPlate = null;
-            this.currentPlateID = null;
-            this.data = this.getEmptyData();
-            this.normalizedData = this.getEmptyData();
+            this.currentPlateIndex = null;
+            this.data = this.getEmptyGrid();
+            this.normalizedData = this.getEmptyGrid();
         }
     }
 
@@ -317,9 +322,9 @@ function ExperimentModel() {
     /**
      * Calculates the z-factor value for the current plate.
      */
-    this.zFactor = function(plateID) {
-        plateID = (plateID === undefined) ? this.currentPlateID : plateID;
-        var rawLabel = this.rawDataLabel(plateID);
+    this.zFactor = function(plateIndex) {
+        plateIndex = (plateIndex === undefined) ? this.currentPlateIndex : plateIndex;
+        var rawLabel = this.rawDataLabel(plateIndex);
         if (!rawLabel) {
             return null;
         }
@@ -327,13 +332,13 @@ function ExperimentModel() {
 
         var plate;
         var controls;
-        if (plateID === this.currentPlateID) {
+        if (plateIndex === this.currentPlateIndex) {
             plate = this.currentPlate;
             controls = this.controls;
         }
         else {
-            plate = this.plates[plateID];
-            controls = this.locateControls(plateID);
+            plate = this.experiment.plates[plateIndex];
+            controls = this.locateControls(plateIndex);
         }
         
         var rv;
@@ -352,9 +357,9 @@ function ExperimentModel() {
     /**
      * Calculates the z'-factor value for the current plate.
      */
-    this.zPrimeFactor = function(plateID) {
-        plateID = (plateID === undefined) ? this.currentPlateID : plateID;
-        var rawLabel = this.rawDataLabel(plateID);
+    this.zPrimeFactor = function(plateIndex) {
+        plateIndex = (plateIndex === undefined) ? this.currentPlateIndex : plateIndex;
+        var rawLabel = this.rawDataLabel(plateIndex);
         if (!rawLabel) {
             return null;
         }
@@ -362,13 +367,13 @@ function ExperimentModel() {
         var plate;
         var controls;
 
-        if (plateID === this.currentPlateID) {
+        if (plateIndex === this.currentPlateIndex) {
             plate = this.currentPlate;
             controls = this.controls;
         }
         else {
-            plate = this.plates[plateID];
-            controls = this.locateControls(plateID);
+            plate = this.experiment.plates[plateIndex];
+            controls = this.locateControls(plateIndex);
         }
 
         var rv;

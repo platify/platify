@@ -178,16 +178,13 @@ class ResultService {
 			throw new RuntimeException("Plates of the JSON do not match with the template")
 		}	
         */
-		
 
         if (!resultInstance){
             throw new RuntimeException("A result set must be specified")
         }
 
-
 		// create the result plates
 		data.plates.eachWithIndex{ dataPlate, plateIndex ->
-
 			def plateInstance = ResultPlate.findByResultAndBarcode(resultInstance, dataPlate.plateID)
 			
     		// well level
@@ -241,8 +238,6 @@ class ResultService {
         
     	def importData = [
             experimentID: experiment.id,
-            //resultID: resultInstance.id, // TODO - move to plate
-            //parsingID: resultInstance.equipment.id, // TODO - move to plate
             experimentFeatures: [labels: [:]],
             plates: [],
         ]
@@ -262,6 +257,8 @@ class ResultService {
 
             ResultPlate.findAllByResult(resultInstance).each{ resultPlate ->
                 def plate = [
+                    resultID: resultInstance.id,
+                    parsingID: resultInstance.equipment.id,
                     resultCreated: resultInstance.dateCreated,
                     plateID: resultPlate.barcode,
                     labels: [:],

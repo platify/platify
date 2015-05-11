@@ -120,7 +120,9 @@ function init() {
             aButtons: [],
             sRowSelect: 'single',
             fnRowSelected: function (nodes) {
-                plateSelected(nodes[0].children[0].textContent);
+                var row = plateTableTools.fnGetSelectedData()[0];
+                var plateIndex = row[row.length-1];
+                plateSelected(plateIndex);
             },
         },
     });
@@ -130,14 +132,15 @@ function init() {
     grid  = new Grid("resultGrid");
 
     // process experiment object
-    if (Object.keys(experiment.plates).length > 0) {
-        var plateData = Object.keys(experiment.plates).map(function(plateID) {
+    if (Object.keys(experiment.experiment.plates).length > 0) {
+        var plateData = Object.keys(experiment.experiment.plates).map(function(plateIndex) {
             var row = [
-                       plateID,
-                       experiment.zFactor(plateID),
-                       experiment.zPrimeFactor(plateID),
-                       experiment.meanNegativeControl(plateID),
-                       experiment.meanPositiveControl(plateID)];
+                       experiment.experiment.plates[plateIndex].plateID,
+                       experiment.zFactor(plateIndex),
+                       experiment.zPrimeFactor(plateIndex),
+                       experiment.meanNegativeControl(plateIndex),
+                       experiment.meanPositiveControl(plateIndex),
+                       plateIndex];
             return row;
         });
         plateTable.clear().rows.add(plateData).draw();
@@ -178,8 +181,8 @@ function loadGrid(dataSet) {
 }
 
 
-function plateSelected(plateID) {
-    experiment.selectPlate(plateID);
+function plateSelected(plateIndex) {
+    experiment.selectPlate(plateIndex);
     loadGrid(showNormalized ? experiment.normalizedData : experiment.data);
     $('#rawDataLabel')[0].textContent = experiment.rawDataLabel();
 }
