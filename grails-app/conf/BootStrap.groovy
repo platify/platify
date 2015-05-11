@@ -145,6 +145,19 @@ class BootStrap {
 
             def template1 = new PlateTemplate(owner: andres, name: "first template", width: "24", height: "16").save(flush: true)
             def template2 = new PlateTemplate(owner: zach, name: "envision template", width: "24", height: "16").save(flush: true)
+			
+			// pushing empty wells for templates
+			for (x in 0 .. 23) {
+				for (y in 0 .. 15) {
+					def t1well = new Well(plate: template1, column: x, row: y, control: Well.WellControl.EMPTY).save(flush: true)
+				}
+			}
+			
+			for (x in 0 .. 23) {
+				for (y in 0 .. 15) {
+					def t2well = new Well(plate: template2, column: x, row: y, control: Well.WellControl.EMPTY).save(flush: true)
+				}
+			}
 
             def plateSet1 = new PlateSet(plate: template1, experiment: experiment1, assay: "my assay", barcode: "10293").save(flush: true)
             def plateSet2 = new PlateSet(plate: template1, experiment: experiment1, assay: "my assay", barcode: "3321").save(flush: true)
@@ -191,7 +204,7 @@ class BootStrap {
 	    def controlLabels = []
 	    for (x in 0 .. resultPlate1.rows-1) {
 		for (y in 0 .. resultPlate1.columns-1) {
-		    def well = new Well(plate: template1, column: x, row: y, groupName: "W1", control: Well.WellControl.EMPTY).save(flush: true)
+		    def well = new Well(plate: template1, column: x, row: y, control: Well.WellControl.EMPTY).save(flush: true)
 		    if ((x < 4) && (y == 0)) {
                         controlWells << well
                         def domainLabel = new DomainLabel(label: foo, domainId: well.id, labelType: DomainLabel.LabelType.WELL, plate:resultPlate1).save(flush: true)
@@ -211,22 +224,22 @@ class BootStrap {
 	    }
 	    for (i in 0 .. 1) {
 			controlWells[i].control = Well.WellControl.NEGATIVE
-			controlWells[i].groupName = "N1"
 			controlWells[i].save(flush: true)
 			controlLabels[i].value = "0"
 			controlLabels[i].save(flush: true)
 	    }
 	    for (i in 2 .. 3) {
 			controlWells[i].control = Well.WellControl.POSITIVE
-			controlWells[i].groupName = "P1"
 			controlWells[i].save(flush: true)
 			controlLabels[i].value = "100"
 			controlLabels[i].save(flush: true)
 	    }
+		
+		
 		}
 		log.info "Users: " + Scientist.count()
 		log.info "Roles: " + Role.count()
-		log.info "UserRole: " + ScientistRole.count()            
+		log.info "UserRole: " + ScientistRole.count()
 		
     }
     def destroy = {
