@@ -119,6 +119,25 @@ function init() {
         paging: false,
         scrollY: '150px',
         searching: false,
+        columnDefs: [{
+            targets: 3,
+            render: function (data, type, full, meta) {
+                // color the z'-factor per good/maybe/bad bucketing defined on
+                // https://support.collaborativedrug.com/entries/21220276-Plate-Quality-Control
+                var bucket;
+                if ((data < 0) || (data > 1)) {
+                    bucket = 'unacceptable';
+                }
+                else if (data <= 0.5) {
+                    bucket = 'acceptable';
+                }
+                else if (data <= 1) {
+                    bucket = 'excellent';
+                }
+                return '<span class="results-z-prime-' + bucket
+                       + '">' + data + '</span>';
+            },
+        }],
         tableTools: {
             aButtons: [],
             sRowSelect: 'single',
