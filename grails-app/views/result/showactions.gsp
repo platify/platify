@@ -9,7 +9,7 @@
 		<asset:stylesheet href="grid/slick.grid.css"/>
 		<asset:stylesheet href="grid/slick-default-theme.css"/>
 		<asset:stylesheet href="grid/Grid.css"/>
-		<asset:stylesheet href="heatmaps.css"/>
+		<asset:stylesheet href="grid/heatmaps.css"/>
 		<asset:stylesheet href="dataTables.bootstrap.css"/>
 		<asset:stylesheet href="dataTables.tableTools.css"/>
 	</head>
