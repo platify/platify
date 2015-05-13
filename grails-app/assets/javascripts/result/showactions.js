@@ -7,17 +7,20 @@ var showNormalized = false;
 
 
 function cellFormatter(row, cell, value, columnDef, dataContext) {
-    var finalValue = value;
     var well = experiment.currentPlate.rows[row].columns[cell-1];
 
+    var style = "";
     switch (well.control) {
         case 'NEGATIVE':
+            style = "color: red";
+            break;
+
         case 'POSITIVE':
-            finalValue += ',' + well.control.toLowerCase();
+            style = "color: green";
             break;
     }
 
-    return Grid.editorCellFormatter(row, cell, finalValue, columnDef, dataContext);
+    return '<span style="' + style + '">' + value + '</span>'
 }
 
 /**

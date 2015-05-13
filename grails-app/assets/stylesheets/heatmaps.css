@@ -126,70 +126,70 @@
 .copper .q7 { background-color: rgb(13.890%, 8.680%, 5.530%) }
 .copper .q8 { background-color: rgb(15.870%, 9.920%, 6.320%) }
 .copper .q9 { background-color: rgb(17.860%, 11.160%, 7.110%) }
-.gray .q0 { background-color: rgb(0.000%, 0.000%, 0.000%) }
-.gray .q1 { background-color: rgb(1.590%, 1.590%, 1.590%) }
-.gray .q10 { background-color: rgb(15.870%, 15.870%, 15.870%) }
-.gray .q11 { background-color: rgb(17.460%, 17.460%, 17.460%) }
-.gray .q12 { background-color: rgb(19.050%, 19.050%, 19.050%) }
-.gray .q13 { background-color: rgb(20.630%, 20.630%, 20.630%) }
-.gray .q14 { background-color: rgb(22.220%, 22.220%, 22.220%) }
-.gray .q15 { background-color: rgb(23.810%, 23.810%, 23.810%) }
-.gray .q16 { background-color: rgb(25.400%, 25.400%, 25.400%) }
-.gray .q17 { background-color: rgb(26.980%, 26.980%, 26.980%) }
-.gray .q18 { background-color: rgb(28.570%, 28.570%, 28.570%) }
-.gray .q19 { background-color: rgb(30.160%, 30.160%, 30.160%) }
-.gray .q2 { background-color: rgb(3.170%, 3.170%, 3.170%) }
-.gray .q20 { background-color: rgb(31.750%, 31.750%, 31.750%) }
-.gray .q21 { background-color: rgb(33.330%, 33.330%, 33.330%) }
-.gray .q22 { background-color: rgb(34.920%, 34.920%, 34.920%) }
-.gray .q23 { background-color: rgb(36.510%, 36.510%, 36.510%) }
-.gray .q24 { background-color: rgb(38.100%, 38.100%, 38.100%) }
-.gray .q25 { background-color: rgb(39.680%, 39.680%, 39.680%) }
-.gray .q26 { background-color: rgb(41.270%, 41.270%, 41.270%) }
-.gray .q27 { background-color: rgb(42.860%, 42.860%, 42.860%) }
-.gray .q28 { background-color: rgb(44.440%, 44.440%, 44.440%) }
-.gray .q29 { background-color: rgb(46.030%, 46.030%, 46.030%) }
-.gray .q3 { background-color: rgb(4.760%, 4.760%, 4.760%) }
-.gray .q30 { background-color: rgb(47.620%, 47.620%, 47.620%) }
-.gray .q31 { background-color: rgb(49.210%, 49.210%, 49.210%) }
-.gray .q32 { background-color: rgb(50.790%, 50.790%, 50.790%) }
-.gray .q33 { background-color: rgb(52.380%, 52.380%, 52.380%) }
-.gray .q34 { background-color: rgb(53.970%, 53.970%, 53.970%) }
-.gray .q35 { background-color: rgb(55.560%, 55.560%, 55.560%) }
-.gray .q36 { background-color: rgb(57.140%, 57.140%, 57.140%) }
-.gray .q37 { background-color: rgb(58.730%, 58.730%, 58.730%) }
-.gray .q38 { background-color: rgb(60.320%, 60.320%, 60.320%) }
-.gray .q39 { background-color: rgb(61.900%, 61.900%, 61.900%) }
-.gray .q4 { background-color: rgb(6.350%, 6.350%, 6.350%) }
-.gray .q40 { background-color: rgb(63.490%, 63.490%, 63.490%) }
-.gray .q41 { background-color: rgb(65.080%, 65.080%, 65.080%) }
-.gray .q42 { background-color: rgb(66.670%, 66.670%, 66.670%) }
-.gray .q43 { background-color: rgb(68.250%, 68.250%, 68.250%) }
-.gray .q44 { background-color: rgb(69.840%, 69.840%, 69.840%) }
-.gray .q45 { background-color: rgb(71.430%, 71.430%, 71.430%) }
-.gray .q46 { background-color: rgb(73.020%, 73.020%, 73.020%) }
-.gray .q47 { background-color: rgb(74.600%, 74.600%, 74.600%) }
-.gray .q48 { background-color: rgb(76.190%, 76.190%, 76.190%) }
-.gray .q49 { background-color: rgb(77.780%, 77.780%, 77.780%) }
-.gray .q5 { background-color: rgb(7.940%, 7.940%, 7.940%) }
-.gray .q50 { background-color: rgb(79.370%, 79.370%, 79.370%) }
-.gray .q51 { background-color: rgb(80.950%, 80.950%, 80.950%) }
-.gray .q52 { background-color: rgb(82.540%, 82.540%, 82.540%) }
-.gray .q53 { background-color: rgb(84.130%, 84.130%, 84.130%) }
-.gray .q54 { background-color: rgb(85.710%, 85.710%, 85.710%) }
-.gray .q55 { background-color: rgb(87.300%, 87.300%, 87.300%) }
-.gray .q56 { background-color: rgb(88.890%, 88.890%, 88.890%) }
-.gray .q57 { background-color: rgb(90.480%, 90.480%, 90.480%) }
-.gray .q58 { background-color: rgb(92.060%, 92.060%, 92.060%) }
-.gray .q59 { background-color: rgb(93.650%, 93.650%, 93.650%) }
-.gray .q6 { background-color: rgb(9.520%, 9.520%, 9.520%) }
-.gray .q60 { background-color: rgb(95.240%, 95.240%, 95.240%) }
-.gray .q61 { background-color: rgb(96.830%, 96.830%, 96.830%) }
-.gray .q62 { background-color: rgb(98.410%, 98.410%, 98.410%) }
-.gray .q63 { background-color: rgb(100.000%, 100.000%, 100.000%) }
-.gray .q7 { background-color: rgb(11.110%, 11.110%, 11.110%) }
-.gray .q8 { background-color: rgb(12.700%, 12.700%, 12.700%) }
-.gray .q9 { background-color: rgb(14.290%, 14.290%, 14.290%) }
+.gray .q0 { background-color: rgb(0.000%, 0.000%, 0.000%); color: yellow; }
+.gray .q1 { background-color: rgb(1.590%, 1.590%, 1.590%); color: yellow; }
+.gray .q10 { background-color: rgb(15.870%, 15.870%, 15.870%); color: yellow; }
+.gray .q11 { background-color: rgb(17.460%, 17.460%, 17.460%); color: yellow; }
+.gray .q12 { background-color: rgb(19.050%, 19.050%, 19.050%); color: yellow; }
+.gray .q13 { background-color: rgb(20.630%, 20.630%, 20.630%); color: yellow; }
+.gray .q14 { background-color: rgb(22.220%, 22.220%, 22.220%); color: yellow; }
+.gray .q15 { background-color: rgb(23.810%, 23.810%, 23.810%); color: yellow; }
+.gray .q16 { background-color: rgb(25.400%, 25.400%, 25.400%); color: yellow; }
+.gray .q17 { background-color: rgb(26.980%, 26.980%, 26.980%); color: yellow; }
+.gray .q18 { background-color: rgb(28.570%, 28.570%, 28.570%); color: yellow; }
+.gray .q19 { background-color: rgb(30.160%, 30.160%, 30.160%); color: yellow; }
+.gray .q2 { background-color: rgb(3.170%, 3.170%, 3.170%); color: yellow; }
+.gray .q20 { background-color: rgb(31.750%, 31.750%, 31.750%); color: yellow; }
+.gray .q21 { background-color: rgb(33.330%, 33.330%, 33.330%); color: yellow; }
+.gray .q22 { background-color: rgb(34.920%, 34.920%, 34.920%); color: yellow; }
+.gray .q23 { background-color: rgb(36.510%, 36.510%, 36.510%); color: yellow; }
+.gray .q24 { background-color: rgb(38.100%, 38.100%, 38.100%); color: yellow; }
+.gray .q25 { background-color: rgb(39.680%, 39.680%, 39.680%); color: yellow; }
+.gray .q26 { background-color: rgb(41.270%, 41.270%, 41.270%); color: yellow; }
+.gray .q27 { background-color: rgb(42.860%, 42.860%, 42.860%); color: yellow; }
+.gray .q28 { background-color: rgb(44.440%, 44.440%, 44.440%); color: yellow; }
+.gray .q29 { background-color: rgb(46.030%, 46.030%, 46.030%); color: yellow; }
+.gray .q3 { background-color: rgb(4.760%, 4.760%, 4.760%); color: yellow; }
+.gray .q30 { background-color: rgb(47.620%, 47.620%, 47.620%); color: yellow; }
+.gray .q31 { background-color: rgb(49.210%, 49.210%, 49.210%); color: yellow; }
+.gray .q32 { background-color: rgb(50.790%, 50.790%, 50.790%); color: yellow; }
+.gray .q33 { background-color: rgb(52.380%, 52.380%, 52.380%); color: yellow; }
+.gray .q34 { background-color: rgb(53.970%, 53.970%, 53.970%); color: yellow; }
+.gray .q35 { background-color: rgb(55.560%, 55.560%, 55.560%); color: yellow; }
+.gray .q36 { background-color: rgb(57.140%, 57.140%, 57.140%); color: yellow; }
+.gray .q37 { background-color: rgb(58.730%, 58.730%, 58.730%); color: yellow; }
+.gray .q38 { background-color: rgb(60.320%, 60.320%, 60.320%); color: yellow; }
+.gray .q39 { background-color: rgb(61.900%, 61.900%, 61.900%); color: yellow; }
+.gray .q4 { background-color: rgb(6.350%, 6.350%, 6.350%); color: yellow; }
+.gray .q40 { background-color: rgb(63.490%, 63.490%, 63.490%); color: yellow; }
+.gray .q41 { background-color: rgb(65.080%, 65.080%, 65.080%); color: yellow; }
+.gray .q42 { background-color: rgb(66.670%, 66.670%, 66.670%); color: yellow; }
+.gray .q43 { background-color: rgb(68.250%, 68.250%, 68.250%); color: yellow; }
+.gray .q44 { background-color: rgb(69.840%, 69.840%, 69.840%); color: yellow; }
+.gray .q45 { background-color: rgb(71.430%, 71.430%, 71.430%); color: yellow; }
+.gray .q46 { background-color: rgb(73.020%, 73.020%, 73.020%); color: yellow; }
+.gray .q47 { background-color: rgb(74.600%, 74.600%, 74.600%); color: yellow; }
+.gray .q48 { background-color: rgb(76.190%, 76.190%, 76.190%); color: yellow; }
+.gray .q49 { background-color: rgb(77.780%, 77.780%, 77.780%); color: yellow; }
+.gray .q5 { background-color: rgb(7.940%, 7.940%, 7.940%); color: yellow; }
+.gray .q50 { background-color: rgb(79.370%, 79.370%, 79.370%); color: yellow; }
+.gray .q51 { background-color: rgb(80.950%, 80.950%, 80.950%); color: yellow; }
+.gray .q52 { background-color: rgb(82.540%, 82.540%, 82.540%); color: yellow; }
+.gray .q53 { background-color: rgb(84.130%, 84.130%, 84.130%); color: yellow; }
+.gray .q54 { background-color: rgb(85.710%, 85.710%, 85.710%); color: yellow; }
+.gray .q55 { background-color: rgb(87.300%, 87.300%, 87.300%); color: yellow; }
+.gray .q56 { background-color: rgb(88.890%, 88.890%, 88.890%); color: yellow; }
+.gray .q57 { background-color: rgb(90.480%, 90.480%, 90.480%); color: yellow; }
+.gray .q58 { background-color: rgb(92.060%, 92.060%, 92.060%); color: yellow; }
+.gray .q59 { background-color: rgb(93.650%, 93.650%, 93.650%); color: yellow; }
+.gray .q6 { background-color: rgb(9.520%, 9.520%, 9.520%); color: yellow; }
+.gray .q60 { background-color: rgb(95.240%, 95.240%, 95.240%); color: yellow; }
+.gray .q61 { background-color: rgb(96.830%, 96.830%, 96.830%); color: yellow; }
+.gray .q62 { background-color: rgb(98.410%, 98.410%, 98.410%); color: yellow; }
+.gray .q63 { background-color: rgb(100.000%, 100.000%, 100.000%); color: yellow; }
+.gray .q7 { background-color: rgb(11.110%, 11.110%, 11.110%); color: yellow; }
+.gray .q8 { background-color: rgb(12.700%, 12.700%, 12.700%); color: yellow; }
+.gray .q9 { background-color: rgb(14.290%, 14.290%, 14.290%); color: yellow; }
 .hot .q0 { background-color: rgb(4.170%, 0.000%, 0.000%) }
 .hot .q1 { background-color: rgb(8.330%, 0.000%, 0.000%) }
 .hot .q10 { background-color: rgb(45.830%, 0.000%, 0.000%) }
