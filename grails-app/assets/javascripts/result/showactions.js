@@ -17,20 +17,6 @@ function cellFormatter(row, cell, value, columnDef, dataContext) {
             break;
     }
 
-    /*
-    if (showHeatMap) {
-        var dataSet = showNormalized ? experiment.normalizedData : experiment.data;
-
-        // first get a color quantizer
-        var flattened = dataSet.reduce(function(a, b) {
-            return a.concat(b);
-        });
-        var colorScale = d3.scale.category20c().domain([d3.min(flattened),
-                                                   d3.max(flattened)]);
-                                          //.range(colorbrewer.Blues[9]);
-        finalValue += ',' + colorScale(value);
-    }
-    */
     return Grid.editorCellFormatter(row, cell, finalValue, columnDef, dataContext);
 }
 
@@ -48,15 +34,16 @@ function colorGrid(dataSet) {
     var flattened = dataSet.reduce(function(a, b) {
         return a.concat(b);
     });
+    flattened = $.map(flattened, Number);
     var colorScale = d3.scale.linear().domain([d3.min(flattened),
-                                               d3.max(flattened)]).rangeRound([0,8]);
+                                               d3.max(flattened)]).rangeRound([0,63]);
 
     var valueStyles = {};
     for (var x=0; x<grid.rowsSize; x++) {
         valueStyles[x] = {};
         for (var y=1; y<=grid.colsSize; y++) {
             var value = grid.getDataPoint(x+1, y);
-            valueStyles[x][y] = "q" + colorScale(value) + "-9";
+            valueStyles[x][y] = "q" + colorScale(value);
         }
     }
     grid.grid.setCellCssStyles("valueStyles", valueStyles);
