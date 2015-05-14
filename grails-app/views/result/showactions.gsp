@@ -9,7 +9,7 @@
 		<asset:stylesheet href="grid/slick.grid.css"/>
 		<asset:stylesheet href="grid/slick-default-theme.css"/>
 		<asset:stylesheet href="grid/Grid.css"/>
-		<asset:stylesheet href="colorbrewer.css"/>
+		<asset:stylesheet href="heatmaps.css"/>
 		<asset:stylesheet href="dataTables.bootstrap.css"/>
 		<asset:stylesheet href="dataTables.tableTools.css"/>
 	</head>
@@ -41,6 +41,7 @@
 						<thead>
 							<tr>
 								<th>Plate ID</th>
+								<th>Results Imported</th>
 								<th>Z-Factor</th>
 								<th>Z'-Factor</th>
 								<th>Mean Negative Control</th>
@@ -66,7 +67,7 @@
 					</h4>
 				</div>
 				<div class="panel-body">
-					<div id="resultGrid" class="Blues" style="width:100%;height:650px;"></div>
+					<div id="resultGrid" class="gray" style="width:100%;height:650px;"></div>
 				</div>
 			</div>
 		</div>

@@ -29,9 +29,9 @@ function txtFieldFocus() {
 /**
  * This function loads random numeric data into the already created and
  * displayed Grid. It is a handler for the event that the "loadData" button
- * is clicked.
+ * is clicked. Only used for testing.
  */
-function loadRandomData() {				// TODO consider removing this, as it is not used !!!
+function loadRandomData() {
 	"use strict";
 	data = createRandomData(plateModel.grid_height, plateModel.grid_width);
 	grid.setData(data);
@@ -49,10 +49,9 @@ function loadRandomData() {				// TODO consider removing this, as it is not used
 function updateCellColors(cat, label, color) {
 	"use strict";
 	var cellRef, cellRefArr, row, column, newContents, catKey, labKey;
-	// update all cells with cat and label (messy?)
+	// update all cells with cat and label
 	if (catLegend[cat] !== undefined && catLegend[cat] !== null && catLegend[cat].labels[label] !== undefined && catLegend[cat].labels[label] !== null) {
-		for (cellRef in catLegend[cat].labels[label].cellref) {			//change iteration method !!!
-			// what are you doing here ??, define some sort of structure !!!
+		for (cellRef in catLegend[cat].labels[label].cellref) {
 			cellRefArr = catLegend[cat].labels[label].cellref[cellRef].split("-");
 			row = cellRefArr[0];
 			column = cellRefArr[1];
@@ -188,8 +187,8 @@ function updateCompoundList() {
 	}
 	document.getElementById("compoundList").innerHTML = newDiv.innerHTML;
 
-	// won't seem to take value for input until created ??
-	for (wellGroup in groupNames) {			// USED a second time ?? // does this need to be re-inited ?? ( it's prob ok?)
+	// only seems to take when object is in dom model already
+	for (wellGroup in groupNames) {
 		if (wellGroup !== null) {
 			if (groupNames[wellGroup] !== undefined && groupNames[wellGroup] !== null) {
 				document.getElementById("wellGroup__sep__" + wellGroup).value = groupNames[wellGroup];
@@ -210,7 +209,7 @@ function updatePlateLabelList() {
 
 	for (i = 0; i < pLabels.length; i++) {
 		newH = document.createElement("H5");
-		newH.appendChild(document.createTextNode(pLabels[i].category + ": "));	// should null check !
+		newH.appendChild(document.createTextNode(pLabels[i].category + ": "));
 		newH.appendChild(document.createTextNode(pLabels[i].name));
 		newDiv.appendChild(newH);
 	}
@@ -276,13 +275,12 @@ function onCatVisCheck(event) {
  * Event handler for label edit button.
  * Opens edit dialog box for category/label in question.
  */
-function onEditLabelChange(event) {					// TODO - some issues here !! (when editing 1st label in cat, it actually changes 2nd !!)
+function onEditLabelChange(event) {
 	"use strict";
 	var idArr, unit_split;
 	
 	idArr = event.currentTarget.id.split("__sep__");
 	tmpEditCat = idArr[1];
-	//tmpEditOldLabel = idArr[2];
 	unit_split = idArr[2].toString().split('__dot__').join('.').split("__lu__");
 	tmpEditOldLabel = unit_split[0];
 	
@@ -293,7 +291,7 @@ function onEditLabelChange(event) {					// TODO - some issues here !! (when edit
 	}
 	
 	console.log("editLabel: " + tmpEditCat + ";" + tmpEditOldLabel);
-	// disaply current label, with special chars converted for display
+	// display current label, with special chars converted for display
 	document.getElementById("editNewLabelValue").value = tmpEditOldLabel;
 	
 	$('#editLabelModal').modal('show');
@@ -303,7 +301,7 @@ function onEditLabelChange(event) {					// TODO - some issues here !! (when edit
  * Event handler for label edit button.
  * Opens edit dialog box for category/label in question.
  */
-function onEditDoseChange(event) {					// TODO - need to add units ???
+function onEditDoseChange(event) {
 	"use strict";
 	var idArr, unit_split;
 	
@@ -318,7 +316,7 @@ function onEditDoseChange(event) {					// TODO - need to add units ???
 		tmpEditOldUnits = "";
 	}
 	console.log("editDose: " + tmpEditCat + ";" + tmpEditOldLabel);
-	// disaply current label, with special chars converted for display
+	// display current label, with special chars converted for display
 	document.getElementById("editNewDoseValue").value = tmpEditOldLabel;
 	document.getElementById("editNewUnitsValue").value = tmpEditOldUnits;
 	
@@ -404,9 +402,8 @@ function removeLabel(cat, label) {
 	var cellRef, cellRefArr, row, column, newContents, catKey, labKey;
 	delete catLegend[cat].labels[label].color;
 
-	// remove all cells with cat and label (messy?)
-	for (cellRef in catLegend[cat].labels[label].cellref) {			//change iteration method !!!
-		// what are you doing here ??, define some sort of structure !!!
+	// remove all cells with cat and label
+	for (cellRef in catLegend[cat].labels[label].cellref) {
 		cellRefArr = catLegend[cat].labels[label].cellref[cellRef].split("-");
 		row = cellRefArr[0];
 		column = cellRefArr[1];
@@ -456,8 +453,6 @@ function updateLabelName(cat, oldLabel, label) {
 
 	// update color legend cell reverse lookup				
 	if (catLegend[cat].labels[label] === undefined) {
-		//catLegend[cat][label] = {};
-		//catLegend[cat][label].cellref = [];
 		catLegend[cat].labels[label] = catLegend[cat].labels[oldLabel];
 
 		console.log("Old color:" + catLegend[cat].labels[oldLabel].color);
@@ -481,7 +476,7 @@ function updateLabelName(cat, oldLabel, label) {
 		updateCategoryList();
 		$('#editLabelModal').modal('hide');
 	} else {
-		// other label already exists , can't rename on label to another existing label !!
+		// other label already exists , can't rename on label to another existing label!
 		alert('Cannot rename "' + oldLabel + '" to "' + label + '" as label with that name already exists.');
 	}
 }
@@ -522,7 +517,7 @@ function editDoseValue() {
 	var convOld;
 	
 	// validation new doage
-    if (!isNumeric(newDosage) || newDosage < 0) {						// TODO - deal with case of renaming to existing dosage !!!
+    if (!isNumeric(newDosage) || newDosage < 0) {
        alert('Dosage must be a positive number: '+ newDosage);
     } else if (isReservedValue(newUnits)) {
        alert('Units contains a reserved value: '+ newDosage);
@@ -564,11 +559,11 @@ function shadeColor2(color, percent) {
  * @param percent - new percentage to lighten/darken color.
  * @returns the value of the lightened/darkened color.
  */
-function shade(color, percent) {		// TODO, combine with the above method
+function shade(color, percent) {
 	"use strict";
 	if (color.length > 7) {
-		//return shadeRGBColor(color, percent);		// THIS FUNCTION is not defined !!, need to throw exception instead !!
-		return "0x0000FF";		// some default / or shoudl be null ???
+		// dealing with random longer value passed, shouldn't happen really
+		return "0x0000FF";
 	} else {
 		return shadeColor2(color, percent);
 	}
@@ -610,10 +605,8 @@ function createNewLabel(cat, label, units, color, applyToCells) {
 	if (catLegend[cat].labels[l_units] === undefined) {
 		catLegend[cat].labels[l_units] = {};
 		catLegend[cat].labels[l_units].color = color;
-		//catLegend[cat].labels[l_units].units = units;
 	} else {
 		catLegend[cat].labels[l_units].color = color;
-		//catLegend[cat].labels[l_units].units = units;
 		// category and label already exist, just changing color,
 		// in this case cells which already have this label need their color updated also!!
 		updateCellColors(cat, l_units, color);
@@ -641,7 +634,6 @@ function createNewLabel(cat, label, units, color, applyToCells) {
 
 		if (plateModel.rows[row].columns[column].wellGroupName === undefined) {
 			// shouldn't real be neccessary if json is loaded at init
-			//plateModel.rows[row].columns[column].wellGroupName = data[row-1][column-1];
 			plateModel.rows[row].columns[column].wellGroupName = "-";
 		}
 
@@ -659,7 +651,6 @@ function createNewLabel(cat, label, units, color, applyToCells) {
 		plateModel.rows[row].columns[column].categories[cat] = {};
 		plateModel.rows[row].columns[column].categories[cat][l_units] = {};
 		plateModel.rows[row].columns[column].categories[cat][l_units].color = color;
-		//plateModel.rows[row].columns[column].categories[cat][l_units].units = units;
 		newContents = plateModel.rows[row].columns[column].wellGroupName;
 		newContents += "," + plateModel.rows[row].columns[column].wellType;
 
@@ -740,8 +731,6 @@ function addNewLabel() {
 		console.log("plateModel:" + JSON.stringify(plateModel));
 		console.log("catLegend:" + JSON.stringify(catLegend));
 
-		//var jsonPlate = translateModelToOutputJson(plateModel);
-		//console.log("jsonPlate:" + JSON.stringify(jsonPlate));
 		removeAllHighlightedCells();
 	}
 }
@@ -774,8 +763,6 @@ function addNewDose() {
 		console.log("plateModel:" + JSON.stringify(plateModel));
 		console.log("catLegend:" + JSON.stringify(catLegend));
 
-		//var jsonPlate = translateModelToOutputJson(plateModel);
-		//console.log("jsonPlate:" + JSON.stringify(jsonPlate));
 		removeAllHighlightedCells();
 	}
 }
@@ -899,7 +886,7 @@ function importCompoundsFromFile() {
         }
         updateCompoundList();
     };
-    // TODO - check for loaded file
+
     reader.readAsText($('#compoundsFile')[0].files[0]);
 }
 
@@ -925,6 +912,11 @@ function translateModelToOutputJson(pModel) {
 	plate.templateID = window.templateId;
 
 	plate.plateID = document.getElementById("barcode").value;
+	if (plate.plateID === undefined || plate.plateID === null || plate.plateID === "") {
+		alert("Please enter valid non-blank value for barcode.");
+		return null;
+	}
+	
 	plate.wells = [];
 
 	if (pModel.labels !== undefined) {
@@ -938,8 +930,9 @@ function translateModelToOutputJson(pModel) {
 		if (groupNames[wellGroup] !== undefined && groupNames[wellGroup] !== null) {
 			cmpdValue = document.getElementById("wellGroup__sep__" + wellGroup).value;
 			if (cmpdValue === undefined || cmpdValue === null || cmpdValue === "") {
-				// !!! THROW ERROR DIALOG HERE ASKING TO FILL OUT THIS FIELD !!!
-				groupNames[wellGroup] = "SOME_COMPOUND";
+				//groupNames[wellGroup] = "SOME_COMPOUND";
+				alert("Please enter value for compound: " + wellGroup);
+				return null;
 			} else {
 				groupNames[wellGroup] = cmpdValue;
 			}
@@ -958,7 +951,7 @@ function translateModelToOutputJson(pModel) {
 			
 			if (pModel.rows[i] !== undefined && pModel.rows[i].columns[j] !== undefined) {
 				well.groupName = pModel.rows[i].columns[j].wellGroupName;
-				well.control = pModel.rows[i].columns[j].wellType;		// TODO - null check ??
+				well.control = pModel.rows[i].columns[j].wellType;
 				
 				for (catKey in pModel.rows[i].columns[j].categories) {
 					for (labKey in pModel.rows[i].columns[j].categories[catKey]) {
@@ -976,7 +969,6 @@ function translateModelToOutputJson(pModel) {
 						} else {
 							label.units = "";
 						}
-						//label.units = pModel.rows[i].columns[j].categories[catKey][labKey].units;
 						labels.push(label);
 					}
 				}
@@ -1010,39 +1002,40 @@ function translateModelToOutputJson(pModel) {
 function saveConfigToServer() {
 	"use strict";
 	var plateJson, jqxhr;
+	
 	plateJson = translateModelToOutputJson(plateModel);
-	console.log("SendingToServer: " + JSON.stringify(plateJson));
+		
+	if (plateJson !== null) {
+		console.log("SendingToServer: " + JSON.stringify(plateJson));
 
-	jqxhr = $.ajax({		// need to update to save plate instead of template
-		url: hostname + "/plate/save",
-		type: "POST",
-		data: JSON.stringify(plateJson),
-		processData: false,
-		contentType: "application/json; charset=UTF-8"
-	}).done(function() {
-		console.log("success");
-	}).fail(function() {
-		console.log("error");
-	}).always(function() {
-		console.log("complete");
-	});
+		jqxhr = $.ajax({		// need to update to save plate instead of template
+			url: hostname + "/plate/save",
+			type: "POST",
+			data: JSON.stringify(plateJson),
+			processData: false,
+			contentType: "application/json; charset=UTF-8"
+		}).done(function() {
+			console.log("success");
+		}).fail(function() {
+			console.log("error");
+			alert("An error while saving the plate.");
+		}).always(function() {
+			console.log("complete");
+		});
 
-	// Set another completion function for the request above
-	jqxhr.always(function(resData) {
-		console.log("second complete");
-		console.log("result=" + JSON.stringify(resData));
+		// Set another completion function for the request above
+		jqxhr.always(function(resData) {
+			console.log("result=" + JSON.stringify(resData));
 
-		if (resData.plate !== undefined &&  resData.plate.id !== undefined) {
-			//plateModel.templateID = resData.plateTemplate.id;
-			// use less hacky method !!
-			window.location.href = hostname + "/experimentalPlateSet/showactions/" + window.expId;
-		} else {
-			alert("An error while saving the template!");
-		}
-	});
+			if (resData.plate !== undefined &&  resData.plate.id !== undefined) {
+				window.location.href = hostname + "/experimentalPlateSet/showactions/" + window.expId;
+			} else {
+				alert("An error while saving the plate: " + JSON.stringify(resData));
+			}
+		});
+	}
 }
 
-// TODO -- comment these out to see where they are referenced. If not needed just use jquery command instead.
 function hideLabelPanel() {
 	"use strict";
 	$("#addLabelPanel").hide();
@@ -1140,7 +1133,7 @@ function showPlateLabelPanel() {
 	hideCategoryPanel();
 	$("#addPlateLabelPanel").show();
 
-	// disable grid selection !! (labels only apply to plate level)
+	// disable grid selection, (labels only apply to plate level)
 	disableGridSelection();
 	removeAllHighlightedCells();
 	showPlateLabelCatPanel();
@@ -1182,7 +1175,7 @@ $(function() {
  */
 function loadJsonData(plateJson) {
 	"use strict";
-	var row, column, wellgrp, wellType, catKey, labKey, color, newContents;
+	var row, column, wellgrp, wellType, catKey, labKey, color, newContents, units;
 	// translate the json received to the internal models structure
 	plateModel = translateInputJsonToModel(plateJson);
 
@@ -1203,7 +1196,6 @@ function loadJsonData(plateJson) {
 			wellgrp = plateModel.rows[row].columns[column].wellGroupName;
 			wellType = plateModel.rows[row].columns[column].wellType;
 			if (wellgrp !== undefined && wellgrp !== null && wellgrp !== "") {
-				//groupNames[wellgrp] = "SOME_COMPOUND";
 				groupNames[wellgrp] = "";
 			}
 
@@ -1215,10 +1207,13 @@ function loadJsonData(plateJson) {
 			for (catKey in plateModel.rows[row].columns[column].categories) {
 				for (labKey in plateModel.rows[row].columns[column].categories[catKey]) {
 					color = plateModel.rows[row].columns[column].categories[catKey][labKey].color;
-					units = plateModel.rows[row].columns[column].categories[catKey][labKey].units;
+					if (plateModel.rows[row].columns[column].categories[catKey][labKey].units !== undefined) {
+						units = plateModel.rows[row].columns[column].categories[catKey][labKey].units;
+					} else {
+						units = "";
+					}
 					newContents += "," + color;
 
-					// cat legend part !! --> only needed for assignlabels page ??
 					// update catLegend color
 					if (catLegend[catKey] === undefined) {
 						catLegend[catKey] = {};
@@ -1278,15 +1273,20 @@ function fetchTemplateData(tId) {
 		console.log("success");
 	}).fail(function() {
 		console.log("error");
+		alert("An error while fetching the template from the server.");
 	}).always(function() {
 		console.log("complete");
 	});
 
 	// Set another completion function for the request above
 	jqxhr.always(function(resData) {
-		console.log("second complete");
 		console.log("recievedFromServer:  " + JSON.stringify(resData));
-		loadJsonData(resData);
+		
+		if (resData.error !== undefined && resData.error !== null) {
+			alert("An error has occurred while fetching data from the server: "+ resData.error);
+		} else {
+			loadJsonData(resData);
+		}
 	});
 }
 
@@ -1302,7 +1302,7 @@ function init() {
 	hidePlateLabelPanel();
 
 	// fetch templateJson
-	fetchTemplateData(window.templateId); // TODO - should set flag to say if recieved model was ok!, inform user otherwise // confirm correct id is sent
+	fetchTemplateData(window.templateId);
 	console.log("templateId:" + window.templateId);
 
 	addEvent("addNewLabel", "click", addNewLabel);

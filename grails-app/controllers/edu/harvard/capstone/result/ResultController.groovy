@@ -101,20 +101,20 @@ class ResultController {
 
 
     @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
-    def showactions(Result resultInstance){
+    def showactions(ExperimentalPlateSet experiment){
         if (!springSecurityService.isLoggedIn()){
             redirect controller: 'experimentalPlateSet', action: 'index', method: 'GET'
             return
         } 
 
-        if (resultInstance == null) {
+        if (experiment == null) {
             notFound()
             return
         }
 
         def importData
         try{
-            importData = resultService.getResults(resultInstance)    
+            importData = resultService.getResults(experiment)    
         }
         catch (ValidationException e) {
             response.sendError(400)
@@ -124,7 +124,8 @@ class ResultController {
             return                      
         }
 
-        respond resultInstance as Object, model:[importData: importData]
+        // TODO - don't really need the experiment object
+        respond experiment as Object, model:[importData: importData]
     }
 
 

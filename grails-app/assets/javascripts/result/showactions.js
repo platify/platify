@@ -7,31 +7,20 @@ var showNormalized = false;
 
 
 function cellFormatter(row, cell, value, columnDef, dataContext) {
-    var finalValue = value;
     var well = experiment.currentPlate.rows[row].columns[cell-1];
 
+    var style = "";
     switch (well.control) {
         case 'NEGATIVE':
+            style = "color: red";
+            break;
+
         case 'POSITIVE':
-            finalValue += ',' + well.control.toLowerCase();
+            style = "color: green";
             break;
     }
 
-    /*
-    if (showHeatMap) {
-        var dataSet = showNormalized ? experiment.normalizedData : experiment.data;
-
-        // first get a color quantizer
-        var flattened = dataSet.reduce(function(a, b) {
-            return a.concat(b);
-        });
-        var colorScale = d3.scale.category20c().domain([d3.min(flattened),
-                                                   d3.max(flattened)]);
-                                          //.range(colorbrewer.Blues[9]);
-        finalValue += ',' + colorScale(value);
-    }
-    */
-    return Grid.editorCellFormatter(row, cell, finalValue, columnDef, dataContext);
+    return '<span style="' + style + '">' + value + '</span>'
 }
 
 /**
@@ -48,15 +37,16 @@ function colorGrid(dataSet) {
     var flattened = dataSet.reduce(function(a, b) {
         return a.concat(b);
     });
+    flattened = $.map(flattened, Number);
     var colorScale = d3.scale.linear().domain([d3.min(flattened),
-                                               d3.max(flattened)]).rangeRound([0,8]);
+                                               d3.max(flattened)]).rangeRound([0,63]);
 
     var valueStyles = {};
     for (var x=0; x<grid.rowsSize; x++) {
         valueStyles[x] = {};
         for (var y=1; y<=grid.colsSize; y++) {
             var value = grid.getDataPoint(x+1, y);
-            valueStyles[x][y] = "q" + colorScale(value) + "-9";
+            valueStyles[x][y] = "q" + colorScale(value);
         }
     }
     grid.grid.setCellCssStyles("valueStyles", valueStyles);
@@ -83,6 +73,9 @@ function createBlankData(width, height) {
  * browser.
  */
 function downloadExperiment(fileformat) {
+    // TODO - HACK - the ImportData library expected a parsingID, but never
+    //               uses it.  supply a dummy one for now.
+    experiment.experiment.parsingID = -1;
     var importData = ImportData.createImportDataObjectFromJSON(experiment.experiment);
     var generator = new ImportDataFileGenerator();
     //generator.createIntergroupInterchangeFormatMatrix(importData);
@@ -116,11 +109,32 @@ function init() {
         paging: false,
         scrollY: '150px',
         searching: false,
+        columnDefs: [{
+            targets: 3,
+            render: function (data, type, full, meta) {
+                // color the z'-factor per good/maybe/bad bucketing defined on
+                // https://support.collaborativedrug.com/entries/21220276-Plate-Quality-Control
+                var bucket;
+                if ((data < 0) || (data > 1)) {
+                    bucket = 'unacceptable';
+                }
+                else if (data <= 0.5) {
+                    bucket = 'acceptable';
+                }
+                else if (data <= 1) {
+                    bucket = 'excellent';
+                }
+                return '<span class="results-z-prime-' + bucket
+                       + '">' + data + '</span>';
+            },
+        }],
         tableTools: {
             aButtons: [],
             sRowSelect: 'single',
             fnRowSelected: function (nodes) {
-                plateSelected(nodes[0].children[0].textContent);
+                var row = plateTableTools.fnGetSelectedData()[0];
+                var plateIndex = row[row.length-1];
+                plateSelected(plateIndex);
             },
         },
     });
@@ -130,14 +144,16 @@ function init() {
     grid  = new Grid("resultGrid");
 
     // process experiment object
-    if (Object.keys(experiment.plates).length > 0) {
-        var plateData = Object.keys(experiment.plates).map(function(plateID) {
+    if (Object.keys(experiment.experiment.plates).length > 0) {
+        var plateData = Object.keys(experiment.experiment.plates).map(function(plateIndex) {
             var row = [
-                       plateID,
-                       experiment.zFactor(plateID),
-                       experiment.zPrimeFactor(plateID),
-                       experiment.meanNegativeControl(plateID),
-                       experiment.meanPositiveControl(plateID)];
+                       experiment.experiment.plates[plateIndex].plateID,
+                       experiment.experiment.plates[plateIndex].resultCreated,
+                       experiment.zFactor(plateIndex),
+                       experiment.zPrimeFactor(plateIndex),
+                       experiment.meanNegativeControl(plateIndex),
+                       experiment.meanPositiveControl(plateIndex),
+                       plateIndex];
             return row;
         });
         plateTable.clear().rows.add(plateData).draw();
@@ -178,8 +194,8 @@ function loadGrid(dataSet) {
 }
 
 
-function plateSelected(plateID) {
-    experiment.selectPlate(plateID);
+function plateSelected(plateIndex) {
+    experiment.selectPlate(plateIndex);
     loadGrid(showNormalized ? experiment.normalizedData : experiment.data);
     $('#rawDataLabel')[0].textContent = experiment.rawDataLabel();
 }

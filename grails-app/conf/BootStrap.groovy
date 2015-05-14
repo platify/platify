@@ -143,8 +143,21 @@ class BootStrap {
             new ExperimentalPlateSet(owner: andres, name: "Zero Assay", description: "Zero assay description").save(flush: true)
             def experiment3 = new ExperimentalPlateSet(owner: zach, name: "envision", description: "Envision assay description").save(flush: true)
 
-            def template1 = new PlateTemplate(owner: andres, name: "first template").save(flush: true)
-            def template2 = new PlateTemplate(owner: zach, name: "envision template").save(flush: true)
+            def template1 = new PlateTemplate(owner: andres, name: "first template", width: "24", height: "16").save(flush: true)
+            def template2 = new PlateTemplate(owner: zach, name: "envision template", width: "24", height: "16").save(flush: true)
+			
+			// pushing empty wells for templates
+			for (x in 0 .. 23) {
+				for (y in 0 .. 15) {
+					def t1well = new Well(plate: template1, column: x, row: y, control: Well.WellControl.EMPTY).save(flush: true)
+				}
+			}
+			
+			for (x in 0 .. 23) {
+				for (y in 0 .. 15) {
+					def t2well = new Well(plate: template2, column: x, row: y, control: Well.WellControl.EMPTY).save(flush: true)
+				}
+			}
 
             def plateSet1 = new PlateSet(plate: template1, experiment: experiment1, assay: "my assay", barcode: "10293").save(flush: true)
             def plateSet2 = new PlateSet(plate: template1, experiment: experiment1, assay: "my assay", barcode: "3321").save(flush: true)
@@ -176,30 +189,29 @@ class BootStrap {
             new PlateSet(plate: template2, experiment: experiment3, assay: "my assay", barcode: "024twenty-four").save(flush: true)
 
 	    // largely stolen from ResultService.save(), let's set up a plate including results
-            def result1 = new Result(owner: andres, equipment: machine1, experiment: experiment1, name: "Results 1", description: "Do we really need to name and describe results?").save(flush: true)
+            def result1 = new Result(owner: andres, equipment: machine1, experiment: experiment1, name: "Results 1", description: "Do we really need to name and describe results?", dateCreated: new Date()).save(flush: true)
 	    def resultLabel1 = new ResultLabel(name: "result label", value: "result label value", labelType: ResultLabel.LabelType.LABEL, scope: ResultLabel.LabelScope.RESULT, domainId: result1.id).save(flush: true)
 	    def resultPlate1 = new ResultPlate(result: result1, rows: 4, columns: 4, barcode: plateSet1.barcode).save(flush: true)
 	    def resultPlateLabel = new ResultLabel(name: "result plate label", value: "result plate label value", labelType: ResultLabel.LabelType.LABEL, scope: ResultLabel.LabelScope.PLATE, domainId: resultPlate1.id).save(flush: true)
 
             // pick some labels to apply to the wells
-            def foo = new Label(category: "foo", name: "foo").save(flush: true)
-            def bar = new Label(category: "foo", name: "bar").save(flush: true)
-            def baz = new Label(category: "foo", name: "baz").save(flush: true)
+            def foo = new Label(category: "foo", name: "foo", value: "#bfcc2f").save(flush: true)
+            def bar = new Label(category: "foo", name: "bar", value: "#bfcc2f").save(flush: true)
+            def baz = new Label(category: "foo", name: "baz", value: "#bfcc2f").save(flush: true)
 
 	    def random = new Random()
 	    def controlWells = []
 	    def controlLabels = []
 	    for (x in 0 .. resultPlate1.rows-1) {
 		for (y in 0 .. resultPlate1.columns-1) {
-		    def well = new Well(plate: template1, column: x, row: y,
-					control: Well.WellControl.EMPTY).save(flush: true)
+		    def well = new Well(plate: template1, column: x, row: y, control: Well.WellControl.EMPTY).save(flush: true)
 		    if ((x < 4) && (y == 0)) {
                         controlWells << well
-                        def domainLabel = new DomainLabel(label: foo, domainId: well.id, labelType: DomainLabel.LabelType.WELL).save(flush: true)
+                        def domainLabel = new DomainLabel(label: foo, domainId: well.id, labelType: DomainLabel.LabelType.WELL, plate:resultPlate1).save(flush: true)
                     }
                     else {
                         def thisLabel = ((x % 2) == 1) ? bar : baz;
-                        def domainLabel = new DomainLabel(label: thisLabel, domainId: well.id, labelType: DomainLabel.LabelType.WELL).save(flush: true)
+                        def domainLabel = new DomainLabel(label: thisLabel, domainId: well.id, labelType: DomainLabel.LabelType.WELL, plate:resultPlate1).save(flush: true)
                     }
 		    def resultWell = new ResultWell(plate: resultPlate1, well: well).save(flush: true)
 		    def resultLabel = new ResultLabel(name: "smoots",
@@ -211,21 +223,23 @@ class BootStrap {
 		}
 	    }
 	    for (i in 0 .. 1) {
-		controlWells[i].control = Well.WellControl.NEGATIVE
-		controlWells[i].save(flush: true)
-		controlLabels[i].value = "0"
-		controlLabels[i].save(flush: true)
+			controlWells[i].control = Well.WellControl.NEGATIVE
+			controlWells[i].save(flush: true)
+			controlLabels[i].value = "0"
+			controlLabels[i].save(flush: true)
 	    }
 	    for (i in 2 .. 3) {
-		controlWells[i].control = Well.WellControl.POSITIVE
-		controlWells[i].save(flush: true)
-		controlLabels[i].value = "100"
-		controlLabels[i].save(flush: true)
+			controlWells[i].control = Well.WellControl.POSITIVE
+			controlWells[i].save(flush: true)
+			controlLabels[i].value = "100"
+			controlLabels[i].save(flush: true)
 	    }
+		
+		
 		}
 		log.info "Users: " + Scientist.count()
 		log.info "Roles: " + Role.count()
-		log.info "UserRole: " + ScientistRole.count()            
+		log.info "UserRole: " + ScientistRole.count()
 		
     }
     def destroy = {

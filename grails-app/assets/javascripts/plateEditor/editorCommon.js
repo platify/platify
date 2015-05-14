@@ -63,7 +63,7 @@ function createBlankData(grid_height, grid_width) {
  * @param grid_height - number of rows on the grid
  * @param grid_width - number of columns on the grid
  */
-function createRandomData(grid_height, grid_width) {		// TODO - perhaps remove (only used for testing)
+function createRandomData(grid_height, grid_width) {
 	"use strict";
 	var i, j, result;
 	result = [];
@@ -101,8 +101,8 @@ function translateInputJsonToModel(plateJson) {
 	} else {
 		pModel.labels = [];
 	}
-
-	pModel.name = plate.name;			// should also copy expId and plateId at this point !!
+	
+	pModel.name = plate.name;
 	pModel.grid_width = plate.width;
 	pModel.grid_height = plate.height;
 
@@ -115,7 +115,7 @@ function translateInputJsonToModel(plateJson) {
 			if (plate.wells[i].control !== undefined && plate.wells[i].control !== null) {
 				wellType = plate.wells[i].control;
 			} else {
-				wellType = "compound";		// fail back to compound ??
+				wellType = "compound";		// fail back to compound
 			}
 		} else {
 			groupName = "";
@@ -143,7 +143,7 @@ function translateInputJsonToModel(plateJson) {
 
 			if (convCat === "compound") {
 				if (groupName !== null && groupName !== "") {
-					groupNames[groupName] = convLab;		// should do null check ??
+					groupNames[groupName] = convLab;
 				}
 			} else {
 				// other labels

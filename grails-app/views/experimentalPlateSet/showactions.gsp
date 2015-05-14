@@ -57,8 +57,8 @@
 											<g:sortableColumn property="name" title="${message(code: 'plateSetInstance.plate.name.label', default: 'Template Name')}" />
 											<g:sortableColumn property="owner" title="${message(code: 'plateSetInstance.plate.owner.label', default: 'Owner')}" />	
 											<g:sortableColumn property="dateCreated" title="${message(code: 'plateSetInstance.plate.date.label', default: 'Date')}" />
-											<th>Horizontal Wells</th>
-											<th>Vertical Wells</th>			<!-- Change to well size ?? -->
+											<g:sortableColumn property="width" title="Horizontal Wells" />
+											<g:sortableColumn property="height" title="Vertical Wells" />
 											<th>Preview</th>	
 											<th style="text-align: center;">Export</th>															
 										</tr>

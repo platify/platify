@@ -18,51 +18,6 @@ function txtFieldFocus() {
 }
 
 /**
- * This function is used to convert the internal data structure json format into
- * a data structure json format that is expected by the server when sending the 
- * template json to be saved by the back-end. This allows for differences between
- * the 2 models. The internal model providing a more efficient referencing structure
- * for the client-side tasks, and allows for quick changes to either model while
- * maintaining the contract with the server.
- * @param pModel - a data structure in the format of the internal data model.
- * @returns plateJson - a data structure in the format excepted by the server.
- */
-function translateModelToOutputJson(pModel) {
-	'use strict';
-	var plateJson, plate, row, column, well, labels, catKey, labKey, label;
-	plateJson = {};
-	plate = {};
-	plate.name = document.getElementById("templateName").value;
-	plate.experimentID = window.expId;
-	plate.labels = [];		// plate level labels, should set these if available already !!!
-	plate.wells = [];
-	for (row in pModel.rows) {
-		for (column in pModel.rows[row].columns) {
-			well = {};
-			well.row = row - 1;
-			well.column = column - 1;
-			well.control = null;
-			labels = [];
-			for (catKey in pModel.rows[row].columns[column].categories) {
-				for (labKey in pModel.rows[row].columns[column].categories[catKey]) {
-					label = {};
-					label.category = catKey;
-					label.name = labKey;
-					label.color = pModel.rows[row].columns[column].categories[catKey][labKey];
-					labels.push(label);
-				}
-			}
-			well.labels = labels;
-			well.groupName = pModel.rows[row].columns[column].wellGroupName;
-			plate.wells.push(well);
-		}
-	}
-	plateJson.plate = plate;
-	return plateJson;
-}
-
-
-/**
  * Creates a new div containing a label and color picker.
  * @param cat - name of category to create a label for.
  * @param label - name of label to create.
@@ -83,14 +38,14 @@ function createColorPicker(cat, label) {
  * @param catKey - name of category to create a label for.
  * @returns labDiv - div containing new category label structure.
  */
-function createCatLabel(catKey) {			// TODO -- update split to deal with "-" !!!!
+function createCatLabel(catKey) {
 	"use strict";
 	var labDiv, newLabel, convCat;
 	labDiv = document.createElement("div");
 	labDiv.className = "button-labels";
 	newLabel = document.createElement("label");
-	newLabel.setAttribute("for", "vischeck-" + catKey);		// TODO -- is vischeck used here ?? !!!!
-	// if category has been converted from a decimal, then convert it back for display!!
+	newLabel.setAttribute("for", "vischeck-" + catKey);	
+	// if category has been converted from a decimal, then convert it back for display
 	convCat = catKey.toString().split('__dot__').join('.');
 	newLabel.appendChild(document.createTextNode(convCat));
 	labDiv.appendChild(newLabel);
@@ -104,17 +59,18 @@ function createCatLabel(catKey) {			// TODO -- update split to deal with "-" !!!
  */
 function updateCategoryList() {
 	"use strict";
-	var newDiv, catKey, labelKey, newLi, convLab, newInput;
+	var newDiv, catKey, labelKey, newLi, convLab, convUnits, newInput;
 	newDiv = document.createElement("div");
 	for (catKey in catLegend) {
 		newDiv.appendChild(createCatLabel(catKey));
 		for (labelKey in catLegend[catKey].labels) {
 			newLi = document.createElement("div");
-			// if label has been converted from a decimal, then convert it back for display!!
+			// if label has been converted from a decimal, then convert it back for display
 			convLab = labelKey.toString().split('__dot__').join('.');
+			convUnits = catLegend[catKey].labels[labelKey].units;
 			newInput = createColorPicker(catKey, labelKey);
 			newLi.appendChild(newInput);
-			newLi.appendChild(document.createTextNode("  " + convLab));
+			newLi.appendChild(document.createTextNode("  " + convLab + "  " + convUnits));
 			newDiv.appendChild(newLi);
 		}
 	}
@@ -148,11 +104,10 @@ function updateCompoundList() {
  */
 function loadJsonData(plateJson) {
 	"use strict";
-	var g_height, g_width, newData, row, column, wellgrp, catKey, labKey, color, newContents;
-	// assuming plate model has all empty rows ??
+	var g_height, g_width, newData, row, column, wellgrp, catKey, labKey, color, newContents, units;
 	plateModel = {};
 	catLegend = {};
-	plateModel = translateInputJsonToModel(plateJson);  // TMP	--> should only load plateModel instead,
+	plateModel = translateInputJsonToModel(plateJson);
 	g_height = DIMENSION;
 	g_width = DIMENSION;
 	
@@ -172,16 +127,18 @@ function loadJsonData(plateJson) {
 			wellgrp = plateModel.rows[row].columns[column].wellGroupName;
 			//groupNames[wellgrp] = "SOME_COMPOUND";
 			//groupNames[wellgrp] = "";
-
 			newContents = wellgrp;
-			// NEED TO PARSE COMPOUND LABELS !!!! 
 
 			for (catKey in plateModel.rows[row].columns[column].categories) {
 				for (labKey in plateModel.rows[row].columns[column].categories[catKey]) {
 					color = plateModel.rows[row].columns[column].categories[catKey][labKey].color;
+					units = plateModel.rows[row].columns[column].categories[catKey][labKey].units;
+					if (units === null || units === undefined) {
+						units = "";
+					}
+					
 					newContents += "," + color;
 
-					// cat legend part !! --> only needed for assignlabels page ??
 					// update catLegend color
 					if (catLegend[catKey] === undefined) {
 						catLegend[catKey] = {};
@@ -192,11 +149,12 @@ function loadJsonData(plateJson) {
 					if (catLegend[catKey].labels[labKey] === undefined) {
 						catLegend[catKey].labels[labKey] = {};
 						catLegend[catKey].labels[labKey].color = color;
+						catLegend[catKey].labels[labKey].units = units;
 					} else {
 						catLegend[catKey].labels[labKey].color = color;
+						catLegend[catKey].labels[labKey].units = units;
 						// category and label already exist, just changing color,
 						// in this case cells which already have this label need their color updated also!!
-				//		updateCellColors(catKey, labKey, color);
 					}
 
 					// update color legend cell reverse lookup
@@ -212,7 +170,7 @@ function loadJsonData(plateJson) {
 					}
 				}
 			}
-			//grid.updateCellContents(row, column, newContents);
+
 			if (row > 0 && column > 0) {
 				newData[row - 1][column - 1] = newContents;
 			}
@@ -248,14 +206,17 @@ function onViewSelect(clickedEL) {
 	GRID_HEIGHT = elValArr[2];
 	
 	console.log("selectEvent!:" + plateId);
-	fetchTemplateData(plateId);
+	fetchPlateData(plateId);
 }
 
-//ajax save object call
-function fetchTemplateData(tId) {
+/**
+ * Call to server to get plate with specified id.
+ * @param pId - ID of plate to retrieve the json data model for. 
+ */
+function fetchPlateData(pId) {
 	"use strict";
 	var jqxhr = $.ajax({
-		url: hostname + "/plate/read/" + tId,
+		url: hostname + "/plate/read/" + pId,
 		type: "POST",
 		data: null,
 		processData: false,
@@ -264,6 +225,7 @@ function fetchTemplateData(tId) {
 		console.log("success");
 	}).fail(function() {
 		console.log("error");
+		alert("An error has occurred while fetching template data from the server.");
 	}).always(function() {
 		console.log("complete");
 	});
@@ -275,10 +237,19 @@ function fetchTemplateData(tId) {
 		$("#loaderView").hide();
 		$("#gridView").show();
 		loadJsonData(resData);
-
-		//forceGridRefresh();
 	});
 }
+
+/**
+ * Event thrown when preview modal is visible. Need to refresh grid so it shows
+ * correctly.
+ */
+$(function(){
+	$('#viewSavedPlateModal').on('shown.bs.modal', function () {
+		// will only come inside after the modal is shown
+		forceGridRefresh();
+	});
+});
 
 /**
  * This function handles the window load event. It initializes and fills the

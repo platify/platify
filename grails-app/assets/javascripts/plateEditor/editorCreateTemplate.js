@@ -26,7 +26,6 @@ function addTemplateValue() {
 	"use strict";
 	var selCells, cellValue, wellType, cell, row, column, wgs;
 	selCells = highlightedCoords;
-	// console.log(selCells);
 	cellValue = document.getElementById("newLabelValue").value;
 	
 	// validate input
@@ -71,9 +70,9 @@ function addTemplateValue() {
 			}
 		}
 
-		console.log("plateModel1:" + JSON.stringify(plateModel));		// TODO Remove console log
+		console.log("plateModel1:" + JSON.stringify(plateModel));
 
-		wgs = document.getElementById("wellGroupSpan");		// TODO WHAT IS THIS USED FOR ???
+		wgs = document.getElementById("wellGroupSpan");
 		wgs.innerHTML = wellGroupings;
 
 		// clear current selection
@@ -97,12 +96,12 @@ function translateModelToOutputJson(pModel) {
 	var plateJson, plate, i, j, well, labels, catKey, labKey, label;
 	plateJson = {};
 	plate = {};
-	plate.name = window.tName;			// should do null check ???
+	plate.name = window.tName;
 	plate.width = GRID_WIDTH;
 	plate.height = GRID_HEIGHT;
 
 	plate.experimentID = window.expId;
-	plate.labels = [];		// plate level labels, should set these if available already !!!
+	plate.labels = [];
 	plate.wells = [];
 
 	// Send all values for the grid
@@ -114,7 +113,8 @@ function translateModelToOutputJson(pModel) {
 			
 			labels = [];
 			if (pModel.rows[i] !== undefined && pModel.rows[i].columns[j] !== undefined) {
-				// RECONSIDER what you are doing here. Are labels even present at template stage ??
+				// Labels not necessarily present at template stage, but for future
+				// could be used for templates with labels already loaded.
 				for (catKey in pModel.rows[i].columns[j].categories) {
 					for (labKey in pModel.rows[i].columns[j].categories[catKey]) {
 						label = {};
@@ -162,6 +162,7 @@ function saveConfigToServer() {
 		console.log("success");
 	}).fail(function() {
 		console.log("error");
+		alert("An error while saving the template.");
 	}).always(function() {
 		console.log("complete");
 	});
@@ -169,25 +170,22 @@ function saveConfigToServer() {
 	// Set another completion function for the request above
 	jqxhr.always(function(resData) {
 		var storedTemplate = JSON.stringify(resData);
-		console.log("second complete");
-		console.log("result=" + storedTemplate);		// should parse for id
-		console.log("storedTemplate['plateTemplate']=" + resData.plateTemplate);
-		console.log("storedTemplate['plateTemplate']['id']=" + resData.plateTemplate.id);
+		console.log("result=" + storedTemplate);
 
 		if (resData.plateTemplate !== undefined &&  resData.plateTemplate.id !== undefined) {
+			console.log("storedTemplate['plateTemplate']=" + resData.plateTemplate);
+			console.log("storedTemplate['plateTemplate']['id']=" + resData.plateTemplate.id);
 			plateModel.templateID = resData.plateTemplate.id;
-			// use less hacky method !!
 			if (window.expId !== undefined) {
-				// if we're in an experiment, then continue to assignlabels page
+				// if we're in an assay, then continue to assignlabels page
 				window.location.href = hostname + "/experimentalPlateSet/createPlate" + '?expid=' + window.expId + '&tmpid=' + plateModel.templateID;
 			} else {
-				// if we're not in an experiment, then return to homepage
+				// if we're not in an assay, then return to homepage
 				window.location.href = hostname + "/";
 			}
 		} else {
 			alert("An error while saving the template: " + storedTemplate);
 		}
-
 	});
 }
 
