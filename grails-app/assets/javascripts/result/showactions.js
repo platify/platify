@@ -17,20 +17,6 @@ function cellFormatter(row, cell, value, columnDef, dataContext) {
             break;
     }
 
-    /*
-    if (showHeatMap) {
-        var dataSet = showNormalized ? experiment.normalizedData : experiment.data;
-
-        // first get a color quantizer
-        var flattened = dataSet.reduce(function(a, b) {
-            return a.concat(b);
-        });
-        var colorScale = d3.scale.category20c().domain([d3.min(flattened),
-                                                   d3.max(flattened)]);
-                                          //.range(colorbrewer.Blues[9]);
-        finalValue += ',' + colorScale(value);
-    }
-    */
     return Grid.editorCellFormatter(row, cell, finalValue, columnDef, dataContext);
 }
 
@@ -48,6 +34,7 @@ function colorGrid(dataSet) {
     var flattened = dataSet.reduce(function(a, b) {
         return a.concat(b);
     });
+    flattened = $.map(flattened, Number);
     var colorScale = d3.scale.linear().domain([d3.min(flattened),
                                                d3.max(flattened)]).rangeRound([0,8]);
 
