@@ -221,6 +221,7 @@ function ParserUI(parsingController){
         select.value = _self.getSelectedDelimiter();
         $(delimiterList).replaceWith(select);
         delimiterList = select;
+        addEvent(select, "change", _self.handleDelimiterChange);
     };
 
     this.getListedDelimiters = function(){
