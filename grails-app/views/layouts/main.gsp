@@ -68,7 +68,7 @@
 							</sec:ifAnyGranted>
 						</ul>
 					</sec:ifLoggedIn>
-			      
+
 			      <ul class="nav navbar-nav navbar-right">
 			        <sec:ifLoggedIn>
 				      	<li class="dropdown user">
@@ -85,20 +85,20 @@
 			      </ul>
 			    </div><!-- /.navbar-collapse -->
 			  </div><!-- /.container-fluid -->
-			</nav>		
+			</nav>
 		</header>
 		<g:layoutBody/>
-		
+
 		<g:if env="production">
 		    <!-- Markup to include ONLY when in production -->
 		    <g:javascript>
-				var hostname = "";    	
+				var hostname = "/capstone";
 		    </g:javascript>
 		</g:if>
 		<g:else>
 		    <g:javascript>
-				var hostname = "/capstone";    	
-		    </g:javascript>	
+				var hostname = "/capstone";
+		    </g:javascript>
 		</g:else>
 
 		<!-- main JS libs -->
@@ -107,6 +107,3 @@
 
 	</body>
 </html>
-
-
-

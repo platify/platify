@@ -27,7 +27,7 @@ function addTemplateValue() {
 	var selCells, cellValue, wellType, cell, row, column, wgs;
 	selCells = highlightedCoords;
 	cellValue = document.getElementById("newLabelValue").value;
-	
+
 	// validate input
 	if( /[^a-zA-Z0-9]/.test(cellValue)) {
        alert('Input is not alphanumeric');
@@ -65,7 +65,7 @@ function addTemplateValue() {
 
 				// add control to well
 				var wellStr = cellValue + "," + wellType;
-				
+
 				grid.updateCellContents(row, column, wellStr);
 			}
 		}
@@ -83,7 +83,7 @@ function addTemplateValue() {
 
 /**
  * This function is used to convert the internal data structure json format into
- * a data structure json format that is expected by the server when sending the 
+ * a data structure json format that is expected by the server when sending the
  * template json to be saved by the back-end. This allows for differences between
  * the 2 models. The internal model providing a more efficient referencing structure
  * for the client-side tasks, and allows for quick changes to either model while
@@ -110,7 +110,7 @@ function translateModelToOutputJson(pModel) {
 			well = {};
 			well.row = i - 1;
 			well.column = j - 1;
-			
+
 			labels = [];
 			if (pModel.rows[i] !== undefined && pModel.rows[i].columns[j] !== undefined) {
 				// Labels not necessarily present at template stage, but for future
@@ -124,7 +124,7 @@ function translateModelToOutputJson(pModel) {
 						labels.push(label);
 					}
 				}
-				
+
 				well.groupName = pModel.rows[i].columns[j].wellGroupName;
 				well.control = pModel.rows[i].columns[j].wellType;
 			} else {
@@ -190,7 +190,7 @@ function saveConfigToServer() {
 }
 
 /**
- * Loads a json data structure received from the server. It is translated into 
+ * Loads a json data structure received from the server. It is translated into
  * a format understood by the local internal plate model and updates the grid
  * with the data received.
  * @param plateJson - a data structure in the format sent by the server.

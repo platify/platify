@@ -15,7 +15,7 @@ function txtFieldFocus() {
 }
 
 /**
- * Loads a json data structure received from the server. It is translated into 
+ * Loads a json data structure received from the server. It is translated into
  * a format understood by the local internal plate model and updates the grid
  * with the data received.
  * @param plateJson - a data structure in the format sent by the server.
@@ -26,24 +26,24 @@ function loadJsonData(plateJson) {
 	plateModel = translateInputJsonToModel(plateJson);
 	g_height = DIMENSION;
 	g_width = DIMENSION;
-	
+
 	if (plateModel.grid_height !== null && plateModel.grid_height !== undefined) {
 		g_height = plateModel.grid_height;
 	}
-	
+
 	if (plateModel.grid_width !== null && plateModel.grid_width !== undefined) {
 		g_width = plateModel.grid_width;
 	}
-	
+
 	newData = createBlankData(g_height, g_width);
-	
+
 	for (row in plateModel.rows) {
 		if (plateModel.rows.hasOwnProperty(row)) {
 			for (column in plateModel.rows[row].columns) {
 				if (plateModel.rows[row].columns.hasOwnProperty(column)) {
 					newContents = plateModel.rows[row].columns[column].wellGroupName;
 					newContents += "," + plateModel.rows[row].columns[column].wellType;
-					
+
 					if (newContents !== null && newContents !== undefined) {
 						newData[row - 1][column - 1] = newContents;
 					}
@@ -51,7 +51,7 @@ function loadJsonData(plateJson) {
 			}
 		}
 	}
-	
+
 	grid.setData(newData);
 
 	// display the data
@@ -62,7 +62,7 @@ function loadJsonData(plateJson) {
  * Makes an ajax call to the server to retrieve the json data model containing
  * the information about a single stored template.
  * If successful it calls loadJsonData to update the grid with the new model.
- * @param tId - ID of template to retrieve the json data model for. 
+ * @param tId - ID of template to retrieve the json data model for.
  */
 function fetchTemplateData(tId) {
 	"use strict";
@@ -83,7 +83,7 @@ function fetchTemplateData(tId) {
 	}).always(function() {
 		console.log("complete");
 	});
-   
+
 	// Set another completion function for the request above
 	jqxhr.always(function(resData) {
 		console.log( "second complete" );
@@ -96,10 +96,10 @@ function fetchTemplateData(tId) {
 	if (exportTemplate.length > 0){
 		var link = exportTemplate.attr('href').split('/')
 		if (link.length > 0){
-			link[link.length-1] = tId;	
+			link[link.length-1] = tId;
 			exportTemplate.attr('href', link.join('/'))
 		}
-	}	
+	}
 }
 
 /**
@@ -116,7 +116,7 @@ function onPlateSelectChange(selectEl) {
 }
 
 /**
- * This Function updates the grid based on the current the id of the selected item 
+ * This Function updates the grid based on the current the id of the selected item
  * in the template select drop-down. FetchTemplateData is called to retrieve the
  * template data and update the preview grid.
  * @param selectEl - selected item in the drop-down.
@@ -147,7 +147,7 @@ function selectAndContinue() {
 
 /**
  * This function handles the window load event. It initializes and fills the
- * grid with the initial item in the plateSelect drop-down, or blank data if 
+ * grid with the initial item in the plateSelect drop-down, or blank data if
  * no templates are available, and sets up the event handlers.
  */
 function init() {
@@ -157,12 +157,12 @@ function init() {
 	// allows for passing input Json, but it not used here. Perhaps refactor!
 	//var testInputJson = {"plate":{"wells":[{"row":"2","column":"2","control":null,"labels":[{"category":"c1","name":"l1","color":"#ffff00"}],"groupName":"L67"},{"row":"2","column":"3","control":null,"labels":[{"category":"c1","name":"l2","color":"#4780b8"}],"groupName":"L5"},{"row":"3","column":"2","control":null,"labels":[{"category":"c1","name":"l1","color":"#ffff00"},{"category":"c2","name":"l3","color":"#8d7278"}],"groupName":"L51"},{"row":"3","column":"3","control":null,"labels":[{"category":"c1","name":"l2","color":"#4780b8"},{"category":"c2","name":"l3","color":"#8d7278"}],"groupName":"L17"},{"row":"4","column":"2","control":null,"labels":[{"category":"c2","name":"l3","color":"#8d7278"}],"groupName":"L2"},{"row":"4","column":"3","control":null,"labels":[{"category":"c2","name":"l3","color":"#8d7278"}],"groupName":"L47"}],"labels":[]}};
 	//loadJsonData(testInputJson);
-	
+
 	addEvent("saveTemplate", "click", selectAndContinue);
 
 	// initially disable selection of grid cells
 	disableGridSelection();
-	
+
 	var pSelect = document.getElementById("plateSelect");
 	if (pSelect.value !== undefined && pSelect.value !== null) {
 		fetchTemplateData(pSelect.value);

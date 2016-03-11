@@ -5,7 +5,7 @@
 	<!-- Highlight / Error -->
 	<div id="userMsgPanel" ></div>
 	<div class="col-sm-12">
-			<!-- TABS -->				
+			<!-- TABS -->
 				<div id="tabs" >
                     <ul style="background-color:#d9edf7;" >
                         <li><a href="#parsingTab">Parsing</a></li>
@@ -26,7 +26,7 @@
 			                            <button id="getFile">choose file(s)</button>
 								    </th>
 								    <th >
-								    	<label for="delimiterList">Delimiter</label>	
+								    	<label for="delimiterList">Delimiter</label>
 								    </th>
 								    <th >
 	                            		<select name="delimiterList" id="delimiterList" size="1"></select>
@@ -87,11 +87,11 @@
 								    <td><select name="featureList" id="featureList" size="5"><option>--features--</option></select></td>
 								    <td><select name="labelList" id="labelList" size="5"><option>---labels---</option></select></td>
 								  </tr>
-								</table>	  
+								</table>
                         	</h5>
                         </div>
                     </div>
-                    
+
                     <div id="plateIDSelection">
 	                    <div>
 	                    	<h5>
@@ -120,10 +120,10 @@
 								  <tr >
 								  	<td colspan="8">
 								  		<label for="plateIDMatchMethod">Plate ID match by &nbsp;&nbsp;&nbsp;  </label>
-								    	<input type="radio" id="byFeature" name="plateIDMatchMethod" value="byFeature" /> Plate level feature &nbsp;&nbsp;&nbsp; 
+								    	<input type="radio" id="byFeature" name="plateIDMatchMethod" value="byFeature" /> Plate level feature &nbsp;&nbsp;&nbsp;
 	                                	<input type="radio" id="byManualEntry" name="plateIDMatchMethod" value="byManualEntry" /> Manual entry
 								    </td>
-								  </tr>  
+								  </tr>
 								  <tr >
 								  	<td  >&nbsp;</td>
 								    <td colspan="6" >
@@ -140,21 +140,21 @@
 					                            Enter a plate ID for each plate by selecting the plate in the
 					                            plate list above and then entering the plate id for that plate
 					                            in the field below and hitting the "set plate id" button.
-					                        </p>    
+					                        </p>
 					                        <select id="plateID" name="plateID"><option>--Plate ID--<option></select>
 					                        <button class="btn btn-info btn-xs" id="setPlateID">Set Plate Id</button>
-					                    </div>									    
+					                    </div>
 								    </td>
 								    <td >&nbsp;</td>
 								  </tr>
-								</table>	  
+								</table>
                         	</h5>
 	                </div>
                 </div>
-          </div>      
+          </div>
 	</div> <!--  END TABS -->
-	
-	
+
+
 	<div class="col-sm-12"><div class="panel-body"></div></div>
 
 	<div class="col-sm-12">
@@ -171,13 +171,13 @@
     <g:if env="production">
         <!-- Markup to include ONLY when in production -->
         <g:javascript>
-            var hostname = "";      
+            var hostname = "/capstone";      
         </g:javascript>
     </g:if>
     <g:else>
         <g:javascript>
-            var hostname = "/capstone";       
-        </g:javascript> 
+            var hostname = "/capstone";
+        </g:javascript>
     </g:else>
 
     <asset:javascript src="jquery-1.11.2.min.js"/>
@@ -205,5 +205,3 @@
     <asset:javascript src="parser/ServerCommunicator.js"/>
     <asset:javascript src="parser/ParserUI.js"/>
     <asset:javascript src="parser/ParsingController.js"/>
-
-

@@ -2,7 +2,7 @@
 <div class="col-xs-8">
 	<div id="labelPanel" class="panel panel-default">
 		<div class="panel-heading">
-			<div class="panel-title">Add New Label: 
+			<div class="panel-title">Add New Label:
 				<span class="pull-right">
 					<label>Type:</label>
 					<div class="btn-group" data-toggle="buttons">
@@ -112,7 +112,7 @@
 							<button id="addNewPlateLabel" class="btn btn-default btn-xs glyphicon glyphicon-plus"></button>
 						</div>
 					</div>
-				</div>				
+				</div>
 			</div>
 		</div>
 	</div>
@@ -138,7 +138,7 @@
 			</div>
 		</div>
 	</div>
-	
+
 	<div class="toggler">
 		<div id="plateLabelCatPanel" class="panel panel-default">
 			<div class="panel-heading">
@@ -284,13 +284,13 @@
 <g:if env="production">
     <!-- Markup to include ONLY when in production -->
     <g:javascript>
-        var hostname = "";
+        var hostname = "/capstone";
     </g:javascript>
 </g:if>
 <g:else>
     <g:javascript>
-        var hostname = "/capstone";       
-    </g:javascript> 
+        var hostname = "/capstone";
+    </g:javascript>
 </g:else>
 
 <asset:javascript src="jquery-ui.js"/>

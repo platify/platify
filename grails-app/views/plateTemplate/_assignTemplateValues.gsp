@@ -10,7 +10,7 @@
 					<label for="newLabelValue" class="col-xs-2 control-label">Well Group Name:</label>
 					<div class="col-xs-3">
 						<div class="input-group">
-							<input type="text" id="newLabelValue" class="input-sm form-control" required maxlength="3" 
+							<input type="text" id="newLabelValue" class="input-sm form-control" required maxlength="3"
 								title="Use up to 3 alphanumeric characters for well group reference."></input>
 							<span class="input-group-btn"><button id="addTemplateValueBtn" class="btn btn-default btn-sm glyphicon glyphicon-plus"></button></span>
 						</div>
@@ -37,7 +37,7 @@
 			</div>
 		</div>
 	</div>
-	
+
 	<div class="col-sm-3">
 		<div id="labelPanel" class="panel panel-default">
 			<div class="panel-heading">
@@ -49,7 +49,7 @@
 			</div>
 		</div>
 	</div>
-	
+
 	<div class="col-sm-12">
 		<div id="gridPanel" class="panel panel-default">
 			<div class="panel-heading">
@@ -60,19 +60,19 @@
 			</div>
 		</div>
 	</div>
-	
+
 	<div style="display: none;">Well Groupings:<span id="wellGroupSpan"></span>Cell Range Selected:<span id="cellRange"></span></div>
 
     <g:if env="production">
         <!-- Markup to include ONLY when in production -->
         <g:javascript>
-            var hostname = "";
+            var hostname = "/capstone";
         </g:javascript>
     </g:if>
     <g:else>
         <g:javascript>
-            var hostname = "/capstone";       
-        </g:javascript> 
+            var hostname = "/capstone";
+        </g:javascript>
     </g:else>
 
 	<asset:javascript src="jquery-ui.js"/>

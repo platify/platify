@@ -107,7 +107,7 @@ log4j = {
     //    console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
     //}
     info  'grails.app', 'grails.app.jobs'
-    
+
     debug 'grails.app.jobs'
 
     error  'org.codehaus.groovy.grails.web.servlet',        // controllers
@@ -145,13 +145,13 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
     '/console':                       ['ROLE_SUPER_ADMIN'],
     '/console.*':                     ['ROLE_SUPER_ADMIN'],
     '/console/**':                    ['ROLE_SUPER_ADMIN'],
-    '/**/vendor/**':                  ['ROLE_SUPER_ADMIN'],    
+    '/**/vendor/**':                  ['ROLE_SUPER_ADMIN'],
     '/**/dist/**':                    ['ROLE_SUPER_ADMIN'],
     '/scientist/index':               ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'],
     '/j_spring_*':                    ['permitAll'],
     '/login/**':                      ['permitAll'],
-    '/logout/**':                     ['permitAll'],    
-    '/j_spring_security_logout':      ['permitAll'], 
+    '/logout/**':                     ['permitAll'],
+    '/j_spring_security_logout':      ['permitAll'],
     '/scientist/**':                  ['permitAll'],
     '/equipment/index':               ['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'],
     '/equipment/**':                  ['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'],
@@ -162,4 +162,3 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
     '/**':			      ['permitAll'],
 
 ]
-

@@ -5,12 +5,12 @@
 		    -animation: spin .7s infinite linear;
 		    -webkit-animation: spin2 .7s infinite linear;
 		}
-		
+
 		@-webkit-keyframes spin2 {
 		    from { -webkit-transform: rotate(0deg);}
 		    to { -webkit-transform: rotate(360deg);}
 		}
-		
+
 		@keyframes spin {
 		    from { transform: scale(1) rotate(0deg);}
 		    to { transform: scale(1) rotate(360deg);}
@@ -30,11 +30,11 @@
 						<h4><label class="control-label col-sm-2" for="plateSelect">Templates: </label></h4>
 					    <div class="col-sm-9">
 							 <div id="templateSelection">
-							  	<g:select class="form-control" id="plateSelect" name="plate.id" from="${edu.harvard.capstone.editor.PlateTemplate.list()}" 
+							  	<g:select class="form-control" id="plateSelect" name="plate.id" from="${edu.harvard.capstone.editor.PlateTemplate.list()}"
 							  		optionKey="id" optionValue="${{it.name + ' (id:' + it.id + ')'}}"
-									onchange="onPlateSelectChange(this)" onload="onPlateSelectChange(this)" value="${plateSetInstance?.plate?.id}" class="many-to-one"/> 
+									onchange="onPlateSelectChange(this)" onload="onPlateSelectChange(this)" value="${plateSetInstance?.plate?.id}" class="many-to-one"/>
 							 </div>
-						</div>						
+						</div>
 			      	</div>
 				</form>
 			</div>
@@ -73,7 +73,7 @@
 							  <option>Bio-plate</option>
 							  <option>Chem-plate</option>
 							</select>
-						</div>			 -->			
+						</div>			 -->
 			      	</div>
 				</form>
 			</div>
@@ -98,19 +98,19 @@
 			</div>
 		</div>
 	</div>
-	
+
 	<div style="display: none;">Cell Range Selected:<span id="cellRange"></span></div>
-	
+
     <g:if env="production">
         <!-- Markup to include ONLY when in production -->
         <g:javascript>
-            var hostname = "";
+            var hostname = "/capstone";
         </g:javascript>
     </g:if>
     <g:else>
         <g:javascript>
-            var hostname = "/capstone";       
-        </g:javascript> 
+            var hostname = "/capstone";
+        </g:javascript>
     </g:else>
 
 	<asset:javascript src="jquery-ui.js"/>
@@ -127,5 +127,3 @@
     <asset:javascript src="grid/Grid.js"/>
     <asset:javascript src="plateEditor/editorCommon.js"/>
     <asset:javascript src="plateEditor/editorPreviewTemplate.js"/>
-
-

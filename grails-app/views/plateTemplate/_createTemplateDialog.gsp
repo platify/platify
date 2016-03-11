@@ -1,7 +1,7 @@
 <script type="text/javascript" charset="utf-8">
 	function goToCreateTemplate() {
 		var expIdParam = ${experimentalPlateSetInstance?.id} + "" ;
-		
+
 		var goTolocation = hostname + "/plateTemplate/create"
 			+ '?name=' + document.getElementById("templateName").value
 	    	+ '&width=' + document.getElementById("templateWidth").value
