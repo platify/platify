@@ -27,7 +27,7 @@ class ScientistServiceSpec extends Specification {
 		scientist.authorities.any{ it.authority != "ROLE_ADMIN" }
 	}
 
-	void "Test user creation"() {
+	void "Test user creation 2"() {
 		when: "Created with valid params an Admin"
 		def scientist = service.newUser('first name', 'last name', 'password', "my@email.com", true)
 
@@ -37,7 +37,7 @@ class ScientistServiceSpec extends Specification {
 		scientist.authorities.any{ it.authority == "ROLE_ADMIN" }
 	}
 
-	void "Test user creation"() {
+	void "Test user creation 3"() {
 		when: "Created with invalid params"
 		def scientist = service.newUser('first name', 'last name', '', "my@email.com", false)
 
