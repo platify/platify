@@ -1,5 +1,6 @@
 package edu.harvard.capstone.user
 
+import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.Specification
 
