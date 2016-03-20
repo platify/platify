@@ -2,13 +2,13 @@
 <html>
 	<head>
 		<meta name="layout" content="main">
-		<title>Capstone</title>
+		<title>Platify</title>
 	</head>
 	<body>
 		<div class="content-fluid">
 			<div class="row">
 				<div class="col-sm-12 content-body">
-					<h3 style="margin-left:15px">SurNorte Assay Management System</h3>
+					<h3 style="margin-left:15px">Platify: Plate, Assay, and Results Management System</h3>
 					<ol class="breadcrumb">
 						<li><a class="home" href="#">Home</a></li>
 					</ol>

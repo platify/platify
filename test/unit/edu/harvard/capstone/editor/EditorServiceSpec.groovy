@@ -1,5 +1,6 @@
 package edu.harvard.capstone.editor
 
+import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.Specification
 
@@ -525,7 +526,7 @@ class EditorServiceSpec extends Specification {
 			plateInstance == null
 	}
 
-	void "Test incorrect creation of a plate, plate size does not match template size"() {
+	void "Test incorrect creation of a plate, plate size does not match template size 2"() {
 		when: "Incorrect parameters"
     	// Fake springSecurityService - login as id 1
 		Scientist scientistInstance = new Scientist(firstName: "Test", lastName: "User", email:"my@email.com", password:"test")
