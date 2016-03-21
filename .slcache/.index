@@ -3525,3 +3525,10 @@ n:722:org/codehaus/groovy/runtime/dgm$365
 n:1765:org/codehaus/groovy/runtime/dgmimpl/NumberNumberMultiply$IntegerInteger
 n:1900:grails/util/PluginBuildSettings$getPluginSourceDirectories$13
 n:2447:org/codehaus/groovy/grails/compiler/GrailsProjectWatcher$1
+y:4910:com/intellij/rt/execution/application/AppMain
+n:1520:com/intellij/rt/execution/application/AppMain$1
+n:1902:org/codehaus/groovy/control/messages/WarningMessage
+n:2244:org/codehaus/groovy/control/messages/LocatedMessage
+n:1558:org/codehaus/groovy/control/messages/SimpleMessage
+n:1774:org/codehaus/groovy/control/messages/Message
+n:2812:BuildConfig$_run_closure1_closure4
