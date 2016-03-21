@@ -3,4 +3,11 @@ As large scale biochemical plate assay experimentation becomes more common, the 
 For further details and documentation, please visit the [wiki](https://github.com/platify/platify/wiki).
 
 
+SAMS (North-South team):
+https://github.com/surnorte/capstone
 
+ADAM (Around-the-World team):
+https://github.com/alexGalushka/CapStone_HES_2015
+
+Dose Response (West-East team)
+https://github.com/massfords/we99
