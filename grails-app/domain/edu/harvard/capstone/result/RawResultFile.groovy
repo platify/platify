@@ -9,5 +9,6 @@ class RawResultFile {
     static belongsTo = [plateSet:PlateSet]
 
     static constraints = {
+		plateSet nullable: true, blank: true
     }
 }
