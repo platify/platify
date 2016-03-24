@@ -13,3 +13,5 @@ node_modules
 # intellij idea files
 *.iml
 .idea
+*.iws
+*.ipr
