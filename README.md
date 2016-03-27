@@ -9,7 +9,7 @@ TBD
 
 ### Getting Started: Development Environment
 * For Windows developers
-  * using IntelliJ [here](https://github.com/platify/platify//wiki/Development#mac-wintellij).
+  * using IntelliJ: [setup instructions](https://github.com/platify/platify//wiki/Development#mac-wintellij).
 * For Mac developers
   * using Eclipse: [setup instructions](https://github.com/platify/platify//wiki/Development#eclipse)
   * using IntelliJ: [setup instructions](https://github.com/platify/platify//wiki/Development#mac-wintellij)
