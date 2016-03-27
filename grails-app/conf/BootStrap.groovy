@@ -11,6 +11,7 @@ import edu.harvard.capstone.editor.PlateSet
 import edu.harvard.capstone.editor.PlateTemplate
 import edu.harvard.capstone.editor.Well
 import edu.harvard.capstone.parser.Equipment
+import edu.harvard.capstone.result.RawResultFile
 import edu.harvard.capstone.result.Result
 import edu.harvard.capstone.result.ResultLabel
 import edu.harvard.capstone.result.ResultPlate
@@ -159,10 +160,21 @@ class BootStrap {
 				}
 			}
 
-            def plateSet1 = new PlateSet(plate: template1, experiment: experiment1, assay: "my assay", barcode: "10293").save(flush: true)
+            def plateSet1 = new PlateSet(plate: template1, experiment: experiment1, assay: "my assay", barcode: "10293")
+            def rawResultFile1 = new RawResultFile(fName:"asdf", plateSet:plateSet1)
+			def rawResultFile2 = new RawResultFile(fName:"fdsa").save(flush: true)
+            plateSet1.addToRawResults(rawResultFile1)
+            plateSet1.save(flush: true)
+			rawResultFile2.plateSet = plateSet1
+			plateSet1.addToRawResults(rawResultFile2)
+			plateSet1.save(flush: true)
+
             def plateSet2 = new PlateSet(plate: template1, experiment: experiment1, assay: "my assay", barcode: "3321").save(flush: true)
             def plateSet3 = new PlateSet(plate: template1, experiment: experiment1, assay: "my assay", barcode: "2334").save(flush: true)
 
+			def foundRawResult = RawResultFile.findByFName("asdf")
+			
+			
             new PlateSet(plate: template2, experiment: experiment3, assay: "my assay", barcode: "001one").save(flush: true)
             new PlateSet(plate: template2, experiment: experiment3, assay: "my assay", barcode: "002two").save(flush: true)
             new PlateSet(plate: template2, experiment: experiment3, assay: "my assay", barcode: "003three").save(flush: true)
@@ -236,7 +248,9 @@ class BootStrap {
 	    }
 		
 		
-		}
+		}		
+		
+		
 		log.info "Users: " + Scientist.count()
 		log.info "Roles: " + Role.count()
 		log.info "UserRole: " + ScientistRole.count()
