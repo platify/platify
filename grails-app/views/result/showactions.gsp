@@ -9,9 +9,11 @@
 		<asset:stylesheet href="grid/slick.grid.css"/>
 		<asset:stylesheet href="grid/slick-default-theme.css"/>
 		<asset:stylesheet href="grid/Grid.css"/>
+		<asset:stylesheet href="scatter/Scatter.css"/>
 		<asset:stylesheet href="colorbrewer.css"/>
 		<asset:stylesheet href="dataTables.bootstrap.css"/>
 		<asset:stylesheet href="dataTables.tableTools.css"/>
+		
 	</head>
 
 	<body>
@@ -68,7 +70,10 @@
 				</div>
 				<div class="panel-body">
 					<div id="resultGrid" class="Blues" style="width:100%;height:650px;"></div>
+					<div id="scatterplot" style="width:100%;height:650px;"></div>
 				</div>
+
+					
 			</div>
 		</div>
 
@@ -106,6 +111,8 @@
 	</g:javascript>
 	<asset:javascript src="result/ExperimentModel.js" />
 	<asset:javascript src="result/showactions.js" />
-
+	
+	<!-- scatter plot -->
+	<asset:javascript src="scatter/Scatter.js" />
 	</body>
 </html>
