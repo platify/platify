@@ -5,7 +5,7 @@ var x_scale;
 var y_scale;
 
 function init() {
-console.log(IMPORT_DATA_JSON);
+//console.log(IMPORT_DATA_JSON);
 
     // Extract x- and y-coordinate from reference wells
     var referencePoints = [];
@@ -25,7 +25,7 @@ console.log(IMPORT_DATA_JSON);
             referencePoints.push([x_coord, y_coord]);
     });
 
-    console.log(referencePoints);
+//    console.log(referencePoints);
 
     // Plot points of reference wells
     createGraph(referencePoints);
@@ -35,6 +35,7 @@ console.log(IMPORT_DATA_JSON);
     var regression_model = "linearThroughOrigin";
     var newReferencePoints = regression(regression_model, referencePoints).points;
     plotPoints(newReferencePoints, newReference_group);
+    drawLine(referencePoints);
 
     // Plot points of unknown samples
 }
@@ -45,13 +46,21 @@ function createGraph(points) {
     var height = 650 - margin.top - margin.bottom;
 
     chart = d3.select('#stdCurveVis')
-        .append('svg')
-        .attr('width', width + margin.left + margin.right)
-        .attr('height', height + margin.top + margin.bottom)
-        .append('g')
-        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
-        .attr('class', 'stdCurveGraph');
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+        .attr("class", "stdCurveGraph");
 
+    createAxes(points, width, height);
+
+    // Create groups needed for different data sets
+    reference_group = chart.append("g");
+    newReference_group = chart.append("g");
+}
+
+function createAxes(points, width, height) {
     var max_x = d3.max(points, function(d) { return d[0]; });
     x_scale = d3.scale.linear()
         .domain([0, max_x])
@@ -63,32 +72,38 @@ function createGraph(points) {
         .range([height, 0]);
 
     // Create graph axes
-    chart.append('g')
-        .attr('transform', 'translate(0,' + height + ')')
+    chart.append("g")
+        .attr("transform", "translate(0," + height + ")")
         .call(d3.svg.axis()
             .scale(x_scale)
-            .orient('bottom'));
-    chart.append('g')
+            .orient("bottom"));
+    chart.append("g")
         .call(d3.svg.axis()
             .scale(y_scale)
-            .orient('left'));
-
-    // Create groups needed for different data sets
-    reference_group = chart.append("g");
-    newReference_group = chart.append("g");
+            .orient("left"));
 }
 
 function plotPoints(points, group) {
     group.selectAll("points")
       .data(points).enter()
       .append("circle")
-      .attr("cx", function (d) { return x_scale(d[0]); } )
-      .attr("cy", function (d) { return y_scale(d[1]); } )
+      .attr("cx", function(d) { return x_scale(d[0]); } )
+      .attr("cy", function(d) { return y_scale(d[1]); } )
       .attr("r", 2);
 }
 
-function drawLine() {
+function drawLine(points) {
+    points.push([0,0]);
 
+    var line = d3.svg.line()
+        .x(function(d) { return x_scale(d[0]); })
+        .y(function(d) { return y_scale(d[1]); });
+
+    chart.selectAll("path")
+        .data(points).enter()
+        .append("path")
+        .attr("d", line(points))
+        .attr("stroke", "blue");
 }
 
 window.onload = init;
