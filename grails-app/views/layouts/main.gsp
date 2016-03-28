@@ -103,12 +103,12 @@
 		<g:if env="production">
 		    <!-- Markup to include ONLY when in production -->
 		    <g:javascript>
-				var hostname = "/capstone";
+				var hostname = "/platify";
 		    </g:javascript>
 		</g:if>
 		<g:else>
 		    <g:javascript>
-				var hostname = "/capstone";
+				var hostname = "/platify";
 		    </g:javascript>
 		</g:else>
 
