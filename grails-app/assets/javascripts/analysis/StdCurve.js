@@ -4,6 +4,11 @@ var newReference_group;
 var x_scale;
 var y_scale;
 
+function getReferenceData(referenceData) {
+    REFERENCE_DATA_JSON = JSON.stringify(referenceData);
+    console.log(REFERENCE_DATA_JSON);
+}
+
 function init() {
 //console.log(IMPORT_DATA_JSON);
 
@@ -85,11 +90,11 @@ function createAxes(points, width, height) {
 
 function plotPoints(points, group) {
     group.selectAll("points")
-      .data(points).enter()
-      .append("circle")
-      .attr("cx", function(d) { return x_scale(d[0]); } )
-      .attr("cy", function(d) { return y_scale(d[1]); } )
-      .attr("r", 2);
+        .data(points).enter()
+        .append("circle")
+        .attr("cx", function(d) { return x_scale(d[0]); } )
+        .attr("cy", function(d) { return y_scale(d[1]); } )
+        .attr("r", 2);
 }
 
 function drawLine(points) {
