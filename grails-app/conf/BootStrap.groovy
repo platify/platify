@@ -165,10 +165,10 @@ class BootStrap {
 			// pushing empty wells for templates
 			for (x in 0 .. 23) {
 				for (y in 0 .. 15) {
-					def compound1 = new WellCompound(well: t1well, compound: compoundA, unit: WellCompound.Unit.ML, amount:String.valueOf(x*y), dateCreated: new Date()).save(failOnError: true, flush: true)
+					def compound1 = new WellCompound(compound: compoundA, unit: WellCompound.Unit.ML, amount:String.valueOf(x*y), dateCreated: new Date()).save(failOnError: true, flush: true)
 			
 					def t1well = new Well(compound: compound1, plate: template1, column: x, row: y, control: Well.WellControl.EMPTY).save(flush: true)
-					println("Creating well compounds")
+
 				}
 			}
 			
