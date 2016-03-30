@@ -28,6 +28,8 @@ class BootStrap {
             def frank = new Scientist (firstName: "Frank", lastName: "O'Connor", email: "frank@gmail.com", password:"admin").save(failOnError: true, flush: true)
             def dave = new Scientist (firstName: "Dave", lastName: "Bonner", email: "dave@gmail.com", password:"admin").save(failOnError: true, flush: true)
 
+            def reagan = new Scientist (firstName: "Reagan", lastName: "Williams", email: "reagan@gmail.com", password:"admin").save(failOnError: true, flush: true)
+
             def admin = new Scientist (firstName: "John", lastName: "Davids", email: "admin@gmail.com", password:"admin").save(failOnError: true, flush: true)
 			def scientist = new Scientist (firstName: "Mike", lastName: "Tara", email: "s@gmail.com", password:"s").save(failOnError: true, flush: true)
 
@@ -40,6 +42,10 @@ class BootStrap {
             ScientistRole.findOrCreateByScientistAndRole(admin, externalUser).save(flush: true)
             ScientistRole.findOrCreateByScientistAndRole(admin, adminUser).save(flush: true)
             ScientistRole.findOrCreateByScientistAndRole(scientist, externalUser).save(flush: true)
+
+            ScientistRole.findOrCreateByScientistAndRole(reagan, externalUser).save(flush: true)
+            ScientistRole.findOrCreateByScientistAndRole(reagan, adminUser).save(flush: true)
+            ScientistRole.findOrCreateByScientistAndRole(reagan, superAdmin).save(flush: true)
 
             ScientistRole.findOrCreateByScientistAndRole(andres, externalUser).save(flush: true)
             ScientistRole.findOrCreateByScientistAndRole(andres, adminUser).save(flush: true)
