@@ -20,8 +20,7 @@ class ResultController {
         params.max = Math.min(max ?: 10, 100)
         respond Result.list(params), model:[resultInstanceCount: Result.count()]
     }
-
-
+	
     @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
     def kitchenSink(ExperimentalPlateSet experiment) {
         if (!springSecurityService.isLoggedIn()){
@@ -194,6 +193,33 @@ class ResultController {
         }
     }
 
+	@Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
+	def rrf_upload() {
+		render(view: "rrf_upload")
+	}
+	
+	def upload() {
+		RawResultFile rrf = new RawResultFile()
+		rrf.save(flush: true)
+		def rrfId = rrf.id
+		def destFolderPath = System.getProperty("user.home") + "/rrf/" + rrfId
+		def destDir = new File(destFolderPath)
+		
+		if (!destDir.exists()) destDir.mkdir()
+		def f = request.getFile('filecsv')
+		if (f.empty) {
+			flash.message = 'file cannot be empty'
+			render(view: 'rrf_upload')
+			rrf.delete()
+			return
+		}
+	
+		def destFile = new File(destDir, f.getOriginalFilename())
+		
+		f.transferTo(destFile)
+		response.sendError(200, 'Done')
+	}
+	
     protected void notFound() {
         request.withFormat {
             form multipartForm {
