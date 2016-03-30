@@ -214,9 +214,13 @@ class ResultController {
 			return
 		}
 	
-		def destFile = new File(destDir, f.getOriginalFilename())
+		def originalFName = f.getOriginalFilename();
+		def destFile = new File(destDir, originalFName)
 		
 		f.transferTo(destFile)
+		
+		rrf.fName = rrfId + "/" + originalFName
+		rrf.save(flush: true)
 		response.sendError(200, 'Done')
 	}
 	
