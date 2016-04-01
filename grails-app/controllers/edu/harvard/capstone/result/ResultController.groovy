@@ -6,6 +6,8 @@ import edu.harvard.capstone.editor.ExperimentalPlateSet
 import static org.springframework.http.HttpStatus.*
 import grails.validation.ValidationException
 import grails.converters.JSON
+import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.multipart.MultipartHttpServletRequest
 
 class ResultController {
 
@@ -199,28 +201,37 @@ class ResultController {
 	}
 	
 	def upload() {
-		RawResultFile rrf = new RawResultFile()
-		rrf.save(flush: true)
-		def rrfId = rrf.id
-		def destFolderPath = System.getProperty("user.home") + "/rrf/" + rrfId
-		def destDir = new File(destFolderPath)
+		List<String, MultipartFile> filesList = request.getFiles("filecsv[]");
 		
-		if (!destDir.exists()) destDir.mkdir()
-		def f = request.getFile('filecsv')
-		if (f.empty) {
+		if (filesList.size() < 1) {
 			flash.message = 'file cannot be empty'
 			render(view: 'rrf_upload')
 			rrf.delete()
 			return
 		}
-	
-		def originalFName = f.getOriginalFilename();
-		def destFile = new File(destDir, originalFName)
 		
-		f.transferTo(destFile)
+		def rrfRoot = grailsApplication.mainContext.servletContext.getRealPath('rrf')
+		def rrfRootDir = new File(rrfRoot)
+		if (!rrfRootDir.exists()) rrfRootDir.mkdir()
 		
-		rrf.fName = rrfId + "/" + originalFName
-		rrf.save(flush: true)
+		filesList.each { f ->
+
+			RawResultFile rrf = new RawResultFile()
+			rrf.save(flush: true)
+			def rrfId = rrf.id
+			def destFolderPath = rrfRoot + "/" + rrfId
+			def destDir = new File(destFolderPath)
+
+			if (!destDir.exists()) destDir.mkdir()
+
+			def originalFName = f.getOriginalFilename();
+			def destFile = new File(destDir, originalFName)
+
+			f.transferTo(destFile)
+
+			rrf.fName = rrfId + "/" + originalFName
+			rrf.save(flush: true)
+		}
 		response.sendError(200, 'Done')
 	}
 	
