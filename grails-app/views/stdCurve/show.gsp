@@ -81,6 +81,7 @@
 <!-- results-specific js -->
 <asset:javascript src="plate-statistics/statistics.js" />
 
+<asset:javascript src="regression.js"/>
 <asset:javascript src="analysis/StdCurve.js" />
 
 <g:javascript>
@@ -129,8 +130,5 @@
 </g:javascript>
 
 <asset:javascript src="result/ExperimentModel.js" />
-
-<asset:javascript src="regression.js"/>
-
 </body>
 </html>

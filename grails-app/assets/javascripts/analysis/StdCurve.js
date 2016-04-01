@@ -5,6 +5,16 @@ var margin;
 var width;
 var height;
 
+function init() {
+    //console.log(IMPORT_DATA_JSON);
+
+    margin = {top: 20, right: 20, bottom: 30, left: 30};
+    width = 650 - margin.left - margin.right;
+    height = 650 - margin.top - margin.bottom;
+
+    createGraph();
+}
+
 function getReferenceData(referenceData) {
     REFERENCE_DATA_JSON = JSON.stringify(referenceData);
 
@@ -17,14 +27,14 @@ function getReferenceData(referenceData) {
     // Plot points of reference wells
     var reference_group = ".reference_group";
     plotPoints(reference_points, reference_group);
-    var regression = addRegression(referencePoints);
+    var regression_data = addRegression(reference_points);
 
-    inferUnknownProperties(regression, unknown_data);
+//    inferUnknownProperties(regression_data, unknown_data);
 }
 
 function getPoints(experiment_json) {
     // Extract x- and y-coordinate from reference wells
-    var referencePoints = [];
+    var reference_points = [];
     experiment_json.plates[0].wells.forEach(function(well) {
         var x_coord = null;
         var y_coord = null;
@@ -37,30 +47,20 @@ function getPoints(experiment_json) {
         });
 
         if (x_coord !== null && y_coord !== null)
-            referencePoints.push([x_coord, y_coord]);
+            reference_points.push([x_coord, y_coord]);
     });
 
-    return referencePoints;
+    return reference_points;
 }
 
-function addRegression(referencePoints) {}
+function addRegression(reference_points) {
     // Draw line according to selected curve fit
     var regression_model = "linearThroughOrigin";
-    var regression = regression(regression_model, referencePoints);
-    var newReferencePoints = regression.points;
+    var regression_data = regression(regression_model, reference_points);
+    var newReferencePoints = regression_data.points;
     drawLine(newReferencePoints);
 
-    return regression;
-}
-
-function init() {
-    //console.log(IMPORT_DATA_JSON);
-
-    margin = {top: 20, right: 20, bottom: 30, left: 30};
-    width = 650 - margin.left - margin.right;
-    height = 650 - margin.top - margin.bottom;
-
-    createGraph();
+    return regression_data;
 }
 
 function createGraph() {
