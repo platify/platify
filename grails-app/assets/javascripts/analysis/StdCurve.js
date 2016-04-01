@@ -8,13 +8,23 @@ var height;
 function getReferenceData(referenceData) {
     REFERENCE_DATA_JSON = JSON.stringify(referenceData);
 
-    plotData();
+    var reference_data = JSON.parse(REFERENCE_DATA_JSON);
+    var unknown_data = JSON.parse(IMPORT_DATA_JSON);
+
+    var reference_points = getPoints(reference_data);
+    createAxes(reference_points, width, height);
+
+    // Plot points of reference wells
+    var reference_group = ".reference_group";
+    plotPoints(reference_points, reference_group);
+    var regression = addRegression(referencePoints);
+
+    inferUnknownProperties(regression, unknown_data);
 }
 
-function plotData() {
+function getPoints(experiment_json) {
     // Extract x- and y-coordinate from reference wells
     var referencePoints = [];
-    var experiment_json = JSON.parse(REFERENCE_DATA_JSON);
     experiment_json.plates[0].wells.forEach(function(well) {
         var x_coord = null;
         var y_coord = null;
@@ -30,16 +40,17 @@ function plotData() {
             referencePoints.push([x_coord, y_coord]);
     });
 
-    createAxes(referencePoints, width, height);
+    return referencePoints;
+}
 
-    // Plot points of reference wells
-    var reference_group = ".reference_group";
-    plotPoints(referencePoints, reference_group);
-
+function addRegression(referencePoints) {}
     // Draw line according to selected curve fit
     var regression_model = "linearThroughOrigin";
-    var newReferencePoints = regression(regression_model, referencePoints).points;
+    var regression = regression(regression_model, referencePoints);
+    var newReferencePoints = regression.points;
     drawLine(newReferencePoints);
+
+    return regression;
 }
 
 function init() {

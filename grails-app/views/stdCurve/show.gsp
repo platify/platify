@@ -20,7 +20,7 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             <h4 class="panel-title">
-                <span id="selectRefLabel">[ Testing Reference Selection ]</span>
+                <span id="selectRefLabel">Reference Plate</span>
             </h4>
         </div>
         <div class="panel-body">
@@ -39,11 +39,21 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             <h4 class="panel-title">
-                <span id="rawDataLabel">[ Testing Standard Curve ]</span>
+                <span id="rawDataLabel">Standard Curve</span>
             </h4>
         </div>
         <div class="panel-body">
-            <div id="stdCurveVis" style="width:100%;height:650px;"></div>
+            <div id="stdCurveVis"></div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <span id="inferredLabel">Inferred Properties</span>
+            </h4>
+        </div>
+        <div class="panel-body">
+            <div id="inferredTable"></div>
         </div>
     </div>
 </div>
