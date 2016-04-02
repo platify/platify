@@ -2,8 +2,7 @@ package edu.harvard.capstone.editor
 
 import edu.harvard.capstone.result.Result
 import grails.plugin.springsecurity.annotation.Secured
-
-import static org.springframework.http.HttpStatus.CREATED
+import static org.springframework.http.HttpStatus.*
 
 
 /**
@@ -17,6 +16,7 @@ import static org.springframework.http.HttpStatus.CREATED
  */
 class LiquidHandlerController {
     def springSecurityService
+    def liquidHandlerService
 
     /**
      * Lists the liquid handler configurations
@@ -44,13 +44,6 @@ class LiquidHandlerController {
         respond new LiquidHandler(params)
     }
 
-    String inputPlateId
-    String inputWell
-    String inputDose
-    String outputPlateId
-    String outputWell
-    String outputDose
-
     def save(String name, String inputPlateId, String inputWell, String inputDose, String outputPlateId, String outputWell, String outputDose) {
 
         if (!springSecurityService.isLoggedIn()){
@@ -58,25 +51,24 @@ class LiquidHandlerController {
             return
         }
 
-        def liquidHandlerMappingInstance =
-        def experimentalPlateSetInstance = editorService.newExperiment(name, description)
+        def liquidHandlerInstance = liquidHandlerService.newMapper(name, inputPlateId, inputWell, inputDose, outputPlateId, outputWell, outputDose)
 
-        if (experimentalPlateSetInstance == null) {
+        if (liquidHandlerInstance == null) {
             notFound()
             return
         }
 
-        if (experimentalPlateSetInstance.hasErrors()) {
-            respond experimentalPlateSetInstance.errors, view:'create'
+        if (liquidHandlerInstance.hasErrors()) {
+            respond liquidHandlerInstance.errors, view:'create'
             return
         }
 
         request.withFormat {
             form multipartForm {
-                flash.message = message(code: 'default.created.message', args: [message(code: 'experimentalPlateSet.label', default: 'ExperimentalPlateSet'), experimentalPlateSetInstance.id])
-                redirect action: 'showactions', id: experimentalPlateSetInstance.id
+                flash.message = message(code: 'default.created.message', args: [message(code: 'liquidHandler.label', default: 'LiquidHandler'), liquidHandlerInstance.id])
+                redirect action: 'showactions', id: liquidHandlerInstance.id
             }
-            '*' { respond experimentalPlateSetInstance, [status: CREATED] }
+            '*' { respond liquidHandlerInstance, [status: CREATED] }
         }
     }
 
