@@ -2,15 +2,21 @@ package edu.harvard.capstone.editor
 
 class LiquidHandler {
 
-    String type
-    Integer maxInputPlates
-    Integer maxOutputPlates
-    Integer maxRacks
+    String name
+    String inputPlateId
+    String inputWell
+    String inputDose
+    String outputPlateId
+    String outputWell
+    String outputDose
 
     static constraints = {
-        type blank: false, nullable: false
-        maxInputPlates min: 0, max: 99999
-        maxOutputPlates min: 0, max: 99999
-        maxRacks min: 0, max: 99999
+        name blank: false, nullable: false
+        inputPlateId blank: false, nullable: false
+        inputWell blank: false, nullable: false
+        inputDose blank: false, nullable: false
+        outputPlateId blank: false, nullable: false
+        outputWell blank: false, nullable: false
+        outputDose blank: false, nullable: false
     }
 }
