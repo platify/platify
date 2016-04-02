@@ -10,5 +10,6 @@ class RawResultFile {
 
     static constraints = {
 		plateSet nullable: true, blank: true
+		fName nullable:true, blank: true
     }
 }

@@ -3,7 +3,7 @@
 <div class="col-sm-6 fieldcontain ${hasErrors(bean: liquidHandlerInstance, field: 'name', 'error')} required">
     <div class="form-group">
         <label for="name">
-            <g:message code="liquidHandler.name.label" default="Name" />
+            <g:message code="liquidHandlerInstance.name.label" default="Name" />
         </label>
         <g:textField name="name" required="" class="form-control" value="${liquidHandlerInstance?.name}"/>
     </div>
@@ -12,7 +12,7 @@
 <div class="col-sm-6 fieldcontain ${hasErrors(bean: liquidHandlerInstance, field: 'inputPlateId', 'error')} required">
     <div class="form-group">
         <label for="name">
-            <g:message code="liquidHandler.inputPlateId.label" default="InputPlateId" />
+            <g:message code="liquidHandlerInstance.inputPlateId.label" default="InputPlateId" />
         </label>
         <g:textField name="inputPlateId" required="" class="form-control" value="${liquidHandlerInstance?.inputPlateId}"/>
     </div>

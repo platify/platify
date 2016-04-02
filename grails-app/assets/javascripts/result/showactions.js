@@ -185,6 +185,8 @@ function init() {
         showHeatMap = $(event.target)[0].checked;
         reloadGrid();
     });
+    
+    var resultUI = new ResultUI();
 }
 
 

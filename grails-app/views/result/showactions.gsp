@@ -69,8 +69,14 @@
 					</h4>
 				</div>
 				<div class="panel-body">
+				<div id="tabs" >
+                    <ul style="background-color:#d9edf7;" >
+                        <li><a href="#resultGrid">Result Grid</a></li>
+                        <li><a href="#scatterplot">Scatter Plot</a></li>
+                    </ul>
 					<div id="resultGrid" class="Blues" style="width:100%;height:650px;"></div>
 					<div id="scatterplot" style="width:100%;height:650px;"></div>
+					</div>
 				</div>
 
 					
@@ -111,6 +117,7 @@
 	</g:javascript>
 	<asset:javascript src="result/ExperimentModel.js" />
 	<asset:javascript src="result/showactions.js" />
+	<asset:javascript src="result/ResultUI.js"/>
 	
 	<!-- scatter plot -->
 	<asset:javascript src="scatter/Scatter.js" />

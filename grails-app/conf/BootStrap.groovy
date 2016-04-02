@@ -10,6 +10,8 @@ import edu.harvard.capstone.editor.Label
 import edu.harvard.capstone.editor.PlateSet
 import edu.harvard.capstone.editor.PlateTemplate
 import edu.harvard.capstone.editor.Well
+import edu.harvard.capstone.editor.Compound
+import edu.harvard.capstone.editor.WellCompound
 import edu.harvard.capstone.parser.Equipment
 import edu.harvard.capstone.result.RawResultFile
 import edu.harvard.capstone.result.Result
@@ -150,13 +152,23 @@ class BootStrap {
             new ExperimentalPlateSet(owner: andres, name: "Zero Assay", description: "Zero assay description").save(flush: true)
             def experiment3 = new ExperimentalPlateSet(owner: zach, name: "envision", description: "Envision assay description").save(flush: true)
 
+			
+			//Create compounds
+			def compoundA = new Compound(name: "substanceA", experiment: experiment1, dateCreated: new Date()).save(failOnError: true, flush: true)
+			def compoundB = new Compound(name: "substanceB", experiment: experiment1, dateCreated: new Date()).save(failOnError: true, flush: true)
+			def compoundC = new Compound(name: "substanceC", experiment: experiment1, dateCreated: new Date()).save(failOnError: true, flush: true)
+			
             def template1 = new PlateTemplate(owner: andres, name: "first template", width: "24", height: "16").save(flush: true)
             def template2 = new PlateTemplate(owner: zach, name: "envision template", width: "24", height: "16").save(flush: true)
 			
+
 			// pushing empty wells for templates
 			for (x in 0 .. 23) {
 				for (y in 0 .. 15) {
-					def t1well = new Well(plate: template1, column: x, row: y, control: Well.WellControl.EMPTY).save(flush: true)
+					def compound1 = new WellCompound(compound: compoundA, unit: WellCompound.Unit.ML, amount:String.valueOf(x*y), dateCreated: new Date()).save(failOnError: true, flush: true)
+			
+					def t1well = new Well(compound: compound1, plate: template1, column: x, row: y, control: Well.WellControl.EMPTY).save(flush: true)
+
 				}
 			}
 			
