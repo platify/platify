@@ -1,10 +1,10 @@
 
-<%@ page import="edu.harvard.capstone.editor.LiquidHandler" %>
+<%@ page import="edu.harvard.capstone.editor.LiquidHandlerMapping" %>
 <!DOCTYPE html>
 <html>
 <head>
     <meta name="layout" content="main">
-    <g:set var="entityName" value="${message(code: 'liquidHandler.type', default: 'type1')}" />
+    <g:set var="entityName" value="${message(code: 'liquidHandlerMapping.type', default: 'type1')}" />
     <title><g:message code="default.list.label" args="[entityName]" /></title>
 </head>
 <body>
@@ -26,7 +26,7 @@
 
             <g:sortableColumn property="name" title="${message(code: 'liquidHandler.name.label', default: 'Name')}" />
 
-            <th><g:message code="liquidHandler.owner.label" default="Owner" /></th>
+            <th><g:message code="liquidHandlerMapping.owner.label" default="Owner" /></th>
 
         </tr>
         </thead>
