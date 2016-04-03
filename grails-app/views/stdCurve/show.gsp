@@ -31,9 +31,8 @@
             Plate: <span id="refPlateSelect"></span>
             <br>
 
-            Plot on X-Axis: <span id="refXCategorySelect"></span><br>
-            Plot on Y-Axis: <span id="refYCategorySelect"></span>
-
+            Known Property: <span id="refXCategorySelect"></span><br>
+            Unknown Property: <span id="refYCategorySelect"></span>
         </div>
     </div>
     <div class="panel panel-default">
@@ -120,7 +119,7 @@
 
     function yCategoryChanged() {
         <g:remoteFunction controller="stdCurve" action="getReferenceData"
-            onSuccess="getReferenceData(data)"
+            onSuccess="updateStdCurve(data)"
                           params="'plate_id='+PLATE_ID"/>
 
         Y_CATEGORY = document.getElementById("refYCategory").value;

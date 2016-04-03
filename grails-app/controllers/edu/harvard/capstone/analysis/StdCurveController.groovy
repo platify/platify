@@ -4,6 +4,7 @@ import edu.harvard.capstone.editor.DomainLabel
 import edu.harvard.capstone.editor.ExperimentalPlateSet
 import edu.harvard.capstone.editor.PlateSet
 import edu.harvard.capstone.editor.Well
+import edu.harvard.capstone.result.ResultService
 import grails.converters.JSON
 
 //import grails.validation.ValidationException
@@ -13,6 +14,7 @@ import grails.converters.JSON
  */
 class StdCurveController {
     def editorService
+    def resultService
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
@@ -30,9 +32,9 @@ class StdCurveController {
             return
         }
 
-        def importData
+        def resultData
         try{
-            importData = editorService.getExperimentData(experiment)
+            resultData = resultService.getResults(experiment)
         }
 /*        catch (ValidationException e) {
             response.sendError(400)
@@ -43,7 +45,7 @@ class StdCurveController {
         }
 
         // TODO - don't really need the experiment object
-        respond experiment as Object, model:[importData: importData]
+        respond experiment as Object, model:[importData: resultData]
     }
 
     def getReferencePlates(int experiment_id) {

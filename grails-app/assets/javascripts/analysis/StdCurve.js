@@ -1,4 +1,5 @@
 var graph;
+var table;
 var x_scale;
 var y_scale;
 var margin;
@@ -6,16 +7,14 @@ var width;
 var height;
 
 function init() {
-    //console.log(IMPORT_DATA_JSON);
-
     margin = {top: 20, right: 20, bottom: 30, left: 30};
     width = 650 - margin.left - margin.right;
     height = 650 - margin.top - margin.bottom;
 
-    createGraph();
+    createGraphAndTable();
 }
 
-function getReferenceData(referenceData) {
+function updateStdCurve(referenceData) {
     REFERENCE_DATA_JSON = JSON.stringify(referenceData);
 
     var reference_data = JSON.parse(REFERENCE_DATA_JSON);
@@ -28,8 +27,10 @@ function getReferenceData(referenceData) {
     var reference_group = ".reference_group";
     plotPoints(reference_points, reference_group);
     var regression_data = addRegression(reference_points);
+    drawLine(regression_data.points);
 
-//    inferUnknownProperties(regression_data, unknown_data);
+    var inferred_data = inferUnknownProperties(regression_data, unknown_data);
+    fillInferredTable(inferred_data);
 }
 
 function getPoints(experiment_json) {
@@ -58,12 +59,11 @@ function addRegression(reference_points) {
     var regression_model = "linearThroughOrigin";
     var regression_data = regression(regression_model, reference_points);
     var newReferencePoints = regression_data.points;
-    drawLine(newReferencePoints);
 
     return regression_data;
 }
 
-function createGraph() {
+function createGraphAndTable() {
     chart = d3.select('#stdCurveVis')
         .append("svg")
         .attr("width", width + margin.left + margin.right)
@@ -84,6 +84,13 @@ function createGraph() {
 
     // Create groups of data sets
     chart.append("g").attr("class", "reference_group");
+    chart.append("g").attr("class", "inferred_group");
+
+    // Create table
+    table = d3.select("#inferredTable").append("table").attr("class", "table");
+    table.append("thead").append("tr").attr("class", "heading");
+    table.append("tbody").attr("class", "body");
+
 }
 
 function createAxes(points) {
@@ -116,7 +123,13 @@ function plotPoints(points, group) {
         .append("circle")
         .attr("cx", function(d) { return x_scale(d[0]); } )
         .attr("cy", function(d) { return y_scale(d[1]); } )
-        .attr("r", 2);
+        .attr("r", 2)
+        .style("fill", function(){
+            if (group == ".inferred_group")
+                return "red";
+            if (group == ".reference_group")
+                return "green";
+        });
 }
 
 function drawLine(points) {
@@ -128,7 +141,60 @@ function drawLine(points) {
 
     chart.selectAll("path.line")
         .attr("d", line(points))
-        .attr("stroke", "blue");
+        .attr("stroke", "lightblue");
+}
+
+function inferUnknownProperties(regression_data, unknown_data) {
+     // Extract x- and y-coordinate from reference wells
+        var unknown_points = [];
+        unknown_data.plates[2].rows.forEach(function(row) {
+            var x_coord = null;
+            var y_coord = null;
+
+            row.columns.forEach(function(column) {
+                x_coord_string = column.rawData[X_CATEGORY];
+                y_coord_string = column.rawData[Y_CATEGORY];
+
+                if (x_coord_string !== undefined)
+                    x_coord = parseFloat(x_coord_string);
+                if (y_coord_string !== undefined)
+                    y_coord = parseFloat(y_coord_string);
+
+                if (!(x_coord == null && y_coord == null))
+                    unknown_points.push([x_coord, y_coord]);
+            });
+        });
+
+        merged_points = regression_data.points.concat(unknown_points);
+        var merged_regression_data = addRegression(merged_points); //regression.js determines unknown y-coordinate
+        createAxes(merged_regression_data.points, width, height);
+
+        // Extract, plot, and return inferred properties
+        var inferred_start_index = regression_data.points.length;
+        var inferred_array = merged_regression_data.points.slice(inferred_start_index);
+        plotPoints(inferred_array, ".inferred_group");
+        return inferred_array;
+}
+
+function fillInferredTable(inferred_data) {
+    var heading = d3.select("tr.heading").selectAll("th")
+        .data([X_CATEGORY, Y_CATEGORY]);
+    heading.exit().remove();
+    heading.enter().append("th");
+    heading.text(function(d) { return d; });
+
+    var rows = d3.select("tbody.body").selectAll("tr")
+        .data(inferred_data);
+    rows.exit().remove();
+    rows.enter().append("tr");
+
+    var cells = rows.selectAll("td")
+        .data(function(d) {
+            return d;
+        });
+    cells.exit().remove();
+    cells.enter().append("td");
+    cells.text(function(d) { return d; });
 }
 
 window.onload = init;
