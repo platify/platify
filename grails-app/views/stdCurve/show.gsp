@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-<%@ page import="edu.harvard.capstone.editor.ExperimentalPlateSet" %>
+<%@ page import="edu.harvard.capstone.editor.PlateSet; edu.harvard.capstone.editor.ExperimentalPlateSet" %>
 <html>
 <head>
     <meta name="layout" content="main">
@@ -24,12 +24,13 @@
             </h4>
         </div>
         <div class="panel-body">
-            Experiment: <g:select id="refExperiment" name="refExperiment" from ="${ExperimentalPlateSet.listOrderByName()}"
-            optionKey="id" optionValue="name" noSelection="[null:' ']" onchange="experimentChanged(this.value);" />
-            <br>
+            Experiment: <g>${experimentName}</g><br>
+            Plate: <g:select id="unknownPlate" name="unknownPlate" from ="${PlateSet.findAllByExperiment(ExperimentalPlateSet.findByName(experimentName))}"
+                 optionKey="barcode" optionValue="barcode" noSelection="[null:' ']" onchange="plateChanged(this.value);" /><br>
 
-            Plate: <span id="refPlateSelect"></span>
-            <br>
+            Experiment: <g:select id="refExperiment" name="refExperiment" from ="${ExperimentalPlateSet.listOrderByName()}"
+                optionKey="id" optionValue="name" noSelection="[null:' ']" onchange="refExperimentChanged(this.value);" /><br>
+            Plate: <span id="refPlateSelect"></span><br>
 
             Known Property: <span id="refXCategorySelect"></span><br>
             Unknown Property: <span id="refYCategorySelect"></span>
@@ -88,24 +89,28 @@
     var IMPORT_DATA_JSON = '${importData.encodeAsJSON()}';
 
     var REFERENCE_DATA_JSON;
-    var EXPERIMENT_ID;
-    var PLATE_ID;
+    var REF_EXPERIMENT_ID;
+    var REF_PLATE_ID;
     var X_CATEGORY;
     var Y_CATGEORY;
 
-    function experimentChanged(experimentId) {
+    function plateChanged(barcode) {
+
+    }
+
+    function refExperimentChanged(experimentId) {
         <g:remoteFunction controller="stdCurve" action="getReferencePlates"
                       update="refPlateSelect"
                       params="'experiment_id='+experimentId"/>
-        EXPERIMENT_ID = document.getElementById("refExperiment").value;
+        REF_EXPERIMENT_ID = document.getElementById("refExperiment").value;
     }
 
-    function plateChanged(plateId) {
+    function refPlateChanged(plateId) {
         <g:remoteFunction controller="stdCurve" action="getReferenceXCategories"
                       update="refXCategorySelect"
                       params="'plate_id='+plateId"/>
 
-        PLATE_ID = document.getElementById("refPlate").value;
+        REF_PLATE_ID = document.getElementById("refPlate").value;
     }
 
     function xCategoryChanged(xCategory) {
@@ -120,7 +125,7 @@
     function yCategoryChanged() {
         <g:remoteFunction controller="stdCurve" action="getReferenceData"
             onSuccess="updateStdCurve(data)"
-                          params="'plate_id='+PLATE_ID"/>
+                          params="'plate_id='+REF_PLATE_ID"/>
 
         Y_CATEGORY = document.getElementById("refYCategory").value;
     }

@@ -32,8 +32,10 @@ class StdCurveController {
             return
         }
 
+        def experimentName
         def resultData
         try{
+            experimentName = experiment.getName();
             resultData = resultService.getResults(experiment)
         }
 /*        catch (ValidationException e) {
@@ -45,14 +47,14 @@ class StdCurveController {
         }
 
         // TODO - don't really need the experiment object
-        respond experiment as Object, model:[importData: resultData]
+        respond experiment as Object, model:[importData: resultData, experimentName: experimentName]
     }
 
     def getReferencePlates(int experiment_id) {
         def referenceExperiment = ExperimentalPlateSet.findById(experiment_id);
         def referencePlate = PlateSet.findAllByExperiment(referenceExperiment);
         render g.select(id:"refPlate", name:"refPlate", from:referencePlate,
-            optionKey:'id', optionValue:"barcode", noSelection:[null:' '], onchange:"plateChanged(this.value)")
+            optionKey:'id', optionValue:"barcode", noSelection:[null:' '], onchange:"refPlateChanged(this.value)")
     }
 
     def getReferenceXCategories(int plate_id) {
