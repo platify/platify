@@ -27,7 +27,7 @@
                                 <thead>
                                 <tr>
                                     <g:sortableColumn property="id" title="#" />
-                                    <g:sortableColumn property="Name" title="${message(code: 'liquidHandler.name.label', default: 'Name')}" />
+                                    <g:sortableColumn property="Name" title="${message(code: 'liquidHandler.Name.label', default: 'Name')}" />
                                     <g:sortableColumn property="InputPlateId" title="${message(code: 'liquidHandler.inputPlateId.label', default: 'InputPlateId')}" />
                                     <g:sortableColumn property="InputWell" title="${message(code: 'liquidHandler.inputWell.label', default: 'InputWell')}" />
                                     <g:sortableColumn property="InputDose" title="${message(code: 'liquidHandler.inputDose.label', default: 'InputDose')}" />
@@ -41,20 +41,14 @@
                                 <g:each in="${liquidHandlerInstanceList}" status="i" var="liquidHandlerInstance">
                                     <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
                                         <td>${liquidHandlerInstance.id}</td>
-                                        <td>${fieldValue(bean: liquidHandlerInstance, field: "Name")}</td>
+                                        <td>${fieldValue(bean: liquidHandlerInstance, field: "name")}</td>
                                         <td>${fieldValue(bean: liquidHandlerInstance, field: "inputPlateId")}</td>
                                         <td>${fieldValue(bean: liquidHandlerInstance, field: "inputWell")}</td>
-                                        <td>${liquidHandlerInstance.owner.firstName + ' ' + liquidHandlerInstance.owner.lastName}</td>
-                                        <td>${fieldValue(bean: liquidHandlerInstance, field: "dateCreated")}</td>
-                                        <td>
-                                            <g:link class="btn btn-info btn-xs"
-                                                    id="${liquidHandlerInstance.id}"
-                                                    action="showactions">Show Details</g:link>
-                                            <g:link class="btn btn-info btn-xs ${disabled[liquidHandlerInstance.id]}"
-                                                    id="${liquidHandlerInstance.id}"
-                                                    controller="result"
-                                                    action="showactions">Show Results</g:link>
-                                        </td>
+                                        <td>${fieldValue(bean: liquidHandlerInstance, field: "inputDose")}</td>
+                                        <td>${fieldValue(bean: liquidHandlerInstance, field: "outputPlateId")}</td>
+                                        <td>${fieldValue(bean: liquidHandlerInstance, field: "outputWell")}</td>
+                                        <td>${fieldValue(bean: liquidHandlerInstance, field: "outputDose")}</td>
+                                        <td>n/a</td>
                                     </tr>
                                 </g:each>
                                 </tbody>

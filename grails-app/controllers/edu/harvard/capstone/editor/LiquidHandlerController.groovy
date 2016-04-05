@@ -16,7 +16,7 @@ import static org.springframework.http.HttpStatus.*
  */
 class LiquidHandlerController {
     def springSecurityService
-    def liquidHandlerService
+    def liquidService
 
     /**
      * Lists the liquid handler configurations
@@ -51,7 +51,7 @@ class LiquidHandlerController {
             return
         }
 
-        def liquidHandlerInstance = liquidHandlerService.newMapper(name, inputPlateId, inputWell, inputDose, outputPlateId, outputWell, outputDose)
+        def liquidHandlerInstance = liquidService.newMapper(name, inputPlateId, inputWell, inputDose, outputPlateId, outputWell, outputDose)
 
         if (liquidHandlerInstance == null) {
             notFound()
@@ -66,10 +66,23 @@ class LiquidHandlerController {
         request.withFormat {
             form multipartForm {
                 flash.message = message(code: 'default.created.message', args: [message(code: 'liquidHandler.label', default: 'LiquidHandler'), liquidHandlerInstance.id])
-                redirect action: 'showactions', id: liquidHandlerInstance.id
+                redirect action: 'index', id: liquidHandlerInstance.id
             }
             '*' { respond liquidHandlerInstance, [status: CREATED] }
         }
+    }
+
+    @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
+    def show(LiquidHandler liquidHandlerInstance) {
+        if (!springSecurityService.isLoggedIn())
+            return
+
+        if(!springSecurityService.principal?.getAuthorities().any { it.authority == "ROLE_ADMIN" || it.authority == "ROLE_SUPER_ADMIN"}){
+            params.owner = springSecurityService.principal
+        }
+
+        def liquidHandlerList = liquidHandler.get(liquidHandlerInstance);
+        response liquidHandlerInstance, model:[liquidHandlerList: liquidHandlerList]
     }
 
 
