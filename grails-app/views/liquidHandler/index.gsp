@@ -19,7 +19,7 @@
             <div class="col-sm-12">
                 <div id="expDetailsPanel" class="panel panel-default">
                     <div class="panel-heading">
-                        <h4 class="panel-title">Mapper List<span class="pull-right"><g:link class="btn btn-info btn-xs" action="create">Create Liquid Handler Mapping</g:link></span></h4>
+                        <h4 class="panel-title">Mapper List<span class="pull-right"><g:link class="btn btn-info" action="create">Create Liquid Handler Mapping</g:link></span></h4>
                     </div>
                     <div class="panel-body ">
                         <div id="list-scientist" class="content scaffold-list" role="main">
