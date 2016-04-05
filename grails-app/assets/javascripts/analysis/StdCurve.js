@@ -7,9 +7,9 @@ var width;
 var height;
 
 function init() {
-    margin = {top: 20, right: 30, bottom: 30, left: 40};
+    margin = {top: 10, right: 30, bottom: 30, left: 40};
     width = 650 - margin.left - margin.right;
-    height = 650 - margin.top - margin.bottom;
+    height = 575 - margin.top - margin.bottom;
 
     createGraphAndTable();
 }
@@ -42,6 +42,9 @@ function updateStdCurve() {
     fillInferredTable(inferred_data);
 }
 
+/*
+    Currently unused; for later add-on.
+*/
 function updateRegressionPreview(referenceData) {
     REFERENCE_DATA_JSON = JSON.stringify(referenceData);
 
