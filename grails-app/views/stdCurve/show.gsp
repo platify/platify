@@ -144,27 +144,28 @@
     }
 
     function refPlateChanged(plateId) {
+        REF_PLATE_ID = document.getElementById("refPlate").value;
+
         <g:remoteFunction controller="stdCurve" action="getReferenceXCategories"
                       update="refXCategorySelect"
                       params="'plate_id='+plateId"/>
 
-        REF_PLATE_ID = document.getElementById("refPlate").value;
+        <g:remoteFunction controller="stdCurve" action="getReferenceData"
+                      onSuccess="updateReferenceData(data)"
+                      params="'plate_id='+REF_PLATE_ID"/>
+
     }
 
     function xCategoryChanged(xCategory) {
         var plateId = document.getElementById("refPlate").value;
-        <g:remoteFunction controller="stdCurve" action="getReferenceYCategories"
-                      update="refYCategorySelect"
-                      params="'plate_id='+plateId + '&x_category='+xCategory"/>
+            <g:remoteFunction controller="stdCurve" action="getReferenceYCategories"
+                          update="refYCategorySelect"
+                          params="'plate_id='+plateId + '&x_category='+xCategory"/>
 
         X_CATEGORY = document.getElementById("refXCategory").value;
     }
 
     function yCategoryChanged() {
-        <g:remoteFunction controller="stdCurve" action="getReferenceData"
-            onSuccess="updateReferenceData(data)"
-                          params="'plate_id='+REF_PLATE_ID"/>
-
         Y_CATEGORY = document.getElementById("refYCategory").value;
     }
 

@@ -28,7 +28,7 @@ function updateStdCurve() {
     var inferred_SVGgroup = ".inferred_group";
 
     var fitModel = $("input[name=fitModel]:checked").val();
-    var degree = document.getElementById('degree').value;console.log(degree);
+    var degree = document.getElementById('degree').value;
     var merged_points = mergeUnknownAndKnownPoints(reference_points, unknown_data);
     var merged_regression_data = getRegression(merged_points, fitModel, degree); //regression.js determines unknown y-coordinate
 
@@ -109,7 +109,7 @@ function getUnknownPoints(unknown_data, plate_index) {
 
 function getRegression(reference_points, fitModel, degree) {
     // Draw line according to selected curve fit
-    var regression_data;console.log(fitModel);
+    var regression_data;
     if (fitModel === "polynomial") {
         regression_data = regression(fitModel, reference_points, parseFloat(degree));
     }
@@ -148,7 +148,6 @@ function createGraphAndTable() {
     table = d3.select("#inferredTable").append("table").attr("class", "table");
     table.append("thead").append("tr").attr("class", "heading");
     table.append("tbody").attr("class", "body");
-
 }
 
 function createAxes(points) {
@@ -188,13 +187,19 @@ function plotPoints(points, group) {
         .attr("cy", function(d) { return y_scale(d[1]); } )
         .attr("r", function() {
             if (group == ".inferred_group")
-                return 1;
-            if (group == ".reference_group")
                 return 2;
+            if (group == ".reference_group")
+                return 3;
+        })
+        .style("stroke", function() {
+            if (group == ".inferred_group")
+                return "red";
+            if (group == ".reference_group")
+                return "green";
         })
         .style("fill", function() {
             if (group == ".inferred_group")
-                return "red";
+                return "none";
             if (group == ".reference_group")
                 return "green";
         });
