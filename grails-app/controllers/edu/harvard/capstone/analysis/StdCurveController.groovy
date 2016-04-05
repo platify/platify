@@ -18,7 +18,7 @@ class StdCurveController {
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
-    def show(ExperimentalPlateSet experiment){
+    def show(){
 
 /*
         if (!springSecurityService.isLoggedIn()){
@@ -26,28 +26,30 @@ class StdCurveController {
             return
         }
 */
+        def experimentList = ExperimentalPlateSet.listOrderByName();
+        // TODO - don't really need the experiment object
+        respond experimentList as Object, model:[experimentList: experimentList]
+    }
 
-        if (experiment == null) {
-            //notFound()
-            return
-        }
-
-        def experimentName
+    def getResultData(int experiment_id) {
         def resultData
         try{
-            experimentName = experiment.getName();
+            def experiment = ExperimentalPlateSet.findById(experiment_id);
             resultData = resultService.getResults(experiment)
         }
-/*        catch (ValidationException e) {
-            response.sendError(400)
-            return
-        }*/ catch (RuntimeException e) {
+        catch (RuntimeException e) {
             response.sendError(500)
             return
         }
 
-        // TODO - don't really need the experiment object
-        respond experiment as Object, model:[importData: resultData, experimentName: experimentName]
+        render (resultData as JSON);
+    }
+
+    def getUnknownPlates(int experiment_id) {
+        def unknownExperiment = ExperimentalPlateSet.findById(experiment_id);
+        def unknownPlate = PlateSet.findAllByExperiment(unknownExperiment);
+        render g.select(id:"unknownPlate", name:"unknownPlate", from:unknownPlate,
+                optionKey:'id', optionValue:"barcode", noSelection:[null:' '], onchange:"unknownPlateChanged()")
     }
 
     def getReferencePlates(int experiment_id) {

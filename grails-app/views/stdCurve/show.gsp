@@ -24,16 +24,29 @@
             </h4>
         </div>
         <div class="panel-body">
-            Experiment: <g>${experimentName}</g><br>
-            Plate: <g:select id="unknownPlate" name="unknownPlate" from ="${PlateSet.findAllByExperiment(ExperimentalPlateSet.findByName(experimentName))}"
-                 optionKey="barcode" optionValue="barcode" noSelection="[null:' ']" onchange="plateChanged(this.value);" /><br>
+            <h5>UNKNOWN SAMPLE</h5>
+            Experiment: <g:select id="unknownExperiment" name="refExperiment" from ="${experimentList}"
+                  optionKey="id" optionValue="name" noSelection="[null:' ']" onchange="getUnknownResults(this.value)"/><br>
+            Plate: <span id="unknownPlateSelect"></span><br><br>
 
-            Experiment: <g:select id="refExperiment" name="refExperiment" from ="${ExperimentalPlateSet.listOrderByName()}"
+            <h5>REFERENCE SAMPLE</h5>
+            Experiment: <g:select id="refExperiment" name="refExperiment" from ="${experimentList}"
                 optionKey="id" optionValue="name" noSelection="[null:' ']" onchange="refExperimentChanged(this.value);" /><br>
-            Plate: <span id="refPlateSelect"></span><br>
+            Plate: <span id="refPlateSelect"></span><br><br>
 
+            <h5>PROPERTIES</h5>
             Known Property: <span id="refXCategorySelect"></span><br>
-            Unknown Property: <span id="refYCategorySelect"></span>
+            Unknown Property: <span id="refYCategorySelect"></span><br><br>
+
+            <h5>REGRESSION MODEL</h5>
+            <input type="radio" name="fitModel" value="linearThroughOrigin" checked="checked"> Linear<br>
+            <input type="radio" name="fitModel" value="exponential"> Exponential<br>
+            <input type="radio" name="fitModel" value="logarithmic"> Logarithmic<br>
+            <input type="radio" name="fitModel" value="power"> Power<br>
+            <input type="radio" name="fitModel" value="polynomial"> Polynomial
+            <input type="text" id="degree" name="degree" placeholder="degree" maxlength="1" size="2"> <br>
+
+            <button id="stdCurveButton">Generate</button>
         </div>
     </div>
     <div class="panel panel-default">
@@ -85,17 +98,32 @@
 <asset:javascript src="analysis/StdCurve.js" />
 
 <g:javascript>
-    var RESULT_SAVE_REFACTORED_DATA_URL = "${createLink(controller: 'refactoredData', action: 'save', resultInstance: null)}";
-    var IMPORT_DATA_JSON = '${importData.encodeAsJSON()}';
-
+    var UNKNOWN_EXPERIMENT_ID;
+    var UNKNOWN_PLATE_ID;
     var REFERENCE_DATA_JSON;
     var REF_EXPERIMENT_ID;
     var REF_PLATE_ID;
     var X_CATEGORY;
-    var Y_CATGEORY;
+    var Y_CATEGORY;
 
-    function plateChanged(barcode) {
+    function getUnknownResults(experimentId) {
+        UNKNOWN_EXPERIMENT_ID = experimentId;
 
+        <g:remoteFunction controller="stdCurve" action="getResultData"
+                          onSuccess="updateUnknownPlates(data)"
+                          params="'experiment_id='+experimentId"/>
+    }
+
+    function updateUnknownPlates(data) {
+        IMPORT_DATA_JSON = data;
+        <g:remoteFunction controller="stdCurve" action="getUnknownPlates"
+                      update="unknownPlateSelect"
+                      params="'experiment_id='+UNKNOWN_EXPERIMENT_ID"/>
+    }
+
+    function unknownPlateChanged() {
+        var unknownPlateSelect = document.getElementById("unknownPlate");
+        UNKNOWN_PLATE_ID = unknownPlateSelect.options[unknownPlateSelect.selectedIndex].text;
     }
 
     function refExperimentChanged(experimentId) {
@@ -124,12 +152,15 @@
 
     function yCategoryChanged() {
         <g:remoteFunction controller="stdCurve" action="getReferenceData"
-            onSuccess="updateStdCurve(data)"
+            onSuccess="updateReferenceData(data)"
                           params="'plate_id='+REF_PLATE_ID"/>
 
         Y_CATEGORY = document.getElementById("refYCategory").value;
     }
 
+    function updateReferenceData(data) {
+        REFERENCE_DATA_JSON = data;
+    }
 
 </g:javascript>
 
