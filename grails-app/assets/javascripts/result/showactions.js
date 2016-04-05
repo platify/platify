@@ -1,6 +1,8 @@
 var experiment;
 var grid;
+var scatter;
 var plateTable;
+var scatterPlot;
 var plateTableTools;
 var showHeatMap = true;
 var showNormalized = false;
@@ -140,6 +142,10 @@ function init() {
     // set up grid
     grid  = new Grid("resultGrid");
 
+    //Set up scatterplot
+    scatter = new Scatter();
+    scatter.setData(experiment.data);
+
     // process experiment object
     if (Object.keys(experiment.experiment.plates).length > 0) {
         var plateData = Object.keys(experiment.experiment.plates).map(function(plateIndex) {
@@ -179,6 +185,8 @@ function init() {
         showHeatMap = $(event.target)[0].checked;
         reloadGrid();
     });
+    
+    var resultUI = new ResultUI();
 }
 
 
