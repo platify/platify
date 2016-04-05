@@ -28,7 +28,7 @@
 					<div class="col-sm-12">
 						<div id="equipementPanel" class="panel panel-default">
 							<div class="panel-heading">
-								<h4 class="panel-title">Equipment List<span class="pull-right"><g:link class="create" action="create" class="btn btn-info btn-xs"><g:message code="default.new.label" args="[entityName]" /></g:link></span></h4>
+								<h4 class="panel-title">Equipment List<span class="pull-right"><g:link class="create" action="create" class="btn btn-info"><g:message code="default.new.label" args="[entityName]" /></g:link></span></h4>
 							</div>
 							<div class="panel-body ">
 								<div id="list-scientist" class="content scaffold-list" role="main">
