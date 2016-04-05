@@ -18,6 +18,18 @@ class LiquidService {
 
     def springSecurityService
 
+    /**
+     * Create new Liquid Handler Mapper
+     * 
+     * @param name
+     * @param inputPlateId
+     * @param inputWell
+     * @param inputDose
+     * @param outputPlateId
+     * @param outputWell
+     * @param outputDose
+     * @return
+     */
     def newMapper(String name, String inputPlateId, String inputWell, String inputDose, String outputPlateId, String outputWell, String outputDose) {
         def scientistInstance = Scientist.get(springSecurityService.principal.id)
         if (!scientistInstance)
@@ -27,6 +39,13 @@ class LiquidService {
         mapperInstance.save()
         mapperInstance
     }
+
+    /**
+     * Export Liquid Handler Mappings to CSV
+     *
+     * @param liquidHandlerInstance
+     * @return
+     */
 
     File exportLiquidHandlerMapper(LiquidHandler liquidHandlerInstance){
         if (!liquidHandlerInstance)
