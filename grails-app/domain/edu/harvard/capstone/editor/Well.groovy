@@ -7,7 +7,6 @@ class Well {
 	Integer row
 	String groupName
 	WellControl control = WellControl.EMPTY
-	WellCompound wellCompound;
 	
 	
 	enum WellControl {
