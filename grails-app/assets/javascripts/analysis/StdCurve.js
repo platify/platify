@@ -37,6 +37,7 @@ function updateStdCurve() {
     createAxes(reference_points.concat(inferred_data.concat(merged_regression_data.points)), width, height);
     plotPoints(reference_points, reference_SVGgroup);
     plotPoints(inferred_data, inferred_SVGgroup);
+
     drawLine(merged_regression_data.points);
 
     fillInferredTable(inferred_data);
@@ -206,7 +207,17 @@ function plotPoints(points, group) {
 }
 
 function drawLine(points) {
-    points = points.sort(function(a, b) {
+    var min_x = d3.min(points, function(d) { return d[0]; });
+    var max_x = d3.max(points, function(d) { return d[0]; });
+
+    var extra_points = interpolate(min_x, max_x);
+    var merged_points = points.concat(extra_points);
+
+    var fitModel = $("input[name=fitModel]:checked").val();
+    var degree = document.getElementById('degree').value;
+    var interpolated_points = getRegression(merged_points, fitModel, degree).points;
+
+    interpolated_points = interpolated_points.sort(function(a, b) {
         return d3.ascending(a[0], b[0]);
     });
 
@@ -215,7 +226,7 @@ function drawLine(points) {
         .y(function(d) { return y_scale(d[1]); });
 
     chart.selectAll("path.line")
-        .attr("d", line(points))
+        .attr("d", line(interpolated_points))
         .attr("stroke", "lightblue")
         .attr("fill", "none");
 }
@@ -266,6 +277,18 @@ function fillInferredTable(inferred_data) {
     cells.exit().remove();
     cells.enter().append("td");
     cells.text(function(d) { return d; });
+}
+
+function interpolate(start, end) {
+    var length = end - start;
+    var interval_length = length/50;
+    var points = [];
+    var x = start;
+    for (var i = 0; i < 50; i++) {
+        points.push([x+(i*interval_length), null]);
+    }
+
+    return points;
 }
 
 function replaceDot(dotString) {
