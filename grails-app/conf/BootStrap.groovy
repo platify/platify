@@ -165,10 +165,8 @@ class BootStrap {
 			// pushing empty wells for templates
 			for (x in 0 .. 23) {
 				for (y in 0 .. 15) {
-					def compound1 = new WellCompound(compound: compoundA, unit: WellCompound.Unit.ML, amount:String.valueOf(x*y), dateCreated: new Date()).save(failOnError: true, flush: true)
-			
-					def t1well = new Well(compound: compound1, plate: template1, column: x, row: y, control: Well.WellControl.EMPTY).save(flush: true)
-
+					def t1well = new Well(plate: template1, column: x, row: y, control: Well.WellControl.EMPTY).save(flush: true)
+					def compound1 = new WellCompound(compound: compoundA, well: t1well, unit: WellCompound.Unit.ML, amount:String.valueOf(x*y), dateCreated: new Date()).save(failOnError: true, flush: true)
 				}
 			}
 			
@@ -248,7 +246,8 @@ class BootStrap {
 						      value: random.nextFloat() * 100,
 						      labelType: ResultLabel.LabelType.RAW_DATA,
 						      scope: ResultLabel.LabelScope.WELL,
-						      domainId: resultWell.id).save(flush: true)
+						      domainId: resultWell.id,
+							 outlier: false).save(flush: true)
 		    if ((x < 4) && (y == 0)) { controlLabels << resultLabel }
 		}
 	    }
