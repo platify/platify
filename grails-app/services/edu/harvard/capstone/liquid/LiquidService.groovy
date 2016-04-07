@@ -20,7 +20,7 @@ class LiquidService {
 
     /**
      * Create new Liquid Handler Mapper
-     * 
+     *
      * @param name
      * @param inputPlateId
      * @param inputWell
