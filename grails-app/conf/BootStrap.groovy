@@ -10,7 +10,10 @@ import edu.harvard.capstone.editor.Label
 import edu.harvard.capstone.editor.PlateSet
 import edu.harvard.capstone.editor.PlateTemplate
 import edu.harvard.capstone.editor.Well
+import edu.harvard.capstone.editor.Compound
+import edu.harvard.capstone.editor.WellCompound
 import edu.harvard.capstone.parser.Equipment
+import edu.harvard.capstone.result.RawResultFile
 import edu.harvard.capstone.result.Result
 import edu.harvard.capstone.result.ResultLabel
 import edu.harvard.capstone.result.ResultPlate
@@ -27,6 +30,8 @@ class BootStrap {
             def frank = new Scientist (firstName: "Frank", lastName: "O'Connor", email: "frank@gmail.com", password:"admin").save(failOnError: true, flush: true)
             def dave = new Scientist (firstName: "Dave", lastName: "Bonner", email: "dave@gmail.com", password:"admin").save(failOnError: true, flush: true)
 
+            def reagan = new Scientist (firstName: "Reagan", lastName: "Williams", email: "reagan@gmail.com", password:"admin").save(failOnError: true, flush: true)
+
             def admin = new Scientist (firstName: "John", lastName: "Davids", email: "admin@gmail.com", password:"admin").save(failOnError: true, flush: true)
 			def scientist = new Scientist (firstName: "Mike", lastName: "Tara", email: "s@gmail.com", password:"s").save(failOnError: true, flush: true)
 
@@ -39,6 +44,10 @@ class BootStrap {
             ScientistRole.findOrCreateByScientistAndRole(admin, externalUser).save(flush: true)
             ScientistRole.findOrCreateByScientistAndRole(admin, adminUser).save(flush: true)
             ScientistRole.findOrCreateByScientistAndRole(scientist, externalUser).save(flush: true)
+
+            ScientistRole.findOrCreateByScientistAndRole(reagan, externalUser).save(flush: true)
+            ScientistRole.findOrCreateByScientistAndRole(reagan, adminUser).save(flush: true)
+            ScientistRole.findOrCreateByScientistAndRole(reagan, superAdmin).save(flush: true)
 
             ScientistRole.findOrCreateByScientistAndRole(andres, externalUser).save(flush: true)
             ScientistRole.findOrCreateByScientistAndRole(andres, adminUser).save(flush: true)
@@ -143,13 +152,22 @@ class BootStrap {
             new ExperimentalPlateSet(owner: andres, name: "Zero Assay", description: "Zero assay description").save(flush: true)
             def experiment3 = new ExperimentalPlateSet(owner: zach, name: "envision", description: "Envision assay description").save(flush: true)
 
+			
+			//Create compounds
+			def compoundA = new Compound(name: "substanceA", experiment: experiment1, dateCreated: new Date()).save(failOnError: true, flush: true)
+			def compoundB = new Compound(name: "substanceB", experiment: experiment1, dateCreated: new Date()).save(failOnError: true, flush: true)
+			def compoundC = new Compound(name: "substanceC", experiment: experiment1, dateCreated: new Date()).save(failOnError: true, flush: true)
+			
             def template1 = new PlateTemplate(owner: andres, name: "first template", width: "24", height: "16").save(flush: true)
             def template2 = new PlateTemplate(owner: zach, name: "envision template", width: "24", height: "16").save(flush: true)
 			
+
 			// pushing empty wells for templates
 			for (x in 0 .. 23) {
 				for (y in 0 .. 15) {
-					def t1well = new Well(plate: template1, column: x, row: y, control: Well.WellControl.EMPTY).save(flush: true)
+					def t1well = new Well(plate: template1, column: x, row: y, control: Well.WellControl.COMPOUND).save(flush: true)
+					def wellCompound1 = new WellCompound(compound: compoundA, well: t1well, unit: WellCompound.Unit.ML, amount:String.valueOf(x*y), dateCreated: new Date()).save(failOnError: true, flush: true)
+					def wellCompound2 = new WellCompound(compound: compoundB, well: t1well, unit: WellCompound.Unit.ML,amount:String.valueOf(x*y),dateCreated: new Date()).save(failOnError: true, flush: true)
 				}
 			}
 			
@@ -159,10 +177,21 @@ class BootStrap {
 				}
 			}
 
-            def plateSet1 = new PlateSet(plate: template1, experiment: experiment1, assay: "my assay", barcode: "10293").save(flush: true)
+            def plateSet1 = new PlateSet(plate: template1, experiment: experiment1, assay: "my assay", barcode: "10293")
+            def rawResultFile1 = new RawResultFile(fName:"asdf", plateSet:plateSet1)
+			def rawResultFile2 = new RawResultFile(fName:"fdsa").save(flush: true)
+            plateSet1.addToRawResults(rawResultFile1)
+            plateSet1.save(flush: true)
+			rawResultFile2.plateSet = plateSet1
+			plateSet1.addToRawResults(rawResultFile2)
+			plateSet1.save(flush: true)
+
             def plateSet2 = new PlateSet(plate: template1, experiment: experiment1, assay: "my assay", barcode: "3321").save(flush: true)
             def plateSet3 = new PlateSet(plate: template1, experiment: experiment1, assay: "my assay", barcode: "2334").save(flush: true)
 
+			def foundRawResult = RawResultFile.findByFName("asdf")
+			
+			
             new PlateSet(plate: template2, experiment: experiment3, assay: "my assay", barcode: "001one").save(flush: true)
             new PlateSet(plate: template2, experiment: experiment3, assay: "my assay", barcode: "002two").save(flush: true)
             new PlateSet(plate: template2, experiment: experiment3, assay: "my assay", barcode: "003three").save(flush: true)
@@ -218,7 +247,8 @@ class BootStrap {
 						      value: random.nextFloat() * 100,
 						      labelType: ResultLabel.LabelType.RAW_DATA,
 						      scope: ResultLabel.LabelScope.WELL,
-						      domainId: resultWell.id).save(flush: true)
+						      domainId: resultWell.id,
+							 outlier: false).save(flush: true)
 		    if ((x < 4) && (y == 0)) { controlLabels << resultLabel }
 		}
 	    }
@@ -236,7 +266,9 @@ class BootStrap {
 	    }
 		
 		
-		}
+		}		
+		
+		
 		log.info "Users: " + Scientist.count()
 		log.info "Roles: " + Role.count()
 		log.info "UserRole: " + ScientistRole.count()

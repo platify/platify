@@ -1,4 +1,3 @@
-build/*
 /.settings
 /bin
 /target-eclipse
@@ -14,3 +13,6 @@ node_modules
 # intellij idea files
 *.iml
 .idea
+*.iws
+*.ipr
+.slcache

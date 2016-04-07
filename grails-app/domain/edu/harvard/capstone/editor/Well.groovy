@@ -7,7 +7,8 @@ class Well {
 	Integer row
 	String groupName
 	WellControl control = WellControl.EMPTY
-
+	
+	
 	enum WellControl {
 	    POSITIVE ("POS"),
 	    NEGATIVE ("NEG"),

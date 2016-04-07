@@ -1,4 +1,23 @@
-As large scale biochemical plate assay experimentation becomes more common, the need for a central management system for organizing, storing, and analyzing plate information is becoming more important.  The Platify Plate, Assay, and Results Management System (PARMS) provides an end-to-end solution, with a focus on providing an intuitive, feature-rich interface.  The plate editor allows rapid layout of an assay, storing plate templates for later reuse.  SAMS also provides an interactive, user-driven output parser.  A researcher can load in CSV/TSV-formatted output from a new machine, then guide SAMS through locating any and all values to be imported.  Once that’s finished, SAMS will store a machine configuration, so it can later be applied automatically to any further output from that machine.  Results can be viewed within SAMS, or downloaded for further analysis elsewhere.
+# Platify
+
+Platify is an open-source project geared towards simplifying the setup, repeatability, results import, analysis, visualization, and sharing of data associated with liquid based bio-chemical experimentation. It is flexible enough for use with a wide range of apparatus, and geared towards the most common types of experiments which scientists perform today. 
+
+![Platify Home Screen](https://raw.githubusercontent.com/platify/platify/master/grails-app/assets/images/screenshot.png)
+
+The system is easy to install and run from a lab’s group server, with the client application accessible via a web browser. This setup will support two layers of security: Software security through the application itself (username and password access), and security through controlled access and firewalls on the server, giving organizations the ability to even close the server off entirely from access outside of the lab or facility. A web application that is run on the user’s own server provides a tremendous amount of portability, ease of access, and flexible security control that makes this ideal for a lab setting.
+
+### Getting Started: Lab Environment
+TBD
+
+### Getting Started: Development Environment
+* For Windows developers
+  * using IntelliJ: [setup instructions](https://github.com/platify/platify//wiki/Development#mac-wintellij).
+* For Mac developers
+  * using Eclipse: [setup instructions](https://github.com/platify/platify//wiki/Development#eclipse)
+  * using IntelliJ: [setup instructions](https://github.com/platify/platify//wiki/Development#mac-wintellij)
+
+
+### Misc details
 
 For further details and documentation, please visit the [wiki](https://github.com/platify/platify/wiki).
 
@@ -11,3 +30,4 @@ https://github.com/alexGalushka/CapStone_HES_2015
 
 Dose Response (West-East team)
 https://github.com/massfords/we99
+=======
