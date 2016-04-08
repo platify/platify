@@ -3,23 +3,11 @@ package platify
 import groovy.sql.Sql
 import grails.plugin.springsecurity.annotation.Secured
 
-
 class SqlController
 {
   def springSecurityService
   def dataSource
-
-  static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
-  def runQuery(){
-    def sql = new Sql(dataSource)
-    def rows = sql.rows(params.sql)
-    rows.each { row ->
-      log.debug row.name
-    }
-    sql.close()
-    render "Query Executed"
-  }
-
+  static allowedMethods = [run: "POST", update: "PUT", delete: "DELETE", index: ["GET", "POST"] ]
 
   @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
   def index()
@@ -31,9 +19,15 @@ class SqlController
     {
       params.owner = springSecurityService.principal
     }
-    runQuery();
+
+    if (request.method == 'POST') {
+      def sql = new Sql(dataSource)
+      def rows = sql.rows(params.sql)
+      sql.close()
+      [results: rows]
+    } else {
+      [results: null]
+    }
   }
 }
-
-
 
