@@ -12,7 +12,7 @@ class ExperimentalPlateSetController {
     def springSecurityService
     def editorService
 
-    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
+   static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
     @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
     def index(Integer max) {

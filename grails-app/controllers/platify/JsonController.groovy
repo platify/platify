@@ -44,16 +44,6 @@ class JsonController
 
 
   @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
-  def dose() {
-    if (params.id){
-      respond Label.get(params.id), [formats:['json']]
-    } else {
-      respond Label.getAll(), [formats:['json']]
-    }
-  }
-
-
-  @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
   def equipment() {
     if (params.id){
       respond Equipment.get(params.id), [formats:['json']]

@@ -44,16 +44,6 @@ class XmlController
 
 
   @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
-  def dose() {
-    if (params.id){
-      respond Dose.get(params.id), [formats:['xml']]
-    } else {
-      respond Dose.getAll(), [formats:['xml']]
-    }
-  }
-
-
-  @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
   def equipment() {
     if (params.id){
       respond Equipment.get(params.id), [formats:['xml']]
