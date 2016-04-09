@@ -68,6 +68,7 @@ grails.converters.encoding = "UTF-8"
 // scaffolding templates configuration
 grails.scaffolding.templates.domainSuffix = 'Instance'
 
+
 // Set to false to use the new Grails 1.2 JSONBuilder in the render method
 grails.json.legacy.builder = false
 // enabled native2ascii conversion of i18n properties files
@@ -159,4 +160,10 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
     '/rawData/**':                    ['IS_AUTHENTICATED_ANONYMOUSLY'],
     '/**':                            ['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'],
 ]
+
+
+grails.converters.default.pretty.print = true
+grails.converters.xml.pretty.print = true
+grails.converters.json.pretty.print = true
+
 
