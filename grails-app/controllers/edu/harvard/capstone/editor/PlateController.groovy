@@ -96,6 +96,22 @@ class PlateController {
         }
    }
 
+  @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
+  def xml() {
+    //render scientistInstance as JSON.use('deep')
+    respond Scientist.getAll(), [formats:['xml']]
+  }
+
+  @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
+  def json() {
+    //render scientistInstance as JSON.use('deep')
+    respond Scientist.getAll(), [formats:['json']]
+  }
+
+
+
+
+
        @Secured(['permitAll'])
     def debug(Long id){
 /*
