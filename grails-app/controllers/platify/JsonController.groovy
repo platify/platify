@@ -23,118 +23,193 @@ import grails.plugin.springsecurity.annotation.Secured
 
 class JsonController
 {
-
   @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
   def compound() {
-    respond Compound.getAll(), [formats:['json']]
+    if (params.id){
+      respond Compound.get(params.id), [formats:['json']]
+    } else {
+      respond Compound.getAll(), [formats:['json']]
+    }
   }
 
 
   @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
   def domain_label() {
-    respond DomainLabel.getAll(), [formats:['json']]
+    if (params.id){
+      respond DomainLabel.get(params.id), [formats:['json']]
+    } else {
+      respond DomainLabel.getAll(), [formats:['json']]
+    }
   }
 
 
   @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
   def dose() {
-    respond Label.getAll(), [formats:['json']]
+    if (params.id){
+      respond Label.get(params.id), [formats:['json']]
+    } else {
+      respond Label.getAll(), [formats:['json']]
+    }
   }
 
 
   @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
   def equipment() {
-    respond Equipment.getAll(), [formats:['json']]
+    if (params.id){
+      respond Equipment.get(params.id), [formats:['json']]
+    } else {
+      respond Equipment.getAll(), [formats:['json']]
+    }
   }
 
 
   @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
   def experimental_plate_set() {
-    respond ExperimentalPlateSet.getAll(), [formats:['json']]
+    if (params.id){
+      respond ExperimentalPlateSet.get(params.id), [formats:['json']]
+    } else {
+      respond ExperimentalPlateSet.getAll(), [formats:['json']]
+    }
   }
 
 
   @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
   def label() {
-    respond Label.getAll(), [formats:['json']]
+    if (params.id){
+      respond Label.get(params.id), [formats:['json']]
+    } else {
+      respond Label.getAll(), [formats:['json']]
+    }
   }
 
 
   @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
   def liquid_handler() {
-    respond LiquidHandler.getAll(), [formats:['json']]
+    if (params.id){
+      respond LiquidHandler.get(params.id), [formats:['json']]
+    } else {
+      respond LiquidHandler.getAll(), [formats:['json']]
+    }
   }
 
 
   @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
   def plate_set() {
-    respond PlateSet.getAll(), [formats:['json']]
+    if (params.id){
+      respond PlateSet.get(params.id), [formats:['json']]
+    } else {
+      respond PlateSet.getAll(), [formats:['json']]
+    }
   }
 
 
   @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
   def plate_template() {
-    respond PlateTemplate.getAll(), [formats:['json']]
+    if (params.id){
+      respond PlateTemplate.get(params.id), [formats:['json']]
+    } else {
+      respond PlateTemplate.getAll(), [formats:['json']]
+    }
   }
 
 
   @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
   def raw_result_file() {
-    respond RawResultFile.getAll(), [formats:['json']]
+    if (params.id){
+      respond RawResultFile.get(params.id), [formats:['json']]
+    } else {
+      respond RawResultFile.getAll(), [formats:['json']]
+    }
   }
 
 
   @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
   def result() {
-    respond Result.getAll(), [formats:['json']]
+    if (params.id){
+      respond Result.get(params.id), [formats:['json']]
+    } else {
+      respond Result.getAll(), [formats:['json']]
+    }
   }
 
 
   @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
   def result_label() {
-    respond ResultLabel.getAll(), [formats:['json']]
+    if (params.id){
+      respond ResultLabel.get(params.id), [formats:['json']]
+    } else {
+      respond ResultLabel.getAll(), [formats:['json']]
+    }
   }
 
 
   @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
   def result_plate() {
-    respond ResultPlate.getAll(), [formats:['json']]
+    if (params.id){
+      respond ResultPlate.get(params.id), [formats:['json']]
+    } else {
+      respond ResultPlate.getAll(), [formats:['json']]
+    }
   }
 
 
   @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
   def result_well() {
-    respond ResultWell.getAll(), [formats:['json']]
+    if (params.id){
+      respond ResultWell.get(params.id), [formats:['json']]
+    } else {
+      respond ResultWell.getAll(), [formats:['json']]
+    }
   }
 
 
   @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
   def role() {
-    respond Role.getAll(), [formats:['json']]
+    if (params.id){
+      respond Role.get(params.id), [formats:['json']]
+    } else {
+      respond Role.getAll(), [formats:['json']]
+    }
   }
 
 
   @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
   def scientist() {
-    respond Scientist.getAll(), [formats:['json']]
+    if (params.id){
+      respond Scientist.get(params.id), [formats:['json']]
+    } else {
+      respond Scientist.getAll(), [formats:['json']]
+    }
   }
 
 
   @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
   def scientist_role() {
-    respond ScientistRole.getAll(), [formats:['json']]
+    if (params.id){
+      respond ScientistRole.get(params.id), [formats:['json']]
+    } else {
+      respond ScientistRole.getAll(), [formats:['json']]
+    }
   }
 
 
   @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
   def well() {
-    respond Well.getAll(), [formats:['json']]
+    if (params.id){
+      respond Well.get(params.id), [formats:['json']]
+    } else {
+      respond Well.getAll(), [formats:['json']]
+    }
   }
 
 
   @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
   def well_compound() {
-    respond WellCompound.getAll(), [formats:['json']]
+    if (params.id){
+      respond WellCompound.get(params.id), [formats:['json']]
+    } else {
+      respond WellCompound.getAll(), [formats:['json']]
+    }
   }
 
 }
