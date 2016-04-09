@@ -85,7 +85,7 @@ function ParserUI(parsingController){
     var parsingIDElement = document.getElementById("parsingId");
     var saveConfigButton = document.getElementById("saveConfigToServer");
     var saveAsConfigButton = document.getElementById("saveAsConfigToServer");
-
+    var selectedFiles;
 
 
 
@@ -250,23 +250,23 @@ function ParserUI(parsingController){
     };
 
     this.handleFileSelect = function(event) {
-        var files;
+        
 
         if (event.target && event.target.files){
             // file input case
-            files = event.target.files; // FileList object
+            selectedFiles = event.target.files; // FileList object
         } else if (event.dataTransfer && event.dataTransfer.files) {
             // drag and drop case
-            files = event.dataTransfer.files;
+            selectedFiles = event.dataTransfer.files;
         }
 
 
         try{
-            _self.parsingController.loadFiles(files);
+            _self.parsingController.loadFiles(selectedFiles);
 
             // if the files loaded without errors, display their names on the UI
             // TODO - display multiple file names
-            _self.setSelectedFileName(files[0].name);
+            _self.setSelectedFileName(selectedFiles[0].name);
         } catch (error){
             _self.displayError(error);
         }

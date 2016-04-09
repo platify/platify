@@ -29,7 +29,7 @@ function ParsingController(){
     _self.selectCells = null;
     _self.originalName = null;
     _self.stage = null;
-
+    _self.rawFiles = null;
 
 
 
@@ -42,6 +42,7 @@ function ParsingController(){
                                     "load files");
         }
 
+        _self.rawFiles = files;
         // start with a fresh file examiner, and set its load event listener
         _self.examiner = new FileExaminer();
         _self.examiner.registerAsLoadListener(_self.handleExaminerLoad);
@@ -180,6 +181,7 @@ function ParsingController(){
                                               _self.parsingConfig.getNumberOfPlateRows(),
                                               _self.parsingConfig.getNumberOfPlateColumns());
             _self.importData.setParsingID(_self.parsingConfig.getID());
+            _self.importData.setRawFiles(_self.rawFiles);
             DataExtractor.fillImportData(_self.importData,
                                          _self.parsingConfig,
                                          _self.plates,
