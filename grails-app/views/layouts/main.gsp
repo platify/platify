@@ -21,7 +21,7 @@
 		<asset:javascript src="jquery-1.11.2.min.js"/>
 		<g:layoutHead/>
 	</head>
-	<body>
+	<body style="-webkit-font-smoothing: antialiased;">
 
 		<g:set var="userObject" value="${Scientist.findByEmail(sec?.loggedInUserInfo(field:'username'))}"/>
 

@@ -1,7 +1,8 @@
 package edu.harvard.capstone.editor
 
-class LiquidHandlerMapping {
+class LiquidHandler {
 
+    String name
     String inputPlateId
     String inputWell
     String inputDose
@@ -10,6 +11,7 @@ class LiquidHandlerMapping {
     String outputDose
 
     static constraints = {
+        name blank: false, nullable: false
         inputPlateId blank: false, nullable: false
         inputWell blank: false, nullable: false
         inputDose blank: false, nullable: false
