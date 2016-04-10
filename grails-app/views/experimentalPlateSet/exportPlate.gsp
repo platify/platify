@@ -43,8 +43,10 @@
 										<g:sortableColumn property="dateCreated" title="${message(code: 'plateSetInstance.plate.date.label', default: 'Date')}" />
 										<th>Horizontal Wells</th>
 										<th>Vertical Wells</th>			<!-- Change to well size ?? -->
-										<th>Preview</th>	
-										<th style="text-align: center;">Export</th>															
+										<th>Preview</th>
+                                      <th style="text-align: center;">CSV</th>
+                                      <th style="text-align: center;">JSON</th>
+                                      <th style="text-align: center;">XML</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -60,9 +62,23 @@
 										<td>${fieldValue(bean: plateSetInstance.plate, field: "height")}</td>
 										<td><button value="${plateSetInstance.id}-${fieldValue(bean: plateSetInstance.plate, field: 'width')}-${fieldValue(bean: plateSetInstance.plate, field: 'height')}"
 										onclick="onViewSelect(this)" type="button" class="btn btn-info btn-xs" data-toggle="modal" data-target="#viewSavedPlateModal">View</button></td>
-										<td style="text-align: center;"><g:link controller="experimentalPlateSet" action="exportPlateSetFile" id="${plateSetInstance.id}">
-											<i class="fa fa-file-excel-o"></i>
-										</g:link></td>
+
+                                      <td style="text-align: center;"><g:link controller="experimentalPlateSet"
+                                                                              action="exportPlateSetFile" id="${plateSetInstance.id}">
+                                        <i class="fa fa-file-excel-o"></i>
+                                      </g:link></td>
+
+                                      <td style="text-align: center;"><g:link controller="experimentalPlateSet"
+                                                                              action="exportPlateSetJson" id="${plateSetInstance.id}">
+                                        <i class="fa fa-file-text-o"></i>
+                                      </g:link></td>
+
+
+                                      <td style="text-align: center;"><g:link controller="experimentalPlateSet"
+                                                                              action="exportPlateSetXml" id="${plateSetInstance.id}">
+                                        <i class="fa fa-file-text-o"></i>
+                                      </g:link></td>
+
 									</tr>
 								</g:each>
 								</tbody>
