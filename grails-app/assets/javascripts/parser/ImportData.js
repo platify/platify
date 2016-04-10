@@ -982,13 +982,7 @@ function ImportData(numPlates, numRows, numCols){
      */
     this.getJSONImportDataObject = function(){
         var object = {};
-        var fileReady = false;
-        var check = function() {
-        	if (fileReady == true) {
-        		return;
-        	}
-        	setTimeout(check, 1000);
-        }
+        
         
         object.experimentID = this.experimentID;
         object.parsingID = this.parsingID;
@@ -1001,14 +995,8 @@ function ImportData(numPlates, numRows, numCols){
         	for (var idx = 0; idx < rawFiles.length; ++idx) {
         		f = rawFiles[idx];
         		fileName = f.name;
-        		fileReader = new FileReader();
-        		fileReader.onload = function(readerEvent) {
-        			fileData = readerEvent.target.result;
-        			fileReady = true;
-        		}
-        		fileReader.readAsDataURL(f);
-        		check();
-        		fileReady = false;
+        		fileReader = new FileReaderSync();
+        		fileData = fileReader.readAsText(f);
     			object.rawFiles.push([fileName, fileData]);
         	}
         	
