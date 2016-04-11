@@ -69,8 +69,8 @@ class ResultService {
 
 		data.rawFiles.each { name, contents ->
 			def rawResultFile = createRawResultFile(name, contents)
-			rawResultFile.result = resultInstance
-			
+			resultInstance.addToRawResults(rawResultFile)
+			resultInstance.save()
 		}
 
 		// create the experiment labels
