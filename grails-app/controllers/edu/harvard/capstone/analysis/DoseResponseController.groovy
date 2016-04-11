@@ -19,7 +19,7 @@ import grails.converters.JSON
 class DoseResponseController {
 
     def springSecurityService
-    def resultService
+    def fitDoseResponseCurveService
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
@@ -27,6 +27,25 @@ class DoseResponseController {
     @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
     def show(Integer max) {
 
+        def experimentList = ExperimentalPlateSet.listOrderByName();
+        // TODO - don't really need the experiment object
+        respond experimentList as Object, model:[experimentList: experimentList]
+
+    }
+
+    @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
+    def getDoseResponseData(int experiment_id) {
+        def resultData
+        try{
+            def experiment = ExperimentalPlateSet.findById(experiment_id);
+            resultData = fitDoseResponseCurveService.getData(experiment)
+        }
+        catch (RuntimeException e) {
+            response.sendError(500)
+            return
+        }
+
+        render (resultData as JSON);
     }
 }
 
