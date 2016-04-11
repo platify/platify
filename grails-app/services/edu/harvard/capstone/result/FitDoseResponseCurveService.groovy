@@ -20,7 +20,10 @@ class FitDoseResponseCurveService {
 
     }
 
-    def fitCurve(ExperimentalPlateSet experiment) {
+    def getfittedData(ExperimentalPlateSet experiment) {
+        if (!experiment) {
+            throw new RuntimeException("The experiment does not exist")
+        }
 
         data = getResults(experiment)
 
@@ -61,10 +64,6 @@ class FitDoseResponseCurveService {
 
             resultData.compounds << fitData
         }
-
-
-
-
     }
 
     def getResults(ExperimentalPlateSet experiment) {
