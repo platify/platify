@@ -15,17 +15,14 @@ function init() {
 }
 
 $("#stdCurveButton").click(function() {
-    updateStdCurve();
+    updateDoseResponseCurve();
 });
 
-function updateStdCurve() {
+function updateDoseResponseCurve() {
     var reference_data = REFERENCE_DATA_JSON;
     var unknown_data = IMPORT_DATA_JSON;
 
     var reference_points = getRefPoints(reference_data);
-
-    var reference_SVGgroup = ".reference_group";
-    var inferred_SVGgroup = ".inferred_group";
 
     var fitModel = $("input[name=fitModel]:checked").val();
     var degree = document.getElementById('degree').value;
@@ -60,66 +57,6 @@ function updateRegressionPreview(referenceData) {
     createAxes(reference_points.concat(regression_data.points), width, height);
     plotPoints(reference_points, reference_SVGgroup);
     drawLine(regression_data.points);
-}
-
-function getRefPoints(experiment_json) {
-    // Extract x- and y-coordinate from reference wells
-    var reference_points = [];
-    experiment_json.plates[0].wells.forEach(function(well) {
-        var x_coord = null;
-        var y_coord = null;
-
-        well.labels.forEach(function(label) {
-            if (label.category == X_CATEGORY)
-                x_coord = parseFloat(replaceDot(label.name));
-            if (label.category == Y_CATEGORY)
-                y_coord = parseFloat(replaceDot(label.name));
-        });
-
-        if (x_coord !== null && y_coord !== null)
-            reference_points.push([x_coord, y_coord]);
-    });
-
-    return reference_points;
-}
-
-function getUnknownPoints(unknown_data, plate_index) {
-    var unknown_points = [];
-
-    unknown_data.plates[plate_index].rows.forEach(function(row) {
-        var x_coord = null;
-        var y_coord = null;
-
-        row.columns.forEach(function(column) {
-            x_coord_string = column.rawData[X_CATEGORY];
-            y_coord_string = column.rawData[Y_CATEGORY];
-
-            if (x_coord_string !== undefined)
-                x_coord = parseFloat(x_coord_string);
-            if (y_coord_string !== undefined)
-                y_coord = parseFloat(y_coord_string);
-
-            if (!(x_coord == null && y_coord == null))
-                unknown_points.push([x_coord, y_coord]);
-        });
-    });
-
-    return unknown_points;
-}
-
-
-function getRegression(reference_points, fitModel, degree) {
-    // Draw line according to selected curve fit
-    var regression_data;
-    if (fitModel === "polynomial") {
-        regression_data = regression(fitModel, reference_points, parseFloat(degree));
-    }
-    else
-        regression_data = regression(fitModel, reference_points);
-
-    var newReferencePoints = regression_data.points;
-
-    return regression_data;
 }
 
 function createGraphAndTable() {
@@ -231,28 +168,6 @@ function drawLine(points) {
         .attr("fill", "none");
 }
 
-function mergeUnknownAndKnownPoints(reference_points, unknown_data) {
-    // Extract x- and y-coordinate from reference wells
-    var plate_index;
-    for (var i = 0; i < unknown_data.plates.length; i++) {
-            if (UNKNOWN_PLATE_ID.localeCompare(unknown_data.plates[i].plateID) === 0) {
-                plate_index = i;
-                break;
-            }
-    }
-
-    var unknown_points = getUnknownPoints(unknown_data, plate_index);
-
-    return reference_points.concat(unknown_points);
-}
-
-function getInferredPointsFromRegression(reference_points, regression_points) {
-    // Extract, plot, and return inferred properties
-    var inferred_start_index = reference_points.length;
-    var inferred_array = regression_points.slice(inferred_start_index);
-
-    return inferred_array;
-}
 
 function fillInferredTable(inferred_data) {
     inferred_data = inferred_data.sort(function(a, b) {

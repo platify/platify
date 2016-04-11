@@ -66,7 +66,7 @@ class FitDoseResponseCurveService {
         }
     }
 
-    def getResults(ExperimentalPlateSet experiment) {
+    def getData(ExperimentalPlateSet experiment) {
         if (!experiment) {
             throw new RuntimeException("The experiment does not exist")
         }
@@ -85,8 +85,8 @@ class FitDoseResponseCurveService {
                         rows     : [],
                         compounds: [:]
                 ]
-                def n_rows = Integer.parseInt(plateTemplate.width)
-                def n_columns = Integer.parseInt(plateTemplate.height)
+                def n_columns = Integer.parseInt(plateTemplate.width)
+                def n_rows = Integer.parseInt(plateTemplate.height)
 
                 // generate the shape of the plate
                 (0..n_rows - 1).each { rowIndex ->
@@ -101,8 +101,10 @@ class FitDoseResponseCurveService {
 
                 def wellsById = [:]
                 Well.findAllByPlate(plateSet.plate).each { well ->
-                    wellsById[well.id] = well
-                    plate.rows[well.row].columns[well.column].control = well.control.toString().toUpperCase()
+                    if (well.row < n_rows && well.column < n_columns) {
+                        wellsById[well.id] = well
+                        plate.rows[well.row].columns[well.column].control = well.control.toString().toUpperCase()
+                    }
                 }
                 DomainLabel.where {
                     domainId in wellsById.keySet()
@@ -112,9 +114,9 @@ class FitDoseResponseCurveService {
                     def wellOut = plate.rows[well.row].columns[well.column]
                     def label = domainLabel.label
                     if (label.category == "compound") {
-                        plate.compounds[label.value] = 1
+                        plate.compounds[label.name] = 1
                     }
-                    wellOut.labels[label.category] = label.value
+                    wellOut.labels[label.category] = label.name
                 }
 
                 def resultWellsById = [:]
