@@ -130,15 +130,13 @@ grails.plugin.springsecurity.userLookup.usernamePropertyName='email'
 grails.plugin.springsecurity.userLookup.userDomainClassName = 'edu.harvard.capstone.user.Scientist'
 grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'edu.harvard.capstone.user.ScientistRole'
 grails.plugin.springsecurity.authority.className = 'edu.harvard.capstone.user.Role'
+//grails.plugins.springsecurity.securityConfigType = SecurityConfigType.InterceptUrlMap
+grails.plugin.springsecurity.successHandler.defaultTargetUrl = '/index'
 grails.plugin.springsecurity.controllerAnnotations.staticRules = [
-	'/':                              ['permitAll'],
-	'/index':                         ['permitAll'],
-	'/index.gsp':                     ['permitAll'],
-	'/**/js/**':                      ['permitAll'],
-	'/**/css/**':                     ['permitAll'],
-	'/**/images/**':                  ['permitAll'],
-	'/**/favicon.ico':                ['permitAll'],
-    '/assets/**':                     ['permitAll'],
+//	'/':                              ['IS_AUTHENTICATED_ANONYMOUSLY'],
+//	'/index':                         ['IS_AUTHENTICATED_ANONYMOUSLY'],
+//	'/index.gsp':                     ['IS_AUTHENTICATED_ANONYMOUSLY'],
+    '/**/assets/**':                  ['permitAll'], // js, css, images, ico
     '/dbconsole':                     ['ROLE_SUPER_ADMIN'],//['ROLE_ADMIN', 'ROLE_SUPER_ADMIN']],
     '/dbconsole.*':                   ['ROLE_SUPER_ADMIN'],
     '/dbconsole/**':                  ['ROLE_SUPER_ADMIN'],
@@ -148,17 +146,17 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
     '/**/vendor/**':                  ['ROLE_SUPER_ADMIN'],
     '/**/dist/**':                    ['ROLE_SUPER_ADMIN'],
     '/scientist/index':               ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'],
-    '/j_spring_*':                    ['permitAll'],
-    '/login/**':                      ['permitAll'],
-    '/logout/**':                     ['permitAll'],
-    '/j_spring_security_logout':      ['permitAll'],
-    '/scientist/**':                  ['permitAll'],
+    '/j_spring_*':                    ['IS_AUTHENTICATED_ANONYMOUSLY'],
+    '/login/**':                      ['IS_AUTHENTICATED_ANONYMOUSLY'],
+    '/logout/**':                     ['IS_AUTHENTICATED_ANONYMOUSLY'],
+    '/j_spring_security_logout':      ['IS_AUTHENTICATED_ANONYMOUSLY'],
+    '/scientist/**':                  ['IS_AUTHENTICATED_ANONYMOUSLY'],
     '/equipment/index':               ['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'],
     '/equipment/**':                  ['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'],
     '/experimentalPlateSet/index':    ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'],
-    '/experimentalPlateSet/**':       ['permitAll'],
-    '/result/**':                     ['permitAll'],
-    '/rawData/**':                    ['permitAll'],
-    '/**':			      ['permitAll'],
-
+    '/experimentalPlateSet/**':       ['IS_AUTHENTICATED_ANONYMOUSLY'],
+    '/result/**':                     ['IS_AUTHENTICATED_ANONYMOUSLY'],
+    '/rawData/**':                    ['IS_AUTHENTICATED_ANONYMOUSLY'],
+    '/**':                            ['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'],
 ]
+

@@ -21,7 +21,7 @@
 		<asset:javascript src="jquery-1.11.2.min.js"/>
 		<g:layoutHead/>
 	</head>
-	<body>
+	<body style="-webkit-font-smoothing: antialiased;">
 
 		<g:set var="userObject" value="${Scientist.findByEmail(sec?.loggedInUserInfo(field:'username'))}"/>
 
@@ -37,7 +37,7 @@
 			        <span class="icon-bar"></span>
 			        <span class="icon-bar"></span>
 			      </button>
-			      <a class="navbar-brand" href="${createLink(uri: '/')}">SurNorte</a>
+			      <a class="navbar-brand" href="${createLink(uri: '/')}">Platify</a>
 			    </div>
 
 			    <!-- Collect the nav links, forms, and other content for toggling -->
@@ -52,6 +52,17 @@
 									<li><g:link controller="experimentalPlateSet" action="create">Create Assay</g:link></li>
 								</ul>
 							</li>
+							<li class="plate-editor">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Liquid Handler Mappers<span class="caret"></span></a>
+								<ul class="dropdown-menu" role="menu">
+									<li><g:link controller="liquidHandler" action="index">View Mappers</g:link></li>
+									<li class="divider"></li>
+									<li><g:link controller="liquidHandler" action="create">Create Mapper</g:link></li>
+								</ul>
+							</li>
+
+
+
 							<li class="output-parser">
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Output Parser <span class="caret"></span></a>
 								<ul class="dropdown-menu" role="menu">

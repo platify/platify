@@ -19,9 +19,9 @@
 							</div>
 							<div class="panel-body ">
 								<ul class="list-unstyled">
-									<li><g:link class="btn btn-info btn-sm" controller="experimentalPlateSet" action="index">View Assays</g:link></li>
-									<li><g:link class="btn btn-info btn-sm" controller="experimentalPlateSet" action="create">Create New Assay</g:link></li>
-									<li><g:link class="btn btn-info btn-sm" controller="experimentalPlateSet" action="exportPlate">Export Plate</g:link></li>
+									<li><button type="button" class="btn btn-info btn-sm" onclick="location.href='experimentalPlateSet/index';">View Assays</button></li>
+									<li><button type="button" class="btn btn-info btn-sm" onclick="location.href='experimentalPlateSet/create';">Create New Assay</button></li>
+									<li><button type="button" class="btn btn-info btn-sm" onclick="location.href='experimentalPlateSet/exportPlate';">Export Plate</button></li>
 								</ul>
 							</div>
 						</div>
@@ -31,10 +31,10 @@
 							<div class="panel-heading">
 								<h4 class="panel-title">Plate Templates</h4>
 							</div>
-							<div class="panel-body ">							
+							<div class="panel-body ">
 								<ul class="list-unstyled">
 									<li><button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#createTemplateModal">Create New Template</button></li>
-									<li><g:link class="btn btn-info btn-sm" controller="experimentalPlateSet" action="exportTemplate">Export Template</g:link></li>
+									<li><button type="button" class="btn btn-info btn-sm" onclick="location.href='experimentalPlateSet/exportTemplate';">Export Template</button></li>
 								</ul>
 							</div>
 						</div>
@@ -46,8 +46,8 @@
 							</div>
 							<div class="panel-body ">
 								<ul class="list-unstyled">
-									<li><g:link class="btn btn-info btn-sm" controller="equipment" action="index">View Equipment</g:link></li>
-									<li><g:link class="btn btn-info btn-sm" controller="equipment" action="create">Create New Equipment</g:link></li>
+									<li><button type="button" class="btn btn-info btn-sm" onclick="location.href='equipment/index';">View Equipment</button></li>
+									<li><button type="button" class="btn btn-info btn-sm" onclick="location.href='equipment/create';">Create New Equipment</button></li>
 								</ul>
 							</div>
 						</div>
@@ -59,8 +59,24 @@
 							</div>
 							<div class="panel-body ">
 								<ul class="list-unstyled">
-									<li><g:link class="btn btn-info btn-sm" controller="scientist" action="index">View Users</g:link></li>
-									<li><g:link class="btn btn-info btn-sm" controller="scientist" action="create">Create New User</g:link></li>
+									<li><button type="button" class="btn btn-info btn-sm" onclick="location.href='scientist/index';">View Users</button></li>
+									<li><button type="button" class="btn btn-info btn-sm" onclick="location.href='scientist/create';">Create New User</button></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-12 content-body">
+					<div class="col-sm-3">
+						<div id="normPanel" class="panel panel-default">
+							<div class="panel-heading">
+								<h4 class="panel-title">Standard Curve</h4>
+							</div>
+							<div class="panel-body ">
+								<ul class="list-unstyled">
+									<li><button type="button" class="btn btn-info btn-sm" onclick="location.href='stdCurve/show';">Normalize plate</button></li>
 								</ul>
 							</div>
 						</div>
@@ -68,7 +84,7 @@
 				</div>
 			</div>
 		</div>
-		
+
 		<g:render template="/plateTemplate/createTemplateDialog"/>
 	</body>
 </html>

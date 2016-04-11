@@ -72,9 +72,10 @@ grails.project.dependency.resolution = {
         compile ":console:1.4.4"
 
         // plugins needed at runtime but not for compilation
-        runtime ":hibernate:3.6.10.16" // or ":hibernate4:4.3.5.4"
+        compile ":hibernate:3.6.10.16" // or ":hibernate4:4.3.5.4"
         runtime ":database-migration:1.4.0"
         runtime ":jquery:1.11.1"
+        //runtime ':twitter-bootstrap:3.3.5'
 
         // To avoid caching issues
         compile ":cache-headers:1.1.7"
@@ -83,8 +84,11 @@ grails.project.dependency.resolution = {
 
         compile ":platform-core:1.0.RC6"
 
-        compile ":sass-asset-pipeline:1.9.0"   
- 
+        compile ":sass-asset-pipeline:1.9.0"
+
+
+
+
         // Uncomment these (or add new ones) to enable additional resources capabilities
         //runtime ":zipped-resources:1.0.1"
         //runtime ":cached-resources:1.1"
