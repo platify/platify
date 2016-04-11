@@ -88,7 +88,6 @@ function ParserUI(parsingController){
     var selectedFiles;
 
 
-
     // ------------------- parsing tab getters and setters ------------------------------
 
 

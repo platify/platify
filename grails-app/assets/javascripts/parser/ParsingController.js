@@ -435,6 +435,7 @@ function ParsingController(){
 
     _self.saveImportDataToServer = function(){
         _self.importData.setExperimentID(_self.parserUI.getSelectedExperimentID());
+        _self.importData.setRawFilesData(_self.examiner.rawFileContents)
         _self.importData.throwErrorIfAnyPlateIDsNotSet();
 
         var serverCommunicator = new ServerCommunicator(hostname);

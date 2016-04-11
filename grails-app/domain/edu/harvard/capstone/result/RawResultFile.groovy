@@ -6,10 +6,10 @@ class RawResultFile {
 
       String fName
 
-    static belongsTo = [plateSet:PlateSet]
+    static belongsTo = [result:Result]
 
     static constraints = {
-		plateSet nullable: true, blank: true
+		result nullable: true, blank: true
 		fName nullable:true, blank: true
     }
 }
