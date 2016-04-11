@@ -4,7 +4,11 @@ import edu.harvard.capstone.editor.DomainLabel
 import edu.harvard.capstone.editor.ExperimentalPlateSet
 import edu.harvard.capstone.editor.PlateSet
 import edu.harvard.capstone.editor.Well
+import edu.harvard.capstone.result.Result
+import edu.harvard.capstone.result.ResultLabel
+import edu.harvard.capstone.result.ResultPlate
 import edu.harvard.capstone.result.ResultService
+import edu.harvard.capstone.result.ResultWell
 import grails.converters.JSON
 
 //import grails.validation.ValidationException
@@ -59,7 +63,49 @@ class StdCurveController {
             optionKey:'id', optionValue:"barcode", noSelection:[null:' '], onchange:"refPlateChanged(this.value)")
     }
 
-    def getReferenceXCategories(int plate_id) {
+    def getReferenceXCategories(int experiment_id) {
+//        def plateInstance = PlateSet.findById(plate_id);
+//        def referenceWells = Well.findAllByPlate(plateInstance.plate);
+//        def wellLabels = [];
+//        referenceWells.each{
+//            def label = DomainLabel.findAllByDomainIdAndLabelTypeAndPlate(
+//                    it.id, DomainLabel.LabelType.WELL, plateInstance).collect{it.label}
+//            label.each{
+//                if (!wellLabels.contains(it.category) && it.category != "compound")
+//                wellLabels << it.category;
+//            }
+//        }
+//
+//        render g.select(id:"refXCategory", name:"refXCategory", from:wellLabels,
+//                noSelection:[null:' '], onchange:"xCategoryChanged(this.value)")
+        def experiment = ExperimentalPlateSet.findById(experiment_id);
+        def resultInstance = Result.findByExperiment(experiment);
+        def resultPlate = ResultPlate.findByResult(resultInstance);
+        def result_well = ResultWell.findByPlate(resultPlate);
+        def result_label = ResultLabel.findByDomainIdAndLabelType(result_well.id, ResultLabel.LabelType.RAW_DATA)
+        def labels = [result_label.name];
+        render g.select(id:"refXCategory", name:"refXCategory", from:labels,
+                noSelection:[null:' '], onchange:"xCategoryChanged(this.value)")
+    }
+
+    def getReferenceYCategories(int plate_id) {
+//        def plateInstance = PlateSet.findById(plate_id);
+//        def referenceWells = Well.findAllByPlate(plateInstance.plate);
+//
+//        def wellLabels = [];
+//        referenceWells.each{
+//            def label = DomainLabel.findAllByDomainIdAndLabelTypeAndPlate(
+//                    it.id, DomainLabel.LabelType.WELL, plateInstance).collect{it.label}
+//            label.each{
+//                if (!wellLabels.contains(it.category) && it.category != "compound"
+//                    && it.category != x_category)
+//                    wellLabels << it.category;
+//            }
+//        }
+//
+//        render g.select(id:"refYCategory", name:"refYCategory", from:wellLabels,
+//                noSelection:[null:' '], onchange:"yCategoryChanged()")
+
         def plateInstance = PlateSet.findById(plate_id);
         def referenceWells = Well.findAllByPlate(plateInstance.plate);
         def wellLabels = [];
@@ -69,24 +115,6 @@ class StdCurveController {
             label.each{
                 if (!wellLabels.contains(it.category) && it.category != "compound")
                 wellLabels << it.category;
-            }
-        }
-
-        render g.select(id:"refXCategory", name:"refXCategory", from:wellLabels,
-                noSelection:[null:' '], onchange:"xCategoryChanged(this.value)")
-    }
-
-    def getReferenceYCategories(int plate_id, String x_category) {
-        def plateInstance = PlateSet.findById(plate_id);
-        def referenceWells = Well.findAllByPlate(plateInstance.plate);
-        def wellLabels = [];
-        referenceWells.each{
-            def label = DomainLabel.findAllByDomainIdAndLabelTypeAndPlate(
-                    it.id, DomainLabel.LabelType.WELL, plateInstance).collect{it.label}
-            label.each{
-                if (!wellLabels.contains(it.category) && it.category != "compound"
-                    && it.category != x_category)
-                    wellLabels << it.category;
             }
         }
 

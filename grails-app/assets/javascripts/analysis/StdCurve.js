@@ -22,7 +22,7 @@ function updateStdCurve() {
     var reference_data = REFERENCE_DATA_JSON;
     var unknown_data = IMPORT_DATA_JSON;
 
-    var reference_points = getRefPoints(reference_data);
+    var reference_points = getRefPoints(reference_data, unknown_data);
 
     var reference_SVGgroup = ".reference_group";
     var inferred_SVGgroup = ".inferred_group";
@@ -62,24 +62,51 @@ function updateRegressionPreview(referenceData) {
     drawLine(regression_data.points);
 }
 
-function getRefPoints(experiment_json) {
+function getRefPoints(editor_json, result_json) {
     // Extract x- and y-coordinate from reference wells
     var reference_points = [];
-    experiment_json.plates[0].wells.forEach(function(well) {
+    var x = [];
+    var y = [];
+
+    var plate_index;
+    for (var i = 0; i < editor_json.plates.length; i++) {
+            if (REF_PLATE_ID.localeCompare(editor_json.plates[i].plateID) === 0) {
+                plate_index = i;
+                break;
+            }
+    }
+
+    editor_json.plates[0].wells.forEach(function(well) {
         var x_coord = null;
-        var y_coord = null;
 
         well.labels.forEach(function(label) {
-            if (label.category == X_CATEGORY)
-                x_coord = parseFloat(replaceDot(label.name));
             if (label.category == Y_CATEGORY)
-                y_coord = parseFloat(replaceDot(label.name));
+                x_coord = parseFloat(replaceDot(label.name));
         });
 
-        if (x_coord !== null && y_coord !== null)
-            reference_points.push([x_coord, y_coord]);
+        if (x_coord !== null)
+            y.push(x_coord);
     });
 
+    result_json.plates[plate_index].rows.forEach(function(row) {
+        var y_coord = null;
+
+        row.columns.forEach(function(column) {
+            if (column.control.localeCompare("POSITIVE") === 0
+                || column.control.localeCompare("NEGATIVE") === 0) {
+                y_coord_string = column.rawData[X_CATEGORY];
+
+                if (y_coord_string !== undefined) {
+                    y_coord = parseFloat(y_coord_string);
+                    x.push(y_coord);
+                }
+            }
+        });
+    });
+
+    for (var i = 0; i < x.length; i++)
+        if (x[i] !== undefined && y[i] !== undefined)
+            reference_points.push([x[i], y[i]]);console.log(reference_points);
     return reference_points;
 }
 
@@ -91,16 +118,18 @@ function getUnknownPoints(unknown_data, plate_index) {
         var y_coord = null;
 
         row.columns.forEach(function(column) {
-            x_coord_string = column.rawData[X_CATEGORY];
-            y_coord_string = column.rawData[Y_CATEGORY];
+            if (column.control.localeCompare("COMPOUND") === 0) {
+                x_coord_string = column.rawData[X_CATEGORY];
+                y_coord_string = column.rawData[Y_CATEGORY];
 
-            if (x_coord_string !== undefined)
-                x_coord = parseFloat(x_coord_string);
-            if (y_coord_string !== undefined)
-                y_coord = parseFloat(y_coord_string);
+                if (x_coord_string !== undefined)
+                    x_coord = parseFloat(x_coord_string);
+                if (y_coord_string !== undefined)
+                    y_coord = parseFloat(y_coord_string);
 
-            if (!(x_coord == null && y_coord == null))
-                unknown_points.push([x_coord, y_coord]);
+                if (!(x_coord == null && y_coord == null))
+                    unknown_points.push([x_coord, y_coord]);
+            }
         });
     });
 
@@ -235,7 +264,7 @@ function mergeUnknownAndKnownPoints(reference_points, unknown_data) {
     // Extract x- and y-coordinate from reference wells
     var plate_index;
     for (var i = 0; i < unknown_data.plates.length; i++) {
-            if (UNKNOWN_PLATE_ID.localeCompare(unknown_data.plates[i].plateID) === 0) {
+            if (REF_PLATE_ID.localeCompare(unknown_data.plates[i].plateID) === 0) {
                 plate_index = i;
                 break;
             }

@@ -24,24 +24,18 @@
             </h4>
         </div>
         <div class="panel-body">
-            <div class="col-md-3">
-                <h5><b>UNKNOWN SAMPLE</b></h5>
-                Experiment: <g:select id="unknownExperiment" name="refExperiment" from ="${experimentList}"
-                                      optionKey="id" optionValue="name" noSelection="[null:' ']" onchange="getUnknownResults(this.value)"/><br>
-                Plate: <span id="unknownPlateSelect"></span>
-            </div>
-            <div class="col-md-3">
-                <h5><b>REFERENCE SAMPLE</b></h5>
+            <div class="col-md-4">
+                <h5><b>PLATE</b></h5>
                 Experiment: <g:select id="refExperiment" name="refExperiment" from ="${experimentList}"
                     optionKey="id" optionValue="name" noSelection="[null:' ']" onchange="refExperimentChanged(this.value);" /><br>
                 Plate: <span id="refPlateSelect"></span>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <h5><b>PROPERTIES</b></h5>
                 Known Property: <span id="refXCategorySelect"></span><br>
                 Unknown Property: <span id="refYCategorySelect"></span>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <h5><b>REGRESSION MODEL</b></h5>
                 <input type="radio" name="fitModel" value="linearThroughOrigin" checked="checked"> Linear<br>
                 <input type="radio" name="fitModel" value="exponential"> Exponential<br>
@@ -113,6 +107,7 @@
     var REFERENCE_DATA_JSON;
     var REF_EXPERIMENT_ID;
     var REF_PLATE_ID;
+    var PLATE_ID;
     var X_CATEGORY;
     var Y_CATEGORY;
 
@@ -126,9 +121,9 @@
 
     function updateUnknownPlates(data) {
         IMPORT_DATA_JSON = data;
-        <g:remoteFunction controller="stdCurve" action="getUnknownPlates"
-                      update="unknownPlateSelect"
-                      params="'experiment_id='+UNKNOWN_EXPERIMENT_ID"/>
+        %{--<g:remoteFunction controller="stdCurve" action="getUnknownPlates"--}%
+                      %{--update="unknownPlateSelect"--}%
+                      %{--params="'experiment_id='+UNKNOWN_EXPERIMENT_ID"/>--}%
     }
 
     function unknownPlateChanged() {
@@ -137,32 +132,37 @@
     }
 
     function refExperimentChanged(experimentId) {
+        REF_EXPERIMENT_ID = document.getElementById("refExperiment").value;
         <g:remoteFunction controller="stdCurve" action="getReferencePlates"
                       update="refPlateSelect"
                       params="'experiment_id='+experimentId"/>
-        REF_EXPERIMENT_ID = document.getElementById("refExperiment").value;
+        <g:remoteFunction controller="stdCurve" action="getResultData"
+                      onSuccess="updateUnknownPlates(data)"
+                      params="'experiment_id='+experimentId"/>
     }
 
     function refPlateChanged(plateId) {
-        REF_PLATE_ID = document.getElementById("refPlate").value;
+        var refPlateSelect = document.getElementById("refPlate");
+        PLATE_ID = plateId;
+        REF_PLATE_ID = refPlateSelect.options[refPlateSelect.selectedIndex].text;
 
         <g:remoteFunction controller="stdCurve" action="getReferenceXCategories"
                       update="refXCategorySelect"
-                      params="'plate_id='+plateId"/>
+                      params="'experiment_id='+REF_EXPERIMENT_ID"/>
 
         <g:remoteFunction controller="stdCurve" action="getReferenceData"
                       onSuccess="updateReferenceData(data)"
-                      params="'plate_id='+REF_PLATE_ID"/>
-
+                      params="'plate_id='+plateId"/>
     }
 
     function xCategoryChanged(xCategory) {
+        X_CATEGORY = document.getElementById("refXCategory").value;
+
         var plateId = document.getElementById("refPlate").value;
             <g:remoteFunction controller="stdCurve" action="getReferenceYCategories"
                           update="refYCategorySelect"
-                          params="'plate_id='+plateId + '&x_category='+xCategory"/>
+                          params="'plate_id='+PLATE_ID"/>
 
-        X_CATEGORY = document.getElementById("refXCategory").value;
     }
 
     function yCategoryChanged() {
