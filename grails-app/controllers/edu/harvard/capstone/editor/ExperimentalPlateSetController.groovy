@@ -217,29 +217,28 @@ class ExperimentalPlateSetController {
   }
 
 
-
-
-  def exportPlateSetJson(PlateSet plateSetInstance){
+  def exportPlateSetJSON(PlateSet plateSetInstance){
     if (plateSetInstance == null) {
       notFound()
       return
     }
-    response.setHeader "Content-disposition", "attachment; filename=plateset-template.json"
-    response.contentType = 'text/json'
-    response.outputStream << (plateSetInstance as JSON)
+    def plateJSONString = editorService.getPlate(plateSetInstance)
+    response.setHeader "Content-disposition", "attachment; filename=plate.json"
+    response.contentType = 'text-json'
+    response.outputStream << (plateJSONString as JSON)
     response.outputStream.flush()
   }
+
 
   def exportPlateSetXml(PlateSet plateSetInstance){
     if (plateSetInstance == null) {
       notFound()
       return
     }
-    XML.use('deep')
-    def xmlString = plateSetInstance as XML
-    //response.setHeader "Content-disposition", "attachment; filename=plateset-template.xml"
-    response.contentType = 'text/xml'
-    response.outputStream << xmlString
+    def plateXMLString = editorService.getPlateXml(plateSetInstance)
+    response.setHeader "Content-disposition", "attachment; filename=plate.xml"
+    response.contentType = 'application/xml'
+    response.outputStream << plateXMLString
     response.outputStream.flush()
   }
 
@@ -262,8 +261,31 @@ class ExperimentalPlateSetController {
   }
 
 
+  def exportTemplateJSONFile(PlateTemplate plateTemplateInstance){
+    if (plateTemplateInstance == null) {
+      notFound()
+      return
+    }
+    def plateTemplateString = editorService.getTemplate(plateTemplateInstance)
+    response.setHeader "Content-disposition", "attachment; filename=plateTemplate.json"
+    response.contentType = 'text-json'
+    response.outputStream << (plateTemplateString as JSON)
+    response.outputStream.flush()
+  }
 
 
+
+  def exportTemplateXMLFile(PlateTemplate plateTemplateInstance){
+    if (plateTemplateInstance == null) {
+      notFound()
+      return
+    }
+    def plateTemplateString = editorService.getTemplateXML(plateTemplateInstance)
+    response.setHeader "Content-disposition", "attachment; filename=plateTemplate.xml"
+    response.contentType = 'text-xml'
+    response.outputStream << plateTemplateString
+    response.outputStream.flush()
+  }
 
 
   protected void notFound() {

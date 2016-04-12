@@ -69,7 +69,7 @@
                                       </g:link></td>
 
                                       <td style="text-align: center;"><g:link controller="experimentalPlateSet"
-                                                                              action="exportPlateSetJson" id="${plateSetInstance.id}">
+                                                                              action="exportPlateSetJSON" id="${plateSetInstance.id}">
                                         <i class="fa fa-file-text-o"></i>
                                       </g:link></td>
 
