@@ -86,16 +86,17 @@ function Histogram(json_data, experiment) {
             .domain([min_x, max_x+6])
             .range([0, width]);
 
-        var ticks = xScale.ticks(num_bins);
 
 //        var x_values = [];
 //        x_data.forEach(function(data) {
 //            x_values.push(data.value);
 //        });
 
-        var histogram = d3.layout.histogram();
-        var bins = histogram.bins(ticks);
-        var data = bins(x_data/*, function(d) { return d.value; }*/);
+        var ticks = xScale.ticks(num_bins);
+        var histogram = d3.layout.histogram()
+            .frequency(false)
+            .bins(ticks);
+        var data = histogram(x_data/*, function(d) { return d.value; }*/);
 
         var yScale = d3.scale.linear()
             .domain([0, d3.max(data, function(d) { return d.y; })])
