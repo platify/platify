@@ -26,6 +26,7 @@ function FileExaminer(){
     this.matrix = null;
     this.loadObservers = [];
     this.errors = [];
+    this.rawFileContents = [];
 
     /**
      * This public public starts the file examining process for a given set of files in
@@ -134,6 +135,7 @@ function FileExaminer(){
             _self.errors.push(e.target.error.message);
         } else {
             _self.fileContents += e.target.result + "\n[ end of file: "+ fileName +"]\n";
+            _self.rawFileContents.push(e.target.result);
         }
 
         _self.currentFileIndex++;
