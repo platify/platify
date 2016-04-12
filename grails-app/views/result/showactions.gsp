@@ -73,9 +73,31 @@
                     <ul style="background-color:#d9edf7;" >
                         <li><a href="#resultGrid">Result Grid</a></li>
                         <li><a href="#scatterplot">Scatter Plot</a></li>
+                        <li><a href="#histogram">Histogram</a></li>
                     </ul>
 					<div id="resultGrid" class="Blues" style="width:100%;height:650px;"></div>
 					<div id="scatterplot" style="width:100%;height:650px;"></div>
+                    <div id="histogram" style="width:100%;height:650px;">
+                        <div class="col-md-3">
+                            <div class="row">
+                                <h5><b>Replicates</b></h5>
+                                <input type="radio" name="replicate_option" value="mean"> Mean<br>
+                                <input type="radio" name="replicate_option" value="median"> Median<br>
+                                <input type="radio" name="replicate_option" value="none" checked="checked"> None<br>
+                            </div>
+                            <div class="row">
+                                <h5><b>Bin Width</b></h5>
+                                <input type="text" id="bin_width" placeholder="bin_width" size="4" value=5>
+                            </div>
+                            <div class="row">
+                                <button id="histogramButton">Generate</button>
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <div id="histogramVis"></div>
+                        </div>
+
+                    </div>
 					</div>
 				</div>
 
@@ -121,5 +143,9 @@
 	
 	<!-- scatter plot -->
 	<asset:javascript src="scatter/Scatter.js" />
+
+    %{-- histogram js--}%
+    <asset:javascript src="histogram/Histogram.js" />
+
 	</body>
 </html>
