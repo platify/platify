@@ -87,7 +87,11 @@
                             </div>
                             <div class="row">
                                 <h5><b>Bin Width</b></h5>
-                                <input type="text" id="bin_width" placeholder="bin_width" size="4" value=5>
+                                <input type="text" id="bin_width" placeholder="bin_width" size="5" value=5>
+                            </div>
+                            <div class="row">
+                                <h5><b>Cut-off</b></h5>
+                                <input type="text" id="cutoff" placeholder="cutoff" size="5" value=0>
                             </div>
                             <div class="row">
                                 <button id="histogramButton">Generate</button>

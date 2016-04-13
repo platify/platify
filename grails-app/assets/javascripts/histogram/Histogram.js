@@ -1,6 +1,7 @@
 function Histogram(json_data, experiment) {
     var json_data = JSON.parse(json_data);
-    var experiment = experiment;
+//    var experiment = experiment;
+    var x_data;
     var margin;
     var width;
     var height;
@@ -14,42 +15,55 @@ function Histogram(json_data, experiment) {
     }
 
     this.getXData = function() {
+        // Collect all compound names & result values in experiment
         var x_data = [];
+        $.each(json_data.plates, function(i, plate){
+            $.each(plate.rows, function (i, row) {
+                $.each(row.columns, function(i, column){
+                    var compound_name = "";
+                    if (Object.keys(column.labels).length !== 0)
+                        compound_name = column.labels.compound;
 
-        var replicate_option = $("input[name=replicate_option]:checked").val();
+                    var value_label = Object.keys(column.rawData).sort()[0];
+
+                    x_data.push({
+                        "name": compound_name,
+                        "value": +column.rawData[value_label]
+                    });
+                });
+            });
+        });
+
+        // Group data by compound name
+        x_data = d3.nest().key(function(d) {
+            return d.name;
+        }).entries(x_data);
+
+        // Calculate & store median and mean values for each compound
+        x_data.forEach(function(compound) {
+            var mean = d3.mean(compound.values, function(d) { return d.value; });
+            var median = d3.median(compound.values, function(d) { return d.value; });
+
+            compound.mean = +mean;
+            compound.median = +median;
+        });
+
+        var x_values = [];
+        var replicate_option = $("input[name=replicate_option]:checked").val(); //"mean", "median", or "none"
         if (replicate_option.localeCompare("none") !== 0) {
-//            var first_compound_label = null;
-//            if (data_json.rows[0].columns[0].labels)
-//                first_compound_label = data_json.rows[0].columns[0].labels.compound;
-//            if ()
+            x_data.forEach(function(compound) {
+                x_values.push(compound[replicate_option]);
+            })
         }
         else {
-        //        json_data = JSON.parse('{"plates": [{"rows": ['
-        //+'{"columns": [{"labels": {"absorbance": "0.0508","compound": "CMPD4"},"rawData": {"absorbance": "0.0508"},'
-        //+'"normalizedData": {},"control": "POSITIVE"},{"labels": {"absorbance": "0.0491","compound": "CMPD4"},'
-        //+'"rawData": {"absorbance": "0.0491"},"normalizedData": {},"control": "COMPOUND"}]}]}]}');
-
-            $.each(json_data.plates, function(i, plate){
-                $.each(plate.rows, function (i, row) {
-                    $.each(row.columns, function(i, column){
-                        var compound_name = "";
-                        if (Object.keys(column.labels).length !== 0)
-                            compound_name = column.labels.compound;
-
-                        var value_label = Object.keys(column.rawData).sort()[0];
-
-                        //x_data.push({
-                        //    "name": compound_name,
-                        //    "value": +column.rawData[value_label]
-                        //});
-
-                        x_data.push(+column.rawData[value_label]);
-                    });
+             x_data.forEach(function(compound) {
+                compound.values.forEach(function(data) {
+                    x_values.push(data.value);
                 });
             });
         }
 
-        return x_data;
+        return x_values;
     }
 
     this.setUpGraph = function() {
@@ -71,39 +85,38 @@ function Histogram(json_data, experiment) {
     }
 
     this.updateGraph = function() {
-        var x_data = this.getXData();
-        var min_x = d3.min(x_data/*, function(d) {
-            return d.value;
-        }*/);
-        var max_x = d3.max(x_data/*, function(d) {
-            return d.value;
-        }*/);
+        var x_values = this.getXData();
+        var min_x = d3.min(x_values);
+        var max_x = d3.max(x_values);
 
-        var bin_width = document.getElementById('bin_width').value;
-        var num_bins = (max_x - min_x) / bin_width;
+        var bin_width = +document.getElementById('bin_width').value;
+        var num_bins;
+        if (min_x === max_x)
+            num_bins = 1;
+        else
+            num_bins = (max_x - min_x) / bin_width;
 
         var xScale = d3.scale.linear()
-            .domain([min_x, max_x+6])
+            .domain([min_x, max_x + 6])
             .range([0, width]);
 
+        var ticks;
+        if (num_bins === 1)
+            ticks = [min_x, max_x];
+        else
+            ticks = xScale.ticks(num_bins);
 
-//        var x_values = [];
-//        x_data.forEach(function(data) {
-//            x_values.push(data.value);
-//        });
-
-        var ticks = xScale.ticks(num_bins);
         var histogram = d3.layout.histogram()
             .frequency(false)
             .bins(ticks);
-        var data = histogram(x_data/*, function(d) { return d.value; }*/);
+        var data = histogram(x_values);
 
         var yScale = d3.scale.linear()
             .domain([0, d3.max(data, function(d) { return d.y; })])
             .range([height, 0]);
 
         this.updateAxes(xScale, yScale);
-        this.updateBars(data, xScale, yScale, bin_width);
+        this.updateBars(data, xScale, yScale, bin_width + min_x);
     }
 
     this.updateAxes = function(xScale, yScale) {
@@ -118,13 +131,13 @@ function Histogram(json_data, experiment) {
                 .orient("left"));
     }
 
-    this.updateBars = function(data, xScale, yScale, bin_width) {
+    this.updateBars = function(data, xScale, yScale, bin_width_from_min_x) {
         var bar = d3.select(".bar_group").selectAll(".bar")
             .data(data);
 
         bar.enter().append("rect");
         bar.attr("class", "bar")
-            .attr("width", xScale(bin_width))
+            .attr("width", xScale(bin_width_from_min_x))
             .attr("height", function(d) { return height - yScale(d.y); })
             .attr("transform", function(d) {
                 return "translate(" + xScale(d.x) + "," + yScale(d.y) + ")";
