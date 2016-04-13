@@ -115,8 +115,10 @@ function Histogram(json_data, experiment) {
             .domain([0, d3.max(data, function(d) { return d.y; })])
             .range([height, 0]);
 
+        var cutoff = +document.getElementById("cutoff").value;
+
         this.updateAxes(xScale, yScale);
-        this.updateBars(data, xScale, yScale, bin_width + min_x);
+        this.updateBars(data, xScale, yScale, bin_width + min_x, cutoff);
     }
 
     this.updateAxes = function(xScale, yScale) {
@@ -131,7 +133,7 @@ function Histogram(json_data, experiment) {
                 .orient("left"));
     }
 
-    this.updateBars = function(data, xScale, yScale, bin_width_from_min_x) {
+    this.updateBars = function(data, xScale, yScale, bin_width_from_min_x, cutoff) {
         var bar = d3.select(".bar_group").selectAll(".bar")
             .data(data);
 
@@ -143,7 +145,12 @@ function Histogram(json_data, experiment) {
                 return "translate(" + xScale(d.x) + "," + yScale(d.y) + ")";
             })
             .attr("x", 5)
-            .style("fill", "lightgreen")
+            .style("fill", function(d) {
+                if (d.x >= cutoff)
+                    return "lightgreen";
+                else
+                    return "pink";
+            })
             .style("stroke", "black");
 
         bar.exit().remove();
