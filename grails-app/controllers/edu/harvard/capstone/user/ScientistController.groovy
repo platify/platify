@@ -1,5 +1,7 @@
 package edu.harvard.capstone.user
 
+import grails.converters.JSON
+
 import grails.plugin.springsecurity.annotation.Secured
 
 import static org.springframework.http.HttpStatus.*
@@ -9,7 +11,7 @@ class ScientistController {
     def scientistService 
     def springSecurityService
 
-    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
+    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE", export: "GET"]
 
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
@@ -56,6 +58,18 @@ class ScientistController {
 
     def edit(Scientist scientistInstance) {
         respond scientistInstance
+    }
+
+    @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
+    def xml() {
+        //render scientistInstance as JSON.use('deep')
+        respond Scientist.getAll(), [formats:['xml']]
+    }
+
+    @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
+    def json() {
+        //render scientistInstance as JSON.use('deep')
+        respond Scientist.getAll(), [formats:['json']]
     }
 
 

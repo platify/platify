@@ -62,9 +62,25 @@
 						<h4><label class="control-label col-sm-4" for="tSizeFilter">Export: </label></h4>
 						<div class="col-sm-2" style="text-align: center;">
 						${plateSetInstance?.plate?.id}
-							<g:link controller="experimentalPlateSet" action="exportTemplateFile" id="111" class="exportTemplate">
+							CSV:<g:link controller="experimentalPlateSet"
+                                        action="exportTemplateXMLFile" id="111"
+                                     class="exportTemplate">
 								<i style="font-size: 24px;" class="fa fa-file-excel-o"></i>
 							</g:link>
+                          <br>
+                          ${plateSetInstance?.plate?.id}
+                          JSON:<g:link controller="experimentalPlateSet"
+                                       action="exportTemplateJSONFile" id="112"
+                                       class="exportTemplate">
+                          <i style="font-size: 24px;" class="fa fa-file-excel-o"></i>
+                        </g:link>
+                          <br>
+                          ${plateSetInstance?.plate?.id}
+                          XML:<g:link controller="experimentalPlateSet"
+                                       action="exportTemplateXMLFile" id="111"
+                                  class="exportTemplate">
+                            <i style="font-size: 24px;" class="fa fa-file-excel-o"></i>
+                          </g:link>
 				      	</div>
 						<!-- <h4><label class="control-label col-sm-2" for="tTypeFilter">Type: </label></h4>
 					    <div class="col-sm-3">
