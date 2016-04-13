@@ -78,7 +78,7 @@
 					<div id="resultGrid" class="Blues" style="width:100%;height:650px;"></div>
 					<div id="scatterplot" style="width:100%;height:650px;"></div>
                     <div id="histogram" style="width:100%;height:650px;">
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="row">
                                 <h5><b>Replicates</b></h5>
                                 <input type="radio" name="replicate_option" value="mean"> Mean<br>
@@ -97,12 +97,16 @@
                                 <button id="histogramButton">Generate</button>
                             </div>
                         </div>
-                        <div class="col-md-9">
-                            <div id="histogramVis"></div>
+                        <div class="col-md-8">
+                            <div class="col-md-9">
+                                <div id="histogramVis"></div>
+                            </div>
                         </div>
-
+                        <div class="col-md-2" style="height:600px;overflow: auto;">
+                            <div id="cutoffTable"></div>
+                        </div>
                     </div>
-					</div>
+                </div>
 				</div>
 
 					

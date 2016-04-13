@@ -7,7 +7,7 @@ function Histogram(json_data, experiment) {
     var height;
 
     this.initiateVis = function() {
-        margin = {top: 10, right: 30, bottom: 30, left: 40};
+        margin = {top: 10, right: 30, bottom: 30, left: 50};
         width = 650 - margin.left - margin.right;
         height = 575 - margin.top - margin.bottom;
 
@@ -48,8 +48,13 @@ function Histogram(json_data, experiment) {
             compound.median = +median;
         });
 
+        return x_data;
+    }
+
+    this.getXValues = function(x_data) {
         var x_values = [];
         var replicate_option = $("input[name=replicate_option]:checked").val(); //"mean", "median", or "none"
+
         if (replicate_option.localeCompare("none") !== 0) {
             x_data.forEach(function(compound) {
                 x_values.push(compound[replicate_option]);
@@ -64,6 +69,28 @@ function Histogram(json_data, experiment) {
         }
 
         return x_values;
+    }
+
+    this.getCutoffData = function(x_data, cutoff_value) {console.log(x_data);
+        var cutoff_values = [];
+        var replicate_option = $("input[name=replicate_option]:checked").val(); //"mean", "median", or "none"
+
+        if (replicate_option.localeCompare("none") !== 0) {
+            x_data.forEach(function(compound) {
+                if (compound[replicate_option] >= cutoff_value)
+                    cutoff_values.push([compound["key"], compound[replicate_option]]);
+            })
+        }
+        else {
+             x_data.forEach(function(compound) {
+                compound.values.forEach(function(data) {
+                    if (data.value >= cutoff_value)
+                        cutoff_values.push([compound["key"], data.value]);
+                });
+            });
+        }
+
+        return cutoff_values;
     }
 
     this.setUpGraph = function() {
@@ -82,10 +109,16 @@ function Histogram(json_data, experiment) {
 
         // Create group for histogram bars
         histogram.append("g").attr("class", "bar_group");
+
+        // Set up table
+        var table = d3.select("#cutoffTable").append("table").attr("class", "cutoffTable");
+        table.append("thead").append("tr").attr("class", "heading");
+        table.append("tbody").attr("class", "body");
     }
 
     this.updateGraph = function() {
-        var x_values = this.getXData();
+        var x_data = this.getXData();
+        var x_values = this.getXValues(x_data);
         var min_x = d3.min(x_values);
         var max_x = d3.max(x_values);
 
@@ -116,9 +149,11 @@ function Histogram(json_data, experiment) {
             .range([height, 0]);
 
         var cutoff = +document.getElementById("cutoff").value;
+        var cutoff_data = this.getCutoffData(x_data, cutoff);
 
         this.updateAxes(xScale, yScale);
         this.updateBars(data, xScale, yScale, bin_width + min_x, cutoff);
+        this.updateTable(cutoff_data);
     }
 
     this.updateAxes = function(xScale, yScale) {
@@ -151,9 +186,38 @@ function Histogram(json_data, experiment) {
                 else
                     return "pink";
             })
-            .style("stroke", "black");
+            .style("stroke", function(d) {
+                if (d.x >= cutoff)
+                    return "green";
+                else
+                    return "red";
+            });
 
         bar.exit().remove();
+    }
+
+    this.updateTable = function(cutoff_data) {
+        var cutoff_data = cutoff_data.sort(function(a, b) {
+            return d3.ascending(a[1], b[1]);
+        });
+
+        var heading = d3.select("tr.heading").selectAll("th")
+            .data(["Compound", "Value"]);
+        heading.enter().append("th");
+        heading.text(function(d) { return d; });
+
+        var rows = d3.select("tbody.body").selectAll("tr")
+            .data(cutoff_data);
+        rows.exit().remove();
+        rows.enter().append("tr");
+
+        var cells = rows.selectAll("td")
+            .data(function(d) {
+                return d;
+            });
+        cells.exit().remove();
+        cells.enter().append("td");
+        cells.text(function(d) { return d; });
     }
 }
 
