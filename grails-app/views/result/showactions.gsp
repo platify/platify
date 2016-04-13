@@ -97,12 +97,10 @@
                                 <button id="histogramButton">Generate</button>
                             </div>
                         </div>
-                        <div class="col-md-8">
-                            <div class="col-md-9">
-                                <div id="histogramVis"></div>
-                            </div>
+                        <div class="col-md-7">
+                            <div id="histogramVis"></div>
                         </div>
-                        <div class="col-md-2" style="height:600px;overflow: auto;">
+                        <div class="col-md-3" style="height:600px;overflow: auto;">
                             <div id="cutoffTable"></div>
                         </div>
                     </div>

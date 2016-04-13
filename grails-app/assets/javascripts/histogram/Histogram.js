@@ -8,7 +8,7 @@ function Histogram(json_data, experiment) {
 
     this.initiateVis = function() {
         margin = {top: 10, right: 30, bottom: 30, left: 50};
-        width = 650 - margin.left - margin.right;
+        width = 600 - margin.left - margin.right;
         height = 575 - margin.top - margin.bottom;
 
         this.setUpGraph();
@@ -20,7 +20,7 @@ function Histogram(json_data, experiment) {
         $.each(json_data.plates, function(i, plate){
             $.each(plate.rows, function (i, row) {
                 $.each(row.columns, function(i, column){
-                    var compound_name = "";
+                    var compound_name = "unknown";
                     if (Object.keys(column.labels).length !== 0)
                         compound_name = column.labels.compound;
 
@@ -71,7 +71,7 @@ function Histogram(json_data, experiment) {
         return x_values;
     }
 
-    this.getCutoffData = function(x_data, cutoff_value) {console.log(x_data);
+    this.getCutoffData = function(x_data, cutoff_value) {
         var cutoff_values = [];
         var replicate_option = $("input[name=replicate_option]:checked").val(); //"mean", "median", or "none"
 
