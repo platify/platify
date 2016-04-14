@@ -16,18 +16,17 @@ TBD
   * using Eclipse: [setup instructions](https://github.com/platify/platify//wiki/Development#eclipse)
   * using IntelliJ: [setup instructions](https://github.com/platify/platify//wiki/Development#mac-wintellij)
 
-
-### Misc details
-
-For further details and documentation, please visit the [wiki](https://github.com/platify/platify/wiki).
-
-
+### Previous Projects
 SAMS (North-South team):
 https://github.com/surnorte/capstone
 
 ADAM (Around-the-World team):
 https://github.com/alexGalushka/CapStone_HES_2015
 
-Dose Response (West-East team)
+Dose Response (West-East team): 
 https://github.com/massfords/we99
-=======
+
+### Misc Details
+
+For further details and documentation, please visit the [wiki](https://github.com/platify/platify/wiki).
+
