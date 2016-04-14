@@ -146,6 +146,10 @@ function init() {
     scatter = new Scatter();
     scatter.setData(experiment.data);
 
+    // Set up histogram
+    histogram = new Histogram(IMPORT_DATA_JSON, experiment);
+    histogram.initiateVis();
+
     // process experiment object
     if (Object.keys(experiment.experiment.plates).length > 0) {
         var plateData = Object.keys(experiment.experiment.plates).map(function(plateIndex) {
@@ -185,6 +189,11 @@ function init() {
         showHeatMap = $(event.target)[0].checked;
         reloadGrid();
     });
+
+    // add histogram button listener
+    $('#histogramButton').on('click', function(event) {
+            histogram.updateGraph();
+        });
     
     var resultUI = new ResultUI();
 }
