@@ -141,7 +141,7 @@
 	<asset:javascript src="plate-statistics/statistics.js" />
 	<g:javascript>
 	var RESULT_SAVE_REFACTORED_DATA_URL = "${createLink(controller: 'refactoredData', action: 'save', resultInstance: null)}";
-        var IMPORT_DATA_JSON = '${importData.encodeAsJSON()}';
+        var IMPORT_DATA_JSON = JSON.stringify(${importData.encodeAsJSON()});
 	</g:javascript>
 	<asset:javascript src="result/ExperimentModel.js" />
 	<asset:javascript src="result/showactions.js" />
