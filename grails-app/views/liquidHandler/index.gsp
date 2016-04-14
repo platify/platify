@@ -26,15 +26,12 @@
                             <table class="table table-striped table-hover">
                                 <thead>
                                 <tr>
-                                    <g:sortableColumn property="id" title="#" />
-                                    <g:sortableColumn property="Name" title="${message(code: 'liquidHandler.Name.label', default: 'Name')}" />
-                                    <g:sortableColumn property="InputPlateId" title="${message(code: 'liquidHandler.inputPlateId.label', default: 'InputPlateId')}" />
-                                    <g:sortableColumn property="InputWell" title="${message(code: 'liquidHandler.inputWell.label', default: 'InputWell')}" />
-                                    <g:sortableColumn property="InputDose" title="${message(code: 'liquidHandler.inputDose.label', default: 'InputDose')}" />
-                                    <g:sortableColumn property="OutputPlateId" title="${message(code: 'liquidHandler.outputPlateId.label', default: 'OutputPlateId')}" />
-                                    <g:sortableColumn property="OutputWell" title="${message(code: 'liquidHandler.outputWell.label', default: 'OutputWell')}" />
-                                    <g:sortableColumn property="OutputDose" title="${message(code: 'liquidHandler.outputDose.label', default: 'OutputDose')}" />
-                                    <th>Action</th>
+                                    <th>#</th>
+                                    <th>Name</th>
+                                    <th>Url</th>
+                                    <th>Input Plates Count</th>
+                                    <th>Output Plates Count</th>
+                                    <th>Status</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -42,13 +39,10 @@
                                     <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
                                         <td>${liquidHandlerInstance.id}</td>
                                         <td>${fieldValue(bean: liquidHandlerInstance, field: "name")}</td>
-                                        <td>${fieldValue(bean: liquidHandlerInstance, field: "inputPlateId")}</td>
-                                        <td>${fieldValue(bean: liquidHandlerInstance, field: "inputWell")}</td>
-                                        <td>${fieldValue(bean: liquidHandlerInstance, field: "inputDose")}</td>
-                                        <td>${fieldValue(bean: liquidHandlerInstance, field: "outputPlateId")}</td>
-                                        <td>${fieldValue(bean: liquidHandlerInstance, field: "outputWell")}</td>
-                                        <td>${fieldValue(bean: liquidHandlerInstance, field: "outputDose")}</td>
-                                        <td>n/a</td>
+                                        <td>${fieldValue(bean: liquidHandlerInstance, field: "url")}</td>
+                                        <td>${fieldValue(bean: liquidHandlerInstance, field: "inputPlatesCount")}</td>
+                                        <td>${fieldValue(bean: liquidHandlerInstance, field: "outputPlatesCount")}</td>
+                                        <td>${fieldValue(bean: liquidHandlerInstance, field: "configStatus")}</td>
                                     </tr>
                                 </g:each>
                                 </tbody>
