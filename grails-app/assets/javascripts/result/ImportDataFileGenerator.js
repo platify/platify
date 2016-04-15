@@ -348,14 +348,78 @@ function ImportDataFileGenerator(){
             } else {
                 for(var col = 0; col < this.matrix[row].length; col++){
                     lines[row][this.matrix[0][col]] = this.matrix[row][col];
-                    //lines[row][this.matrix[0][col]] = JSON.stringify(this.matrix[row][col]);
-                    console.log(lines[row]);
                 }
             }
-            //lines[row] = this.matrix[row].join(cellTerminator);
         }
         return JSON.stringify(lines, null, 2);
     };
+
+
+
+    /**
+     * This method coverts the ImportData data stored in the calling instance of the
+     * ImportDataFileGenerator object type, to a single Delimiter Separated Value (DSV)
+     * string.
+     * @param cellTerminator - the string that terminates each cell in the DSV string
+     *              except for the final one in a row.
+     * @param lineTerminator - the string that terminates a row in the DSV string
+     * @returns {string} - the string representing the
+     */
+    this.createXMLString = function(){
+        var lines = [];
+        var result;
+
+        var numRows;
+
+        if (this.matrix && this.matrix.length){
+            numRows = this.matrix.length
+        } else {
+            // return empty DSV string if there are no rows in the matrix
+            numRows = 0;
+            return "";
+        }
+
+        // count max number of columns
+        var numColumns = 0;
+
+        for (var i=0; i<this.matrix.length; i++){
+            if (this.matrix[i].length > numColumns){
+                numColumns = this.matrix[i].length;
+            }
+        }
+
+        if (!numColumns){
+            // return empty DSV string if there are no columns in the matrix
+            return "";
+        }
+
+        result = '<results>'
+        result += '\n';
+        // create the result
+        for (var row = 0; row<numRows; row++){
+            result += '<result>';
+            result += '\n';
+            if (this.matrix[row].length !== numColumns){
+                while(this.matrix[row.length] < numColumns){
+                    this.matrix[row].push(BLANK_CELL);
+                }
+            } else {
+                for(var col = 0; col < this.matrix[row].length; col++){
+                    if (this.matrix[row][col] != ""){
+                        startTag = '<' + this.matrix[0][col].replace(/\//g, '').replace(/ /g, '') + ">" ;
+                        endTag = '</' + this.matrix[0][col].replace(/\//g, '').replace(/ /g, '') + ">" ;
+                        result += startTag + this.matrix[row][col] + endTag;
+                        result += '\n';
+                    }
+                }
+            }
+            result += '</result>';
+            result += '\n';
+        }
+        result += '</results>'
+        return result
+    };
+
 
 
     /**
@@ -431,6 +495,15 @@ function ImportDataFileGenerator(){
         var JSONString = this.createJSONString();
         ImportDataFileGenerator.forceFileDownload(filename, JSONString);
     };
+
+
+    this.forceXMLDownload = function(filename){
+        var XMLString = this.createXMLString();
+        ImportDataFileGenerator.forceFileDownload(filename, XMLString);
+    };
+
+
+
 
     /**
      * This method forces a Comma Separated Value(CSV) download of the currently loaded

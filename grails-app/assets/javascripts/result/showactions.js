@@ -91,6 +91,10 @@ function downloadExperiment(fileformat) {
             generator.forceJSONDownload(filename);
             break;
 
+        case 'xml':
+            generator.forceXMLDownload(filename);
+            break;
+
         case 'csv':
         default:
             generator.forceCSVDownload(filename);
