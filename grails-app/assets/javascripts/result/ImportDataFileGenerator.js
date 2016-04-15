@@ -299,6 +299,7 @@ function ImportDataFileGenerator(){
         this.matrix = result;
     };
 
+
     /**
      * This method coverts the ImportData data stored in the calling instance of the
      * ImportDataFileGenerator object type, to a single Delimiter Separated Value (DSV)
@@ -336,16 +337,24 @@ function ImportDataFileGenerator(){
             return "";
         }
 
+        lines = []
         // create the lines
         for (var row = 0; row<numRows; row++){
+            lines[row] = {};
             if (this.matrix[row].length !== numColumns){
                 while(this.matrix[row.length] < numColumns){
                     this.matrix[row].push(BLANK_CELL);
                 }
+            } else {
+                for(var col = 0; col < this.matrix[row].length; col++){
+                    lines[row][this.matrix[0][col]] = this.matrix[row][col];
+                    //lines[row][this.matrix[0][col]] = JSON.stringify(this.matrix[row][col]);
+                    console.log(lines[row]);
+                }
             }
-            lines[row] = JSON.stringify(this.matrix[row]);
+            //lines[row] = this.matrix[row].join(cellTerminator);
         }
-        return result;
+        return JSON.stringify(lines, null, 2);
     };
 
 
