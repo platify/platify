@@ -274,7 +274,6 @@ class ExperimentalPlateSetController {
   }
 
 
-
   def exportTemplateXMLFile(PlateTemplate plateTemplateInstance){
     if (plateTemplateInstance == null) {
       notFound()
