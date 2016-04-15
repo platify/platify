@@ -57,7 +57,7 @@
 	                        <div>
 	                            <label for="firstPlateCellRange">first plate cell range</label>
 	                            <input type="text" id="firstPlateCellRange" autocomplete="off"/>
-	                            <button id="applyFirstPlate">Apply</button>
+	                            <button id="applyFirstPlate">Apply/button>
 	                        </div>
 						</h5>
                     </div>

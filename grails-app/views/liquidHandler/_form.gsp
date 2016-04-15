@@ -9,59 +9,38 @@
     </div>
 </div>
 
-<div class="col-sm-6 fieldcontain ${hasErrors(bean: liquidHandlerInstance, field: 'inputPlateId', 'error')} required">
+<div class="col-sm-6 fieldcontain ${hasErrors(bean: liquidHandlerInstance, field: 'url', 'error')} required">
     <div class="form-group">
         <label for="name">
-            <g:message code="liquidHandlerInstance.inputPlateId.label" default="InputPlateId" />
+            <g:message code="liquidHandlerInstance.url.label" default="Liquid Handler Service URL" />
         </label>
-        <g:textField name="inputPlateId" required="" class="form-control" value="${liquidHandlerInstance?.inputPlateId}"/>
+        <g:textField name="url" required="" class="form-control" value="${liquidHandlerInstance?.url}"/>
     </div>
 </div>
 
-<div class="col-sm-6 fieldcontain ${hasErrors(bean: liquidHandlerInstance, field: 'inputWell', 'error')} required">
+<div class="hidden col-sm-6 fieldcontain ${hasErrors(bean: liquidHandlerInstance, field: 'inputPlatesCount', 'error')} required">
     <div class="form-group">
         <label for="name">
-            <g:message code="liquidHandlerInstance.inputWell.label" default="InputWell" />
+            <g:message code="liquidHandlerInstance.inputPlatesCount.label" default="" />
         </label>
-        <g:textField name="inputWell" required="" class="form-control" value="${liquidHandlerInstance?.inputWell}"/>
+        <g:textField name="inputPlatesCount" required="" class="form-control" value="-1"/>
     </div>
 </div>
 
-<div class="col-sm-6 fieldcontain ${hasErrors(bean: liquidHandlerInstance, field: 'inputDose', 'error')} required">
+<div class="hidden col-sm-6 fieldcontain ${hasErrors(bean: liquidHandlerInstance, field: 'outputPlatesCount', 'error')} required">
     <div class="form-group">
         <label for="name">
-            <g:message code="liquidHandlerInstance.inputDose.label" default="InputDose" />
+            <g:message code="liquidHandlerInstance.outputPlatesCount.label" default="outputPlatesCount" />
         </label>
-        <g:textField name="inputDose" required="" class="form-control" value="${liquidHandlerInstance?.inputDose}"/>
+        <g:textField name="outputPlatesCount" required="" class="form-control" value="-1"/>
     </div>
 </div>
 
-
-<div class="col-sm-6 fieldcontain ${hasErrors(bean: liquidHandlerInstance, field: 'outputPlateId', 'error')} required">
+<div class="hidden col-sm-6 fieldcontain ${hasErrors(bean: liquidHandlerInstance, field: 'configStatus', 'error')} required">
     <div class="form-group">
         <label for="name">
-            <g:message code="liquidHandlerInstance.outputPlateId.label" default="OutputPlateId" />
+            <g:message code="liquidHandlerInstance.configStatus.label" default="configStatus" />
         </label>
-        <g:textField name="outputPlateId" required="" class="form-control" value="${liquidHandlerInstance?.outputPlateId}"/>
+        <g:textField name="configStatus" required="" class="form-control" value="In progress..."/>
     </div>
 </div>
-
-<div class="col-sm-6 fieldcontain ${hasErrors(bean: liquidHandlerInstance, field: 'outputWell', 'error')} required">
-    <div class="form-group">
-        <label for="name">
-            <g:message code="liquidHandlerInstance.outputWell.label" default="OutputWell" />
-        </label>
-        <g:textField name="outputWell" required="" class="form-control" value="${liquidHandlerInstance?.outputWell}"/>
-    </div>
-</div>
-
-<div class="col-sm-6 fieldcontain ${hasErrors(bean: liquidHandlerInstance, field: 'outputDose', 'error')} required">
-    <div class="form-group">
-        <label for="name">
-            <g:message code="liquidHandlerInstance.outputDose.label" default="OutputDose" />
-        </label>
-        <g:textField name="outputDose" required="" class="form-control" value="${liquidHandlerInstance?.outputDose}"/>
-    </div>
-</div>
-
-
