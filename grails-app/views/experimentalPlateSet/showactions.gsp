@@ -59,8 +59,10 @@
 											<g:sortableColumn property="dateCreated" title="${message(code: 'plateSetInstance.plate.date.label', default: 'Date')}" />
 											<g:sortableColumn property="width" title="Horizontal Wells" />
 											<g:sortableColumn property="height" title="Vertical Wells" />
-											<th>Preview</th>	
-											<th style="text-align: center;">Export</th>															
+											<th>Preview</th>
+											<th style="text-align: center;">Export CSV</th>
+											<th style="text-align: center;">Export JSON</th>
+											<th style="text-align: center;">Export XML</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -76,6 +78,14 @@
 											<td><button value="${plateSetInstance.id}-${fieldValue(bean: plateSetInstance.plate, field: 'width')}-${fieldValue(bean: plateSetInstance.plate, field: 'height')}"
 											onclick="onViewSelect(this)" type="button" class="btn btn-info btn-xs" data-toggle="modal" data-target="#viewSavedPlateModal">View</button></td>
 											<td style="text-align: center;"><g:link controller="experimentalPlateSet" action="exportPlateSetFile" id="${plateSetInstance.id}">
+												<i class="fa fa-file-excel-o"></i>
+											</g:link></td>
+											<td style="text-align: center;"><g:link
+													controller="experimentalPlateSet" action="exportPlateSetJSON" id="${plateSetInstance.id}">
+												<i class="fa fa-file-excel-o"></i>
+											</g:link></td>
+											<td style="text-align: center;"><g:link controller="experimentalPlateSet"
+																					action="exportPlateSetXml" id="${plateSetInstance.id}">
 												<i class="fa fa-file-excel-o"></i>
 											</g:link></td>
 										</tr>
