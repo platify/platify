@@ -33,6 +33,7 @@
 						Plates
 						<span id="downloadButtons" class="pull-right">
 							Download:
+                            <button class="btn btn-info btn-xs" type="submit" data-fileformat="json">JSON</button>
 							<button class="btn btn-info btn-xs" type="submit" data-fileformat="csv">CSV</button>
 							<button class="btn btn-info btn-xs" type="submit" data-fileformat="tsv">TSV</button>
 						</span>

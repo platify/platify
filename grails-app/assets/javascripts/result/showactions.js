@@ -87,6 +87,10 @@ function downloadExperiment(fileformat) {
             generator.forceTSVDownload(filename);
             break;
 
+        case 'json':
+            generator.forceJSONDownload(filename);
+            break;
+
         case 'csv':
         default:
             generator.forceCSVDownload(filename);
