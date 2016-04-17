@@ -7,7 +7,12 @@
 		
 		<g:javascript>
 			window.expId = ${expId};
-			window.templateId = ${templateId};
+			<g:if test="${templateId != null}">
+                window.templateId = ${templateId};
+            </g:if>
+            <g:if test="${clonedPlateId != null}">
+                window.clonedId = ${clonedPlateId};
+            </g:if>
 		</g:javascript>
 		
 		<style type="text/css">
