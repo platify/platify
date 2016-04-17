@@ -71,15 +71,15 @@ class FitDoseResponseCurveService {
         }
 
         Function ec50Function = new EC50();
-        double[] trueParams = new double[4];
-        trueParams[0] = fitData.parameters["Min_ROUT"];
-        trueParams[1] = fitData.parameters["Max_ROUT"];
-        trueParams[2] = fitData.parameters["EC50_ROUT"];
-        trueParams[3] = fitData.parameters["Slope_ROUT"];
+        double[] estParams = new double[4];
+        estParams[0] = fitData.parameters["Min_ROUT"];
+        estParams[1] = fitData.parameters["Max_ROUT"];
+        estParams[2] = fitData.parameters["EC50_ROUT"];
+        estParams[3] = fitData.parameters["Slope_ROUT"];
 
         double[] y2 = new double[y.size()];
         for(int i=0; i < x.size(); i++)
-            y2[i] = ec50Function.evaluate(Math.log10(x1[i]), trueParams);
+            y2[i] = ec50Function.evaluate(x1[i], estParams);
 
         def s_x = x1 as List
         def s_y1 = y1 as List
@@ -95,7 +95,7 @@ class FitDoseResponseCurveService {
         for (i in 1..50) {
             def x3 = start+(i*interval_length)
             s_x3 <<  x3
-            s_y3 << ec50Function.evaluate(Math.log10(x3), trueParams)
+            s_y3 << ec50Function.evaluate(x3, estParams)
         }
 
 
@@ -159,6 +159,9 @@ class FitDoseResponseCurveService {
                         plate.compounds[label.name] = 1
                     }
                     wellOut.labels[label.category] = label.name
+                    if (label.category == "dosage") {
+                        wellOut.labels["units"] = label.units
+                    }
                 }
 
                 def resultWellsById = [:]

@@ -71,10 +71,6 @@ function createGraphAndTable() {
     chart.append("g").attr("class", "dose_group");
     chart.append("g").attr("class", "fitted_group");
 
-    // Create table
-    table = d3.select("#inferredTable").append("table").attr("class", "table");
-    table.append("thead").append("tr").attr("class", "heading");
-    table.append("tbody").attr("class", "body");
 }
 
 function createAxes(points) {

@@ -91,11 +91,12 @@
 						  onSuccess="updateDoseCurveData(data)"
 						  params="'experiment_id='+EXPERIMENT_ID + '&compound_name='+compound"/>
 
+		$("#curveParameters").clear();
 	}
 
-	function updateDoseCurveData(data) {
-		DR_CURVE_DATA_JSON = data;
-	}
+function updateDoseCurveData(data) {
+    DR_CURVE_DATA_JSON = data;
+}
 
 </g:javascript>
 
