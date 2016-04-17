@@ -7,7 +7,7 @@ import spock.lang.Specification
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */
 @TestFor(JsonController)
-class JsonControllerSpec extends Specification {
+class JsonControllerSpecTest extends Specification {
 
     def setup() {
     }
