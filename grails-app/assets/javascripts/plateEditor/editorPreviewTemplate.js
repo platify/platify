@@ -92,6 +92,22 @@ function fetchTemplateData(tId) {
 		$("#gridView").show();
 		loadJsonData(resData);
 	});
+	var exportTemplateJSON = $('.exportTemplateJSON')
+	if (exportTemplateJSON.length > 0){
+		var link = exportTemplateJSON.attr('href').split('/')
+		if (link.length > 0){
+			link[link.length-1] = tId;
+			exportTemplateJSON.attr('href', link.join('/'))
+		}
+	}
+	var exportTemplateXML = $('.exportTemplateXML')
+	if (exportTemplateXML.length > 0){
+		var link = exportTemplateXML.attr('href').split('/')
+		if (link.length > 0){
+			link[link.length-1] = tId;
+			exportTemplateXML.attr('href', link.join('/'))
+		}
+	}
 	var exportTemplate = $('.exportTemplate')
 	if (exportTemplate.length > 0){
 		var link = exportTemplate.attr('href').split('/')

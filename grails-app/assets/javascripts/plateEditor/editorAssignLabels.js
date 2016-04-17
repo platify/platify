@@ -1290,6 +1290,35 @@ function fetchTemplateData(tId) {
 	});
 }
 
+function fetchClonedData(plateId) {
+	"use strict";
+	var jqxhr = $.ajax({		// need to update to save plate instead of template
+		url: hostname + "/plate/read/" + plateId,
+		type: "POST",
+		data: null,
+		processData: false,
+		contentType: "application/json; charset=UTF-8"
+	}).done(function() {
+		console.log("success");
+	}).fail(function() {
+		console.log("error");
+		alert("An error while fetching the template from the server.");
+	}).always(function() {
+		console.log("complete");
+	});
+
+	// Set another completion function for the request above
+	jqxhr.always(function(plate) {
+		console.log("recievedFromServer:  " + JSON.stringify(plate));
+
+		if (plate.error !== undefined && plate.error !== null) {
+			alert("An error has occurred while fetching data from the server: "+ resData.error);
+		} else {
+			loadJsonData(plate);
+		}
+	});
+}
+
 /**
  * This function handles the window load event. It initializes and fills the
  * grid with the template that is specified in the url params.
@@ -1302,8 +1331,12 @@ function init() {
 	hidePlateLabelPanel();
 
 	// fetch templateJson
-	fetchTemplateData(window.templateId);
-	console.log("templateId:" + window.templateId);
+	if (window.templateId)
+	    fetchTemplateData(window.templateId);
+        //console.log("templateId:" + window.templateId);
+
+    if(window.sourcePlateId)
+        fetchClonedData(window.sourcePlateId);
 
 	addEvent("addNewLabel", "click", addNewLabel);
 	addEvent("addNewDose", "click", addNewDose);

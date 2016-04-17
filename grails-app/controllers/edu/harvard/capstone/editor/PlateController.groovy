@@ -96,6 +96,22 @@ class PlateController {
         }
    }
 
+    def getPlates(ExperimentalPlateSet experimentalPlateSetInstance){
+        if (!experimentalPlateSetInstance) {
+            render(contentType: "application/json") {
+                [error: "No data received"]
+            }
+            return
+        }
+
+        def plates = PlateSet.findAllByExperiment(experimentalPlateSetInstance)
+        render(contentType: "application/json") {
+            [plates: plates]
+        }
+
+
+    }
+
        @Secured(['permitAll'])
     def debug(Long id){
 /*

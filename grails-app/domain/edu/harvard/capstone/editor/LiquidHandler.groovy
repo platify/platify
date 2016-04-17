@@ -3,20 +3,18 @@ package edu.harvard.capstone.editor
 class LiquidHandler {
 
     String name
-    String inputPlateId
-    String inputWell
-    String inputDose
-    String outputPlateId
-    String outputWell
-    String outputDose
+    String url
+    Integer inputPlatesCount
+    Integer outputPlatesCount
+    String configStatus
 
     static constraints = {
         name blank: false, nullable: false
-        inputPlateId blank: false, nullable: false
-        inputWell blank: false, nullable: false
-        inputDose blank: false, nullable: false
-        outputPlateId blank: false, nullable: false
-        outputWell blank: false, nullable: false
-        outputDose blank: false, nullable: false
+        url blank: false, nullable: false
+
+        // defaults set to -1 before populated by LH webservice call
+        inputPlatesCount defaultValue: -1
+        outputPlatesCount defaultValue: -1
+        configStatus defaultValue: "In progress..."
     }
 }

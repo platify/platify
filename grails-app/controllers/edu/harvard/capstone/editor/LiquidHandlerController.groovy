@@ -4,13 +4,12 @@ import edu.harvard.capstone.result.Result
 import grails.plugin.springsecurity.annotation.Secured
 import static org.springframework.http.HttpStatus.*
 
-
 /**
  * Liquid Handler Controller
  *
  * Handles creating & listing the liquid handler configs.
  *
- * Issue #11 on github.com/platify/platify/issues
+ * Initiated from Issue #11 on github.com/platify/platify/issues
  * @author rbw (Reagan Williams, Spring 2016)
  *
  */
@@ -23,7 +22,6 @@ class LiquidHandlerController {
      * @param max
      * @return
      */
-
     @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
     def index(Integer max) {
         if (!springSecurityService.isLoggedIn())
@@ -44,14 +42,14 @@ class LiquidHandlerController {
         respond new LiquidHandler(params)
     }
 
-    def save(String name, String inputPlateId, String inputWell, String inputDose, String outputPlateId, String outputWell, String outputDose) {
+    def save(String name, String url, Integer inputPlatesCount, Integer outputPlatesCount, String configStatus) {
 
         if (!springSecurityService.isLoggedIn()){
             redirect action: "index", method: "GET"
             return
         }
 
-        def liquidHandlerInstance = liquidService.newMapper(name, inputPlateId, inputWell, inputDose, outputPlateId, outputWell, outputDose)
+        def liquidHandlerInstance = liquidService.newMapper(name, url, inputPlatesCount, outputPlatesCount, configStatus)
 
         if (liquidHandlerInstance == null) {
             notFound()
@@ -84,8 +82,6 @@ class LiquidHandlerController {
         def liquidHandlerList = liquidHandler.get(liquidHandlerInstance);
         response liquidHandlerInstance, model:[liquidHandlerList: liquidHandlerList]
     }
-
-
 
     def list() {
         return model

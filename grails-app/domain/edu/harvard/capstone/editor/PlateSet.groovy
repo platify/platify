@@ -13,10 +13,6 @@ class PlateSet {
 	Date lastUpdated
 	Date dateCreated
 
-	List rawResults
-
-	static hasMany = [rawResults: RawResultFile]
-
     static constraints = {
     	assay nullable: true, blank: true
     }
