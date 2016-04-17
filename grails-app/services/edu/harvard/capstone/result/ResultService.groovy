@@ -6,6 +6,8 @@ import edu.harvard.capstone.user.Scientist
 import grails.converters.JSON
 
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.codehaus.groovy.grails.commons.ApplicationHolder
+
 import grails.validation.ValidationException
 
 import grails.transaction.Transactional
@@ -51,6 +53,7 @@ class ResultService {
 			throw new RuntimeException("No plates")
 		}	
 
+		
 		//verify that the number of plates of the template are = to the result plates
 		/*if (plateList.size() != data.plates?.size()){
 			throw new RuntimeException("Plates of the JSON do not match with the template")
@@ -64,6 +67,13 @@ class ResultService {
 			throw new ValidationException("Result is not valid", resultInstance.errors)
 		}		
 		
+
+		data.rawFiles.each { name, contents ->
+			def rawResultFile = createRawResultFile(name, contents)
+			resultInstance.addToRawResults(rawResultFile)
+			resultInstance.save()
+		}
+
 		// create the experiment labels
 		data.experimentFeatures.labels.each{ key, value ->
 			def resultLabelInstance = new ResultLabel(name: key, value: value, labelType: ResultLabel.LabelType.LABEL, scope: ResultLabel.LabelScope.RESULT, domainId: resultInstance.id)
@@ -517,4 +527,28 @@ class ResultService {
         }
         return experiment
     }
+	
+	def createRawResultFile(String fname, String fdata) {
+		def rrfRoot = ApplicationHolder.application.mainContext.servletContext.getRealPath('rrf')
+		def rrfRootDir = new File(rrfRoot)
+		
+		if (!rrfRootDir.exists()) rrfRootDir.mkdir()
+		
+		RawResultFile rrf = new RawResultFile()
+		rrf.save(flush: true)
+		def rrfId = rrf.id
+		def destFolderPath = rrfRoot + "/" + rrfId
+		def destDir = new File(destFolderPath)
+
+		if (!destDir.exists()) destDir.mkdir()
+
+		def destFile = new File(destDir, fname).withWriter { out ->
+			out.write(fdata)
+		}
+
+		rrf.fName = rrfId + "/" + fname
+		rrf.save(flush: true)
+		
+		return rrf
+	}
 }

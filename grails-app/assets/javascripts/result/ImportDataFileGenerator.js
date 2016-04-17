@@ -299,6 +299,55 @@ function ImportDataFileGenerator(){
         this.matrix = result;
     };
 
+    /**
+     * This method coverts the ImportData data stored in the calling instance of the
+     * ImportDataFileGenerator object type, to a single Delimiter Separated Value (DSV)
+     * string.
+     * @param cellTerminator - the string that terminates each cell in the DSV string
+     *              except for the final one in a row.
+     * @param lineTerminator - the string that terminates a row in the DSV string
+     * @returns {string} - the string representing the
+     */
+    this.createJSONString = function(){
+        var lines = [];
+        var result;
+
+        var numRows;
+
+        if (this.matrix && this.matrix.length){
+            numRows = this.matrix.length
+        } else {
+            // return empty DSV string if there are no rows in the matrix
+            numRows = 0;
+            return "";
+        }
+
+        // count max number of columns
+        var numColumns = 0;
+
+        for (var i=0; i<this.matrix.length; i++){
+            if (this.matrix[i].length > numColumns){
+                numColumns = this.matrix[i].length;
+            }
+        }
+
+        if (!numColumns){
+            // return empty DSV string if there are no columns in the matrix
+            return "";
+        }
+
+        // create the lines
+        for (var row = 0; row<numRows; row++){
+            if (this.matrix[row].length !== numColumns){
+                while(this.matrix[row.length] < numColumns){
+                    this.matrix[row].push(BLANK_CELL);
+                }
+            }
+            lines[row] = JSON.stringify(this.matrix[row]);
+        }
+        return result;
+    };
+
 
     /**
      * This method coverts the ImportData data stored in the calling instance of the
@@ -362,6 +411,16 @@ function ImportDataFileGenerator(){
         var TSVString = this.createDSVString("\t", "\n");
 
         ImportDataFileGenerator.forceFileDownload(filename, TSVString);
+    };
+
+    /**
+     * This method forces a Tab Separated Value(JSON) download of the currently loaded
+     * file in the ImportDataFileGenerator.
+     * @param filename - the name to give the file that is downloaded to the client
+     */
+    this.forceJSONDownload = function(filename){
+        var JSONString = this.createJSONString();
+        ImportDataFileGenerator.forceFileDownload(filename, JSONString);
     };
 
     /**

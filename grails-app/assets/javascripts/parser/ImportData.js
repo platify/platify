@@ -38,6 +38,8 @@ function ImportData(numPlates, numRows, numCols){
         labels: {}
     };
     this.plates = [];
+    this.rawFiles = [];
+    this.rawFilesData = [];
 
     this.wellLevelCategories = {};
     this.plateLevelCategories = {};
@@ -969,6 +971,14 @@ function ImportData(numPlates, numRows, numCols){
         }
     };
 
+    this.setRawFiles = function(rawfiles) {
+    	this.rawFiles = rawfiles;
+    }
+    
+    this.setRawFilesData = function(rawFilesData) {
+    	this.rawFilesData = rawFilesData;
+    }
+    
     /**
      * This method returns a DTO of the calling ImportData object, for storing on the
      * server.
@@ -977,11 +987,22 @@ function ImportData(numPlates, numRows, numCols){
      */
     this.getJSONImportDataObject = function(){
         var object = {};
-
+        
+        
         object.experimentID = this.experimentID;
         object.parsingID = this.parsingID;
         object.experimentFeatures = this.experimentFeatures;
         object.plates = this.plates;
+        object.rawFiles = new Array();
+        var f, fileData, fileName, worker, working;
+        
+        if (rawFiles.length > 0) {
+        	for (var idx = 0; idx < rawFiles.length; ++idx) {
+        		f = rawFiles[idx];
+        		fileName = f.name;
+        		object.rawFiles.push([fileName, this.rawFilesData[idx]]);
+        	}        	
+        }
 
         return object;
     }
