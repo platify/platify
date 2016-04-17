@@ -10,8 +10,8 @@
 			<g:if test="${templateId != null}">
                 window.templateId = ${templateId};
             </g:if>
-            <g:if test="${clonedPlateId != null}">
-                window.clonedId = ${clonedPlateId};
+            <g:if test="${sourcePlateId != null}">
+                window.sourcePlateId = ${sourcePlateId};
             </g:if>
 		</g:javascript>
 		

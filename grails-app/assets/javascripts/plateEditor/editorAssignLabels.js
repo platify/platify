@@ -1335,8 +1335,8 @@ function init() {
 	    fetchTemplateData(window.templateId);
         //console.log("templateId:" + window.templateId);
 
-    if(window.clonedId)
-        fetchClonedData(window.clonedId);
+    if(window.sourcePlateId)
+        fetchClonedData(window.sourcePlateId);
 
 	addEvent("addNewLabel", "click", addNewLabel);
 	addEvent("addNewDose", "click", addNewDose);

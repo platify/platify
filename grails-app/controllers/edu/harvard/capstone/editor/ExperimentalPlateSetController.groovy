@@ -66,7 +66,7 @@ class ExperimentalPlateSetController {
      if(!springSecurityService.principal?.getAuthorities().any { it.authority == "ROLE_ADMIN" || it.authority == "ROLE_SUPER_ADMIN"}){
         params.owner = springSecurityService.principal
      }
-     render (view: "createPlate", model:[expId: params.expid, clonedPlateId: params.clonedplate])
+     render (view: "createPlate", model:[expId: params.expid, sourcePlateId: params.sourceplate])
   }
 
   @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
