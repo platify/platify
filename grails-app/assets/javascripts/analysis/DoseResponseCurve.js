@@ -14,59 +14,48 @@ function init() {
     createGraphAndTable();
 }
 
-$("#stdCurveButton").click(function() {
-    updateDoseResponseCurve();
+$("#doseResponseButton").click(function() {
+    renderDoseResponseCurve();
 });
 
-function updateDoseResponseCurve() {
-    var reference_data = REFERENCE_DATA_JSON;
-    var unknown_data = IMPORT_DATA_JSON;
+function renderDoseResponseCurve() {
+    var data = DR_CURVE_DATA_JSON;
 
-    var reference_points = getRefPoints(reference_data);
+    var dose_points = zip2(data.x, data.y1);
+    var fitted_points = zip2(data.x, data.y2);
+    var extra_points = zip2(data.x3, data.y3);
 
-    var fitModel = $("input[name=fitModel]:checked").val();
-    var degree = document.getElementById('degree').value;
-    var merged_points = mergeUnknownAndKnownPoints(reference_points, unknown_data);
-    var merged_regression_data = getRegression(merged_points, fitModel, degree); //regression.js determines unknown y-coordinate
+    var dose_SVGgroup = ".dose_group";
+    var fitted_SVGgroup = ".fitted_group";
 
-    // Get inferred data to update graph and table
-    var inferred_data = getInferredPointsFromRegression(reference_points, merged_regression_data.points);
-    createAxes(reference_points.concat(inferred_data.concat(merged_regression_data.points)), width, height);
-    plotPoints(reference_points, reference_SVGgroup);
-    plotPoints(inferred_data, inferred_SVGgroup);
+    createAxes(dose_points.concat(fitted_points), width, height);
+    plotPoints(dose_points, dose_SVGgroup);
+    plotPoints(fitted_points, fitted_SVGgroup);
+    drawLine(fitted_points.concat(extra_points));
 
-    drawLine(merged_regression_data.points);
-
-    fillInferredTable(inferred_data);
+    $("#curveParameters").text("Min:" + data.parameters['Min_ROUT'].toFixed(2) +
+                                " Max:" + data.parameters['Max_ROUT'].toFixed(2) +
+                                " EC50:" + data.parameters['EC50_ROUT'].toFixed(2) +
+                                " Slope:" + data.parameters['Slope_ROUT'].toFixed(2)
+    );
 }
 
-/*
-    Currently unused; for later add-on.
-*/
-function updateRegressionPreview(referenceData) {
-    REFERENCE_DATA_JSON = JSON.stringify(referenceData);
-
-    var reference_data = JSON.parse(REFERENCE_DATA_JSON);
-
-    var reference_points = getRefPoints(reference_data);
-
-    var reference_SVGgroup = ".reference_group";
-
-    var regression_data = getRegression(reference_points); //regression.js determines unknown y-coordinate
-
-    createAxes(reference_points.concat(regression_data.points), width, height);
-    plotPoints(reference_points, reference_SVGgroup);
-    drawLine(regression_data.points);
+function zip2(a1, a2)
+{
+    var i;
+    var z = [];
+    for(i=0; i < a1.length; i++)
+        z.push([a1[i], a2[i]]);
+    return z;
 }
 
 function createGraphAndTable() {
-    chart = d3.select('#stdCurveVis')
+    chart = d3.select('#doseResponseCurveVis')
         .append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-        .attr("class", "stdCurveGraph");
 
     // Create axes
     chart.append("g")
@@ -79,8 +68,8 @@ function createGraphAndTable() {
     chart.attr("class", "points");
 
     // Create groups of data sets
-    chart.append("g").attr("class", "reference_group");
-    chart.append("g").attr("class", "inferred_group");
+    chart.append("g").attr("class", "dose_group");
+    chart.append("g").attr("class", "fitted_group");
 
     // Create table
     table = d3.select("#inferredTable").append("table").attr("class", "table");
@@ -124,37 +113,31 @@ function plotPoints(points, group) {
     circles.attr("cx", function(d) { return x_scale(d[0]); } )
         .attr("cy", function(d) { return y_scale(d[1]); } )
         .attr("r", function() {
-            if (group == ".inferred_group")
+            if (group == ".dose_group")
                 return 2;
-            if (group == ".reference_group")
+            if (group == ".fitted_group")
                 return 3;
         })
         .style("stroke", function() {
-            if (group == ".inferred_group")
+            if (group == ".dose_group")
                 return "red";
-            if (group == ".reference_group")
+            if (group == ".fitted_group")
                 return "green";
         })
         .style("fill", function() {
-            if (group == ".inferred_group")
+            if (group == ".dose_group")
                 return "none";
-            if (group == ".reference_group")
+            if (group == ".fitted_group")
                 return "green";
         });
 }
+
 
 function drawLine(points) {
     var min_x = d3.min(points, function(d) { return d[0]; });
     var max_x = d3.max(points, function(d) { return d[0]; });
 
-    var extra_points = interpolate(min_x, max_x);
-    var merged_points = points.concat(extra_points);
-
-    var fitModel = $("input[name=fitModel]:checked").val();
-    var degree = document.getElementById('degree').value;
-    var interpolated_points = getRegression(merged_points, fitModel, degree).points;
-
-    interpolated_points = interpolated_points.sort(function(a, b) {
+    var sorted_points = points.sort(function(a, b) {
         return d3.ascending(a[0], b[0]);
     });
 
@@ -163,47 +146,9 @@ function drawLine(points) {
         .y(function(d) { return y_scale(d[1]); });
 
     chart.selectAll("path.line")
-        .attr("d", line(interpolated_points))
+        .attr("d", line(sorted_points))
         .attr("stroke", "lightblue")
         .attr("fill", "none");
-}
-
-
-function fillInferredTable(inferred_data) {
-    inferred_data = inferred_data.sort(function(a, b) {
-            return d3.ascending(a[0], b[0]);
-        });
-
-    var heading = d3.select("tr.heading").selectAll("th")
-        .data([X_CATEGORY, Y_CATEGORY]);
-    heading.exit().remove();
-    heading.enter().append("th");
-    heading.text(function(d) { return d; });
-
-    var rows = d3.select("tbody.body").selectAll("tr")
-        .data(inferred_data);
-    rows.exit().remove();
-    rows.enter().append("tr");
-
-    var cells = rows.selectAll("td")
-        .data(function(d) {
-            return d;
-        });
-    cells.exit().remove();
-    cells.enter().append("td");
-    cells.text(function(d) { return d; });
-}
-
-function interpolate(start, end) {
-    var length = end - start;
-    var interval_length = length/50;
-    var points = [];
-    var x = start;
-    for (var i = 0; i < 50; i++) {
-        points.push([x+(i*interval_length), null]);
-    }
-
-    return points;
 }
 
 function replaceDot(dotString) {

@@ -3,12 +3,11 @@ package edu.harvard.capstone.analysis
 import edu.harvard.capstone.editor.DomainLabel
 import edu.harvard.capstone.editor.PlateSet
 import edu.harvard.capstone.editor.Well
-import edu.harvard.capstone.editor.WellCompound
+import edu.harvard.capstone.editor.Compound
 import edu.harvard.capstone.result.Result
 import edu.harvard.capstone.result.ResultLabel
 import edu.harvard.capstone.result.ResultPlate
 import edu.harvard.capstone.result.ResultWell
-import edu.harvard.capstone.editor.WellCompound
 import grails.plugin.springsecurity.annotation.Secured
 import edu.harvard.capstone.editor.ExperimentalPlateSet
 
@@ -25,12 +24,45 @@ class DoseResponseController {
 
 
     @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
-    def show(Integer max) {
+    def show() {
 
         def experimentList = ExperimentalPlateSet.listOrderByName();
         // TODO - don't really need the experiment object
         respond experimentList as Object, model:[experimentList: experimentList]
 
+    }
+
+    @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
+    def updateCompounds(int experiment_id)
+    {
+        def resultData
+        try{
+            def experiment = ExperimentalPlateSet.findById(experiment_id);
+            resultData = fitDoseResponseCurveService.getData(experiment)
+            render g.select(name:"compound", from:resultData.plates[0].compounds.keySet(),
+                    noSelection:[null:' '], onchange:"updateDoseResponseCurve(this.value)")
+            return resultData
+        }
+        catch (RuntimeException e) {
+            response.sendError(500)
+            return
+        }
+    }
+
+
+    @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
+    def getfittedData(int experiment_id, String compound_name)
+    {
+        def resultData
+        try{
+            def experiment = ExperimentalPlateSet.findById(experiment_id);
+            resultData = fitDoseResponseCurveService.getfittedData(experiment, compound_name)
+        }
+        catch (RuntimeException e) {
+            response.sendError(500)
+            return
+        }
+        render (resultData as JSON);
     }
 
     @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])

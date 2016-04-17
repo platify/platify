@@ -17,20 +17,24 @@
 	<div class="row">
 		<h3 style="margin-left: 15px">Dose Response Curve</h3>
 	</div>
-	<div class="panel panel-default">
-		<div class="panel-heading">
-			<h4 class="panel-title">
-				<span id="selectRefLabel">Settings</span>
-			</h4>
-		</div>
-		<div class="panel-body">
-			<div class="col-md-3">
-				Experiment: <g:select id="experiment" name="refExperiment" from ="${experimentList}"
-									  optionKey="id" optionValue="name" noSelection="[null:' ']" onchange="getfittedData(this.value)"/><br>
-				Compound: <span id="refCompoundSelect"></span>
+	<div class="col-md-8">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h4 class="panel-title">
+					<span id="selectRefLabel">Settings</span>
+				</h4>
 			</div>
-			<div class="centerWrapper" style="text-align: center">
-				<button id="doseResponseButton">Generate</button>
+			<div class="panel-body">
+				<div class="col-md-8">
+					Experiment: <g:select id="experiment" name="refExperiment" from ="${experimentList}"
+										  optionKey="id" optionValue="name" noSelection="[null:' ']" onchange="updateCompounds(this.value)"/><br>
+					Compound: <span id="compoundSelect"></span><br>
+					Params: <span id="curveParameters"></span>
+				</div>
+				<div class="centerWrapper" style="text-align: center">
+					<button id="doseResponseButton">Generate</button>
+					<button id="setParameterButton">Parameters</button>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -43,18 +47,6 @@
 			</div>
 			<div class="panel-body">
 				<div id="doseResponseCurveVis"></div>
-			</div>
-		</div>
-	</div>
-	<div class="col-md-4">
-		<div class="panel panel-default" style="height: 650px; overflow: auto;">
-			<div class="panel-heading">
-				<h4 class="panel-title">
-					<span id="inferredLabel">Inferred Properties</span>
-				</h4>
-			</div>
-			<div class="panel-body">
-				<div id="inferredTable"></div>
 			</div>
 		</div>
 	</div>
@@ -81,43 +73,29 @@
 
 <g:javascript>
     var EXPERIMENT_ID;
-    var COMPOUND
-    var FITTED_DATA_JSON;
+    var COMPOUND;
+	var DR_CURVE_DATA_JSON;
 
-    function getUnknownResults(experimentId) {
-        UNKNOWN_EXPERIMENT_ID = experimentId;
+    function updateCompounds(experimentId) {
+        EXPERIMENT_ID = experimentId;
 
-        <g:remoteFunction controller="stdCurve" action="getResultData"
-						  onSuccess="updateUnknownPlates(data)"
+        <g:remoteFunction controller="doseResponse" action="updateCompounds"
+						  update="compoundSelect"
 						  params="'experiment_id='+experimentId"/>
 	}
 
-    function unknownPlateChanged() {
-        var unknownPlateSelect = document.getElementById("unknownPlate");
-        UNKNOWN_PLATE_ID = unknownPlateSelect.options[unknownPlateSelect.selectedIndex].text;
-    }
+    function updateDoseResponseCurve(compound) {
+		COMPOUND = compound;
 
-    function refExperimentChanged(experimentId) {
-	<g:remoteFunction controller="stdCurve" action="getReferencePlates"
-					  update="refPlateSelect"
-					  params="'experiment_id='+experimentId"/>
-	REF_EXPERIMENT_ID = document.getElementById("refExperiment").value;
-}
-
-function refPlateChanged(plateId) {
-    REF_PLATE_ID = document.getElementById("refPlate").value;
-
-	<g:remoteFunction controller="stdCurve" action="getReferenceXCategories"
-					  update="refXCategorySelect"
-					  params="'plate_id='+plateId"/>
-
-	<g:remoteFunction controller="stdCurve" action="getReferenceData"
-					  onSuccess="updateReferenceData(data)"
-					  params="'plate_id='+REF_PLATE_ID"/>
+		<g:remoteFunction controller="doseResponse" action="getfittedData"
+						  onSuccess="updateDoseCurveData(data)"
+						  params="'experiment_id='+EXPERIMENT_ID + '&compound_name='+compound"/>
 
 	}
 
-
+	function updateDoseCurveData(data) {
+		DR_CURVE_DATA_JSON = data;
+	}
 
 </g:javascript>
 
