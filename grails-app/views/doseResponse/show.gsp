@@ -90,8 +90,6 @@
 		<g:remoteFunction controller="doseResponse" action="getfittedData"
 						  onSuccess="updateDoseCurveData(data)"
 						  params="'experiment_id='+EXPERIMENT_ID + '&compound_name='+compound"/>
-
-		$("#curveParameters").clear();
 	}
 
 function updateDoseCurveData(data) {
