@@ -158,7 +158,7 @@ class FitDoseResponseCurveService {
                     if (label.category == "compound") {
                         plate.compounds[label.name] = 1
                     }
-                    wellOut.labels[label.category] = label.name
+                    wellOut.labels[label.category] = replaceDot(label.name)
                     if (label.category == "dosage") {
                         wellOut.labels["units"] = label.units
                     }
@@ -191,5 +191,9 @@ class FitDoseResponseCurveService {
         }
 
         return resultData
+    }
+
+    def replaceDot(String dotString) {
+        return dotString.replace("__dot__", ".");
     }
 }
