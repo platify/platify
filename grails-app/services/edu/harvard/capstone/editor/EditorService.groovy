@@ -648,5 +648,52 @@ class EditorService {
 
     return experiment
   }
+
+    def getControlData(ExperimentalPlateSet experimentInstance){
+        if (!experimentInstance)
+            return
+
+        def plateSetList = PlateSet.findAllByExperiment(experimentInstance)
+
+        def experiment = [:]
+        experiment.plates = []
+
+        plateSetList.each{ plateInstance ->
+            def plate = [:]
+
+            plate.plateID = plateInstance.barcode
+
+            plate.wells = []
+
+            def wells = Well.findAllByPlateAndControlNotEqual(plateInstance.plate, Well.WellControl.COMPOUND)
+            wells.each{
+                def well = [:]
+                well.row = it.row
+                well.column = it.column
+//                well.groupName = it.groupName
+//                String c = it.control
+//                well.control = c.toString().toLowerCase()
+                well.labels = []
+
+                // experiment labels
+                def wellLabels = DomainLabel.findAllByDomainIdAndLabelTypeAndPlate(it.id, DomainLabel.LabelType.WELL, plateInstance).collect{it.label}
+                wellLabels.each{
+                    def label = [:]
+                    label.category = it.category
+                    label.name = it.name
+//                    label.value = it.value
+//                    label.id = it.id
+                    well.labels << label
+                }
+
+                plate.wells << well
+            }
+
+            experiment.plates << plate
+
+        }
+
+        return experiment
+    }
 }
 	
