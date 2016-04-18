@@ -13,6 +13,7 @@ class ResultController {
 
     def springSecurityService
     def resultService
+    def editorService
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
@@ -125,8 +126,20 @@ class ResultController {
             return                      
         }
 
+        def editorData
+        try{
+            editorData = editorService.getControlData(experiment)
+        }
+        catch (ValidationException e) {
+            response.sendError(400)
+            return
+        } catch (RuntimeException e) {
+            response.sendError(500)
+            return
+        }
+
         // TODO - don't really need the experiment object
-        respond experiment as Object, model:[importData: importData]
+        respond experiment as Object, model:[importData: importData, editorData: editorData, exp_id: experiment.id]
     }
 
 

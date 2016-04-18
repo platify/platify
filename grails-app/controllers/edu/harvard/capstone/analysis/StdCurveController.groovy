@@ -17,6 +17,7 @@ import grails.converters.JSON
  * Created by Monica on 3/24/2016.
  */
 class StdCurveController {
+    def springSecurityService
     def editorService
     def resultService
 
@@ -24,10 +25,10 @@ class StdCurveController {
 
     def show(){
 
-        if (!springSecurityService.isLoggedIn()){
-            redirect controller: 'experimentalPlateSet', action: 'index', method: 'GET'
-            return
-        }
+//        if (!springSecurityService.isLoggedIn()){
+//            redirect controller: 'experimentalPlateSet', action: 'index', method: 'GET'
+//            return
+//        }
 
         def experimentList = ExperimentalPlateSet.listOrderByName();
 
@@ -48,18 +49,11 @@ class StdCurveController {
         render (resultData as JSON);
     }
 
-    def getUnknownPlates(int experiment_id) {
-        def unknownExperiment = ExperimentalPlateSet.findById(experiment_id);
-        def unknownPlate = PlateSet.findAllByExperiment(unknownExperiment);
-        render g.select(id:"unknownPlate", name:"unknownPlate", from:unknownPlate,
-                optionKey:'id', optionValue:"barcode", noSelection:[null:' '], onchange:"unknownPlateChanged()")
-    }
-
-    def getReferencePlates(int experiment_id) {
+    def getPlates(int experiment_id) {
         def referenceExperiment = ExperimentalPlateSet.findById(experiment_id);
         def referencePlate = PlateSet.findAllByExperiment(referenceExperiment);
-        render g.select(id:"refPlate", name:"refPlate", from:referencePlate,
-            optionKey:'id', optionValue:"barcode", noSelection:[null:' '], onchange:"refPlateChanged(this.value)")
+        render g.select(id:"scPlate", name:"scPlate", from:referencePlate,
+            optionKey:'id', optionValue:"barcode", noSelection:[null:' '], onchange:"scPlateChanged(this.value)")
     }
 
     def getReferenceXCategories(int experiment_id) {
@@ -88,12 +82,5 @@ class StdCurveController {
 
         render g.select(id:"refYCategory", name:"refYCategory", from:wellLabels,
                 noSelection:[null:' '], onchange:"yCategoryChanged()")
-    }
-
-    def getReferenceData(int plate_id) {
-        def test = ExperimentalPlateSet.findById(6);
-        def referenceData = editorService.getExperimentData(test);
-
-        render(referenceData as JSON);
     }
 }

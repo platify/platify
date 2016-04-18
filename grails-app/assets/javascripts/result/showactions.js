@@ -150,8 +150,12 @@ function init() {
     scatter = new Scatter();
     scatter.setData(experiment.data);
 
+    //Set up std curve
+    var stdCurve = new StdCurve();
+    stdCurve.init();
+
     // Set up histogram
-    histogram = new Histogram(IMPORT_DATA_JSON, experiment);
+    var histogram = new Histogram(IMPORT_DATA_JSON, experiment);
     histogram.initiateVis();
 
     // process experiment object
