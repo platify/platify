@@ -104,7 +104,8 @@
 <g:javascript>
     var UNKNOWN_EXPERIMENT_ID;
     var UNKNOWN_PLATE_ID;
-    var REFERENCE_DATA_JSON;
+    var EDITOR_DATA_JSON;
+    var IMPORT_DATA_JSON;
     var REF_EXPERIMENT_ID;
     var REF_PLATE_ID;
     var PLATE_ID;
@@ -121,9 +122,6 @@
 
     function updateUnknownPlates(data) {
         IMPORT_DATA_JSON = data;
-        %{--<g:remoteFunction controller="stdCurve" action="getUnknownPlates"--}%
-                      %{--update="unknownPlateSelect"--}%
-                      %{--params="'experiment_id='+UNKNOWN_EXPERIMENT_ID"/>--}%
     }
 
     function unknownPlateChanged() {
@@ -170,7 +168,7 @@
     }
 
     function updateReferenceData(data) {
-        REFERENCE_DATA_JSON = data;
+        EDITOR_DATA_JSON = data;
     }
 
 </g:javascript>

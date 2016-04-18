@@ -24,14 +24,13 @@ class StdCurveController {
 
     def show(){
 
-/*
         if (!springSecurityService.isLoggedIn()){
             redirect controller: 'experimentalPlateSet', action: 'index', method: 'GET'
             return
         }
-*/
+
         def experimentList = ExperimentalPlateSet.listOrderByName();
-        // TODO - don't really need the experiment object
+
         respond experimentList as Object, model:[experimentList: experimentList]
     }
 
@@ -64,20 +63,6 @@ class StdCurveController {
     }
 
     def getReferenceXCategories(int experiment_id) {
-//        def plateInstance = PlateSet.findById(plate_id);
-//        def referenceWells = Well.findAllByPlate(plateInstance.plate);
-//        def wellLabels = [];
-//        referenceWells.each{
-//            def label = DomainLabel.findAllByDomainIdAndLabelTypeAndPlate(
-//                    it.id, DomainLabel.LabelType.WELL, plateInstance).collect{it.label}
-//            label.each{
-//                if (!wellLabels.contains(it.category) && it.category != "compound")
-//                wellLabels << it.category;
-//            }
-//        }
-//
-//        render g.select(id:"refXCategory", name:"refXCategory", from:wellLabels,
-//                noSelection:[null:' '], onchange:"xCategoryChanged(this.value)")
         def experiment = ExperimentalPlateSet.findById(experiment_id);
         def resultInstance = Result.findByExperiment(experiment);
         def resultPlate = ResultPlate.findByResult(resultInstance);
@@ -89,23 +74,6 @@ class StdCurveController {
     }
 
     def getReferenceYCategories(int plate_id) {
-//        def plateInstance = PlateSet.findById(plate_id);
-//        def referenceWells = Well.findAllByPlate(plateInstance.plate);
-//
-//        def wellLabels = [];
-//        referenceWells.each{
-//            def label = DomainLabel.findAllByDomainIdAndLabelTypeAndPlate(
-//                    it.id, DomainLabel.LabelType.WELL, plateInstance).collect{it.label}
-//            label.each{
-//                if (!wellLabels.contains(it.category) && it.category != "compound"
-//                    && it.category != x_category)
-//                    wellLabels << it.category;
-//            }
-//        }
-//
-//        render g.select(id:"refYCategory", name:"refYCategory", from:wellLabels,
-//                noSelection:[null:' '], onchange:"yCategoryChanged()")
-
         def plateInstance = PlateSet.findById(plate_id);
         def referenceWells = Well.findAllByPlate(plateInstance.plate);
         def wellLabels = [];
@@ -123,9 +91,6 @@ class StdCurveController {
     }
 
     def getReferenceData(int plate_id) {
-//        def plate = PlateSet.findById(plate_id);
-//        def referenceData = editorService.getPlate(plate);
-
         def test = ExperimentalPlateSet.findById(6);
         def referenceData = editorService.getExperimentData(test);
 
