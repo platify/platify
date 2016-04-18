@@ -21,7 +21,7 @@ class StdCurveController {
     def editorService
     def resultService
 
-    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
+//    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
     def show(){
 
