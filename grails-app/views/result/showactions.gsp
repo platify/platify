@@ -53,6 +53,7 @@
 						</thead>
 					</table>
 				</div>
+				<div id="slider"></div>
 			</div>
 
 			<div class="panel panel-default">
@@ -247,6 +248,13 @@
         %{-- standard curve start --}%
 
     </g:javascript>
+    
+    <g:javascript>
+        $(function() {
+            $( "#slider" ).slider();
+        });
+    </g:javascript>
+    
 	<asset:javascript src="result/ExperimentModel.js" />
 	<asset:javascript src="result/showactions.js" />
 	<asset:javascript src="result/ResultUI.js"/>
