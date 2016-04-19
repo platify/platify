@@ -7,7 +7,6 @@ class Well {
 	Integer row
 	String groupName
 	WellControl control = WellControl.EMPTY
-	WellCompound wellCompound;
 	
 	
 	enum WellControl {
@@ -31,7 +30,6 @@ class Well {
 
     static constraints = {
     	groupName nullable: true, blank: true
-		wellCompound nullable: true, blank: true
     }
     static mapping = {
         column column: '`column`'

@@ -87,6 +87,10 @@ function downloadExperiment(fileformat) {
             generator.forceTSVDownload(filename);
             break;
 
+        case 'json':
+            generator.forceJSONDownload(filename);
+            break;
+
         case 'csv':
         default:
             generator.forceCSVDownload(filename);
@@ -146,6 +150,14 @@ function init() {
     scatter = new Scatter();
     scatter.setData(experiment.data);
 
+    //Set up std curve
+    var stdCurve = new StdCurve();
+    stdCurve.init();
+
+    // Set up histogram
+    var histogram = new Histogram(IMPORT_DATA_JSON, experiment);
+    histogram.initiateVis();
+
     // process experiment object
     if (Object.keys(experiment.experiment.plates).length > 0) {
         var plateData = Object.keys(experiment.experiment.plates).map(function(plateIndex) {
@@ -185,6 +197,11 @@ function init() {
         showHeatMap = $(event.target)[0].checked;
         reloadGrid();
     });
+
+    // add histogram button listener
+    $('#histogramButton').on('click', function(event) {
+            histogram.updateGraph();
+        });
     
     var resultUI = new ResultUI();
 }

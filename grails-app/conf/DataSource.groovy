@@ -25,19 +25,21 @@ hibernate {
 environments {
     development {
         dataSource {
-            dbCreate = "create-drop" // one of 'create', 'create-drop', 'update', 'validate', ''
+            dbCreate = "create"
+            //dbCreate = "create-drop" // one of 'create', 'create-drop', 'update', 'validate', ''
             url = "jdbc:mysql://127.0.0.1:3306/platify?useUnicode=yes&characterEncoding=UTF-8"
         }
     }
     test {
         dataSource {
-            dbCreate = "update" // one of 'create', 'create-drop', 'update', 'validate', ''
+            dbCreate = "create"
+//            dbCreate = "update" // one of 'create', 'create-drop', 'update', 'validate', ''
             url = "jdbc:mysql://127.0.0.1:3306/platify?useUnicode=yes&characterEncoding=UTF-8"
         }
     }
     production {
         dataSource {
-            dbCreate = "none" // one of 'create', 'create-drop', 'update', 'validate', ''
+            dbCreate = "create" // one of 'create', 'create-drop', 'update', 'validate', ''
             url = "jdbc:mysql://127.0.0.1:3306/platify?useUnicode=yes&characterEncoding=UTF-8"
 
         }

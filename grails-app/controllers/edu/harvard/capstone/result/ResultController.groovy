@@ -13,6 +13,7 @@ class ResultController {
 
     def springSecurityService
     def resultService
+    def editorService
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
@@ -125,8 +126,20 @@ class ResultController {
             return                      
         }
 
+        def editorData
+        try{
+            editorData = editorService.getControlData(experiment)
+        }
+        catch (ValidationException e) {
+            response.sendError(400)
+            return
+        } catch (RuntimeException e) {
+            response.sendError(500)
+            return
+        }
+
         // TODO - don't really need the experiment object
-        respond experiment as Object, model:[importData: importData]
+        respond experiment as Object, model:[importData: importData, editorData: editorData, exp_id: experiment.id]
     }
 
 
@@ -195,45 +208,45 @@ class ResultController {
         }
     }
 
-	@Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
-	def rrf_upload() {
-		render(view: "rrf_upload")
-	}
-	
-	def upload() {
-		List<String, MultipartFile> filesList = request.getFiles("filecsv[]");
-		
-		if (filesList.size() < 1) {
-			flash.message = 'file cannot be empty'
-			render(view: 'rrf_upload')
-			rrf.delete()
-			return
-		}
-		
-		def rrfRoot = grailsApplication.mainContext.servletContext.getRealPath('rrf')
-		def rrfRootDir = new File(rrfRoot)
-		if (!rrfRootDir.exists()) rrfRootDir.mkdir()
-		
-		filesList.each { f ->
-
-			RawResultFile rrf = new RawResultFile()
-			rrf.save(flush: true)
-			def rrfId = rrf.id
-			def destFolderPath = rrfRoot + "/" + rrfId
-			def destDir = new File(destFolderPath)
-
-			if (!destDir.exists()) destDir.mkdir()
-
-			def originalFName = f.getOriginalFilename();
-			def destFile = new File(destDir, originalFName)
-
-			f.transferTo(destFile)
-
-			rrf.fName = rrfId + "/" + originalFName
-			rrf.save(flush: true)
-		}
-		response.sendError(200, 'Done')
-	}
+//	@Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
+//	def rrf_upload() {
+//		render(view: "rrf_upload")
+//	}
+//	
+//	def upload() {
+//		List<String, MultipartFile> filesList = request.getFiles("filecsv[]");
+//		
+//		if (filesList.size() < 1) {
+//			flash.message = 'file cannot be empty'
+//			render(view: 'rrf_upload')
+//			rrf.delete()
+//			return
+//		}
+//		
+//		def rrfRoot = grailsApplication.mainContext.servletContext.getRealPath('rrf')
+//		def rrfRootDir = new File(rrfRoot)
+//		if (!rrfRootDir.exists()) rrfRootDir.mkdir()
+//		
+//		filesList.each { f ->
+//
+//			RawResultFile rrf = new RawResultFile()
+//			rrf.save(flush: true)
+//			def rrfId = rrf.id
+//			def destFolderPath = rrfRoot + "/" + rrfId
+//			def destDir = new File(destFolderPath)
+//
+//			if (!destDir.exists()) destDir.mkdir()
+//
+//			def originalFName = f.getOriginalFilename();
+//			def destFile = new File(destDir, originalFName)
+//
+//			f.transferTo(destFile)
+//
+//			rrf.fName = rrfId + "/" + originalFName
+//			rrf.save(flush: true)
+//		}
+//		response.sendError(200, 'Done')
+//	}
 	
     protected void notFound() {
         request.withFormat {

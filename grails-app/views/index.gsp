@@ -31,7 +31,7 @@
 							<div class="panel-heading">
 								<h4 class="panel-title">Plate Templates</h4>
 							</div>
-							<div class="panel-body ">							
+							<div class="panel-body ">
 								<ul class="list-unstyled">
 									<li><button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#createTemplateModal">Create New Template</button></li>
 									<li><button type="button" class="btn btn-info btn-sm" onclick="location.href='experimentalPlateSet/exportTemplate';">Export Template</button></li>
@@ -67,8 +67,34 @@
 					</div>
 				</div>
 			</div>
+			<div class="row">
+				<div class="col-sm-12 content-body">
+					<div class="col-sm-3">
+						<div id="normPanel" class="panel panel-default">
+							<div class="panel-heading">
+								<h4 class="panel-title">Standard Curve</h4>
+							</div>
+							<div class="panel-body ">
+								<ul class="list-unstyled">
+									<li><button type="button" class="btn btn-info btn-sm" onclick="location.href='stdCurve/show';">Normalize plate</button></li>
+								</ul>
+							</div>
+						</div>
+						<div id="normPanel" class="panel panel-default">
+							<div class="panel-heading">
+								<h4 class="panel-title">Dose Response Curve</h4>
+							</div>
+							<div class="panel-body ">
+								<ul class="list-unstyled">
+									<li><button type="button" class="btn btn-info btn-sm" onclick="location.href='doseResponse/show';">Dose Response</button></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
-		
+
 		<g:render template="/plateTemplate/createTemplateDialog"/>
 	</body>
 </html>
