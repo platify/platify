@@ -110,7 +110,7 @@
                                 <h4 class="panel-title">Liquid Handler Instructions</h4>
                             </div>
                             <div class="panel-body">
-                                <textarea style="width: 600px; height: 300px;" readonly>
+                                <textarea name="lhmappinginstructions" id="lhmappinginstructions" style="width: 600px; height: 300px;" readonly>
                                 </textarea>
                             </div>
                         </div>
