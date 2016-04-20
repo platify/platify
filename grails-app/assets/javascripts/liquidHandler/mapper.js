@@ -177,10 +177,29 @@ function spoofLiquidHandlerLocations() {
 }
 
 function parseCompoundLiquidHandlerLocationJsonData(jsonData) {
-
     for (el in jsonData) {
-        document.getElementByName("lhmappinginstructions").text += el.
+        document.getElementById("lhmappinginstructions").text = JSON.stringify(jsonData);
     }
+}
+
+
+function onViewSelect(clickedEL) {
+    "use strict";
+    var elValArr, plateId;
+    $("#gridView").hide();
+    $("#loaderView").show();
+
+    fetchCompoundList();
+/*    elValArr = clickedEL.value.split("-");
+    plateId = elValArr[0];
+    GRID_WIDTH = elValArr[1];
+    GRID_HEIGHT = elValArr[2];
+
+    console.log("selectEvent!:" + plateId);
+    fetchPlateData(plateId);
+    */
+    $("#loaderView").hide();
+
 }
 
 
