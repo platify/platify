@@ -19,7 +19,7 @@ function setCompoundList() {
         newCheckbox.name = compounds[compound].id;
         newCheckbox.value = compounds[compound].id;
         newCheckbox.id = compounds[compound].id;
-        newCheckbox.onclick = getCompoundLocations(newCheckbox.id);
+        newCheckbox.setAttribute("onchange", "getCompoundLocations(this.id);");
 
         newLabel = document.createElement("label");
         newLabel.htmlFor = compounds[compound].id;
@@ -28,6 +28,7 @@ function setCompoundList() {
         innerDiv.appendChild(newCheckbox);
         innerDiv.appendChild(newLabel);
         newDiv.appendChild(innerDiv);
+
     }
     document.getElementById("compoundList").innerHTML = newDiv.innerHTML;
 }
