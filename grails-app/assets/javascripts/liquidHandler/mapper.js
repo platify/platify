@@ -19,6 +19,7 @@ function setCompoundList() {
         newCheckbox.name = compounds[compound].id;
         newCheckbox.value = compounds[compound].id;
         newCheckbox.id = compounds[compound].id;
+        newCheckbox.onclick = getCompoundLocations(newCheckbox.id);
 
         newLabel = document.createElement("label");
         newLabel.htmlFor = compounds[compound].id;
@@ -135,10 +136,10 @@ function fetchCompoundList() {
 /**
  * Call to Platify & (spoofed) to Liquid Handler to get location of compounds.
  */
-function getCompoundLocations() {
+function getCompoundLocations(id) {
     "use strict";
     var jqxhr = $.ajax({
-        url: hostname + "/plate/getCompoundLocations/3",
+        url: hostname + "/plate/getCompoundLocations/" + id,
         type: "POST",
         data: null,
         processData: false,
