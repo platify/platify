@@ -20,7 +20,7 @@
 
 <style>
 #gridViewModel {
-    width: 100%;
+    width: 80%;
 }
 
 .modal-body {
@@ -70,10 +70,7 @@
                     <div class="col-sm-5"></div>
                 </div>
                 <div class="toggler" id="gridView">
-                    <div class="col-sm-8" style="padding:0px">
-                        <div id="myGrid" style="width:100%; height:500px;"></div>
-                    </div>
-                    <div class="col-sm-2" style="padding:0px; height:500px;">
+                    <div class="col-sm-4" style="padding:10px; height:400px;">
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <h4 class="panel-title">Compounds</h4>
@@ -81,12 +78,26 @@
                             <div class="panel-body">
                                 <div id="compoundList"></div>
                             </div>
+                            <div style="padding: 10px;">
+                                <button type="button" class="btn btn-default">Get Mapping Instructions</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-8" style="padding:10px; height:400px;">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">Liquid Handler Instructions</h4>
+                            </div>
+                            <div class="panel-body">
+                                <textarea style="width: 600px; height: 300px;" readonly>
+                                </textarea>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Finished</button>
             </div>
         </div>
     </div>

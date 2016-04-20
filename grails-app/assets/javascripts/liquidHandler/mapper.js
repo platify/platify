@@ -6,14 +6,26 @@ var compounds = [];
 
 function setCompoundList() {
     "use strict";
-    var newDiv, innerDiv, wellGroup, newLabel, compound;
+    var newDiv, innerDiv, newLabel, newCheckbox, compound;
     newDiv = document.createElement("div");
     for (compound in compounds) {
+
+        console.log("id2: " + compounds[compound].id);
+        console.log("name2: " + compounds[compound].name);
         innerDiv = document.createElement("div");
+
+        newCheckbox = document.createElement("input");
+        newCheckbox.type = "checkbox";
+        newCheckbox.name = compounds[compound].id;
+        newCheckbox.value = compounds[compound].id;
+        newCheckbox.id = compounds[compound].id;
+
         newLabel = document.createElement("label");
-        newLabel.appendChild(document.createTextNode(compound + ": "));
+        newLabel.htmlFor = compounds[compound].id;
+        newLabel.appendChild(document.createTextNode(" " + compounds[compound].name));
+
+        innerDiv.appendChild(newCheckbox);
         innerDiv.appendChild(newLabel);
-        innerDiv.appendChild(document.createTextNode("  " + compounds[compound]));
         newDiv.appendChild(innerDiv);
     }
     document.getElementById("compoundList").innerHTML = newDiv.innerHTML;
@@ -232,10 +244,6 @@ $(function(){
  */
 function init() {
     "use strict";
-    createGrid("myGrid", CELL_WIDTH, CELL_HEIGHT, DIMENSION, DIMENSION);
-
-    // initially disable selection of grid cells
-    disableGridSelection();
 }
 
 window.onload = init;
