@@ -191,7 +191,7 @@ function init() {
                  false);
         plateTable.clear().draw();
     }
-
+    
     // add download buttons listener
     $('#downloadButtons button').on('click', function(event) {
         downloadExperiment(event.target.dataset.fileformat);
@@ -214,17 +214,139 @@ function init() {
             histogram.updateGraph();
         });
     
+    $(".circle").on('click', function(event){
+    	markOutlierScatterClick(event);
+    });
+    
     var resultUI = new ResultUI();
 }
 
+function markOutlierScatterClick(event) {
+	var eventObj = $(event.target);
+	var indexVar = $(event.target).attr('index');
+	var row = scatter.dotIndexes[indexVar][0];
+	var col = scatter.dotIndexes[indexVar][1];
+	
+    //toggleClass and hasClass aren't working here...
+    //$(event.target).closest("circle").toggleClass("outlier");
+	var s = $(event.target).attr('class');
+
+    if(s.indexOf('outlier')!==-1) {
+    	//Already has 'outlier' unset it
+    	markOutlierStatus(row, col, false);
+    } else {
+    	markOutlierStatus(row, col, true);
+    }
+    experiment.savePlate();
+    console.log("col: "+col+" row: "+row);
+}
+
+function markOutlierGridClick(e, args) {
+	var col = args.cell;
+    var row = args.row;
+    //Toggle the outlier class for styling
+    
+    //$(e.target).closest(".slick-cell").toggleClass("outlier");
+    if($(e.target).closest(".slick-cell").hasClass("outlier")) {
+    	//Keep this in sync with what the outliers are
+    	markOutlierStatus(row, col, false);
+    } else {
+    	markOutlierStatus(row, col, true);
+    }
+    
+    experiment.savePlate();
+    console.log("col: "+col+" row: "+row);
+    
+}
+
+
+
+//Marks outliers in all visualizations
+function markOutlierStatus(row, col, isOutlier) {
+	var colNum = col - 1;
+	if(isOutlier) {
+		experiment.experiment.plates[0].rows[row].columns[colNum].outlier = "true";
+	} else {
+		experiment.experiment.plates[0].rows[row].columns[colNum].outlier = "false";
+	}
+	var rowNum = row+1;
+	var scatterPoint = $('circle[row="'+row+'"][col="'+col+'"]');
+	if(isOutlier) {
+		scatterPoint.attr("class", "outlier circle");
+	} else {
+		scatterPoint.attr("class", "circle");
+	}
+
+	  //Mark "rowIdx", "colIdx" as an outlier
+	  var targetRow = grid.grid.getDataItem(row);
+	  var targetCol = grid.grid.getColumns()[col];
+	  var classname = grid.grid.getCellNode(row, col).className;
+	  classname = classname.replace(/ /g, ".");
+	  //Get the rowIdx slickrow
+	  var cell = $(".slick-row:nth-of-type("+rowNum+") ."+classname);
+	  
+	  var selectedEntity = $(".slick-row:nth-of-type("+rowNum+") ."+classname);
+	  if(isOutlier) {
+		  //Add the outlier class
+		$(".slick-row:nth-of-type("+rowNum+") ."+classname).addClass("outlier");
+	  } else {
+		  //Remove the outlier class if it exists
+		$(".slick-row:nth-of-type("+rowNum+") ."+classname).removeClass("outlier");
+	  }
+	
+}
+
+
+/**
+ * Marks all current outliers in the grid. This is done in the scatterplot
+ * while it is being generated. slickgrid is a little more complicated, so 
+ * let's let it do its thing first, and then go through and modify it
+ */
+function markAllCurrentOutliers() {
+    //Iterate through wells and mark all outliers as "outlier"
+    //experiment.experiment.plates[0].rows[row].columns[col].outlier = "false"
+    $.each(experiment.experiment.plates[0].rows, function( rowIdx, row ) {
+    	$.each(row.columns, function( colIdx, column ) {
+    		//Add 1 to compensate for the headers on table
+		  var rowNum = rowIdx+1;
+		  //Mark "rowIdx", "colIdx" as an outlier
+		  var targetRow = grid.grid.getDataItem(rowIdx);
+		  var targetCol = grid.grid.getColumns()[colIdx+1];
+		  var classname = grid.grid.getCellNode(rowIdx, colIdx+1).className;
+		  classname = classname.replace(/ /g, ".");
+		  //Get the rowIdx slickrow
+		  var cell = $(".slick-row:nth-of-type("+rowIdx+") ."+classname);
+		  
+		  var selectedEntity = $(".slick-row:nth-of-type("+rowNum+") ."+classname);
+		  var scatterPoint = $('col[row="'+rowIdx+'"][col="'+colIdx+'"]');
+      	  if(column.outlier == "true") {
+      		  //Add the outlier class
+      		$(".slick-row:nth-of-type("+rowNum+") ."+classname).addClass("outlier");
+      		scatterPoint.attr("class", "circle outlier");
+      	  } else {
+      		  //Remove the outlier class if it exists
+      		$(".slick-row:nth-of-type("+rowNum+") ."+classname).removeClass("outlier");
+      		scatterPoint.attr("class", "circle outlier");
+      	  }
+    	});
+    });
+}
 
 function loadGrid(dataSet) {
     grid.setData(dataSet);
+    scatter.setData(dataSet);
     grid.fillUpGrid(null, null, true, cellFormatter, 'result-cell');
     if (showHeatMap) {
         colorGrid(dataSet);
     }
+
+    //Mark the appropriate cells as "outliers" on click
+    grid.grid.onClick.subscribe(function(e, args) {
+        markOutlierGridClick(e, args);
+    });
     
+    //Mark all current outliers
+    markAllCurrentOutliers();
 }
 
 function plateSelected(plateIndex) {

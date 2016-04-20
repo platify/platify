@@ -1,13 +1,13 @@
 package platify
 
 import grails.test.mixin.TestFor
-import spock.lang.Specification
 
 /**
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */
-@TestFor(JsonController)
-class JsonControllerSpecTest extends Specification {
+
+//@TestFor(JsonController)
+class JsonControllerSpecTest {
 
     def setup() {
     }

@@ -163,6 +163,7 @@ function Grid(containerID){
         selectionModel.onSelectedRangesChanged.subscribe(updateSelectedCells);
 
         $("#" + this.container).mousemove(handleMousemove);
+       
     };
 
     /**

@@ -208,7 +208,7 @@ class BootStrap {
 
 	    // largely stolen from ResultService.save(), let's set up a plate including results
             def result1 = new Result(owner: andres, equipment: machine1, experiment: experiment1, name: "Results 1", description: "Do we really need to name and describe results?", dateCreated: new Date()).save(flush: true)
-	    def resultLabel1 = new ResultLabel(name: "result label", value: "result label value", labelType: ResultLabel.LabelType.LABEL, scope: ResultLabel.LabelScope.RESULT, domainId: result1.id).save(flush: true)
+	    def resultLabel1 = new ResultLabel(name: "result label", value: "result label value", labelType: ResultLabel.LabelType.LABEL, scope: ResultLabel.LabelScope.RESULT, domainId: result1.id, outlier: "false").save(flush: true)
 	    def resultPlate1 = new ResultPlate(result: result1, rows: 4, columns: 4, barcode: plateSet1.barcode).save(flush: true)
 	    def resultPlateLabel = new ResultLabel(name: "result plate label", value: "result plate label value", labelType: ResultLabel.LabelType.LABEL, scope: ResultLabel.LabelScope.PLATE, domainId: resultPlate1.id).save(flush: true)
 
@@ -237,7 +237,7 @@ class BootStrap {
 						      labelType: ResultLabel.LabelType.RAW_DATA,
 						      scope: ResultLabel.LabelScope.WELL,
 						      domainId: resultWell.id,
-							 outlier: false).save(flush: true)
+							 outlier: "false").save(flush: true)
 		    if ((x < 4) && (y == 0)) { controlLabels << resultLabel }
 		}
 	    }
