@@ -1,4 +1,4 @@
-package edu.harvard.capstone.liquid
+package edu.harvard.capstone.editor
 
 import edu.harvard.capstone.editor.LiquidHandler
 import edu.harvard.capstone.user.Scientist
@@ -122,7 +122,7 @@ class LiquidService {
 
     // spoof Liquid Handler service call #2 to get locations of compounds in Liquid Handler
     // At a later date this can be accurately called to the LH to get the real information
-    def getCompoundLocations() {
+    def spoofCompoundLocations() {
 
         // spoof web service call to Liquid Handler for compound locations
 
@@ -146,6 +146,34 @@ class LiquidService {
         def barcode = responseObject.barcode
         def well = responseObject.well
         def concentration = responseObject.concentration
+
+        return jsonResponse
+    }
+
+    def getCompoundLocations(Integer compoundId) {
+
+        def compoundInstance = Compound.findAllById(compoundId)
+
+        def wellCompoundInstance = WellCompound.findAllByCompound(compoundInstance)
+
+//        wellCompoundInstance.well
+//        wellCompoundInstance.amount
+//        wellCompoundInstance.unit
+
+//        def wellInstance = wellCompoundInstance.well
+        def plateSetInstance = well.plate
+
+        def barcode = plateSetInstance.barcode
+        def well = wellCompoundInstance.well.groupName
+        def amount = wellCompoundInstance.amount + " " + wellCompoundInstance.unit
+
+        def jsonResponse = JsonOutput.toJson([ barcode: barcode,
+                                               well: well,
+                                               concentration: amount])
+
+        // parse JSON response
+        def jsonSlurper = new JsonSlurper()
+        def responseObject = jsonSlurper.parseText(jsonResponse)
 
         return jsonResponse
     }

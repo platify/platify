@@ -93,7 +93,13 @@ class LiquidHandlerController {
      */
     def spoofCompoundLocations(){
         render(contentType: "application/json") {
-            [compound: liquidService.getCompoundLocations()]
+            [compound: liquidService.spoofCompoundLocations()]
+        }
+    }
+
+    def getCompoundLocations(Integer compoundId) {
+        render(contentType: "application/json") {
+            [compound: liquidService.getCompoundLocations(compoundId)]
         }
     }
 }
