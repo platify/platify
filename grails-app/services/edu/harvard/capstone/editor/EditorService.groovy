@@ -382,6 +382,8 @@ class EditorService {
         plate.experimentID = plateInstance.experiment.id
         plate.templateID = plateInstance.plate.id
         plate.plateID = plateInstance.barcode
+        plate.width = plateInstance.plate.width
+        plate.height = plateInstance.plate.height
 
         plate.labels = []
 
