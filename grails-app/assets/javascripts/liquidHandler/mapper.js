@@ -10,8 +10,8 @@ function setCompoundList() {
     newDiv = document.createElement("div");
     for (compound in compounds) {
 
-        console.log("id2: " + compounds[compound].id);
-        console.log("name2: " + compounds[compound].name);
+//        console.log("id2: " + compounds[compound].id);
+//        console.log("name2: " + compounds[compound].name);
         innerDiv = document.createElement("div");
 
         newCheckbox = document.createElement("input");
@@ -56,7 +56,7 @@ function loadCompoundJsonData(compoundJson) {
 
     compoundModel = {};
 
-    console.log(compoundJson);
+//    console.log(compoundJson);
 
     jsonData = JSON.parse(compoundJson);
 
@@ -89,7 +89,7 @@ function fetchCompoundList() {
     // Set another completion function for the request above
     jqxhr.always(function(resData) {
         console.log( "compound complete" );
-        console.log("templateJson=" + JSON.stringify(resData));
+//        console.log("templateJson=" + JSON.stringify(resData));
         $("#gridView").show();
         loadCompoundJsonData(JSON.stringify(resData));
     });
@@ -125,7 +125,7 @@ function getCompoundLocations(id, obj) {
         // Set another completion function for the request above
         jqxhr.always(function (resData) {
             console.log("compound location complete");
-            console.log("templateJson=" + JSON.stringify(resData));
+//            console.log("templateJson=" + JSON.stringify(resData));
             //loadPlateJsonData(resData);
             //loadCompoundJsonData(JSON.stringify(resData));
             //parseCompoundLocationJsonData(JSON.stringify(resData));
@@ -145,6 +145,7 @@ function getCompoundLocations(id, obj) {
     }
 
     console.log("selectedCompounds count: " + selectedCompounds.length);
+    console.log("selectedCompounds items: " + selectedCompounds);
 
 }
 
