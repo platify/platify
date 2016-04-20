@@ -1,4 +1,4 @@
-package edu.harvard.capstone.editor
+package edu.harvard.capstone.liquid
 
 import edu.harvard.capstone.editor.LiquidHandler
 import edu.harvard.capstone.user.Scientist
