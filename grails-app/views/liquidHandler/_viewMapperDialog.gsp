@@ -79,7 +79,7 @@
                                 <div id="compoundList"></div>
                             </div>
                             <div style="padding: 10px;">
-                                <button type="button" class="btn btn-default">Get Mapping Instructions</button>
+                                <button type="button" class="btn btn-default" onclick="getCompoundLocations();">Get Mapping Instructions</button>
                             </div>
                         </div>
                     </div>

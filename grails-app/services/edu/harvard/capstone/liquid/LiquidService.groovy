@@ -136,7 +136,7 @@ class LiquidService {
         // spoof'd json to respond from LH w/random in/out plate quantities
         def jsonResponse = JsonOutput.toJson([ barcode: random.nextInt(randomBarcodeBoundary),
                                                well: "well" + random.nextInt(randomWellBoundary),
-                                               concentration: (random.nextInt(randomConcentrationBoundary)+1*5) + "uM"])
+                                               concentration: ((random.nextInt(randomConcentrationBoundary)+1)*5) + "uM"])
 
         // parse JSON response
         def jsonSlurper = new JsonSlurper()

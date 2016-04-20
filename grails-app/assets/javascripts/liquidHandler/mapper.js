@@ -72,104 +72,6 @@ function loadCompoundJsonData(compoundJson) {
 
 }
 
-function parseCompoundLocationJsonData(locationJson) {
-    console.log("location json: " + locationJson);
-}
-
-/**
- * Loads a json data structure received from the server. It is translated into
- * a format understood by the local internal plate model and updates the grid
- * with the data received.
- * @param plateJson - a data structure in the format sent by the server.
- */
-function loadPlateJsonData(plateJson) {
-    "use strict";
-    var g_height, g_width, newData, row, column, wellgrp, catKey, labKey, color, newContents, units;
-    plateModel = {};
-    catLegend = {};
-    plateModel = translateInputJsonToModel(plateJson);
-    g_height = DIMENSION;
-    g_width = DIMENSION;
-
-    if (GRID_HEIGHT !== null && GRID_HEIGHT !== undefined && GRID_HEIGHT !== "") {
-        g_height = GRID_HEIGHT;
-    }
-
-    if (GRID_WIDTH !== null && GRID_WIDTH !== undefined && GRID_WIDTH !== "") {
-        g_width = GRID_WIDTH;
-    }
-
-    newData = createBlankData(g_height, g_width);
-
-    // load data into the grid
-    for (row in plateModel.rows) {
-        for (column in plateModel.rows[row].columns) {
-            wellgrp = plateModel.rows[row].columns[column].wellGroupName;
-            //groupNames[wellgrp] = "SOME_COMPOUND";
-            //groupNames[wellgrp] = "";
-            newContents = wellgrp;
-
-            for (catKey in plateModel.rows[row].columns[column].categories) {
-                for (labKey in plateModel.rows[row].columns[column].categories[catKey]) {
-                    color = plateModel.rows[row].columns[column].categories[catKey][labKey].color;
-                    units = plateModel.rows[row].columns[column].categories[catKey][labKey].units;
-                    if (units === null || units === undefined) {
-                        units = "";
-                    }
-
-                    newContents += "," + color;
-
-                    // update catLegend color
-                    if (catLegend[catKey] === undefined) {
-                        catLegend[catKey] = {};
-                        catLegend[catKey].labels = {};
-                        catLegend[catKey].visible = true;
-                    }
-
-                    if (catLegend[catKey].labels[labKey] === undefined) {
-                        catLegend[catKey].labels[labKey] = {};
-                        catLegend[catKey].labels[labKey].color = color;
-                        catLegend[catKey].labels[labKey].units = units;
-                    } else {
-                        catLegend[catKey].labels[labKey].color = color;
-                        catLegend[catKey].labels[labKey].units = units;
-                        // category and label already exist, just changing color,
-                        // in this case cells which already have this label need their color updated also!!
-                    }
-
-                    // update color legend cell reverse lookup
-                    if (catLegend[catKey].labels[labKey].cellref === undefined) {
-                        catLegend[catKey].labels[labKey].cellref = [];
-                        catLegend[catKey].labels[labKey].cellref.push(row + "-" + column);
-                    } else {
-                        if (catLegend[catKey].labels[labKey].cellref.indexOf(row + "-" + column) === -1) {
-                            catLegend[catKey].labels[labKey].cellref.push(row + "-" + column);
-                        } else {
-                            console.log("already there");
-                        }
-                    }
-                }
-            }
-
-            if (row > 0 && column > 0) {
-                newData[row - 1][column - 1] = newContents;
-            }
-        }
-    }
-
-    grid.setData(newData);
-
-    updateCategoryList();
-}
-
-/**
- * Forces a refresh of the grid.
- */
-function forceGridRefresh() {
-    "use strict";
-    // display the data
-}
-
 function onViewSelect(clickedEL) {
     "use strict";
     var obj = clickedEL;
@@ -229,7 +131,7 @@ function fetchCompoundList() {
 /**
  * Call (spoofed) to Liquid Handler to get location of compounds.
  */
-function fetchCompoundList(compounds) {
+function getCompoundLocations() {
     "use strict";
     var jqxhr = $.ajax({
         url: hostname + "/LiquidHandler/spoofCompoundLocations/",
@@ -252,28 +154,17 @@ function fetchCompoundList(compounds) {
         console.log("templateJson=" + JSON.stringify(resData));
         //loadPlateJsonData(resData);
         //loadCompoundJsonData(JSON.stringify(resData));
-        parseCompoundLocationJsonData(JSON.stringify(resData));
+        //parseCompoundLocationJsonData(JSON.stringify(resData));
     });
 }
 
-
-/**
- * Event thrown when preview modal is visible. Need to refresh grid so it shows
- * correctly.
- */
-$(function(){
-    $('#viewSavedPlateModal').on('shown.bs.modal', function () {
-        // will only come inside after the modal is shown
-        forceGridRefresh();
-    });
-});
 
 /**
  * This function handles the window load event. It initializes and fills the
  * grid with blank data and sets up the event handlers on the
  */
 function init() {
-    "use strict";
+//    "use strict";
 }
 
 window.onload = init;
