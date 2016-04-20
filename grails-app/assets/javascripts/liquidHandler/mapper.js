@@ -87,6 +87,10 @@ function onViewSelect(clickedEL) {
     var lhInputPlatesCount = obj.dataset.inputplates;
     var lhOutputPlatesCount = obj.dataset.outputplates;
 
+    document.getElementById("liquidHandlerName").innerHTML = lhName;
+    document.getElementById("liquidHandlerInputPlates").innerHTML = lhInputPlatesCount;
+    document.getElementById("liquidHandlerOutputPlates").innerHTML = lhOutputPlatesCount;
+
     console.log("selectEvent!:" + plateId);
     console.log("lhname: " + lhName);
     console.log("lhinputplates: " + lhInputPlatesCount);

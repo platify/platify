@@ -59,15 +59,26 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="myModalLabel">Liquid Handler Mapper</h4>
+                <h4 class="modal-title" id="myModalLabel">Liquid Handler Mapper: <span id="liquidHandlerName"></span></h4>
             </div>
-            <div class="modal-body" style="padding:0px">
+            <div class="modal-body" style="padding:5px">
                 <div class="toggler" id="loaderView">
                     <div class="col-sm-5"></div>
                     <div class="col-sm-2" style="padding:50px">
                         <button class="btn btn-lg btn-info"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</button>
                     </div>
                     <div class="col-sm-5"></div>
+                </div>
+                <div class="clearfix">
+                    <div class="col-sm-2">
+                        Input Plates: <span id="liquidHandlerInputPlates" style="background-color: #DEDEDE; padding: 5px;"></span>
+                    </div>
+                    <div class="col-sm-2">
+                        Output Plates: <span id="liquidHandlerOutputPlates" style="background-color: #DEDEDE; padding: 5px;"></span>
+                    </div>
+                    <div class="col-sm-8">
+                        &nbsp;
+                    </div>
                 </div>
                 <div class="toggler" id="gridView">
                     <div class="col-sm-4" style="padding:10px; height:400px;">
