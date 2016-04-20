@@ -149,8 +149,8 @@ function init() {
     
     slider = $( "#slider" ).slider({
         min: 0,
-        max: experiment.numRows,
-        range: "min",
+        max: (experiment.experiment.plates.length - 1),
+        range: false,
         value: 0,
         slide: function( event, ui ) {
             plateSelected(ui.value);
