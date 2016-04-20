@@ -221,4 +221,9 @@ input.editor-checkbox {
     background: white url('../slickgrid/header-columns-over-bg.gif') repeat-x center bottom;
 }
 
+.outlier {
+	border:2px solid red;
+	opacity: 0.7;
+}
+
 

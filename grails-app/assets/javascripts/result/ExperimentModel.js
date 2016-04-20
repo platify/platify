@@ -22,6 +22,7 @@ function ExperimentModel() {
     this.currentPlateIndex = null;
     this.data = null;
     this.normalizedData = null;
+    this.outlier = null;
 
 
     this.fromJson = function(importDataJson) {
@@ -205,6 +206,49 @@ function ExperimentModel() {
         return rv;
     }
 
+    
+    this.savePlate = function(plateIndex) {
+    	plateIndex = (plateIndex === undefined) ? this.currentPlateIndex : plateIndex;
+        var label = this.rawDataLabel(plateIndex);
+        var plate;
+        var controls;
+
+        if (plateIndex === this.currentPlateIndex) {
+            plate = this.currentPlate;
+            controls = this.controls;
+        }
+        else {
+            plate = this.experiment.plates[plateIndex];
+            controls = this.locateControls(plateIndex);
+        }
+
+        // make sure we've also calculated the plate-level derived values as well
+        this.zFactor(plateIndex);
+        this.zPrimeFactor(plateIndex);
+        this.meanNegativeControl(plateIndex);
+        this.meanPositiveControl(plateIndex);
+
+        // the save endpoint only wants the current plate
+        var data = {
+            experimentID: this.experiment.experimentID,
+            parsingID: this.currentPlate.parsingID,
+            plates: [this.currentPlate],
+        }
+
+        var url = RESULT_SAVE_REFACTORED_DATA_URL + '/' + plate.resultID;
+        var jqxhr = $.ajax({
+            url: url,
+            contentType: 'application/json; charset=UTF-8',
+            data: JSON.stringify(data),
+            method: 'POST',
+            processData: false,
+        });
+        jqxhr.done(function() {
+            var plate = experiment.experiment.plates[plateIndex];
+            console.log('POST of normalized data for plate %s, ID %s, result %s complete',
+                        plateIndex, plate.plateID, plate.resultID);
+        });
+    }
 
     /**
      * Normalizes the data for the given plate, and saves it back to the 

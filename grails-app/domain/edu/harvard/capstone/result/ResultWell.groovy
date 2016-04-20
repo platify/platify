@@ -9,7 +9,11 @@ class ResultWell {
 
 	Date lastUpdated
 	Date dateCreated
-
+	
     static constraints = {
     }
+	
+	static mapping = {
+		outlier defaultValue: "false"
+	 }
 }
