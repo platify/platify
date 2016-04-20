@@ -17,5 +17,11 @@
 }
 
 circle {
+	cursor:pointer;
     fill: steelblue;
+}
+
+.outlier {
+	opacity: 0.7;
+	border: 1px solid red;
 }

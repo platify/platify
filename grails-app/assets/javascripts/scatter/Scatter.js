@@ -1,15 +1,24 @@
 
 
 function Scatter() {
+	
+	//Keep track of which column/row each dot in the plot belongs to
+	this.dotIndexes = Array();
+	
 	this.setData = function(matrixData) {
+		//Clear any existing data in the plot
+		$('#scatterplot').html('');
 		//This is in a set of rows and columns
 		//var data = [[5,3], [10,17], [15,4], [2,8]];
 		var i = 0;
 		var data = [];
-		$.each(matrixData, function(index, row){
-			$.each(row, function(index2 ,column){
+		self = this;
+		$.each(matrixData, function(rowIdx, row){
+			$.each(row, function(colIdx ,column){
 				data.push([i, column]);
 				i = i+1;
+				//dotIndex array is 0 indexed
+				self.dotIndexes[i-1] = [rowIdx, colIdx]
 			});
 		});
 	   
@@ -24,7 +33,7 @@ function Scatter() {
 	    var y = d3.scale.linear()
 	    	      .domain([0, d3.max(data, function(d) { return d[1]; })])
 	    	      .range([ height, 0 ]);
-	 
+	    
 	    var chart = d3.select('#scatterplot')
 		.append('svg:svg')
 		.attr('width', width + margin.right + margin.left)
@@ -58,13 +67,15 @@ function Scatter() {
 		.call(yAxis);
 
 	    var g = main.append("svg:g"); 
-	    
+	    var self = this;
 	    g.selectAll("scatter-dots")
 	      .data(data)
-	      .enter().append("svg:circle")
+	      .enter().append("svg:circle").attr("class", "circle")
 	          .attr("cx", function (d,i) { return x(d[0]); } )
 	          .attr("cy", function (d) { return y(d[1]); } )
-	          .attr("r", 8);
+	          .attr("r", 8).attr("index", function (d,i) { return d[0]; })
+	          .attr("row", function (d,i) { return self.dotIndexes[d[0]][0]; })
+	          .attr("col", function (d,i) { return self.dotIndexes[d[0]][1]; });
 	}
 	
 }
