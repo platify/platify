@@ -153,7 +153,8 @@ function init() {
         range: false,
         value: 0,
         slide: function( event, ui ) {
-            plateSelected(ui.value);
+        	plateTableTools.fnSelect(plateTable.row(ui.value).nodes());
+            //plateSelected(ui.value);
         }
     });
 
