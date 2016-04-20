@@ -103,6 +103,10 @@ function translateInputJsonToModel(plateJson) {
 	}
 	
 	pModel.name = plate.name;
+
+	if (pModel.name === undefined || pModel.name === null) {console.log(plate.templateID);
+	    pModel.name = plate.templateID;}
+
 	pModel.grid_width = plate.width;
 	pModel.grid_height = plate.height;
 
