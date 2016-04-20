@@ -72,6 +72,10 @@ function loadCompoundJsonData(compoundJson) {
 
 }
 
+function parseCompoundLocationJsonData(locationJson) {
+    console.log("location json: " + locationJson);
+}
+
 /**
  * Loads a json data structure received from the server. It is translated into
  * a format understood by the local internal plate model and updates the grid
@@ -155,9 +159,6 @@ function loadPlateJsonData(plateJson) {
 
     grid.setData(newData);
 
-    // display the data
-    grid.fillUpGrid(CELL_WIDTH, CELL_HEIGHT, true, Grid.editorCellFormatter, "editor-cell");
-
     updateCategoryList();
 }
 
@@ -167,7 +168,6 @@ function loadPlateJsonData(plateJson) {
 function forceGridRefresh() {
     "use strict";
     // display the data
-    grid.fillUpGrid(CELL_WIDTH, CELL_HEIGHT, true, Grid.editorCellFormatter, "editor-cell");
 }
 
 function onViewSelect(clickedEL) {
@@ -196,9 +196,8 @@ function onViewSelect(clickedEL) {
 }
 
 /**
- * Call to server to get list of compounds.
+ * Call to Platify server to get list of compounds.
  */
-
 function fetchCompoundList() {
     "use strict";
     var jqxhr = $.ajax({
@@ -226,6 +225,37 @@ function fetchCompoundList() {
         loadCompoundJsonData(JSON.stringify(resData));
     });
 }
+
+/**
+ * Call (spoofed) to Liquid Handler to get location of compounds.
+ */
+function fetchCompoundList(compounds) {
+    "use strict";
+    var jqxhr = $.ajax({
+        url: hostname + "/LiquidHandler/spoofCompoundLocations/",
+        type: "POST",
+        data: null,
+        processData: false,
+        contentType: "application/json; charset=UTF-8"
+    }).done(function() {
+        console.log("success");
+    }).fail(function() {
+        console.log("error");
+        alert("An error has occurred while fetching compound data from the server.");
+    }).always(function() {
+        console.log("complete");
+    });
+
+    // Set another completion function for the request above
+    jqxhr.always(function(resData) {
+        console.log( "compound location complete" );
+        console.log("templateJson=" + JSON.stringify(resData));
+        //loadPlateJsonData(resData);
+        //loadCompoundJsonData(JSON.stringify(resData));
+        parseCompoundLocationJsonData(JSON.stringify(resData));
+    });
+}
+
 
 /**
  * Event thrown when preview modal is visible. Need to refresh grid so it shows

@@ -86,4 +86,14 @@ class LiquidHandlerController {
     def list() {
         return model
     }
+
+    /**
+     * Respond to RESTful call to spoof liquid handler compound locations.
+     * @return
+     */
+    def spoofCompoundLocations(){
+        render(contentType: "application/json") {
+            [compound: liquidService.getCompoundLocations()]
+        }
+    }
 }
