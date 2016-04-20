@@ -133,9 +133,38 @@ function fetchCompoundList() {
 }
 
 /**
- * Call (spoofed) to Liquid Handler to get location of compounds.
+ * Call to Platify & (spoofed) to Liquid Handler to get location of compounds.
  */
 function getCompoundLocations() {
+    "use strict";
+    var jqxhr = $.ajax({
+        url: hostname + "/plate/getCompoundLocations/3",
+        type: "POST",
+        data: null,
+        processData: false,
+        contentType: "application/json; charset=UTF-8"
+    }).done(function() {
+        console.log("success");
+    }).fail(function() {
+        console.log("error");
+        alert("An error has occurred while fetching compound data from the server.");
+    }).always(function() {
+        console.log("complete");
+    });
+
+    // Set another completion function for the request above
+    jqxhr.always(function(resData) {
+        console.log( "compound location complete" );
+        console.log("templateJson=" + JSON.stringify(resData));
+        //loadPlateJsonData(resData);
+        //loadCompoundJsonData(JSON.stringify(resData));
+        //parseCompoundLocationJsonData(JSON.stringify(resData));
+    });
+
+    spoofLiquidHandlerLocations();
+}
+
+function spoofLiquidHandlerLocations() {
     "use strict";
     var jqxhr = $.ajax({
         url: hostname + "/LiquidHandler/spoofCompoundLocations/",
@@ -160,6 +189,7 @@ function getCompoundLocations() {
         //loadCompoundJsonData(JSON.stringify(resData));
         //parseCompoundLocationJsonData(JSON.stringify(resData));
     });
+
 }
 
 

@@ -3,6 +3,8 @@ package edu.harvard.capstone.editor
 import edu.harvard.capstone.user.Scientist
 
 import grails.converters.JSON
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
 import groovy.xml.MarkupBuilder
 import org.codehaus.groovy.grails.web.json.JSONObject
 import grails.validation.ValidationException
@@ -643,6 +645,37 @@ class EditorService {
 
         return compounds
     }
+
+    def getCompoundLocations(Integer compoundId) {
+
+        def compoundInstance = Compound.findByName("substanceA")
+
+        def wellCompoundInstance = WellCompound.findByCompound(compoundInstance)
+
+//        wellCompoundInstance.well
+//        wellCompoundInstance.amount
+//        wellCompoundInstance.unit
+
+        def wellInstance = wellCompoundInstance.well
+        def plateTemplateInstance = wellInstance.plate
+
+        def plateSetInstance = PlateSet.findByExperiment(compoundInstance.experiment)
+
+        def barcode = plateSetInstance.barcode
+        def well = wellCompoundInstance.well.column + "-" + wellCompoundInstance.well.row
+        def amount = wellCompoundInstance.amount + " " + wellCompoundInstance.unit
+
+        def jsonResponse = JsonOutput.toJson([barcode      : barcode,
+                                              well         : well,
+                                              concentration: amount])
+
+        // parse JSON response
+        def jsonSlurper = new JsonSlurper()
+        def responseObject = jsonSlurper.parseText(jsonResponse)
+
+        return jsonResponse
+    }
+
 
     def getExperimentData(ExperimentalPlateSet experimentInstance){
     if (!experimentInstance)

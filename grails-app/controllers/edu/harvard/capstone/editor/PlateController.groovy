@@ -121,7 +121,11 @@ class PlateController {
 
     }
 
-
+    def getCompoundLocations(Integer compoundId) {
+        render(contentType: "application/json") {
+            [compound: editorService.getCompoundLocations(compoundId)]
+        }
+    }
 
 
     @Secured(['permitAll'])

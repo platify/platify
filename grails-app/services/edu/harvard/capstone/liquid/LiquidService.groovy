@@ -150,33 +150,6 @@ class LiquidService {
         return jsonResponse
     }
 
-    def getCompoundLocations(Integer compoundId) {
-
-        def compoundInstance = Compound.findAllById(compoundId)
-
-        def wellCompoundInstance = WellCompound.findAllByCompound(compoundInstance)
-
-//        wellCompoundInstance.well
-//        wellCompoundInstance.amount
-//        wellCompoundInstance.unit
-
-//        def wellInstance = wellCompoundInstance.well
-        def plateSetInstance = well.plate
-
-        def barcode = plateSetInstance.barcode
-        def well = wellCompoundInstance.well.groupName
-        def amount = wellCompoundInstance.amount + " " + wellCompoundInstance.unit
-
-        def jsonResponse = JsonOutput.toJson([ barcode: barcode,
-                                               well: well,
-                                               concentration: amount])
-
-        // parse JSON response
-        def jsonSlurper = new JsonSlurper()
-        def responseObject = jsonSlurper.parseText(jsonResponse)
-
-        return jsonResponse
-    }
 
 
 }
