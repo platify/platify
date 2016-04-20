@@ -103,7 +103,7 @@ function init() {
     // init the experiment object
     experiment = new ExperimentModel();
     experiment.fromJson(IMPORT_DATA_JSON);
-
+    
     // set up plate table
     plateTable = $('#plateTable').DataTable({
         bootstrap: true,
@@ -138,6 +138,7 @@ function init() {
                 var row = plateTableTools.fnGetSelectedData()[0];
                 var plateIndex = row[row.length-1];
                 plateSelected(plateIndex);
+                slider.slider( "value", plateIndex );
             },
         },
     });
@@ -145,6 +146,16 @@ function init() {
 
     // set up grid
     grid  = new Grid("resultGrid");
+    
+    slider = $( "#slider" ).slider({
+        min: 0,
+        max: experiment.numRows,
+        range: "min",
+        value: 0,
+        slide: function( event, ui ) {
+            plateSelected(ui.value);
+        }
+    });
 
     //Set up scatterplot
     scatter = new Scatter();
@@ -213,8 +224,8 @@ function loadGrid(dataSet) {
     if (showHeatMap) {
         colorGrid(dataSet);
     }
+    
 }
-
 
 function plateSelected(plateIndex) {
     experiment.selectPlate(plateIndex);
