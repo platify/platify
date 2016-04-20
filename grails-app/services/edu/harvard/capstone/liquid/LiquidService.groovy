@@ -14,6 +14,18 @@ class LiquidService {
 
     def springSecurityService
 
+    /**
+     * Create new Liquid Handler Mapper
+     *
+     * @param name
+     * @param inputPlateId
+     * @param inputWell
+     * @param inputDose
+     * @param outputPlateId
+     * @param outputWell
+     * @param outputDose
+     * @return
+     */
     def newMapper(String name, String url, Integer inputPlatesCount, Integer outputPlatesCount, String configStatus) {
         def scientistInstance = Scientist.get(springSecurityService.principal.id)
         if (!scientistInstance)
@@ -21,7 +33,6 @@ class LiquidService {
 
         def mapperInstance = new LiquidHandler(name: name, url: url, inputPlatesCount: inputPlatesCount, outputPlatesCount: outputPlatesCount, configStatus: configStatus)
         mapperInstance.save()
-
 
         // Call LH web service with async call to get config
         def p = task {
@@ -38,6 +49,13 @@ class LiquidService {
 
         mapperInstance
     }
+
+    /**
+     * Export Liquid Handler Mappings to CSV
+     *
+     * @param liquidHandlerInstance
+     * @return
+     */
 
     File exportLiquidHandlerMapper(LiquidHandler liquidHandlerInstance){
         if (!liquidHandlerInstance)
