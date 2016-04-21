@@ -18,6 +18,7 @@ class ResultLabel {
 	}
 
     static constraints = {
+        outlier blank: true, nullable: true
     }
 	
 }

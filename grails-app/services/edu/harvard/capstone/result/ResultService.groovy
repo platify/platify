@@ -27,8 +27,8 @@ class ResultService {
 	*	Throws ValidationException if can't create a domain object
 	*/
     def newRawData(JSONObject data) {
-		println("newRawData")
-		println(data.toString())
+//		println("newRawData")
+//		println(data.toString())
     	//if no data of the template return, 
     	if (!data || !data.experimentID || !data.parsingID){
 			throw new RuntimeException("Incorrect Data")
@@ -157,8 +157,8 @@ class ResultService {
 	*	Throws ValidationException if can't create a domain object
 	*/
     def storeNormalizedData(Result resultInstance, JSONObject data) {
-		println("Store normalized data")
-		println(data.toString())
+//		println("Store normalized data")
+//		println(data.toString())
     	//if no data of the template return, 
     	if (!data || !data.experimentID || !data.parsingID){
 			throw new RuntimeException("Incorrect Data")
@@ -194,79 +194,83 @@ class ResultService {
         if (!resultInstance){
             throw new RuntimeException("A result set must be specified")
         }
-
+//log.info(data);
 		// create the result plates
 		data.plates.eachWithIndex{ dataPlate, plateIndex ->
 			def plateInstance = ResultPlate.findByResultAndBarcode(resultInstance, dataPlate.plateID)
-			
+
     		// well level
     		dataPlate.rows.eachWithIndex{ row, rowIndex ->
     			row.columns.eachWithIndex{ wellInstance, columnIndex ->
     				//for each well
 					//wellInstance will have the "outlier" information
+//log.info(wellInstance);
 		    		def wellResultInstance = ResultWell.withCriteria {
 		    			well {
 	    					eq('row', rowIndex)
 	    					eq('column', columnIndex)
 	    					eq('plate', PlateSet.findByBarcodeAndExperiment(dataPlate.plateID, experimentInstance)?.plate)
 	    				}
+//                        eq('well', Well.findByRowAndColumnAndPlate(rowIndex,columnIndex,PlateSet.findByBarcodeAndExperiment(dataPlate.plateID, experimentInstance)?.plate))
 	    				eq('plate', plateInstance)
-		    		}			
+		    		}
+//                    log.info(wellResultInstance as JSON);
 					//Update all of the cells here?
 					
-					println("Raw Well instance outlier: "+wellInstance.outlier)
-					println("Well instance: "+wellInstance.toString())
-					println("Well Result Instance: "+wellResultInstance.toString())
+//					println("Raw Well instance outlier: "+wellInstance.outlier)
+//					println("Well instance: "+wellInstance.toString())
+//					println("Well Result Instance: "+wellResultInstance.toString())
 					// raw data needs to be saved too!
+//                    log.info(wellInstance as JSON);//
 					wellInstance.rawData?.each{ key, value ->
 						def rawDataObj = new ResultLabel(name: key, value: value,
 							labelType: ResultLabel.LabelType.RAW_DATA,
 							scope: ResultLabel.LabelScope.WELL,
 							outlier: wellInstance.outlier,
 							domainId: wellResultInstance.id)
-						println("name: "+key+" value: "+value+" labelType: "+ResultLabel.LabelType.RAW_DATA+" scope: "+ResultLabel.LabelScope.WELL+" outlier: "+wellInstance.outlier+" domainId: "+wellResultInstance.id)
-						println(rawDataObj.toString())
+//						println("name: "+key+" value: "+value+" labelType: "+ResultLabel.LabelType.RAW_DATA+" scope: "+ResultLabel.LabelScope.WELL+" outlier: "+wellInstance.outlier+" domainId: "+wellResultInstance.id)
+//						println(rawDataObj.toString())
 						if(rawDataObj.validate()) {
-							println("Validated just fine")
+//							println("Validated just fine")
 						} else {
-							println("No validation!!!")
+//							println("No validation!!!")
 						}
-						println("Results of saving raw object:")
-						println(rawDataObj.save(failOnError: true, flush: true))
-						println("IT FUCKING SAVED")
-						println("Saved result data with value: "+value+" outlier: "+wellInstance.outlier)
+//						println("Results of saving raw object:")
+						/*println(*/rawDataObj.save(failOnError: true, flush: true)/*)*/
+//						println("IT FUCKING SAVED")
+//						println("Saved result data with value: "+value+" outlier: "+wellInstance.outlier)
 						if (rawDataObj.hasErrors()){
-							println("Error saving this! ")
-							println(rawDataObj.errors)
+//							println("Error saving this! ")
+//							println(rawDataObj.errors)
 							throw new ValidationException("Normalized Data is not valid", rawDataObj.errors)
 						}
 						
 					}
 		    		// nomalized data
 		    		wellInstance.normalizedData?.each{ key, value ->
-		    			def normalizedDataObj = new ResultLabel(name: key, value: value, 
-							labelType: ResultLabel.LabelType.NORMALIZED_DATA, 
-							scope: ResultLabel.LabelScope.WELL, 
-							outlier: wellInstance.outlier, 
+		    			def normalizedDataObj = new ResultLabel(name: key, value: value,
+							labelType: ResultLabel.LabelType.NORMALIZED_DATA,
+							scope: ResultLabel.LabelScope.WELL,
+							outlier: wellInstance.outlier,
 							domainId: wellResultInstance.id)
-						println("name: "+key+" value: "+value+" labelType: "+ResultLabel.LabelType.NORMALIZED_DATA+" scope: "+ResultLabel.LabelScope.WELL+" outlier: "+wellInstance.outlier+" domainId: "+wellResultInstance.id)
-						println(normalizedDataObj.toString())
+//						println("name: "+key+" value: "+value+" labelType: "+ResultLabel.LabelType.NORMALIZED_DATA+" scope: "+ResultLabel.LabelScope.WELL+" outlier: "+wellInstance.outlier+" domainId: "+wellResultInstance.id)
+//						println(normalizedDataObj.toString())
 						if(normalizedDataObj.validate()) {
-							println("Validated just fine")
+//							println("Validated just fine")
 						} else {
-							println("No validation")
+//							println("No validation")
 						}
-						println("Results of saving:")
-						println(normalizedDataObj.save(failOnError: true, flush: true))
-						println("IT FUCKING SAVED")		    			
-						println("Saved result data with value: "+value+" outlier: "+wellInstance.outlier)
+//						println("Results of saving:")
+						/*println(*/normalizedDataObj.save(failOnError: true, flush: true)/*)*/
+//						println("IT FUCKING SAVED")
+//						println("Saved result data with value: "+value+" outlier: "+wellInstance.outlier)
 		    			if (normalizedDataObj.hasErrors()){
-							println("Error saving this! ")
-							println(normalizedDataObj.errors)
+//							println("Error saving this! ")
+//							println(normalizedDataObj.errors)
 			    			throw new ValidationException("Normalized Data is not valid", normalizedDataObj.errors)
 			    		}	    			
 		    		}
-    					    	
+
     			}
     		}
 
@@ -279,10 +283,10 @@ class ResultService {
 												 outlier: wellInstance.outlier,
                                                  domainId: plateInstance.id)
                 resultData.save(failOnError: true, flush: true)
-				println("Saved result data with value: "+value+" outlier: "+outlier)
+//				println("Saved result data with value: "+value+" outlier: "+outlier)
                 if (resultData.hasErrors()) {
-					println("Error saving this! ")
-					println(resultData.errors)
+//					println("Error saving this! ")
+//					println(resultData.errors)
                     throw new ValidationException('Plate-level raw data is not valid',
                                                   resultData.errors)
                 }
@@ -293,8 +297,8 @@ class ResultService {
     }    
 
     def getResults(ExperimentalPlateSet experiment) {
-		println("getResults")
-		println(experiment.toString())
+//		println("getResults")
+//		println(experiment.toString())
     	if (!experiment) {
 			throw new RuntimeException("The experiment does not exist")
         }

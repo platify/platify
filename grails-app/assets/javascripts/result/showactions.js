@@ -246,18 +246,24 @@ function markOutlierGridClick(e, args) {
 	var col = args.cell;
     var row = args.row;
     //Toggle the outlier class for styling
-    
+
+    var isOutlier;
     //$(e.target).closest(".slick-cell").toggleClass("outlier");
     if($(e.target).closest(".slick-cell").hasClass("outlier")) {
     	//Keep this in sync with what the outliers are
-    	markOutlierStatus(row, col, false);
+//    	markOutlierStatus(row, col, false);
+        isOutlier = false;
     } else {
-    	markOutlierStatus(row, col, true);
+//    	markOutlierStatus(row, col, true);
+        isOutlier = true;
     }
-    
-    experiment.savePlate();
+    markOutlierStatus(row, col, isOutlier);
     console.log("col: "+col+" row: "+row);
-    
+
+    var scope = "well";
+    experiment.toggleOutlier(row, col-1, isOutlier, scope);
+
+    experiment.savePlate();
 }
 
 
