@@ -431,4 +431,25 @@ function ExperimentModel() {
         }
         return isNaN(rv) ? null : rv;
     }
+
+    this.toggleOutlier = function(row, col, isOutlier, scope) {
+        var plateBarcode = experiment.experiment.plates[this.currentPlateIndex].plateID;
+        var params = "?exp_id=" + this.experiment.experimentID
+            + "&barcode=" + plateBarcode
+            + "&scope=" + scope
+            + "&row=" + row
+            + "&col=" + col
+            + "&outlier=" + isOutlier;
+
+        var jqxhr = $.ajax({
+                    url: hostname + "/result/updateOutlier" + params,
+                    contentType: 'application/json; charset=UTF-8',
+                    data: null,
+                    type: "POST",
+                    processData: false
+                });
+        jqxhr.done(function() {
+            console.log('POST of outlier status complete');
+        });
+    }
 }

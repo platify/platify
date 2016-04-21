@@ -1,11 +1,8 @@
 function StdCurve() {
-    var graph;
-    var table;
-    var x_scale;
-    var y_scale;
-    var margin;
-    var width;
-    var height;
+    var graph, table, x_scale, y_scale, margin, width, height; //vis variables
+    var currentPlate;
+    var currentStdCurve;
+    var settings;
 
     this.init = function() {
         margin = {top: 10, right: 30, bottom: 30, left: 40};
@@ -37,7 +34,7 @@ function StdCurve() {
         var inferred_data = getInferredPointsFromRegression(reference_points, merged_regression_data.points);
         createAxes(reference_points.concat(inferred_data.concat(merged_regression_data.points)), width, height);
         plotPoints(reference_points, reference_SVGgroup);
-        plotPoints(inferred_data, inferred_SVGgroup);
+        //plotPoints(inferred_data, inferred_SVGgroup); //plots the inferred points along the std curve
 
         drawLine(merged_regression_data.points);
 

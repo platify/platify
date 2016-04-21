@@ -14,6 +14,18 @@ class LiquidService {
 
     def springSecurityService
 
+    /**
+     * Create new Liquid Handler Mapper
+     *
+     * @param name
+     * @param inputPlateId
+     * @param inputWell
+     * @param inputDose
+     * @param outputPlateId
+     * @param outputWell
+     * @param outputDose
+     * @return
+     */
     def newMapper(String name, String url, Integer inputPlatesCount, Integer outputPlatesCount, String configStatus) {
         def scientistInstance = Scientist.get(springSecurityService.principal.id)
         if (!scientistInstance)
@@ -21,7 +33,6 @@ class LiquidService {
 
         def mapperInstance = new LiquidHandler(name: name, url: url, inputPlatesCount: inputPlatesCount, outputPlatesCount: outputPlatesCount, configStatus: configStatus)
         mapperInstance.save()
-
 
         // Call LH web service with async call to get config
         def p = task {
@@ -38,6 +49,13 @@ class LiquidService {
 
         mapperInstance
     }
+
+    /**
+     * Export Liquid Handler Mappings to CSV
+     *
+     * @param liquidHandlerInstance
+     * @return
+     */
 
     File exportLiquidHandlerMapper(LiquidHandler liquidHandlerInstance){
         if (!liquidHandlerInstance)
@@ -101,4 +119,37 @@ class LiquidService {
 
         updateMapper(liquidHandlerInstance, liquidHandlerInstance.name, liquidHandlerInstance.url, i, o, "Configured")
     }
+
+    // spoof Liquid Handler service call #2 to get locations of compounds in Liquid Handler
+    // At a later date this can be accurately called to the LH to get the real information
+    def spoofCompoundLocations() {
+
+        // spoof web service call to Liquid Handler for compound locations
+
+        // stub rest get request for the future engineer who wants to build this out!
+        //def resp = rest.get(liquidHandlerInstance.url)
+
+        Integer randomBarcodeBoundary = 999999;
+        Integer randomWellBoundary = 9;
+        Integer randomConcentrationBoundary = 5;
+
+        // spoof'd json to respond from LH w/random in/out plate quantities
+        def jsonResponse = JsonOutput.toJson([ barcode: random.nextInt(randomBarcodeBoundary),
+                                               well: "well" + random.nextInt(randomWellBoundary),
+                                               concentration: ((random.nextInt(randomConcentrationBoundary)+1)*5) + "uM"])
+
+        // parse JSON response
+        def jsonSlurper = new JsonSlurper()
+        def responseObject = jsonSlurper.parseText(jsonResponse)
+
+        // call new LiquidHandlerDeviceController on "config"
+        def barcode = responseObject.barcode
+        def well = responseObject.well
+        def concentration = responseObject.concentration
+
+        return jsonResponse
+    }
+
+
+
 }

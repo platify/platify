@@ -11,7 +11,7 @@
 <div class="content-fluid">
     <div class="row">
         <div class="col-sm-12 content-body">
-            <h3 style="margin-left:15px">Liquid Handlers</h3>
+            <h3 style="margin-left:15px">Liquid Handler</h3>
             <ol class="breadcrumb">
                 <li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
                 <li>Liquid Handlers</li>
@@ -19,7 +19,7 @@
             <div class="col-sm-12">
                 <div id="expDetailsPanel" class="panel panel-default">
                     <div class="panel-heading">
-                        <h4 class="panel-title">Mapper List<span class="pull-right"><g:link class="btn btn-info" action="create">Create Liquid Handler Mapping</g:link></span></h4>
+                        <h4 class="panel-title">Liquid Handler Configuration List<span class="pull-right"><g:link class="btn btn-info" action="create">New Configuration</g:link></span></h4>
                     </div>
                     <div class="panel-body ">
                         <div id="list-scientist" class="content scaffold-list" role="main">
@@ -32,6 +32,7 @@
                                     <th>Input Plates Count</th>
                                     <th>Output Plates Count</th>
                                     <th>Status</th>
+                                    <th>Action</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -43,6 +44,11 @@
                                         <td>${fieldValue(bean: liquidHandlerInstance, field: "inputPlatesCount")}</td>
                                         <td>${fieldValue(bean: liquidHandlerInstance, field: "outputPlatesCount")}</td>
                                         <td>${fieldValue(bean: liquidHandlerInstance, field: "configStatus")}</td>
+                                        <td><a href data-id="${liquidHandlerInstance.id}"
+                                               data-name="${fieldValue(bean: liquidHandlerInstance, field: "name")}"
+                                               data-inputplates="${fieldValue(bean: liquidHandlerInstance, field: "inputPlatesCount")}"
+                                               data-outputplates="${fieldValue(bean: liquidHandlerInstance, field: "outputPlatesCount")}"
+                                                    onclick="onViewSelect(this)" type="button" class="btn btn-info btn-xs" data-toggle="modal" data-target="#viewSavedPlateModal">New Mapping</a></td>
                                     </tr>
                                 </g:each>
                                 </tbody>
@@ -56,6 +62,8 @@
             </div>
         </div>
     </div>
+
 </div>
+<g:render template="/liquidHandler/viewMapperDialog"/>
 </body>
 </html>

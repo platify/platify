@@ -112,7 +112,23 @@ class PlateController {
 
     }
 
-       @Secured(['permitAll'])
+    def getCompounds(){
+        def CompoundList = editorService.getCompoundList()
+
+        render(contentType: "application/json") {
+            [compound: CompoundList]
+        }
+
+    }
+
+    def getCompoundLocations(Integer compoundId) {
+        render(contentType: "application/json") {
+            [compound: editorService.getCompoundLocations(compoundId)]
+        }
+    }
+
+
+    @Secured(['permitAll'])
     def debug(Long id){
 /*
     File exportPlate(PlateSet plateInstance){
