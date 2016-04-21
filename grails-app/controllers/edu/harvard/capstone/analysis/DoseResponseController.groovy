@@ -66,6 +66,21 @@ class DoseResponseController {
     }
 
     @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
+    def getfittedData2(int experiment_id, String compound_name, String max_param, String min_param, String ec50, String slope)
+    {
+        def resultData
+        try{
+            def experiment = ExperimentalPlateSet.findById(experiment_id);
+            resultData = fitDoseResponseCurveService.getfittedData2(experiment, compound_name, max_param, min_param, ec50, slope)
+        }
+        catch (RuntimeException e) {
+            response.sendError(500)
+            return
+        }
+        render (resultData as JSON);
+    }
+
+    @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
     def getDoseResponseData(int experiment_id) {
         def resultData
         try{

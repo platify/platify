@@ -10,7 +10,9 @@ import grails.transaction.Transactional
 
 import curvefit.functions.EC50;
 import curvefit.functions.Function;
-import curvefit.wrapper.SigmoidalCurveFitter;
+import curvefit.wrapper.SigmoidalCurveFitter
+import org.apache.commons.lang.math.NumberUtils;
+
 import java.util.HashMap;
 
 
@@ -20,6 +22,86 @@ class FitDoseResponseCurveService {
     def serviceMethod() {
 
     }
+
+    def getfittedData2(ExperimentalPlateSet experiment, String compound_name, String max_param, String min_param, String ec50, String slope) {
+        if (!experiment) {
+            throw new RuntimeException("The experiment does not exist")
+        }
+
+        def data = getData(experiment)
+
+        def fitData = [
+                parameters   : [:],
+        ]
+
+        ArrayList<Double> x = new ArrayList<Double>()
+        ArrayList<Double> y = new ArrayList<Double>()
+        ArrayList<String> exclusions = new ArrayList<String>()
+        data.plates.each { plate ->
+            plate.rows.each { r ->
+                r.columns.each { c ->
+                    if (c.control == Well.WellControl.COMPOUND.toString().toUpperCase() &&
+                            c.labels["compound"] == compound_name &&
+                            "dosage" in c.labels.keySet() &&
+                            "raw_data" in c.labels.keySet()) {
+                        x.add(Double.parseDouble(c.labels["dosage"]))
+                        y.add(Double.parseDouble(c.labels["raw_data"]))
+                        exclusions.add("N")
+                    }
+                }
+            }
+        }
+
+        Double _max = NumberUtils.isNumber(max_param) ? Double.parseDouble(replaceDot(max_param)) : 0;
+        Double _min = NumberUtils.isNumber(min_param) ? Double.parseDouble(replaceDot(min_param)) : 0;
+        Double _ec50 = NumberUtils.isNumber(ec50) ? Double.parseDouble(replaceDot(ec50)) : 0;
+        Double _slope = NumberUtils.isNumber(slope) ? Double.parseDouble(replaceDot(slope)) : 0;
+
+        double[] x1 = new double[x.size()];
+        double[] y1 = new double[y.size()];
+        for(int i=0; i < x.size(); i++) {
+            x1[i] = Math.log10(x.get(i));
+            y1[i] = y.get(i);
+        }
+
+        Function ec50Function = new EC50();
+        double[] estParams = new double[4];
+        estParams[0] = _min;
+        estParams[1] = _max;
+        estParams[2] = _ec50;
+        estParams[3] = _slope;
+
+        double[] y2 = new double[y.size()];
+        for(int i=0; i < x.size(); i++)
+            y2[i] = ec50Function.evaluate(Math.log10(x1[i]), estParams);
+        def s_x = x1 as List
+        def s_y1 = y1 as List
+        def s_y2 = y2 as List
+        def start = s_x.min();
+        def end = s_x.max();
+        def length = end - start;
+        def interval_length = length/50;
+        def s_x3 = []
+        def s_y3 = []
+        for (i in 1..50) {
+            def x3 = start+(i*interval_length)
+            s_x3 <<  x3
+            s_y3 << ec50Function.evaluate(Math.log10(x3), estParams)
+        }
+
+        fitData.parameters["Min_ROUT"]=_min
+        fitData.parameters["Max_ROUT"]=_max
+        fitData.parameters["EC50_ROUT"]=_ec50
+        fitData.parameters["Slope_ROUT"]=_slope
+        fitData.x = s_x
+        fitData.y1 = s_y1
+        fitData.y2 = s_y2
+        fitData.x3 = s_x3
+        fitData.y3 = s_y3
+
+        return  fitData
+    }
+
 
     def getfittedData(ExperimentalPlateSet experiment, String compound_name) {
         if (!experiment) {
@@ -53,23 +135,19 @@ class FitDoseResponseCurveService {
 
         SigmoidalCurveFitter sigmoidalFitter = new SigmoidalCurveFitter();
         boolean userOutlierDetection = true;
-        //sigmoidalFitter.setFitConstraint("Max", 0.90);
-        //sigmoidalFitter.setFitConstraint("Min", 0.1);
 
         double[] x1 = new double[x.size()];
         double[] y1 = new double[y.size()];
         String[] exclusions1 = new String[exclusions.size()];
         for(int i=0; i < x.size(); i++) {
-            x1[i] = x.get(i);
+            x1[i] = Math.log10(x.get(i));
             y1[i] = y.get(i);
             exclusions1[i] = "N";
         }
         HashMap<String,Object> fitResults = sigmoidalFitter.fit(x1, y1, exclusions1, userOutlierDetection);
-
         for(String fitOutputParameter : fitResults.keySet()) {
             fitData.parameters[fitOutputParameter] = fitResults.get(fitOutputParameter)
         }
-
         Function ec50Function = new EC50();
         double[] estParams = new double[4];
         estParams[0] = fitData.parameters["Min_ROUT"];
@@ -79,13 +157,10 @@ class FitDoseResponseCurveService {
 
         double[] y2 = new double[y.size()];
         for(int i=0; i < x.size(); i++)
-            y2[i] = ec50Function.evaluate(x1[i], estParams);
-
+            y2[i] = ec50Function.evaluate(Math.log10(x1[i]), estParams);
         def s_x = x1 as List
         def s_y1 = y1 as List
         def s_y2 = y2 as List
-
-
         def start = s_x.min();
         def end = s_x.max();
         def length = end - start;
@@ -95,10 +170,8 @@ class FitDoseResponseCurveService {
         for (i in 1..50) {
             def x3 = start+(i*interval_length)
             s_x3 <<  x3
-            s_y3 << ec50Function.evaluate(x3, estParams)
+            s_y3 << ec50Function.evaluate(Math.log10(x3), estParams)
         }
-
-
         fitData.x = s_x
         fitData.y1 = s_y1
         fitData.y2 = s_y2
