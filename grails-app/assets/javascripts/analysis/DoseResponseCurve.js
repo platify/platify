@@ -15,11 +15,14 @@ function init() {
 }
 
 $("#doseResponseButton").click(function() {
-    renderDoseResponseCurve();
+
+    updateDoseResponseCurve2(replaceDot($("#minParameter").val()),
+        replaceDot($("#maxParameter").val()),
+        replaceDot($("#ec50Parameter").val()),
+        replaceDot($("#slopeParameter").val()));
 });
 
-function renderDoseResponseCurve() {
-    var data = DR_CURVE_DATA_JSON;
+function renderDoseResponseCurve(data) {
 
     var dose_points = zip2(data.x, data.y1);
     var fitted_points = zip2(data.x, data.y2);
@@ -33,11 +36,10 @@ function renderDoseResponseCurve() {
     plotPoints(fitted_points, fitted_SVGgroup);
     drawLine(fitted_points.concat(extra_points));
 
-    $("#curveParameters").text("Min:" + data.parameters['Min_ROUT'].toFixed(2) +
-                                " Max:" + data.parameters['Max_ROUT'].toFixed(2) +
-                                " EC50:" + data.parameters['EC50_ROUT'].toFixed(2) +
-                                " Slope:" + data.parameters['Slope_ROUT'].toFixed(2)
-    );
+    $("#minParameter").val(data.parameters['Min_ROUT'].toFixed(2));
+    $("#maxParameter").val(data.parameters['Max_ROUT'].toFixed(2));
+    $("#ec50Parameter").val(data.parameters['EC50_ROUT'].toFixed(2));
+    $("#slopeParameter").val(data.parameters['Slope_ROUT'].toFixed(2));
 }
 
 function zip2(a1, a2)
@@ -150,5 +152,6 @@ function drawLine(points) {
 function replaceDot(dotString) {
     return dotString.replace("__dot__", ".");
 }
+
 
 window.onload = init;

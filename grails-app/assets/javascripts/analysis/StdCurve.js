@@ -19,7 +19,7 @@ function StdCurve() {
         updateStdCurve();
     });
 
-    function updateStdCurve() {
+    function updateStdCurve(data) {
         var editor_data = JSON.parse(EDITOR_DATA_JSON);
         var result_data = JSON.parse(IMPORT_DATA_JSON);
 
