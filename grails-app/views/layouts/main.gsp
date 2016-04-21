@@ -53,11 +53,11 @@
 								</ul>
 							</li>
 							<li class="plate-editor">
-								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Liquid Handler Mappers<span class="caret"></span></a>
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Liquid Handlers<span class="caret"></span></a>
 								<ul class="dropdown-menu" role="menu">
-									<li><g:link controller="liquidHandler" action="index">View Mappers</g:link></li>
+									<li><g:link controller="liquidHandler" action="index">View Configurations</g:link></li>
 									<li class="divider"></li>
-									<li><g:link controller="liquidHandler" action="create">Create Mapper</g:link></li>
+									<li><g:link controller="liquidHandler" action="create">Create Configuration</g:link></li>
 								</ul>
 							</li>
 

@@ -534,7 +534,7 @@ class ResultService {
 	
 	def createRawResultFile(String fname, String fdata) {
 		def rrfRoot = ApplicationHolder.application.mainContext.servletContext.getRealPath('rrf')
-		def rrfRootDir = new File(rrfRoot)
+		File rrfRootDir = new File(rrfRoot)
 		
 		if (!rrfRootDir.exists()) rrfRootDir.mkdir()
 		
@@ -542,7 +542,7 @@ class ResultService {
 		rrf.save(flush: true)
 		def rrfId = rrf.id
 		def destFolderPath = rrfRoot + "/" + rrfId
-		def destDir = new File(destFolderPath)
+		File destDir = new File(destFolderPath)
 
 		if (!destDir.exists()) destDir.mkdir()
 

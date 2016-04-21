@@ -7,7 +7,7 @@ class ResultLabel {
 	LabelType labelType
 	LabelScope scope
 	Long domainId
-	String outlier;
+	String outlier
 
 	enum LabelType{
 		LABEL, RAW_DATA, NORMALIZED_DATA
@@ -18,7 +18,7 @@ class ResultLabel {
 	}
 
     static constraints = {
-        outlier blank: true, nullable: true
+    	   outlier nullable:true, blank:true
     }
 	
 }
