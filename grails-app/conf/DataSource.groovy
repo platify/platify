@@ -25,7 +25,7 @@ hibernate {
 environments {
     development {
         dataSource {
-            dbCreate = "none"
+            dbCreate = "update"
             //dbCreate = "create-drop" // one of 'create', 'create-drop', 'update', 'validate', ''
             url = "jdbc:mysql://127.0.0.1:3306/platify?useUnicode=yes&characterEncoding=UTF-8"
         }
