@@ -238,7 +238,7 @@ function markOutlierScatterClick(event) {
     } else {
     	markOutlierStatus(row, col, true);
     }
-    experiment.savePlate();
+//    experiment.savePlate();
     console.log("col: "+col+" row: "+row);
 }
 
@@ -263,7 +263,7 @@ function markOutlierGridClick(e, args) {
     var scope = "well";
     experiment.toggleOutlier(row, col-1, isOutlier, scope);
 
-    experiment.savePlate();
+//    experiment.savePlate();
 }
 
 

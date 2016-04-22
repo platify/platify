@@ -245,7 +245,7 @@ class ResultController {
             label.outlier = outlier
             label.save()
 
-            if (label.hasErrors()) {log.info("HERE");
+            if (label.hasErrors()) {
                 throw new ValidationException('Some outlier status could not be saved',
                         label.errors)
             }

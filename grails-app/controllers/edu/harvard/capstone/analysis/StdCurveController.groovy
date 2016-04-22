@@ -61,8 +61,9 @@ class StdCurveController {
         def resultInstance = Result.findByExperiment(experiment);
         def resultPlate = ResultPlate.findByResult(resultInstance);
         def result_well = ResultWell.findByPlate(resultPlate);
-        def result_label = ResultLabel.findByDomainIdAndLabelType(result_well.id, ResultLabel.LabelType.RAW_DATA)
-        def labels = [result_label.name];
+        def result_labels = ResultLabel.findAllByDomainIdAndLabelType(result_well.id, ResultLabel.LabelType.RAW_DATA)
+        def labels = [];
+        result_labels.each { result_label -> labels.push(result_label.name) }
         render g.select(id:"refXCategory", name:"refXCategory", from:labels,
                 noSelection:[null:' '], onchange:"xCategoryChanged(this.value)")
     }

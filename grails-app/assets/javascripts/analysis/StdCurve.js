@@ -1,13 +1,19 @@
 function StdCurve() {
+    var controls_editor_data;
+    var result_data;
     var graph, table, x_scale, y_scale, margin, width, height; //vis variables
-    var currentPlate;
+    var currentPlate; // = PLATE_BARCODE?
     var currentStdCurve;
     var settings;
+    var outliers; // todo: set result_data well.outlier = true when knocked out
 
     this.init = function() {
         margin = {top: 10, right: 30, bottom: 30, left: 40};
         width = 650 - margin.left - margin.right;
-        height = 430 - margin.top - margin.bottom;
+        height = 410 - margin.top - margin.bottom;
+
+        controls_editor_data = JSON.parse(EDITOR_CONTROLS_JSON);
+        result_data = JSON.parse(IMPORT_DATA_JSON);
 
         createGraphAndTable();
     }
@@ -16,11 +22,33 @@ function StdCurve() {
         updateStdCurve();
     });
 
-    function updateStdCurve(data) {
-        var editor_data = JSON.parse(EDITOR_CONTROLS_JSON);
-        var result_data = JSON.parse(IMPORT_DATA_JSON);
+    $("#refYCategorySelect").on('change','select', function() {console.log("here");
+        setStdCurves();
+//        updateStdCurve();
+    });
 
-        var reference_points = getRefPoints(editor_data, result_data);
+    // Set default std curve for each plate
+    function setStdCurves() {
+        var stdCurvePlate = [];
+        controls_editor_data.plates.forEach(function(plate) {
+            plate.wells[0].labels.forEach(function(label) {console.log(label.category + Y_CATEGORY);
+                if (label.category.localeCompare(Y_CATEGORY) === 0)
+                    stdCurvePlate.push(plate.plateID);
+                    return;
+            });
+        });
+
+        var currentStdCurve = stdCurvePlate[0];
+        result_data.plates.forEach(function(plate) {
+            if (stdCurvePlate.includes(plate.plateID))
+                currentStdCurve = plate.plateID;
+
+            plate.stdCurveBarcode = currentStdCurve;
+        });
+    }
+
+    function updateStdCurve(data) {
+        var reference_points = getRefPoints(controls_editor_data, result_data);
 
         var reference_SVGgroup = ".reference_group";
         var inferred_SVGgroup = ".inferred_group";
@@ -32,13 +60,17 @@ function StdCurve() {
 
         // Get inferred data to update graph and table
         var inferred_data = getInferredPointsFromRegression(reference_points, merged_regression_data.points);
-        createAxes(reference_points.concat(inferred_data.concat(merged_regression_data.points)), width, height);
+        createAxes(reference_points/*.concat(inferred_data.concat(merged_regression_data.points))*/, width, height);
         plotPoints(reference_points, reference_SVGgroup);
         //plotPoints(inferred_data, inferred_SVGgroup); //plots the inferred points along the std curve
 
-        drawLine(merged_regression_data.points);
+        drawLine(/*merged_regression_data.points*/getRegression(reference_points, fitModel, degree).points);
 
         fillInferredTable(inferred_data);
+    }
+
+    function getStandardCurvePlate() {
+
     }
 
     function getRefPoints(editor_json, result_json) {
@@ -47,15 +79,25 @@ function StdCurve() {
         var x = [];
         var y = [];
 
+        var stdCurveBarcode;
+        for (var i = 0; i < editor_json.plates.length; i++) {
+                if (PLATE_BARCODE.localeCompare(result_json.plates[i].plateID) === 0) {
+                    stdCurveBarcode = result_json.plates[i].stdCurveBarcode;
+                    break;
+                }
+        }
+
         var plate_index;
         for (var i = 0; i < editor_json.plates.length; i++) {
-                if (PLATE_BARCODE.localeCompare(editor_json.plates[i].plateID) === 0) {
+                if (stdCurveBarcode.localeCompare(editor_json.plates[i].plateID) === 0) {
                     plate_index = i;
                     break;
                 }
         }
 
-        editor_json.plates[0].wells.forEach(function(well) {
+        // Get std curve "unknown" y-coordinate
+        // todo: rename the mismatched x- & y-coord variable names
+        editor_json.plates[plate_index].wells.forEach(function(well) {
             var x_coord = null;
 
             well.labels.forEach(function(label) {
@@ -67,6 +109,8 @@ function StdCurve() {
                 y.push(x_coord);
         });
 
+        // Get std curve "known" x-coordinate
+        // todo: rename the mismatched x- & y-coord variable names
         result_json.plates[plate_index].rows.forEach(function(row) {
             var y_coord = null;
 

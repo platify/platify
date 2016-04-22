@@ -221,14 +221,14 @@
                           update="scPlateSelect"
                           params="'experiment_id='+EXPERIMENT_ID"/>
 
+        <g:remoteFunction controller="stdCurve" action="getReferenceXCategories"
+                          update="refXCategorySelect"
+                          params="'experiment_id='+EXPERIMENT_ID"/>
+
         function scPlateChanged(plateId) {
             var plateSelect = document.getElementById("scPlate");
             PLATE_ID = plateId;
             PLATE_BARCODE = plateSelect.options[plateSelect.selectedIndex].text;
-
-            <g:remoteFunction controller="stdCurve" action="getReferenceXCategories"
-                              update="refXCategorySelect"
-                              params="'experiment_id='+EXPERIMENT_ID"/>
         }
 
         function xCategoryChanged(xCategory) {
@@ -242,7 +242,6 @@
 
         function yCategoryChanged() {
             Y_CATEGORY = document.getElementById("refYCategory").value;
-
         }
 
         %{-- standard curve start --}%
