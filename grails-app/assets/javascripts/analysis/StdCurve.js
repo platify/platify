@@ -17,7 +17,7 @@ function StdCurve() {
     });
 
     function updateStdCurve(data) {
-        var editor_data = JSON.parse(EDITOR_DATA_JSON);
+        var editor_data = JSON.parse(EDITOR_CONTROLS_JSON);
         var result_data = JSON.parse(IMPORT_DATA_JSON);
 
         var reference_points = getRefPoints(editor_data, result_data);
