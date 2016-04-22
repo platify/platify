@@ -207,7 +207,7 @@
 	<g:javascript>
         var RESULT_SAVE_REFACTORED_DATA_URL = "${createLink(controller: 'refactoredData', action: 'save', resultInstance: null)}";
         var IMPORT_DATA_JSON = JSON.stringify(${importData.encodeAsJSON()});
-        var EDITOR_DATA_JSON = JSON.stringify(${editorData.encodeAsJSON()});
+        var EDITOR_CONTROLS_JSON = JSON.stringify(${editorControlsData.encodeAsJSON()});
         var EXPERIMENT_ID = ${exp_id};
 
         %{-- standard curve start --}%
