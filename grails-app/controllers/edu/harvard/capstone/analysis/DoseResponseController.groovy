@@ -39,7 +39,7 @@ class DoseResponseController {
         try{
             def experiment = ExperimentalPlateSet.findById(experiment_id);
             resultData = fitDoseResponseCurveService.getData(experiment)
-            render g.select(name:"compound", from:resultData.plates[0].compounds.keySet(),
+            render g.select(id:"compoundSelect", name:"compound", from:resultData.plates[0].compounds.keySet(),
                     noSelection:[null:' '], onchange:"updateDoseResponseCurve(this.value)")
             return resultData
         }
