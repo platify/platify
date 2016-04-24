@@ -100,6 +100,8 @@
 
     function updateDoseResponseCurve(compound) {
 		COMPOUND = compound;
+		if (compound=="null")
+			return;
 		<g:remoteFunction controller="doseResponse" action="getfittedData"
 						  onSuccess="renderDoseResponseCurve(data)"
 						  params="'experiment_id='+EXPERIMENT_ID + '&compound_name='+COMPOUND"/>
