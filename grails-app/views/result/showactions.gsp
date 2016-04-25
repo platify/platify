@@ -158,6 +158,7 @@
                         </div>
                         <div class="col-md-7">
                             <div id="histogramVis"></div>
+                            <div id="histogramOutliers"></div>
                         </div>
                         <div class="col-md-3" style="height:600px;overflow: auto;">
                             <div id="cutoffTable"></div>
