@@ -27,8 +27,18 @@ class DoseResponseController {
     def show() {
 
         def experimentList = ExperimentalPlateSet.listOrderByName();
-        // TODO - don't really need the experiment object
-        respond experimentList as Object, model:[experimentList: experimentList]
+        def eL = []
+        experimentList.each { e ->
+            def plates = PlateSet.findAllByExperiment(e)
+            if (plates.size()>0) {
+                def results = Result.findAllByExperiment(e)
+                if (results.size() > 0) {
+                    eL << e
+                }
+            }
+        }
+
+        respond eL as Object, model:[experimentList: eL]
 
     }
 
@@ -39,7 +49,7 @@ class DoseResponseController {
         try{
             def experiment = ExperimentalPlateSet.findById(experiment_id);
             resultData = fitDoseResponseCurveService.getData(experiment)
-            render g.select(name:"compound", from:resultData.plates[0].compounds.keySet(),
+            render g.select(id:"compoundSelect", name:"compound", from:resultData.plates[0].compounds.keySet(),
                     noSelection:[null:' '], onchange:"updateDoseResponseCurve(this.value)")
             return resultData
         }
