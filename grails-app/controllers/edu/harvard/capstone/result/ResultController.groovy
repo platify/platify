@@ -223,14 +223,14 @@ class ResultController {
 
         def domainId;
         def labels = null;
-        if (scope == "well") {
+        if (scope.toLowerCase() == "well") {
             def well = Well.findByPlateAndRowAndColumn(plateTemplate, row, col)
 			println("Update outlier for well "+well.toString())
             domainId = ResultWell.findByPlateAndWell(resultPlate, well).id
 
             labels = ResultLabel.findAllByDomainIdAndScope(domainId, ResultLabel.LabelScope.WELL)
         }
-        else if (scope == "plate") {
+        else if (scope.toLowerCase() == "plate") {
             domainId = ResultPlate.findByResultAndBarcode(result, barcode).id
             labels = ResultLabel.findAllByDomainIdAndScope(domainId, ResultLabel.LabelScope.PLATE);
         }
