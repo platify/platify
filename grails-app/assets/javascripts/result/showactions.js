@@ -3,6 +3,7 @@ var grid;
 var scatter;
 var plateTable;
 var scatterPlot;
+var stdCurve;
 var plateTableTools;
 var showHeatMap = true;
 var showNormalized = false;
@@ -163,8 +164,8 @@ function init() {
     scatter.setData(experiment.data);
 
     //Set up std curve
-    var stdCurve = new StdCurve();
-    stdCurve.init();
+    stdCurve = new StdCurve();
+    stdCurve.init(experiment);
 
     // Set up histogram
     var histogram = new Histogram(IMPORT_DATA_JSON, experiment);
@@ -222,7 +223,7 @@ function init() {
     var resultUI = new ResultUI();
 }
 
-function markOutlierScatterClick(event) {
+function markOutlierScatterClick(event) {console.log(event);
 	var eventObj = $(event.target);
 	var indexVar = $(event.target).attr('index');
 	var row = scatter.dotIndexes[indexVar][0];
@@ -360,11 +361,14 @@ function plateSelected(plateIndex) {
     experiment.selectPlate(plateIndex);
     loadGrid(showNormalized ? experiment.normalizedData : experiment.data);
     $('#rawDataLabel')[0].textContent = experiment.rawDataLabel();
+
+    stdCurve.updateStdCurveWithoutRecalculate();
 }
 
 
 function reloadGrid() {
     if (showNormalized) {
+        experiment.loadNormalizedDataForGrid();
         loadGrid(experiment.normalizedData);
     }
     else {

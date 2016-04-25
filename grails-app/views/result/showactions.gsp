@@ -84,36 +84,33 @@
                     <div id="standardCurve" style="width:100%;height:650px;">
                         <div class="row">
                             <div class="col-md-4">
-                                <h5><b>PLATE</b></h5>
-                                %{--Experiment: <g:select id="refExperiment" name="refExperiment" from ="${experimentList}"
-                                                      optionKey="id" optionValue="name" noSelection="[null:' ']" onchange="refExperimentChanged(this.value);" />--}%
-                                %{--<br>--}%
-                                Plate: <span id="scPlateSelect"></span>
+                                <div class="row">
+                                    <h5><b>PROPERTIES</b></h5>
+                                    Known Property: <span id="refXCategorySelect"></span><br>
+                                    Unknown Property: <span id="refYCategorySelect"></span>
+                                </div><br>
+                                <div class="row">
+                                    <h5><b>REGRESSION MODEL</b></h5>
+                                    <input type="radio" name="fitModel" value="linearThroughOrigin" checked="checked"> Linear<br>
+                                    <input type="radio" name="fitModel" value="exponential"> Exponential<br>
+                                    <input type="radio" name="fitModel" value="logarithmic"> Logarithmic<br>
+                                    <input type="radio" name="fitModel" value="power"> Power<br>
+                                    <input type="radio" name="fitModel" value="polynomial"> Polynomial
+                                    <input type="text" id="degree" name="degree" placeholder="degree" maxlength="1" size="3"><br>
+                                    <input id="regressionCheckbox" type="checkbox" checked="checked"> Apply to all plates
+                                </div><br>
+                                <div class="row">
+                                    <div class="centerWrapper" style="text-align: center">
+                                        <button id="stdCurveButton">Generate</button>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-md-4">
-                                <h5><b>PROPERTIES</b></h5>
-                                Known Property: <span id="refXCategorySelect"></span><br>
-                                Unknown Property: <span id="refYCategorySelect"></span>
-                            </div>
-                            <div class="col-md-4">
-                                <h5><b>REGRESSION MODEL</b></h5>
-                                <input type="radio" name="fitModel" value="linearThroughOrigin" checked="checked"> Linear<br>
-                                <input type="radio" name="fitModel" value="exponential"> Exponential<br>
-                                <input type="radio" name="fitModel" value="logarithmic"> Logarithmic<br>
-                                <input type="radio" name="fitModel" value="power"> Power<br>
-                                <input type="radio" name="fitModel" value="polynomial"> Polynomial
-                                <input type="text" id="degree" name="degree" placeholder="degree" maxlength="1" size="2">
-                            </div>
-                            <div class="centerWrapper" style="text-align: center">
-                                <button id="stdCurveButton">Generate</button>
-                            </div>
-                        </div><br>
-                        <div class="row">
+
                             <div class="col-md-8">
                                 <div class="panel panel-default">
                                     <div class="panel-heading">
                                         <h4 class="panel-title">
-                                            <span id="stdCurveLabel">Standard Curve</span>
+                                            <span id="stdCurveLabel"></span>
                                         </h4>
                                     </div>
                                     <div class="panel-body">
@@ -121,18 +118,18 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="panel panel-default" style="height: 430px; overflow: auto;">
-                                    <div class="panel-heading">
-                                        <h4 class="panel-title">
-                                            <span id="inferredLabel">Inferred Properties</span>
-                                        </h4>
-                                    </div>
-                                    <div class="panel-body">
-                                        <div id="inferredTable"></div>
-                                    </div>
-                                </div>
-                            </div>
+                            %{--<div class="col-md-4">--}%
+                                %{--<div class="panel panel-default" style="height: 430px; overflow: auto;">--}%
+                                    %{--<div class="panel-heading">--}%
+                                        %{--<h4 class="panel-title">--}%
+                                            %{--<span id="inferredLabel">Inferred Properties</span>--}%
+                                        %{--</h4>--}%
+                                    %{--</div>--}%
+                                    %{--<div class="panel-body">--}%
+                                        %{--<div id="inferredTable"></div>--}%
+                                    %{--</div>--}%
+                                %{--</div>--}%
+                            %{--</div>--}%
                         </div>
                     </div>
 
@@ -234,10 +231,10 @@
         function xCategoryChanged(xCategory) {
             X_CATEGORY = document.getElementById("refXCategory").value;
 
-            var plateId = document.getElementById("scPlate").value;
-            <g:remoteFunction controller="stdCurve" action="getReferenceYCategories"
-                              update="refYCategorySelect"
-                              params="'plate_id='+PLATE_ID"/>
+            %{--var plateId = document.getElementById("scPlate").value;--}%
+            %{--<g:remoteFunction controller="stdCurve" action="getReferenceYCategories"--}%
+                              %{--update="refYCategorySelect"--}%
+                              %{--params="'plate_id='+PLATE_ID"/>--}%
         }
 
         function yCategoryChanged() {

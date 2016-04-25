@@ -186,7 +186,6 @@ class ResultService {
                                 key, ResultLabel.LabelType.NORMALIZED_DATA, ResultLabel.LabelScope.WELL, domainId)
                         label.outlier = wellInstance.outlier
                         label.value = value
-                        log.info(label.id)
                         label.save()
                     }
                 }

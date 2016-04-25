@@ -1,37 +1,70 @@
 function StdCurve() {
+    this.experiment;
     var controls_editor_data;
-    var result_data;
     var graph, table, x_scale, y_scale, margin, width, height; //vis variables
-    var currentPlate; // = PLATE_BARCODE?
-    var currentStdCurve;
-    var settings;
-    var outliers; // todo: set result_data well.outlier = true when knocked out
+    var exp_id;
+    var currentBarcode;
+    var currentStdCurve; //barcode
+    var current_result_index; // current plate index in experiment.experiment.plates
+    var ref_outlier_points;
+    var regressionAllChecked;
+    var previouslySet; //if standard curves were previously set
 
-    this.init = function() {
+    this.init = function(experiment) {
+        this.experiment = experiment;
+        exp_id = experiment.experiment.experimentID;
+        currentBarcode = experiment.currentPlate.plateID;
+        regressionAllChecked = $('#regressionCheckbox').attr('checked');
+        ref_outlier_points = [];
+        previouslySet = false;
+
         margin = {top: 10, right: 30, bottom: 30, left: 40};
         width = 650 - margin.left - margin.right;
         height = 410 - margin.top - margin.bottom;
 
         controls_editor_data = JSON.parse(EDITOR_CONTROLS_JSON);
-        result_data = JSON.parse(IMPORT_DATA_JSON);
 
         createGraphAndTable();
     }
 
-    $("#stdCurveButton").click(function() {
-        updateStdCurve();
+    $('#regressionCheckbox').on('click', function(event) {
+        regressionAllChecked = this.checked;
     });
 
-    $("#refYCategorySelect").on('change','select', function() {console.log("here");
+    $('#stdCurveButton').click(function() {
+        previouslySet = true;
+        currentBarcode = experiment.currentPlate.plateID;
+        current_result_index = getResultPlateIndex(currentBarcode);
+        setRegression();
+        updateStdCurve();
+        storeNormalized();
+//        persistNormalized();
+    });
+
+    $("#refXCategorySelect").on('change','select', function() {
+        var exp_id = experiment.experiment.experimentID;
+        var jqxhr = $.ajax({
+            url: hostname + "/stdCurve/getReferenceYCategories?barcode=" + currentBarcode + "&exp_id=" + exp_id,
+            contentType: 'application/json; charset=UTF-8',
+            data: null,
+            method: 'POST',
+            processData: false,
+        });
+        jqxhr.success(function(data) {
+            $("#refYCategorySelect").html(data);
+            console.log('Retrieved categories of plate.');
+        });
+    });
+
+    $("#refYCategorySelect").on('change','select', function() {
         setStdCurves();
-//        updateStdCurve();
     });
 
     // Set default std curve for each plate
     function setStdCurves() {
         var stdCurvePlate = [];
         controls_editor_data.plates.forEach(function(plate) {
-            plate.wells[0].labels.forEach(function(label) {console.log(label.category + Y_CATEGORY);
+            plate.wells[0].labels.forEach(function(label) {
                 if (label.category.localeCompare(Y_CATEGORY) === 0)
                     stdCurvePlate.push(plate.plateID);
                     return;
@@ -39,7 +72,7 @@ function StdCurve() {
         });
 
         var currentStdCurve = stdCurvePlate[0];
-        result_data.plates.forEach(function(plate) {
+        experiment.experiment.plates.forEach(function(plate) {
             if (stdCurvePlate.includes(plate.plateID))
                 currentStdCurve = plate.plateID;
 
@@ -47,81 +80,131 @@ function StdCurve() {
         });
     }
 
-    function updateStdCurve(data) {
-        var reference_points = getRefPoints(controls_editor_data, result_data);
+    // Set regression model for all plates
+    function setRegression() {
+        var fitModel = $("input[name=fitModel]:checked").val();
+        var degree = document.getElementById('degree').value;
+
+        var stdCurvePlate = experiment.experiment.plates[current_result_index].stdCurveBarcode;
+
+        // Update the fit for all plates using the same standard curve plate
+        experiment.experiment.plates.forEach(function(plate) {
+            if (regressionAllChecked || plate.stdCurveBarcode.localeCompare(stdCurvePlate) === 0) {
+                plate.fitModel = fitModel;
+                plate.degree = degree;
+            }
+        });
+    }
+
+    function updateStdCurve() {
+        var stdCurvePlate = experiment.experiment.plates[current_result_index].stdCurveBarcode;
+        document.getElementById('stdCurveLabel').textContent = "Standard Curve Source: " + stdCurvePlate;
+
+
+        var reference_points = getRefPoints(currentBarcode, controls_editor_data);
 
         var reference_SVGgroup = ".reference_group";
         var inferred_SVGgroup = ".inferred_group";
+        var outlier_SVGgroup = ".outlier_group";
 
-        var fitModel = $("input[name=fitModel]:checked").val();
-        var degree = document.getElementById('degree').value;
-        var merged_points = mergeUnknownAndKnownPoints(reference_points, result_data);
-        var merged_regression_data = getRegression(merged_points, fitModel, degree); //regression.js determines unknown y-coordinate
+        var fitModel = experiment.experiment.plates[current_result_index].fitModel;
+        var degree = experiment.experiment.plates[current_result_index].degree;
 
-        // Get inferred data to update graph and table
-        var inferred_data = getInferredPointsFromRegression(reference_points, merged_regression_data.points);
-        createAxes(reference_points/*.concat(inferred_data.concat(merged_regression_data.points))*/, width, height);
+        createAxes(reference_points.concat(ref_outlier_points), width, height);
+        plotPoints(ref_outlier_points, outlier_SVGgroup)
         plotPoints(reference_points, reference_SVGgroup);
-        //plotPoints(inferred_data, inferred_SVGgroup); //plots the inferred points along the std curve
 
-        drawLine(/*merged_regression_data.points*/getRegression(reference_points, fitModel, degree).points);
+        if (fitModel === undefined) {
+            drawLine([], null, null);
+            return;
+        }
 
-        fillInferredTable(inferred_data);
+        var fit_ref_points = getRegression(reference_points, fitModel, degree).points;
+        drawLine(fit_ref_points, fitModel, degree);
+
+        //var merged_points = mergeUnknownAndKnownPoints(currentBarcode, reference_points);
+        //var merged_regression_data = getRegression(merged_points, fitModel, degree); //regression.js determines unknown y-coordinate
+        //var inferred_data = getInferredPointsFromRegression(reference_points, merged_regression_data.points);
+        //createAxes(reference_points.concat(inferred_data.concat(merged_regression_data.points)), width, height);
+        //plotPoints(inferred_data, inferred_SVGgroup); //plots the inferred points along the std curve; no longer done.
+        //fillInferredTable(inferred_data);
     }
 
-    function getStandardCurvePlate() {
-
+    this.updateStdCurveWithoutRecalculate = function() {
+        if (previouslySet) {
+            currentBarcode = experiment.currentPlate.plateID;
+            current_result_index = getResultPlateIndex(currentBarcode);
+            updateStdCurve();
+        }
     }
 
-    function getRefPoints(editor_json, result_json) {
+    function getResultPlateIndex(plate_barcode) {
+        for (var i = 0; i < experiment.experiment.plates.length; i++) {
+            if (plate_barcode.localeCompare(experiment.experiment.plates[i].plateID) === 0) {
+                return i;
+            }
+        }
+    }
+
+    function getEditorPlateIndex(plate_barcode) {
+        for (var i = 0; i < experiment.experiment.plates.length; i++) {
+            if (plate_barcode.localeCompare(controls_editor_data.plates[i].plateID) === 0) {
+                return i;
+            }
+        }
+    }
+
+    function getRefPoints(barcode, editor_json) {
         // Extract x- and y-coordinate from reference wells
         var reference_points = [];
         var x = [];
         var y = [];
 
-        var stdCurveBarcode;
-        for (var i = 0; i < editor_json.plates.length; i++) {
-                if (PLATE_BARCODE.localeCompare(result_json.plates[i].plateID) === 0) {
-                    stdCurveBarcode = result_json.plates[i].stdCurveBarcode;
-                    break;
-                }
-        }
+        var outlier_points = [];
+        var x_outliers = [];
+        var y_outliers = [];
 
-        var plate_index;
-        for (var i = 0; i < editor_json.plates.length; i++) {
-                if (stdCurveBarcode.localeCompare(editor_json.plates[i].plateID) === 0) {
-                    plate_index = i;
-                    break;
-                }
-        }
+        var result_index = getResultPlateIndex(barcode);
+        var stdCurveBarcode = experiment.experiment.plates[result_index].stdCurveBarcode;
+
+        var editor_index = getEditorPlateIndex(stdCurveBarcode);
 
         // Get std curve "unknown" y-coordinate
         // todo: rename the mismatched x- & y-coord variable names
-        editor_json.plates[plate_index].wells.forEach(function(well) {
+        editor_json.plates[editor_index].wells.forEach(function(well) {
             var x_coord = null;
 
-            well.labels.forEach(function(label) {
-                if (label.category == Y_CATEGORY)
-                    x_coord = parseFloat(replaceDot(label.name));
-            });
+            result_index = getResultPlateIndex(stdCurveBarcode);
 
-            if (x_coord !== null)
-                y.push(x_coord);
+            well.labels.forEach(function(label) {
+                var result_well = experiment.experiment.plates[result_index].rows[well.row].columns[well.column];
+                if (label.category == Y_CATEGORY) {
+                    x_coord = parseFloat(replaceDot(label.name));
+
+                    if (x_coord !== null && result_well.outlier !== "true")
+                        y.push(x_coord);
+                    else if (x_coord !== null)
+                        y_outliers.push(x_coord);
+                }
+            });
         });
 
         // Get std curve "known" x-coordinate
         // todo: rename the mismatched x- & y-coord variable names
-        result_json.plates[plate_index].rows.forEach(function(row) {
+        experiment.experiment.plates[result_index].rows.forEach(function(row) {
             var y_coord = null;
 
             row.columns.forEach(function(column) {
-                if (column.control.localeCompare("POSITIVE") === 0
-                    || column.control.localeCompare("NEGATIVE") === 0) {
+                if (column.control.localeCompare("POSITIVE") === 0 || column.control.localeCompare("NEGATIVE") === 0) {
                     y_coord_string = column.rawData[X_CATEGORY];
 
-                    if (y_coord_string !== undefined) {
-                        y_coord = parseFloat(y_coord_string);
+                    if (column.outlier !== "true" && y_coord_string !== undefined && y_coord_string !== null) {
+                        y_coord = parseFloat(replaceDot(y_coord_string));
                         x.push(y_coord);
+                    }
+                    else if (y_coord_string !== undefined && y_coord_string !== null) {
+                        y_coord = parseFloat(replaceDot(y_coord_string));
+                        x_outliers.push(y_coord);
                     }
                 }
             });
@@ -130,25 +213,33 @@ function StdCurve() {
         for (var i = 0; i < x.length; i++)
             if (x[i] !== undefined && y[i] !== undefined)
                 reference_points.push([x[i], y[i]]);
+
+        for (var i = 0; i < x_outliers.length; i++)
+            if (x_outliers[i] !== undefined && y_outliers[i] !== undefined)
+                outlier_points.push([x_outliers[i], y_outliers[i]]);
+
+        ref_outlier_points = outlier_points;
+
         return reference_points;
     }
 
-    function getUnknownPoints(result_data, plate_index) {
+    function getUnknownPoints(plate_index) {
         var unknown_points = [];
 
-        result_data.plates[plate_index].rows.forEach(function(row) {
+        experiment.experiment.plates[plate_index].rows.forEach(function(row) {
             var x_coord = null;
             var y_coord = null;
 
             row.columns.forEach(function(column) {
                 if (column.control.localeCompare("COMPOUND") === 0) {
+
                     x_coord_string = column.rawData[X_CATEGORY];
                     y_coord_string = column.rawData[Y_CATEGORY];
 
                     if (x_coord_string !== undefined)
-                        x_coord = parseFloat(x_coord_string);
+                        x_coord = parseFloat(replaceDot(x_coord_string));
                     if (y_coord_string !== undefined)
-                        y_coord = parseFloat(y_coord_string);
+                        y_coord = parseFloat(replaceDot(y_coord_string));
 
                     if (!(x_coord == null && y_coord == null))
                         unknown_points.push([x_coord, y_coord]);
@@ -168,8 +259,6 @@ function StdCurve() {
         }
         else
             regression_data = regression(fitModel, reference_points);
-
-        var newReferencePoints = regression_data.points;
 
         return regression_data;
     }
@@ -196,6 +285,7 @@ function StdCurve() {
         // Create groups of data sets
         graph.append("g").attr("class", "reference_group");
         graph.append("g").attr("class", "inferred_group");
+        graph.append("g").attr("class", "outlier_group");
 
         // Create table
         table = d3.select("#inferredTable").append("table").attr("class", "table");
@@ -241,41 +331,48 @@ function StdCurve() {
             .attr("r", function() {
                 if (group == ".inferred_group")
                     return 2;
-                if (group == ".reference_group")
+                if (group == ".reference_group" || group == ".outlier_group")
                     return 3;
             })
             .style("stroke", function() {
                 if (group == ".inferred_group")
                     return "red";
-                if (group == ".reference_group")
+                if (group == ".reference_group" || group == ".outlier_group")
                     return "green";
             })
             .style("fill", function() {
                 if (group == ".inferred_group")
-                    return "none";
+                    return "red";
                 if (group == ".reference_group")
                     return "green";
+                if (group == ".outlier_group")
+                    return "white";
             });
     }
 
-    function drawLine(points) {
+    function drawLine(points, fitModel, degree) {
+        var line = d3.svg.line()
+            .x(function(d) { return x_scale(d[0]); })
+            .y(function(d) { return y_scale(d[1]); });
+
+        if (fitModel == null) {
+            graph.selectAll("path.line").attr("d", line([]));
+            return;
+        }
+
         var min_x = d3.min(points, function(d) { return d[0]; });
         var max_x = d3.max(points, function(d) { return d[0]; });
 
         var extra_points = interpolate(min_x, max_x);
         var merged_points = points.concat(extra_points);
 
-        var fitModel = $("input[name=fitModel]:checked").val();
-        var degree = document.getElementById('degree').value;
         var interpolated_points = getRegression(merged_points, fitModel, degree).points;
+        if (interpolated_points === undefined)
+            return;
 
         interpolated_points = interpolated_points.sort(function(a, b) {
             return d3.ascending(a[0], b[0]);
         });
-
-        var line = d3.svg.line()
-            .x(function(d) { return x_scale(d[0]); })
-            .y(function(d) { return y_scale(d[1]); });
 
         graph.selectAll("path.line")
             .attr("d", line(interpolated_points))
@@ -283,17 +380,17 @@ function StdCurve() {
             .attr("fill", "none");
     }
 
-    function mergeUnknownAndKnownPoints(reference_points, result_data) {
+    function mergeUnknownAndKnownPoints(barcode, reference_points) {
         // Extract x- and y-coordinate from reference wells
         var plate_index;
-        for (var i = 0; i < result_data.plates.length; i++) {
-                if (PLATE_BARCODE.localeCompare(result_data.plates[i].plateID) === 0) {
-                    plate_index = i;
-                    break;
-                }
+        for (var i = 0; i < experiment.experiment.plates.length; i++) {
+            if (barcode.localeCompare(experiment.experiment.plates[i].plateID) === 0) {
+                plate_index = i;
+                break;
+            }
         }
 
-        var unknown_points = getUnknownPoints(result_data, plate_index);
+        var unknown_points = getUnknownPoints(plate_index);
 
         return reference_points.concat(unknown_points);
     }
@@ -306,6 +403,7 @@ function StdCurve() {
         return inferred_array;
     }
 
+    // No longer used, but keeping method in case needed in future
     function fillInferredTable(inferred_data) {
         inferred_data = inferred_data.sort(function(a, b) {
                 return d3.ascending(a[0], b[0]);
@@ -342,6 +440,67 @@ function StdCurve() {
 
         return points;
     }
+
+    // stores normalized values in ExperimentModel
+    function storeNormalized() {
+
+        var stdCurvePlate = experiment.experiment.plates[current_result_index].stdCurveBarcode;
+
+        var label = X_CATEGORY;
+
+        this.experiment.experiment.plates.forEach(function(plate) {
+            if (plate.stdCurveBarcode.localeCompare(stdCurvePlate) === 0 || regressionAllChecked) {
+                var reference_points = getRefPoints(plate.plateID, controls_editor_data);
+                var merged_points = mergeUnknownAndKnownPoints(plate.plateID, reference_points);
+                var merged_regression_points = getRegression(merged_points, plate.fitModel, plate.degree).points; //regression.js determines unknown y-coordinate
+
+                merged_regression_points = d3.nest()
+                    .key(function(point) { return point[0]; })
+                    .rollup(function(v) { return v[0][1]; })
+                    .map(merged_regression_points);
+
+                plate.rows.forEach(function(row) {
+                    row.columns.forEach(function(well) {
+                        var inferred_val;
+                        if (well.control.localeCompare("COMPOUND") !== 0)
+                            inferred_val = well.labels[Y_CATEGORY];
+                        else
+                            inferred_val = merged_regression_points[well.rawData[X_CATEGORY]];
+
+                        well.normalizedData[label] = inferred_val.toString();
+                    });
+                });
+            }
+        });
+    }
+
+
+//    function persistNormalized() {
+//        if (!regressionAllChecked) {
+//
+//        }
+//
+//        else {
+//            // the save endpoint only wants the current plate
+//            var data = {
+//                experimentID: exp_id,
+//                parsingID: this.experiment.currentPlate.parsingID,
+//                plates: this.experiment.experiment.plates
+//            }
+//
+//            var url = RESULT_SAVE_REFACTORED_DATA_URL + '/' + 0; //todo: don't actually need result ID for url
+//            var jqxhr = $.ajax({
+//                url: url,
+//                contentType: 'application/json; charset=UTF-8',
+//                data: JSON.stringify(data),
+//                method: 'POST',
+//                processData: false,
+//            });
+//            jqxhr.done(function() {
+//                console.log('POST of std curve normalized data complete');
+//            });
+//        }
+//    }
 
     function replaceDot(dotString) {
         return dotString.replace("__dot__", ".");

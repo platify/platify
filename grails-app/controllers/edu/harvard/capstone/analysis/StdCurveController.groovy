@@ -66,10 +66,11 @@ class StdCurveController {
         result_labels.each { result_label -> labels.push(result_label.name) }
         render g.select(id:"refXCategory", name:"refXCategory", from:labels,
                 noSelection:[null:' '], onchange:"xCategoryChanged(this.value)")
-    }
+    }//
 
-    def getReferenceYCategories(int plate_id) {
-        def plateInstance = PlateSet.findById(plate_id);
+    def getReferenceYCategories(String barcode, int exp_id) {
+        def experiment = ExperimentalPlateSet.findById(exp_id);
+        def plateInstance = PlateSet.findByBarcodeAndExperiment(barcode, experiment);
         def referenceWells = Well.findAllByPlate(plateInstance.plate);
         def wellLabels = [];
         referenceWells.each{
