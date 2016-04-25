@@ -89,7 +89,7 @@ function Grid(containerID){
      * @param cellCSS - optional, defaults to ""
      */
     this.fillUpGrid = function(cellWidth, cellHeight, resizable, formatter, cellCSS) {
-
+    	console.log("fillUpGrid");
         if (cellWidth){
             this.cellWidth = cellWidth;
         } else {
@@ -163,7 +163,7 @@ function Grid(containerID){
         selectionModel.onSelectedRangesChanged.subscribe(updateSelectedCells);
 
         $("#" + this.container).mousemove(handleMousemove);
-       
+        $("body").trigger("done_drawing");
     };
 
     /**

@@ -22,6 +22,14 @@ circle {
 }
 
 .outlier {
-	opacity: 0.7;
-	border: 1px solid red;
+	background-color:#000;
+	opacity: 0.4;
+	border: 2px solid red;
 }
+
+/**Where is the histogram CSS?*/
+#histogramVis {
+	position: absolute;
+}
+
+ 

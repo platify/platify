@@ -76,6 +76,7 @@ function Scatter() {
 	          .attr("r", 8).attr("index", function (d,i) { return d[0]; })
 	          .attr("row", function (d,i) { return self.dotIndexes[d[0]][0]; })
 	          .attr("col", function (d,i) { return self.dotIndexes[d[0]][1]; });
+	    $("body").trigger("done_drawing");
 	}
 	
 }
