@@ -226,14 +226,21 @@ function Histogram(json_data) {
 
     this.updateGraphOutlier = function() {
     	//I think we can assume that x_data has already been populated here
-    	var x_data = this.getXDataOutliers();
-        var x_values = this.getOutlierValues(x_data);
-        if(x_values.length == 0) {
+    	var x_data_out = this.getXDataOutliers();
+        var x_values_out = this.getOutlierValues(x_data_out);
+        
+        if(x_values_out.length == 0) {
         	//No outlier values
         	return;
         }
-        var min_x = d3.min(x_values);
-        var max_x = d3.max(x_values);
+        
+        //Used to calculate the regular scale for the histogram
+        var x_data = this.getXData();
+        var x_values = this.getXValues(x_data);
+        
+
+        var min_x = d3.min(x_values_out);
+        var max_x = d3.max(x_values_out);
 
         var bin_width = +document.getElementById('bin_width').value;
         var num_bins;
@@ -255,16 +262,20 @@ function Histogram(json_data) {
         var histogram = d3.layout.histogram()
             .frequency(false)
             .bins(ticks);
-        var data = histogram(x_values);
-
+        
+        var data = histogram(x_values_out);
+      //Use the yScale from the original histogram data
+        var histogram_scale = d3.layout.histogram()
+        .frequency(false)
+        .bins(ticks);
+        var data_scale = histogram_scale(x_values);
+        
         var yScale = d3.scale.linear()
-            .domain([0, d3.max(data, function(d) { return d.y; })])
+            .domain([0, d3.max(data_scale, function(d) { return d.y; })])
             .range([height, 0]);
 
         var cutoff = +document.getElementById("cutoff").value;
-        var cutoff_data = this.getCutoffData(x_data, cutoff);
-
-        this.updateAxes(xScale, yScale);
+        
         this.updateBarsOutliers(data, xScale, yScale, bin_width + min_x, cutoff);
     }
     

@@ -32,4 +32,8 @@ circle {
 	position: absolute;
 }
 
+#histogramOutliers {
+	position:relative;
+}
+
  
