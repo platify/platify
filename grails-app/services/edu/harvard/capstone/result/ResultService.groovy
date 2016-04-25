@@ -5,8 +5,9 @@ import edu.harvard.capstone.user.Scientist
 
 import grails.converters.JSON
 
+import grails.util.Holders
+
 import org.codehaus.groovy.grails.web.json.JSONObject
-import org.codehaus.groovy.grails.commons.ApplicationHolder
 
 import grails.validation.ValidationException
 
@@ -578,7 +579,7 @@ class ResultService {
     }
 	
 	def createRawResultFile(String fname, String fdata) {
-		def rrfRoot = ApplicationHolder.application.mainContext.servletContext.getRealPath('rrf')
+		def rrfRoot = Holders.grailsApplication.mainContext.servletContext.getRealPath('rrf')
 		File rrfRootDir = new File(rrfRoot)
 		
 		if (!rrfRootDir.exists()) rrfRootDir.mkdir()
