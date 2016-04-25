@@ -1,6 +1,7 @@
 var experiment;
 var grid;
 var scatter;
+var histogram;
 var plateTable;
 var scatterPlot;
 var stdCurve;
@@ -101,6 +102,8 @@ function downloadExperiment(fileformat) {
 
 
 function init() {
+	//this.on($("body"), "done_drawing", this.markAllCurrentOutliers); 
+	$("body").on("done_drawing", this.markAllCurrentOutliers);
     // init the experiment object
     experiment = new ExperimentModel();
     experiment.fromJson(IMPORT_DATA_JSON);
@@ -168,7 +171,7 @@ function init() {
     stdCurve.init(experiment);
 
     // Set up histogram
-    var histogram = new Histogram(IMPORT_DATA_JSON, experiment);
+    histogram = new Histogram(experiment.experiment);
     histogram.initiateVis();
 
     // process experiment object
@@ -203,6 +206,7 @@ function init() {
     $('#normalizeButton').on('click', function(event) {
         showNormalized = $(event.target)[0].checked;
         reloadGrid();
+        markAllCurrentOutliers();
     });
 
     // add heatmap button listener
@@ -214,16 +218,45 @@ function init() {
     // add histogram button listener
     $('#histogramButton').on('click', function(event) {
             histogram.updateGraph();
-        });
+     });
     
+    
+    $("g.bar_group").on('click', 'rect', function(event){
+    	markOutlierHistogramClick(event);
+    });
+    // add scatterplot outlier listener
     $(".circle").on('click', function(event){
     	markOutlierScatterClick(event);
     });
+
     
     var resultUI = new ResultUI();
 }
 
-function markOutlierScatterClick(event) {console.log(event);
+
+function markOutlierHistogramClick(event) {
+	//Get the indexes of the samples that this bar represents 
+	//in the format "row1,col1;ro2,col2;..."
+	var indexes = $(event.target).attr('indexes');
+	indexes = indexes.split(';');
+	for(var i = 0; i < indexes.length; i++) {
+		var rowCol = indexes[i].split(',');
+		var row = rowCol[0];
+		var col = rowCol[1];
+		if(experiment.experiment.plates[0].rows[row].columns[col].outlier == "false") {
+			markOutlierStatus(row, col, true);
+		} else {
+			markOutlierStatus(row, col, false);
+		}
+		
+	}
+	//Update entire outlier histogram here
+	histogram.update_data(experiment.experiment);
+	histogram.updateGraphOutlier();
+	
+}
+
+function markOutlierScatterClick(event) {
 	var eventObj = $(event.target);
 	var indexVar = $(event.target).attr('index');
 	var row = scatter.dotIndexes[indexVar][0];
@@ -249,35 +282,30 @@ function markOutlierGridClick(e, args) {
     //Toggle the outlier class for styling
 
     var isOutlier;
-    //$(e.target).closest(".slick-cell").toggleClass("outlier");
     if($(e.target).closest(".slick-cell").hasClass("outlier")) {
     	//Keep this in sync with what the outliers are
-//    	markOutlierStatus(row, col, false);
         isOutlier = false;
     } else {
 //    	markOutlierStatus(row, col, true);
         isOutlier = true;
     }
-    markOutlierStatus(row, col, isOutlier);
+    markOutlierStatus(row, col-1, isOutlier);
     console.log("col: "+col+" row: "+row);
 
-    var scope = "well";
-    experiment.toggleOutlier(row, col-1, isOutlier, scope);
-
-//    experiment.savePlate();
 }
 
 
 
 //Marks outliers in all visualizations
 function markOutlierStatus(row, col, isOutlier) {
-	var colNum = col - 1;
+	var colNum = col;
 	if(isOutlier) {
 		experiment.experiment.plates[0].rows[row].columns[colNum].outlier = "true";
 	} else {
 		experiment.experiment.plates[0].rows[row].columns[colNum].outlier = "false";
 	}
-	var rowNum = row+1;
+	var rowNum = parseInt(row)+1;
+	var colNum = parseInt(col)+1;
 	var scatterPoint = $('circle[row="'+row+'"][col="'+col+'"]');
 	if(isOutlier) {
 		scatterPoint.attr("class", "outlier circle");
@@ -285,10 +313,10 @@ function markOutlierStatus(row, col, isOutlier) {
 		scatterPoint.attr("class", "circle");
 	}
 
-	  //Mark "rowIdx", "colIdx" as an outlier
+	  //Mark "rowIdx", "colIdx" as an outlier in the grid
 	  var targetRow = grid.grid.getDataItem(row);
 	  var targetCol = grid.grid.getColumns()[col];
-	  var classname = grid.grid.getCellNode(row, col).className;
+	  var classname = grid.grid.getCellNode(row, colNum).className;
 	  classname = classname.replace(/ /g, ".");
 	  //Get the rowIdx slickrow
 	  var cell = $(".slick-row:nth-of-type("+rowNum+") ."+classname);
@@ -301,6 +329,8 @@ function markOutlierStatus(row, col, isOutlier) {
 		  //Remove the outlier class if it exists
 		$(".slick-row:nth-of-type("+rowNum+") ."+classname).removeClass("outlier");
 	  }
+	  //Send the result back to the database
+	  experiment.toggleOutlier(row, col, isOutlier, "WELL");
 	
 }
 
@@ -318,24 +348,45 @@ function markAllCurrentOutliers() {
     		//Add 1 to compensate for the headers on table
 		  var rowNum = rowIdx+1;
 		  //Mark "rowIdx", "colIdx" as an outlier
-		  var targetRow = grid.grid.getDataItem(rowIdx);
-		  var targetCol = grid.grid.getColumns()[colIdx+1];
-		  var classname = grid.grid.getCellNode(rowIdx, colIdx+1).className;
-		  classname = classname.replace(/ /g, ".");
-		  //Get the rowIdx slickrow
-		  var cell = $(".slick-row:nth-of-type("+rowIdx+") ."+classname);
+		  if(grid.grid != null) {
+			  var targetRow = grid.grid.getDataItem(rowIdx);
+			  var targetCol = grid.grid.getColumns()[colIdx+1];
+			  var classname = grid.grid.getCellNode(rowIdx, colIdx+1).className;
+			  classname = classname.replace(/ /g, ".");
+			  //Get the rowIdx slickrow
+			  var cell = $(".slick-row:nth-of-type("+rowIdx+") ."+classname);
+			  var selectedEntity = $(".slick-row:nth-of-type("+rowNum+") ."+classname);
+	      	  if(column.outlier == "true") {
+	      		  //Add the outlier class
+	      		$(".slick-row:nth-of-type("+rowNum+") ."+classname).addClass("outlier");
+	      	  } else {
+	      		  //Remove the outlier class if it exists
+	      		$(".slick-row:nth-of-type("+rowNum+") ."+classname).removeClass("outlier");
+	      	  }
+		  }
 		  
-		  var selectedEntity = $(".slick-row:nth-of-type("+rowNum+") ."+classname);
 		  var scatterPoint = $('col[row="'+rowIdx+'"][col="'+colIdx+'"]');
-      	  if(column.outlier == "true") {
-      		  //Add the outlier class
-      		$(".slick-row:nth-of-type("+rowNum+") ."+classname).addClass("outlier");
-      		scatterPoint.attr("class", "circle outlier");
-      	  } else {
-      		  //Remove the outlier class if it exists
-      		$(".slick-row:nth-of-type("+rowNum+") ."+classname).removeClass("outlier");
-      		scatterPoint.attr("class", "circle outlier");
-      	  }
+		  if(scatterPoint != null) {
+	      	  if(column.outlier == "true") {
+	      		  //Add the outlier class
+	      		$(".slick-row:nth-of-type("+rowNum+") ."+classname).addClass("outlier");
+	      		scatterPoint.attr("class", "circle outlier");
+	      	  } else {
+	      		  //Remove the outlier class if it exists
+	      		$(".slick-row:nth-of-type("+rowNum+") ."+classname).removeClass("outlier");
+	      		scatterPoint.attr("class", "circle outlier");
+	      	  }
+			  
+		  }
+		  
+		  //Update the outlier histogram. This, in effect updates the "CSS" for the histogram
+		  //because it rebuilds the histogram representing the outliers, based on the current
+		  //"outlier" set of data in var experiment
+		  if(histogram != null) {
+			  histogram.update_data(experiment.experiment);
+			  histogram.updateGraphOutlier();
+		  }
+
     	});
     });
 }
@@ -352,9 +403,6 @@ function loadGrid(dataSet) {
     grid.grid.onClick.subscribe(function(e, args) {
         markOutlierGridClick(e, args);
     });
-    
-    //Mark all current outliers
-    markAllCurrentOutliers();
 }
 
 function plateSelected(plateIndex) {

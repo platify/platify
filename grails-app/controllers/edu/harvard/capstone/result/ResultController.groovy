@@ -225,6 +225,7 @@ class ResultController {
         def labels = null;
         if (scope == "well") {
             def well = Well.findByPlateAndRowAndColumn(plateTemplate, row, col)
+			println("Update outlier for well "+well.toString())
             domainId = ResultWell.findByPlateAndWell(resultPlate, well).id
 
             labels = ResultLabel.findAllByDomainIdAndScope(domainId, ResultLabel.LabelScope.WELL)
