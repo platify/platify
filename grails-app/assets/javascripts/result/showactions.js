@@ -233,9 +233,7 @@ function init() {
     var resultUI = new ResultUI();
 }
 
-<<<<<<< HEAD
-function markOutlierScatterClick(event) {console.log(event);
-=======
+
 function markOutlierHistogramClick(event) {
 	//Get the indexes of the samples that this bar represents 
 	//in the format "row1,col1;ro2,col2;..."
@@ -259,7 +257,6 @@ function markOutlierHistogramClick(event) {
 }
 
 function markOutlierScatterClick(event) {
->>>>>>> add-outliers-histogram
 	var eventObj = $(event.target);
 	var indexVar = $(event.target).attr('index');
 	var row = scatter.dotIndexes[indexVar][0];
