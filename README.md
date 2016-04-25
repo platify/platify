@@ -1,5 +1,7 @@
 # Platify
 
+Public URL: [https://platify.net](http://platify.net)
+
 Platify is an open-source project geared towards simplifying the setup, repeatability, results import, analysis, visualization, and sharing of data associated with liquid based bio-chemical experimentation. It is flexible enough for use with a wide range of apparatus, and geared towards the most common types of experiments which scientists perform today. 
 
 ![Platify Home Screen](https://raw.githubusercontent.com/platify/platify/master/grails-app/assets/images/screenshot.png)
