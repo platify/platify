@@ -579,10 +579,21 @@ class ResultService {
     }
 	
 	def createRawResultFile(String fname, String fdata) {
-		def rrfRoot = Holders.grailsApplication.mainContext.servletContext.getRealPath('rrf')
+
+		def rrfRoot = System.getenv("PLATIFY_RRF")
+		if (!rrfRoot)
+		   rrfRoot = Holders.grailsApplication.mainContext.servletContext.getRealPath('rrf')
+//		def tmpFile = new File("/tmp/tmpout.debug")
+//		tmpFile.text = "rrfRoot: " + rrfRoot + "\n"
+//		tmpFile << "Raw Data: "
+//		tmpFile << fdata
+
 		File rrfRootDir = new File(rrfRoot)
 		
-		if (!rrfRootDir.exists()) rrfRootDir.mkdir()
+		if (!rrfRootDir.exists()) {
+		    rrfRootDir.mkdir()
+//		    tmpFile << "Making rrf dir\n"
+		}
 		
 		RawResultFile rrf = new RawResultFile()
 		rrf.save(flush: true)
@@ -590,12 +601,22 @@ class ResultService {
 		def destFolderPath = rrfRoot + "/" + rrfId
 		File destDir = new File(destFolderPath)
 
-		if (!destDir.exists()) destDir.mkdir()
+//		tmpFile << "new file dir: "
 
-		def destFile = new File(destDir, fname).withWriter { out ->
-			out.write(fdata)
+//		tmpFile << destFolderPath + "\n"
+
+		if (!destDir.exists()) {
+//		    tmpFile << "Making ID dir: "
+//		    tmpFile << destFolderPath + "\n"
+		    destDir.mkdir()
 		}
 
+//		tmpFile << "New filename: " + fname + "\n"
+
+		def destFile = new File(destDir, fname)
+		destFile.text = fdata
+
+//		tmpFile << "Wrote file data\n"
 		rrf.fName = rrfId + "/" + fname
 		rrf.save(flush: true)
 		
