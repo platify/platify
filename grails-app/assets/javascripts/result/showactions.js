@@ -224,15 +224,14 @@ function init() {
     $("g.bar_group").on('click', 'rect', function(event){
     	markOutlierHistogramClick(event);
     });
+
     // add scatterplot outlier listener
-    $(".circle").on('click', function(event){
+    $(".circle").on('click', function(event){console.log(event);
     	markOutlierScatterClick(event);
     });
 
-    
     var resultUI = new ResultUI();
 }
-
 
 function markOutlierHistogramClick(event) {
 	//Get the indexes of the samples that this bar represents 

@@ -1,6 +1,8 @@
 package edu.harvard.capstone.editor
 
-import grails.converters.*;
+import grails.converters.*
+import grails.validation.ValidationException;
+
 import static org.springframework.http.HttpStatus.*
 import edu.harvard.capstone.result.Result;
 import grails.plugin.springsecurity.annotation.Secured
@@ -102,6 +104,24 @@ class ExperimentalPlateSetController {
 
   def showy(ExperimentalPlateSet experimentalPlateSetInstance) {
     render editorService.getExperimentData(experimentalPlateSetInstance) as JSON
+  }
+
+  def getControls(ExperimentalPlateSet experiment) {
+      def editorControlsData
+      try{
+          editorControlsData = editorService.getControlData(experiment)
+      }
+      catch (ValidationException e) {
+          response.sendError(400)
+          return
+      } catch (RuntimeException e) {
+          response.sendError(500)
+          return
+      }
+
+      render(contentType: "application/json") {
+          [editorControlsData: editorControlsData]
+      }
   }
 
 
