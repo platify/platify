@@ -184,6 +184,7 @@ function init() {
                        experiment.zPrimeFactor(plateIndex),
                        experiment.meanNegativeControl(plateIndex),
                        experiment.meanPositiveControl(plateIndex),
+                       experiment.meanWellValues(plateIndex),
                        plateIndex];
             return row;
         });
@@ -226,7 +227,7 @@ function init() {
     });
 
     // add scatterplot outlier listener
-    $(".circle").on('click', function(event){console.log(event);
+    $(".circle").on('click', function(event){
     	markOutlierScatterClick(event);
     });
 

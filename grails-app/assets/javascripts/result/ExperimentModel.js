@@ -136,6 +136,46 @@ function ExperimentModel() {
 
 
     /**
+     * returns the mean of the well values, excluding controls.
+     */
+    this.meanWellValues = function(plateIndex) {
+        plateIndex = (plateIndex === undefined) ? this.currentPlateIndex : plateIndex;
+        var rawLabel = this.rawDataLabel(plateIndex);
+        if (!rawLabel) {
+            return null;
+        }
+        var meanLabel = rawLabel + '__meanWellValues';
+
+        var plate;
+        if (plateIndex === this.currentPlateIndex) {
+            plate = this.currentPlate;
+        }
+        else {
+            plate = this.experiment.plates[plateIndex];
+        }
+
+        var rv;
+        if ((meanLabel in plate.rawData) && (plate.rawData[meanLabel] !== null)) {
+            rv = plate.rawData[meanLabel];
+        }
+        else {
+            var nonControls = [];
+            plate.rows.forEach(function(row) {
+                row.columns.forEach(function(well) {
+                    if (well.control.localeCompare("NEGATIVE") !== 0
+                        && well.control.localeCompare("POSITIVE") !== 0)
+                        nonControls.push(well.rawData[rawLabel]);
+                });
+
+            });
+
+            rv = d3.mean(nonControls);
+            plate.rawData[meanLabel] = rv;
+        }
+        return rv;
+    }
+
+    /**
      * returns the mean of the negative control values.
      */
     this.meanNegativeControl = function(plateIndex) {
@@ -227,6 +267,7 @@ function ExperimentModel() {
         this.zPrimeFactor(plateIndex);
         this.meanNegativeControl(plateIndex);
         this.meanPositiveControl(plateIndex);
+        this.meanWellValues(plateIndex);
 
         // the save endpoint only wants the current plate
         var data = {
@@ -283,6 +324,7 @@ function ExperimentModel() {
         this.zPrimeFactor(plateIndex);
         this.meanNegativeControl(plateIndex);
         this.meanPositiveControl(plateIndex);
+        this.meanWellValues(plateIndex);
 
         // the save endpoint only wants the current plate
         var data = {

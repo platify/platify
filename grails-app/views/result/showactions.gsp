@@ -49,6 +49,7 @@
 								<th>Z'-Factor</th>
 								<th>Mean Negative Control</th>
 								<th>Mean Positive Control</th>
+                                <th>Mean Non-Control</th>
 							</tr>
 						</thead>
 					</table>
@@ -96,7 +97,7 @@
                                     <input type="radio" name="fitModel" value="logarithmic"> Logarithmic<br>
                                     <input type="radio" name="fitModel" value="power"> Power<br>
                                     <input type="radio" name="fitModel" value="polynomial"> Polynomial
-                                    <input type="text" id="degree" name="degree" placeholder="degree" maxlength="2" size="4"><br>
+                                    <input type="text" id="degree" name="degree" placeholder="degree" maxlength="1" size="4"><br>
                                     <input id="regressionCheckbox" type="checkbox" checked="checked"> Apply to all plates
                                 </div><br>
                                 <div class="row">
