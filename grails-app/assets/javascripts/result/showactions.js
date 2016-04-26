@@ -230,14 +230,27 @@ function init() {
     	markOutlierScatterClick(event);
     });
 
-    // Std curve circle click listenser
-    $(".stdCurveGraph").on('click', 'circle', function(event){console.log(event);
-        markOutlierScatterClick(event);
+    // Std curve circle click listener
+    $(".stdCurveGraph").on('click', 'circle', function(event){
+        markOutlierStdCurveClick(event);
     });
 
     var resultUI = new ResultUI();
 }
 
+function markOutlierStdCurveClick(event) {console.log(event);
+    console.log($(event.target).data());
+    var data = $(event.target["__data__"]);
+    var row = data["row"];
+    var col = data["column"];
+
+    if (data["outlier"] ==- "true") {
+        data['outlier'] = "false";console.log(row + " " + col);
+        markOutlierStatus(row, col, false);
+    } else {
+        markOutlierStatus(row, col, true);
+    }
+}
 
 function markOutlierHistogramClick(event) {
 	//Get the indexes of the samples that this bar represents 

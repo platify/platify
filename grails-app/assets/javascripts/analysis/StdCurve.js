@@ -329,6 +329,19 @@ function StdCurve() {
                     return "white";
                 else
                     return "green";
+            })
+            .on("click", function(d) {
+                d3.select(this).style("fill", function(d) {
+//                    if (d3.select(this).style("fill").localeCompare("green"))
+                    if (d["outlier"].localeCompare("true") === 0) {
+                        d["outlier"] = "false";
+                        return "green"; //turn off outlier status
+                    }
+                    else {
+                        d["outlier"] = "true";
+                        return "white";
+                    }
+                });
             });
     }
 
@@ -386,7 +399,7 @@ function StdCurve() {
     }
 
     // No longer used, but keeping method in case needed in future
-    function fillInferredTable(inferred_data) {
+    /*function fillInferredTable(inferred_data) {
         inferred_data = inferred_data.sort(function(a, b) {
                 return d3.ascending(a[0], b[0]);
             });
@@ -409,7 +422,7 @@ function StdCurve() {
         cells.exit().remove();
         cells.enter().append("td");
         cells.text(function(d) { return d; });
-    }
+    }*/
 
     function interpolate(start, end) {
         var length = end - start;
