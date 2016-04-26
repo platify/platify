@@ -32,7 +32,7 @@ function StdCurve() {
         regressionAllChecked = this.checked;
     });
 
-    $('#stdCurveButton').click(function() {
+    $('#stdCurveButton').on('click', function() {
         previouslySet = true;
         currentBarcode = experiment.currentPlate.plateID;
         current_result_index = getResultPlateIndex(currentBarcode);
@@ -208,7 +208,7 @@ function StdCurve() {
                     }
                 }
             });
-        });console.log(allControls);
+        });
 
         for (var i = 0; i < x.length; i++)
             if (x[i] !== undefined && y[i] !== undefined)
@@ -332,16 +332,23 @@ function StdCurve() {
             })
             .on("click", function(d) {
                 d3.select(this).style("fill", function(d) {
-//                    if (d3.select(this).style("fill").localeCompare("green"))
                     if (d["outlier"].localeCompare("true") === 0) {
+                        // Turn off outlier status
                         d["outlier"] = "false";
-                        return "green"; //turn off outlier status
+                        markOutlierStatus(d["row"], d["column"], false);
+                        return "green";
                     }
                     else {
                         d["outlier"] = "true";
+                        markOutlierStatus(d["row"], d["column"], true);
                         return "white";
                     }
                 });
+
+                setRegression();
+                updateStdCurve();
+                storeNormalized();
+        //        persistNormalized();
             });
     }
 
