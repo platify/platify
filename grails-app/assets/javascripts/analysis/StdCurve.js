@@ -23,7 +23,16 @@ function StdCurve() {
         width = 650 - margin.left - margin.right;
         height = 410 - margin.top - margin.bottom;
 
-        controls_editor_data = JSON.parse(EDITOR_CONTROLS_JSON);
+        var jqxhr = $.ajax({
+            url: hostname + "/experimentalPlateSet/getControls/" + exp_id,
+            contentType: 'application/json; charset=UTF-8',
+            data: null,
+            type: "POST",
+            processData: false
+        });
+        jqxhr.success(function(data) {
+            controls_editor_data = data.editorControlsData;console.log(controls_editor_data);
+        });
 
         createGraphAndTable();
     }

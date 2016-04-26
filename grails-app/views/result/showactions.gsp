@@ -205,7 +205,6 @@
 	<g:javascript>
         var RESULT_SAVE_REFACTORED_DATA_URL = "${createLink(controller: 'refactoredData', action: 'save', resultInstance: null)}";
         var IMPORT_DATA_JSON = JSON.stringify(${importData.encodeAsJSON()});
-        var EDITOR_CONTROLS_JSON = JSON.stringify(${editorControlsData.encodeAsJSON()});
         var EXPERIMENT_ID = ${exp_id};
 
         %{-- standard curve start --}%
@@ -231,11 +230,6 @@
 
         function xCategoryChanged(xCategory) {
             X_CATEGORY = document.getElementById("refXCategory").value;
-
-            %{--var plateId = document.getElementById("scPlate").value;--}%
-            %{--<g:remoteFunction controller="stdCurve" action="getReferenceYCategories"--}%
-                              %{--update="refYCategorySelect"--}%
-                              %{--params="'plate_id='+PLATE_ID"/>--}%
         }
 
         function yCategoryChanged() {

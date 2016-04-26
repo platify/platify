@@ -131,20 +131,8 @@ class ResultController {
             return                      
         }
 
-        def editorControlsData
-        try{
-            editorControlsData = editorService.getControlData(experiment)
-        }
-        catch (ValidationException e) {
-            response.sendError(400)
-            return
-        } catch (RuntimeException e) {
-            response.sendError(500)
-            return
-        }
-
         // TODO - don't really need the experiment object
-        respond experiment as Object, model:[importData: importData, editorControlsData: editorControlsData, exp_id: experiment.id]
+        respond experiment as Object, model:[importData: importData, exp_id: experiment.id]
     }
 
 
