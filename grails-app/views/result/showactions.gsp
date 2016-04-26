@@ -83,7 +83,7 @@
 
                     <div id="standardCurve" style="width:100%;height:650px;">
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="row">
                                     <h5><b>PROPERTIES</b></h5>
                                     Known Property: <span id="refXCategorySelect"></span><br>
@@ -96,7 +96,7 @@
                                     <input type="radio" name="fitModel" value="logarithmic"> Logarithmic<br>
                                     <input type="radio" name="fitModel" value="power"> Power<br>
                                     <input type="radio" name="fitModel" value="polynomial"> Polynomial
-                                    <input type="text" id="degree" name="degree" placeholder="degree" maxlength="1" size="3"><br>
+                                    <input type="text" id="degree" name="degree" placeholder="degree" maxlength="2" size="4"><br>
                                     <input id="regressionCheckbox" type="checkbox" checked="checked"> Apply to all plates
                                 </div><br>
                                 <div class="row">
@@ -106,7 +106,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-8">
+                            <div class="col-md-9">
                                 <div class="panel panel-default">
                                     <div class="panel-heading">
                                         <h4 class="panel-title">

@@ -19,9 +19,9 @@ function StdCurve() {
         ref_outlier_points = [];
         previouslySet = false;
 
-        margin = {top: 10, right: 30, bottom: 30, left: 40};
-        width = 650 - margin.left - margin.right;
-        height = 410 - margin.top - margin.bottom;
+        margin = {top: 10, right: 20, bottom: 30, left: 60};
+        width = 700 - margin.left - margin.right;
+        height = 500 - margin.top - margin.bottom;
 
         var jqxhr = $.ajax({
             url: hostname + "/experimentalPlateSet/getControls/" + exp_id,
@@ -31,7 +31,7 @@ function StdCurve() {
             processData: false
         });
         jqxhr.success(function(data) {
-            controls_editor_data = data.editorControlsData;console.log(controls_editor_data);
+            controls_editor_data = data.editorControlsData;
         });
 
         createGraphAndTable();
@@ -128,8 +128,13 @@ function StdCurve() {
             return;
         }
 
-        var fit_ref_points = getRegression(reference_points, fitModel, degree).points;
-        drawLine(fit_ref_points, fitModel, degree);
+        var ref_fit = getRegression(reference_points, fitModel, degree);
+        drawLine(ref_fit.points, fitModel, degree);
+
+        var r2 = d3.round(ref_fit.r2 * 100, 2);
+        if (r2 < 0)
+            r2 = 0;
+        fillLegend("R-squared: " + r2 + "%", ref_fit.string);
 
         // Commented out code to show inferred data
         //var merged_points = mergeUnknownAndKnownPoints(currentBarcode, reference_points);
@@ -290,10 +295,14 @@ function StdCurve() {
         graph.append("path").attr("class", "line");
         graph.append("g").attr("class", "sc_points");
 
-        // Create table
-        table = d3.select("#inferredTable").append("table").attr("class", "table");
-        table.append("thead").append("tr").attr("class", "heading");
-        table.append("tbody").attr("class", "body");
+        graph.append("g")
+            .attr("class", "sc_legend")
+            .attr('transform', 'translate(-15,50)');
+
+//        // Create table
+//        table = d3.select("#inferredTable").append("table").attr("class", "table");
+//        table.append("thead").append("tr").attr("class", "heading");
+//        table.append("tbody").attr("class", "body");
     }
 
     function createAxes(points) {
@@ -390,6 +399,80 @@ function StdCurve() {
             .attr("stroke", "lightblue")
             .attr("fill", "none");
     }
+
+    function fillLegend(fit_eq, r2) {
+        var legend = graph.select(".sc_legend").selectAll('text')
+            .data([fit_eq, r2]);
+
+        legend.exit().remove();
+        legend.enter()
+            .append("text");
+        legend.attr("x", 40)
+            .attr("y", function(d, i){ return i * 30;})
+            .style("font-style", "italic")
+            .style("fill", "gray")
+            .text(function(d) {
+                return d;
+            })
+            .call(wrap, 300);
+    }
+
+    // Mike Bostock's wrap function
+    function wrap(text, width) {
+        text.each(function () {
+            var text = d3.select(this),
+                words = text.text().split(/\s+/).reverse(),
+                word,
+                line = [],
+                lineNumber = 0,
+                lineHeight = 1.1, // ems
+                x = text.attr("x"),
+                y = text.attr("y"),
+                dy = 0, //parseFloat(text.attr("dy")),
+                tspan = text.text(null)
+                            .append("tspan")
+                            .attr("x", x)
+                            .attr("y", y)
+                            .attr("dy", dy + "em");
+            while (word = words.pop()) {
+                line.push(word);
+                tspan.text(line.join(" "));
+                if (tspan.node().getComputedTextLength() > width) {
+                    line.pop();
+                    tspan.text(line.join(" "));
+                    line = [word];
+                    tspan = text.append("tspan")
+                                .attr("x", x)
+                                .attr("y", y)
+                                .attr("dy", ++lineNumber * lineHeight + dy + "em")
+                                .text(word);
+                }
+            }
+        });
+    }
+//    function wrap(text, width) {
+//      text.each(function() {
+//        var text = d3.select(this),
+//            words = text.text().split(/\s+/).reverse(),
+//            word,
+//            line = [],
+//            lineNumber = 0,
+//            lineHeight = 1.1, // ems
+//            y = text.attr("y"),
+//            dy = parseFloat(text.attr("dy")),
+//            tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+//        while (word = words.pop()) {
+//          line.push(word);
+//          tspan.text(line.join(" "));
+//          if (tspan.node().getComputedTextLength() > width) {
+//            line.pop();
+//            tspan.text(line.join(" "));
+//            line = [word];
+//            tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+//          }
+//        }
+//      });
+//    }
 
     function mergeUnknownAndKnownPoints(barcode, reference_points) {
         // Extract x- and y-coordinate from reference wells
