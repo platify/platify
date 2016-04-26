@@ -103,7 +103,7 @@ function downloadExperiment(fileformat) {
 
 function init() {
 	//this.on($("body"), "done_drawing", this.markAllCurrentOutliers); 
-	$("body").on("done_drawing", this.markAllCurrentOutliers);
+//	$("body").on("done_drawing", this.markAllCurrentOutliers);
     // init the experiment object
     experiment = new ExperimentModel();
     experiment.fromJson(IMPORT_DATA_JSON);
@@ -224,12 +224,17 @@ function init() {
     $("g.bar_group").on('click', 'rect', function(event){
     	markOutlierHistogramClick(event);
     });
+
     // add scatterplot outlier listener
-    $(".circle").on('click', function(event){
+    $(".circle").on('click', function(event){console.log(event);
     	markOutlierScatterClick(event);
     });
 
-    
+    // Std curve circle click listenser
+    $(".stdCurveGraph").on('click', 'circle', function(event){console.log(event);
+        markOutlierScatterClick(event);
+    });
+
     var resultUI = new ResultUI();
 }
 

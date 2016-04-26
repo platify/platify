@@ -1,6 +1,7 @@
 function StdCurve() {
     this.experiment;
     var controls_editor_data;
+    var allControls;
     var graph, table, x_scale, y_scale, margin, width, height; //vis variables
     var exp_id;
     var currentBarcode;
@@ -60,6 +61,10 @@ function StdCurve() {
         setStdCurves();
     });
 
+    $(".circle").on('click', function(event){console.log(event);
+//        markOutlierScatterClick(event);
+    });
+
     // Set default std curve for each plate
     function setStdCurves() {
         var stdCurvePlate = [];
@@ -103,16 +108,11 @@ function StdCurve() {
 
         var reference_points = getRefPoints(currentBarcode, controls_editor_data);
 
-        var reference_SVGgroup = ".reference_group";
-        var inferred_SVGgroup = ".inferred_group";
-        var outlier_SVGgroup = ".outlier_group";
-
         var fitModel = experiment.experiment.plates[current_result_index].fitModel;
         var degree = experiment.experiment.plates[current_result_index].degree;
 
         createAxes(reference_points.concat(ref_outlier_points), width, height);
-        plotPoints(ref_outlier_points, outlier_SVGgroup)
-        plotPoints(reference_points, reference_SVGgroup);
+        plotPoints(allControls);
 
         if (fitModel === undefined) {
             drawLine([], null, null);
@@ -122,6 +122,7 @@ function StdCurve() {
         var fit_ref_points = getRegression(reference_points, fitModel, degree).points;
         drawLine(fit_ref_points, fitModel, degree);
 
+        // Commented out code to show inferred data
         //var merged_points = mergeUnknownAndKnownPoints(currentBarcode, reference_points);
         //var merged_regression_data = getRegression(merged_points, fitModel, degree); //regression.js determines unknown y-coordinate
         //var inferred_data = getInferredPointsFromRegression(reference_points, merged_regression_data.points);
@@ -155,6 +156,8 @@ function StdCurve() {
     }
 
     function getRefPoints(barcode, editor_json) {
+        allControls = [];
+
         // Extract x- and y-coordinate from reference wells
         var reference_points = [];
         var x = [];
@@ -164,51 +167,48 @@ function StdCurve() {
         var x_outliers = [];
         var y_outliers = [];
 
-        var result_index = getResultPlateIndex(barcode);
-        var stdCurveBarcode = experiment.experiment.plates[result_index].stdCurveBarcode;
-
-        var editor_index = getEditorPlateIndex(stdCurveBarcode);
-
-        // Get std curve "unknown" y-coordinate
-        // todo: rename the mismatched x- & y-coord variable names
-        editor_json.plates[editor_index].wells.forEach(function(well) {
-            var x_coord = null;
-
-            result_index = getResultPlateIndex(stdCurveBarcode);
-
-            well.labels.forEach(function(label) {
-                var result_well = experiment.experiment.plates[result_index].rows[well.row].columns[well.column];
-                if (label.category == Y_CATEGORY) {
-                    x_coord = parseFloat(replaceDot(label.name));
-
-                    if (x_coord !== null && result_well.outlier !== "true")
-                        y.push(x_coord);
-                    else if (x_coord !== null)
-                        y_outliers.push(x_coord);
-                }
-            });
-        });
+        var plate_index = getResultPlateIndex(barcode);
+        var stdCurveBarcode = experiment.experiment.plates[plate_index].stdCurveBarcode;
+        var sc_index = getResultPlateIndex(stdCurveBarcode);
 
         // Get std curve "known" x-coordinate
         // todo: rename the mismatched x- & y-coord variable names
-        experiment.experiment.plates[result_index].rows.forEach(function(row) {
+        experiment.experiment.plates[sc_index].rows.forEach(function(row, row_i) {
+            var x_coord = null;
             var y_coord = null;
 
-            row.columns.forEach(function(column) {
+            row.columns.forEach(function(column, col_i) {
                 if (column.control.localeCompare("POSITIVE") === 0 || column.control.localeCompare("NEGATIVE") === 0) {
+                    x_coord_string = column.labels[Y_CATEGORY];
                     y_coord_string = column.rawData[X_CATEGORY];
 
-                    if (column.outlier !== "true" && y_coord_string !== undefined && y_coord_string !== null) {
+                    var controlProperties = [];
+                    if (y_coord_string !== undefined && y_coord_string !== null
+                        && x_coord_string !== undefined && x_coord_string !== null) {
+
+                        x_coord = parseFloat(replaceDot(x_coord_string));
                         y_coord = parseFloat(replaceDot(y_coord_string));
+
+                        controlProperties["x"] = y_coord;
+                        controlProperties["y"] = x_coord;
+                        controlProperties["outlier"]
+                            = (column.outlier === null || column.outlier.localeCompare("true") !== 0) ? "false" : "true";
+                        controlProperties["row"] = row_i;
+                        controlProperties["column"] = col_i;
+                        allControls.push(controlProperties);
+                    }
+
+                    if (column.outlier !== "true" && y_coord_string !== undefined && y_coord_string !== null) {
                         x.push(y_coord);
+                        y.push(x_coord);
                     }
                     else if (y_coord_string !== undefined && y_coord_string !== null) {
-                        y_coord = parseFloat(replaceDot(y_coord_string));
                         x_outliers.push(y_coord);
+                        y_outliers.push(x_coord);
                     }
                 }
             });
-        });
+        });console.log(allControls);
 
         for (var i = 0; i < x.length; i++)
             if (x[i] !== undefined && y[i] !== undefined)
@@ -279,13 +279,7 @@ function StdCurve() {
         graph.append("g").attr("class", "y_axis");
 
         graph.append("path").attr("class", "line");
-
-        graph.attr("class", "points");
-
-        // Create groups of data sets
-        graph.append("g").attr("class", "reference_group");
-        graph.append("g").attr("class", "inferred_group");
-        graph.append("g").attr("class", "outlier_group");
+        graph.append("g").attr("class", "sc_points");
 
         // Create table
         table = d3.select("#inferredTable").append("table").attr("class", "table");
@@ -318,35 +312,23 @@ function StdCurve() {
                 .orient("left"));
     }
 
-    function plotPoints(points, group) {
-        var circles = graph.select(group).selectAll("circle")
+    function plotPoints(points) {
+        var circles = graph.select(".sc_points").selectAll("circle")
             .data(points);
 
         circles.exit().remove();
         circles.enter()
-            .append("circle");
+            .append("circle").attr("class", "circle");
 
-        circles.attr("cx", function(d) { return x_scale(d[0]); } )
-            .attr("cy", function(d) { return y_scale(d[1]); } )
-            .attr("r", function() {
-                if (group == ".inferred_group")
-                    return 2;
-                if (group == ".reference_group" || group == ".outlier_group")
-                    return 3;
-            })
-            .style("stroke", function() {
-                if (group == ".inferred_group")
-                    return "red";
-                if (group == ".reference_group" || group == ".outlier_group")
-                    return "green";
-            })
-            .style("fill", function() {
-                if (group == ".inferred_group")
-                    return "red";
-                if (group == ".reference_group")
-                    return "green";
-                if (group == ".outlier_group")
+        circles.attr("cx", function(d) { return x_scale(d["x"]); } )
+            .attr("cy", function(d) { return y_scale(d["y"]); } )
+            .attr("r", 3)
+            .style("stroke", "darkgreen")
+            .style("fill", function(d) {
+                if (d["outlier"].localeCompare("true") === 0)
                     return "white";
+                else
+                    return "green";
             });
     }
 
