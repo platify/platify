@@ -103,7 +103,7 @@ function downloadExperiment(fileformat) {
 
 function init() {
 	//this.on($("body"), "done_drawing", this.markAllCurrentOutliers); 
-//	$("body").on("done_drawing", this.markAllCurrentOutliers);
+	$("body").on("done_drawing", this.markAllCurrentOutliers);
     // init the experiment object
     experiment = new ExperimentModel();
     experiment.fromJson(IMPORT_DATA_JSON);
