@@ -172,7 +172,7 @@ function ExperimentModel() {
             rv = d3.mean(nonControls);
             plate.rawData[meanLabel] = rv;
         }
-        return rv;
+        return isNaN(rv) ? null : rv;
     }
 
     /**
@@ -207,7 +207,7 @@ function ExperimentModel() {
             }));
             plate.rawData[meanLabel] = rv;
         }
-        return rv;
+        return isNaN(rv) ? null : rv;
     }
 
 
@@ -243,7 +243,7 @@ function ExperimentModel() {
             }));
             plate.rawData[meanLabel] = rv;
         }
-        return rv;
+        return isNaN(rv) ? null : rv;
     }
 
     

@@ -131,6 +131,8 @@ function init() {
                 else if (data <= 1) {
                     bucket = 'excellent';
                 }
+                if (data === null)
+                    data = "";
                 return '<span class="results-z-prime-' + bucket
                        + '">' + data + '</span>';
             },
