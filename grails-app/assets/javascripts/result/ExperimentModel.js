@@ -474,8 +474,19 @@ function ExperimentModel() {
         return isNaN(rv) ? null : rv;
     }
 
-    this.toggleOutlier = function(row, col, isOutlier, scope) {
-        var plateBarcode = experiment.experiment.plates[this.currentPlateIndex].plateID;
+    this.toggleOutlier = function(row, col, isOutlier, scope, plateBarcode) {
+        // todo: require that barcode is always supplied.
+        // If no barcode supplied, get barcode of currently selected plate.
+        if (plateBarcode === null || plateBarcode === undefined)
+            plateBarcode = this.currentPlate.plateID;
+
+        var plate_index = this.getPlateIndex(plateBarcode);
+        if(isOutlier) {
+            experiment.experiment.plates[plate_index].rows[row].columns[col].outlier = "true";
+        } else {
+            experiment.experiment.plates[plate_index].rows[row].columns[col].outlier = "false";
+        }
+
         var params = "?exp_id=" + this.experiment.experimentID
             + "&barcode=" + plateBarcode
             + "&scope=" + scope
@@ -493,5 +504,13 @@ function ExperimentModel() {
         jqxhr.done(function() {
             console.log('POST of outlier status complete');
         });
+    }
+
+    this.getPlateIndex = function(plate_barcode) {
+        for (var i = 0; i < experiment.experiment.plates.length; i++) {
+            if (plate_barcode.localeCompare(experiment.experiment.plates[i].plateID) === 0) {
+                return i;
+            }
+        }
     }
 }

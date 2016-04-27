@@ -103,7 +103,7 @@ function downloadExperiment(fileformat) {
 
 function init() {
 	//this.on($("body"), "done_drawing", this.markAllCurrentOutliers); 
-	$("body").on("done_drawing", this.markAllCurrentOutliers);
+//	$("body").on("done_drawing", this.markAllCurrentOutliers);
     // init the experiment object
     experiment = new ExperimentModel();
     experiment.fromJson(IMPORT_DATA_JSON);
@@ -301,12 +301,16 @@ function markOutlierGridClick(e, args) {
 
 //Marks outliers in all visualizations
 function markOutlierStatus(row, col, isOutlier) {
-	var colNum = col;
+    var colNum = col;
 	if(isOutlier) {
-		experiment.experiment.plates[0].rows[row].columns[colNum].outlier = "true";
+		experiment.experiment.plates[experiment.currentPlateIndex].rows[row].columns[colNum].outlier = "true";
 	} else {
-		experiment.experiment.plates[0].rows[row].columns[colNum].outlier = "false";
+		experiment.experiment.plates[experiment.currentPlateIndex].rows[row].columns[colNum].outlier = "false";
 	}
+
+	// todo: The above is also performed in experiment.toggleOutlier(), which is called at end of this method.
+	// todo: Determine where is best to keep code.
+
 	var rowNum = parseInt(row)+1;
 	var colNum = parseInt(col)+1;
 	var scatterPoint = $('circle[row="'+row+'"][col="'+col+'"]');

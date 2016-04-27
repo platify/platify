@@ -381,15 +381,17 @@ function StdCurve() {
             })
             .on("click", function(d) {
                 d3.select(this).style("fill", function(d) {
+                    var currentSC = experiment.experiment.plates[current_result_index].stdCurveBarcode;
+
                     if (d["outlier"].localeCompare("true") === 0) {
                         // Turn off outlier status
+                        experiment.toggleOutlier(d["row"], d["column"], false, "WELL", currentSC);
                         d["outlier"] = "false";
-                        markOutlierStatus(d["row"], d["column"], false);
                         return "green";
                     }
                     else {
+                        experiment.toggleOutlier(d["row"], d["column"], true, "WELL", currentSC);
                         d["outlier"] = "true";
-                        markOutlierStatus(d["row"], d["column"], true);
                         return "white";
                     }
                 });
