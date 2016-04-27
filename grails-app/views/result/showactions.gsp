@@ -91,6 +91,11 @@
                                     Unknown Property: <span id="refYCategorySelect"></span>
                                 </div><br>
                                 <div class="row">
+                                    <h5><b>STANDARD CURVE SOURCE</b></h5>
+                                    <g:select name="scPlate" id="scPlate"
+                                              from="" noSelection="[null:'default']"/>
+                                </div><br>
+                                <div class="row">
                                     <h5><b>REGRESSION MODEL</b></h5>
                                     <input type="radio" name="fitModel" value="linearThroughOrigin" checked="checked"> Linear<br>
                                     <input type="radio" name="fitModel" value="exponential"> Exponential<br>
@@ -98,9 +103,10 @@
                                     <input type="radio" name="fitModel" value="power"> Power<br>
                                     <input type="radio" name="fitModel" value="polynomial"> Polynomial
                                     <input type="text" id="degree" name="degree" placeholder="degree" maxlength="1" size="4"><br>
-                                    <input id="regressionCheckbox" type="checkbox" checked="checked"> Apply to all plates
                                 </div><br>
                                 <div class="row">
+                                    <input id="regressionCheckbox" type="checkbox" checked="checked"> Apply settings to all plates
+                                    <br><br>
                                     <div class="centerWrapper" style="text-align: center">
                                         <button id="stdCurveButton">Generate</button>
                                     </div>
@@ -215,9 +221,9 @@
         var X_CATEGORY;
         var Y_CATEGORY;
 
-        <g:remoteFunction controller="stdCurve" action="getPlates"
-                          update="scPlateSelect"
-                          params="'experiment_id='+EXPERIMENT_ID"/>
+        %{--<g:remoteFunction controller="stdCurve" action="getPlates"--}%
+                          %{--update="scPlateSelect"--}%
+                          %{--params="'experiment_id='+EXPERIMENT_ID"/>--}%
 
         <g:remoteFunction controller="stdCurve" action="getReferenceXCategories"
                           update="refXCategorySelect"
