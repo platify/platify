@@ -116,6 +116,7 @@ function init() {
         paging: false,
         scrollY: '150px',
         searching: false,
+        order: [[ 1, "asc" ]],
         columnDefs: [{
             targets: 3,
             render: function (data, type, full, meta) {
