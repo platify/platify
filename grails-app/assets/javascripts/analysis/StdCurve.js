@@ -20,9 +20,9 @@ function StdCurve() {
         ref_outlier_points = [];
         previouslySet = false;
 
-        margin = {top: 10, right: 20, bottom: 30, left: 60};
+        margin = {top: 10, right: 30, bottom: 40, left: 60};
         width = 700 - margin.left - margin.right;
-        height = 500 - margin.top - margin.bottom;
+        height = 550 - margin.top - margin.bottom;
 
         var jqxhr = $.ajax({
             url: hostname + "/experimentalPlateSet/getControls/" + exp_id,
