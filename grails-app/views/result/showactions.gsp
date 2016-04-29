@@ -76,12 +76,13 @@
                     <ul style="background-color:#d9edf7;" >
                         <li><a href="#resultGrid">Result Grid</a></li>
                         <li><a href="#scatterplot">Scatter Plot</a></li>
+                        <li><a href="#scatterplot_control">Controls Plot</a></li>
                         <li><a href="#standardCurve">Standard Curve</a></li>
                         <li><a href="#histogram">Histogram</a></li>
                     </ul>
 					<div id="resultGrid" class="Blues" style="width:100%;height:650px;"></div>
 					<div id="scatterplot" style="width:100%;height:650px;"></div>
-
+					<div id="scatterplot_control" style="width:100%;height:650px;"></div>
                     <div id="standardCurve" style="width:100%;height:650px;">
                         <div class="row">
                             <div class="col-md-3">
@@ -253,6 +254,7 @@
 
 	<!-- scatter plot -->
 	<asset:javascript src="scatter/Scatter.js" />
+	<asset:javascript src="scatter/Scatter_control.js" />
 
     %{-- histogram js--}%
     <asset:javascript src="histogram/Histogram.js" />

@@ -4,6 +4,7 @@ var scatter;
 var histogram;
 var plateTable;
 var scatterPlot;
+var scatterControl;
 var stdCurve;
 var plateTableTools;
 var showHeatMap = true;
@@ -168,6 +169,10 @@ function init() {
     //Set up scatterplot
     scatter = new Scatter();
     scatter.setData(experiment.data);
+    
+    //Get a scatter plot for all the controls in the plates
+    scatterControl = new Scatter_control();
+    scatterControl.setData(experiment.experiment);
 
     //Set up std curve
     stdCurve = new StdCurve();

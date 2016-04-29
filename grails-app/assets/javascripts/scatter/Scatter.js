@@ -71,7 +71,7 @@ function Scatter() {
 	    g.selectAll("scatter-dots")
 	      .data(data)
 	      .enter().append("svg:circle").attr("class", "circle")
-	          .attr("cx", function (d,i) { return x(d[0]); } )
+	          .attr("cx", function (d,i) { return x(d[0])} )
 	          .attr("cy", function (d) { return y(d[1]); } )
 	          .attr("r", 8).attr("index", function (d,i) { return d[0]; })
 	          .attr("row", function (d,i) { return self.dotIndexes[d[0]][0]; })
