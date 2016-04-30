@@ -227,6 +227,7 @@ function init() {
     // add histogram button listener
     $('#histogramButton').on('click', function(event) {
             histogram.updateGraph();
+            histogram.updateGraphOutlier();
      });
     
     

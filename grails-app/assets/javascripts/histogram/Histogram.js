@@ -239,8 +239,11 @@ function Histogram(json_data) {
         var x_values = this.getXValues(x_data);
 
 
-        var min_x = d3.min(x_values_out);
-        var max_x = d3.max(x_values_out);
+        var min_x = d3.min(x_values);
+        var max_x = d3.max(x_values);
+        
+        var min_x_out = d3.min(x_values_out);
+        var max_x_out = d3.max(x_values_out);
 
         var bin_width = +document.getElementById('bin_width').value;
         var num_bins;
@@ -260,14 +263,15 @@ function Histogram(json_data) {
             ticks = xScale.ticks(num_bins);
 
         var histogram = d3.layout.histogram()
-            .frequency(false)
+            .frequency(true)
             .bins(ticks);
 
         var data = histogram(x_values_out);
       //Use the yScale from the original histogram data
         var histogram_scale = d3.layout.histogram()
-        .frequency(false)
+        .frequency(true)
         .bins(ticks);
+        
         var data_scale = histogram_scale(x_values);
 
         var yScale = d3.scale.linear()
@@ -303,7 +307,7 @@ function Histogram(json_data) {
             ticks = xScale.ticks(num_bins);
 
         var histogram = d3.layout.histogram()
-            .frequency(false)
+            .frequency(true)
             .bins(ticks);
         var data = histogram(x_values);
 
