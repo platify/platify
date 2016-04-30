@@ -155,15 +155,16 @@ function ExperimentModel() {
         }
 
         var rv;
-        if ((meanLabel in plate.rawData) && (plate.rawData[meanLabel] !== null)) {
-            rv = plate.rawData[meanLabel];
-        }
-        else {
+//        if ((meanLabel in plate.rawData) && (plate.rawData[meanLabel] !== null)) {
+//            rv = plate.rawData[meanLabel];
+//        }
+//        else {
             var nonControls = [];
             plate.rows.forEach(function(row) {
                 row.columns.forEach(function(well) {
                     if (well.control.localeCompare("NEGATIVE") !== 0
-                        && well.control.localeCompare("POSITIVE") !== 0)
+                        && well.control.localeCompare("POSITIVE") !== 0
+                        && !(well.outlier && well.outlier.localeCompare("true") === 0))
                         nonControls.push(well.rawData[rawLabel]);
                 });
 
@@ -171,7 +172,7 @@ function ExperimentModel() {
 
             rv = d3.mean(nonControls);
             plate.rawData[meanLabel] = rv;
-        }
+//        }
         return isNaN(rv) ? null : rv;
     }
 
@@ -198,15 +199,18 @@ function ExperimentModel() {
         }
 
         var rv;
-        if ((meanLabel in plate.rawData) && (plate.rawData[meanLabel] !== null)) {
-            rv = plate.rawData[meanLabel];
-        }
-        else {
+//        if ((meanLabel in plate.rawData) && (plate.rawData[meanLabel] !== null)) {
+//            rv = plate.rawData[meanLabel];
+//        }
+//        else {
             rv = d3.mean(controls.negative.map(function(coords) {
-                return plate.rows[coords[0]].columns[coords[1]].rawData[rawLabel];
+                var well = plate.rows[coords[0]].columns[coords[1]];
+                if (well.outlier && well.outlier.localeCompare("true") === 0)
+                    return null;
+                return well.rawData[rawLabel];
             }));
             plate.rawData[meanLabel] = rv;
-        }
+//        }
         return isNaN(rv) ? null : rv;
     }
 
@@ -234,15 +238,18 @@ function ExperimentModel() {
         }
 
         var rv;
-        if ((meanLabel in plate.rawData) && (plate.rawData[meanLabel] !== null)) {
-            rv = plate.rawData[meanLabel];
-        }
-        else {
+//        if ((meanLabel in plate.rawData) && (plate.rawData[meanLabel] !== null)) {
+//            rv = plate.rawData[meanLabel];
+//        }
+//        else {
             rv = d3.mean(controls.positive.map(function(coords) {
-                return plate.rows[coords[0]].columns[coords[1]].rawData[rawLabel];
+                var well = plate.rows[coords[0]].columns[coords[1]];
+                if (well.outlier && well.outlier.localeCompare("true") === 0)
+                    return null;
+                return well.rawData[rawLabel];
             }));
             plate.rawData[meanLabel] = rv;
-        }
+//        }
         return isNaN(rv) ? null : rv;
     }
 
@@ -428,14 +435,14 @@ function ExperimentModel() {
         }
         
         var rv;
-        if ((zFactorLabel in plate.rawData) && (plate.rawData[zFactorLabel] !== null)) {
-            rv = plate.rawData[zFactorLabel];
-        }
-        else {
+//        if ((zFactorLabel in plate.rawData) && (plate.rawData[zFactorLabel] !== null)) {
+//            rv = plate.rawData[zFactorLabel];
+//        }
+//        else {
             rv = zFactor(plate, rawLabel,
                          controls.negative, controls.positive);
             plate.rawData[zFactorLabel] = rv;
-        }
+//        }
         return isNaN(rv) ? null : rv;
     }
 
@@ -463,14 +470,14 @@ function ExperimentModel() {
         }
 
         var rv;
-        if ((zPrimeFactorLabel in plate.rawData) && (plate.rawData[zPrimeFactorLabel] !== null)) {
-            rv = plate.rawData[zPrimeFactorLabel];
-        }
-        else {
+//        if ((zPrimeFactorLabel in plate.rawData) && (plate.rawData[zPrimeFactorLabel] !== null)) {
+//            rv = plate.rawData[zPrimeFactorLabel];
+//        }
+//        else {
             rv = zPrimeFactor(plate, rawLabel,
                               controls.negative, controls.positive);
             plate.rawData[zPrimeFactorLabel] = rv;
-        }
+//        }
         return isNaN(rv) ? null : rv;
     }
 
@@ -504,6 +511,21 @@ function ExperimentModel() {
         jqxhr.done(function() {
             console.log('POST of outlier status complete');
         });
+
+        // Update stats table when toggling outlier status
+        var plateData = Object.keys(experiment.experiment.plates).map(function(plateIndex) {
+            var row = [
+                       experiment.experiment.plates[plateIndex].plateID,
+                       experiment.experiment.plates[plateIndex].resultCreated,
+                       experiment.zFactor(plateIndex),
+                       experiment.zPrimeFactor(plateIndex),
+                       experiment.meanNegativeControl(plateIndex),
+                       experiment.meanPositiveControl(plateIndex),
+                       experiment.meanWellValues(plateIndex),
+                       plateIndex];
+            return row;
+        });
+        $('#plateTable').DataTable().clear().rows.add(plateData).draw();
     }
 
     this.getPlateIndex = function(plate_barcode) {

@@ -240,7 +240,7 @@ function init() {
     	markOutlierScatterClick(event);
     });
 
-    var resultUI = new ResultUI();
+    var resultUI = new ResultUI();console.log(experiment);
 }
 
 function markOutlierHistogramClick(event) {
