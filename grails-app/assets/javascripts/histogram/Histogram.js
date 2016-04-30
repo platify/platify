@@ -15,9 +15,9 @@ function Histogram(json_data) {
     }
     
     this.initiateVis = function() {
-        margin = {top: 10, right: 30, bottom: 30, left: 50};
+        margin = {top: 10, right: 30, bottom: 80, left: 50};
         width = 600 - margin.left - margin.right;
-        height = 575 - margin.top - margin.bottom;
+        height = 600 - margin.top - margin.bottom;
 
         this.setUpGraph();
         this.setUpGraphOutliers();
@@ -214,11 +214,11 @@ function Histogram(json_data) {
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-        // Set up axes
-        histogram.append("g")
-            .attr("transform", "translate(0," + height + ")")
-            .attr("class", "x_axis");
-        histogram.append("g").attr("class", "y_axis");
+//        // Set up axes
+//        histogram.append("g")
+//            .attr("transform", "translate(0," + height + ")")
+//            .attr("class", "x_axis");
+//        histogram.append("g").attr("class", "y_axis");
 
         // Create group for histogram bars
         histogram.append("g").attr("class", "bar_group_outliers");
@@ -228,16 +228,16 @@ function Histogram(json_data) {
     	//I think we can assume that x_data has already been populated here
     	var x_data_out = this.getXDataOutliers();
         var x_values_out = this.getOutlierValues(x_data_out);
-        
+
         if(x_values_out.length == 0) {
         	//No outlier values
         	return;
         }
-        
+
         //Used to calculate the regular scale for the histogram
         var x_data = this.getXData();
         var x_values = this.getXValues(x_data);
-        
+
 
         var min_x = d3.min(x_values_out);
         var max_x = d3.max(x_values_out);
@@ -262,20 +262,20 @@ function Histogram(json_data) {
         var histogram = d3.layout.histogram()
             .frequency(false)
             .bins(ticks);
-        
+
         var data = histogram(x_values_out);
       //Use the yScale from the original histogram data
         var histogram_scale = d3.layout.histogram()
         .frequency(false)
         .bins(ticks);
         var data_scale = histogram_scale(x_values);
-        
+
         var yScale = d3.scale.linear()
             .domain([0, d3.max(data_scale, function(d) { return d.y; })])
             .range([height, 0]);
 
         var cutoff = +document.getElementById("cutoff").value;
-        
+
         this.updateBarsOutliers(data, xScale, yScale, bin_width + min_x, cutoff);
     }
     
@@ -323,12 +323,15 @@ function Histogram(json_data) {
 
     this.updateAxes = function(xScale, yScale) {
     	//Check to make sure this transforms both axis
-        d3.select(".x_axis")
+        d3.select("#histogramVis .x_axis")
             .attr("transform", "translate(0," + height + ")")
             .call(d3.svg.axis()
                 .scale(xScale)
-                .orient("bottom"));
-        d3.select(".y_axis")
+                .orient("bottom"))
+            .selectAll("text")
+            .attr("transform", "rotate(-45)")
+            .style("text-anchor", "end");
+        d3.select("#histogramVis .y_axis")
             .call(d3.svg.axis()
                 .scale(yScale)
                 .orient("left"));
@@ -386,7 +389,7 @@ function Histogram(json_data) {
             		indexStr = indexStr+String(data_points[i].row)+","+String(data_points[i].col)+";";
             		i++;
             	}
-            	
+
             	return indexStr.slice(0, - 1);
             })
             .attr("height", function(d) { return height - yScale(d.y); })
