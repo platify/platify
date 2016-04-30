@@ -70,7 +70,7 @@ function Scatter_control() {
 	              .range([ 0, width ]);
 	    
 	    var y = d3.scale.linear()
-	    	      .domain([0, d3.max(positive.concat(negative), function(d) { return d[1]; })])
+	    	      .domain([d3.min(positive.concat(negative), function(d) { return +d[1]; }), d3.max(positive.concat(negative), function(d) { return +d[1]; })])
 	    	      .range([ height, 0 ]);
 	    
 	    var chart = d3.select('#scatterplot_control')
