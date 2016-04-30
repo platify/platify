@@ -86,8 +86,7 @@ function Scatter_control() {
 		.attr('class', 'main')   
 	        
 		
-		var plates = ["Mon","Tues","Wed","Thurs","Fri","Sat","Sun"];
-	    var formatDay = function(d) {
+	    var formatPlate = function(d) {
 	    	//plateLabels.push([i, plateIdx]);
 	        return plateLabels[d];      
 	    }
@@ -96,7 +95,7 @@ function Scatter_control() {
 	    // draw the x axis
 	    var xAxis = d3.svg.axis()
 		.scale(x)
-		.orient('bottom').tickFormat(formatDay);;
+		.orient('bottom').tickFormat(formatPlate);
 
 	    main.append('g')
 		.attr('transform', 'translate(0,' + height + ')')
