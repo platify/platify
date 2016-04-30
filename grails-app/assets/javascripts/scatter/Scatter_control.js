@@ -21,23 +21,30 @@ function Scatter_control() {
 			$.each(plate.rows, function(rowIdx, row){
 				$.each(row.columns, function(colIdx ,column){
 					if(column.control == "NEGATIVE") {
-						negative.push([i,column.rawData["smoots"]]);
-						//dotIndex array is 0 indexed
-						self.dotIndexes[i-1] = [rowIdx, colIdx];
-						i = i+1;
+						//negative.push([i,column.rawData["smoots"]]);
+						var keys = Object.keys(column.rawData);
+						if(keys.length > 0){
+							negative.push([i,column.rawData[keys[0]]]);
+							//dotIndex array is 0 indexed
+							self.dotIndexes[i-1] = [rowIdx, colIdx];
+							i = i+1;
+						}
+						
 					}
 					
 					if(column.control == "POSITIVE") {
-						positive.push([j,column.rawData["smoots"]]);
-						//dotIndex array is 0 indexed
-						self.dotIndexes[j-1] = [rowIdx, colIdx];
-						j = j+1;
+						var keys = Object.keys(column.rawData);
+						if(keys.length > 0){
+							positive.push([j,column.rawData[keys[0]]]);
+							//dotIndex array is 0 indexed
+							self.dotIndexes[j-1] = [rowIdx, colIdx];
+							j = j+1;
+						}
 					}
 
 				});
 			});
 		});
-		
 	   
 	    var margin = {top: 20, right: 15, bottom: 60, left: 60}
 	      , width = 960 - margin.left - margin.right
