@@ -1,3 +1,4 @@
+<%@ page import="edu.harvard.capstone.user.Scientist" %>
 <!DOCTYPE html>
 <html>
 	<head lang="en">
@@ -15,7 +16,7 @@
 						<li><g:link controller="experimentalPlateSet" action="index">Assays</g:link></li>
 						<li>Show Assay</li>
 					</ol>
-					<div class="col-sm-6">
+					<div class="col-sm-8">
 						<div id="expDetailsPanel" class="panel panel-default">
 							<div class="panel-heading">
 								<h4 class="panel-title">Assay Details</h4>
@@ -23,18 +24,20 @@
 							<div class="panel-body ">
 								<h4>Assay ID: ${experimentalPlateSetInstance.id}</h4>
 								<h4>Assay Description: ${experimentalPlateSetInstance.description}</h4>
-								<h4>Assay Owner: ${experimentalPlateSetInstance.owner}</h4>
+								<h4>Assay Owner: ${experimentalPlateSetInstance.owner.firstName} ${experimentalPlateSetInstance.owner.lastName}</h4>
 							</div>
 						</div>
 					</div>
-					<div class="col-sm-6">
+					<div class="col-sm-4">
 						<div id="expActionPanel" class="panel panel-default">
 							<div class="panel-heading">
-								<h4 class="panel-title">Add New Plate to Assay:</h4>
+								<h4 class="panel-title">Add New Plate:</h4>
 							</div>
-							<div class="panel-body">
-								<g:link id="${experimentalPlateSetInstance.id}" action="selectTemplate" class="btn btn-info btn-sm">Select Existing Template</g:link>
-								<button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#createTemplateModal">Create New Template</button>
+							<div class="panel-body" style="text-align: center">
+								<g:link id="${experimentalPlateSetInstance.id}" action="selectTemplate" class="btn btn-info btn-md">Create Plate</g:link>
+								%{--<button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#createTemplateModal">Create New Template</button>--}%
+                                &nbsp; or &nbsp;
+                                <button type="button" class="btn btn-info btn-md" data-toggle="modal" data-target="#clonePlateModal">Clone Plate</button>
 							</div>
 						</div>
 					</div>
@@ -104,5 +107,6 @@
 		
 		<g:render template="/plateTemplate/createTemplateDialog"/>
 		<g:render template="/experimentalPlateSet/viewSavedPlateDialog"/>
+        <g:render template="/experimentalPlateSet/clonePlateDialog"/>
 	</body>
 </html>

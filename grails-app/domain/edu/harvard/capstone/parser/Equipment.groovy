@@ -15,7 +15,7 @@ class Equipment {
     	machineName nullable: true, blank: true
     	description nullable: true, blank: true
     	config nullable: true, blank: true
-    }
+	}
 
 	static mapping = {
 		description type: 'text'

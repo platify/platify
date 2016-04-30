@@ -35,13 +35,20 @@
 								  <tr>
 								    <td  ><label for="parsingName">Parsing Name</label></td>
 								    <td  ><input type="text" id="parsingName" autocomplete="off"/></td>
+
+                                    <td  ><label for="numberOfWellRows"># of Plate Rows</label></td>
+                                    <td  ><input type="text" id="numberOfWellRows" autocomplete="off"/></td>
+
+                                    <td  ><label for="numberOfWellColumns"># of Plate Columns</label></td>
+                                    <td  ><input type="text" id="numberOfWellColumns" autocomplete="off"/></td>
+
 								    <td  ><label for="machineName">Machine</label></td>
 								    <td ><input type="text" id="machineName" autocomplete="off"/></td>
 								  </tr>
-								  <tr>
-								    <td ><label for="parsingDescription">Parsing Description</label></td>
-								    <td  colspan="3"><textarea rows="2" cols="100" id="parsingDescription" ></textarea> </td>
-								  </tr>
+									<tr>
+										<td ><label for="parsingDescription">Parsing Description</label></td>
+										<td  colspan="3"><textarea rows="2" cols="100" id="parsingDescription" ></textarea> </td>
+									</tr>
 								</table>
                     		</h5>
                     	</div>

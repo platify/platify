@@ -168,6 +168,9 @@ function ServerCommunicator(hostname) {
             verb = "PUT";
             urlSuffix = ServerCommunicator.UPDATE_PARSING_CONFIG_URL_SUFFIX + parsingID;
         }
+        console.log("########################## ");
+        console.log(parsingConfig.getJSONObject());
+        console.log("########################## ");
 
         var jqxhr = $.ajax({
             url: _self.hostname + urlSuffix,

@@ -43,33 +43,38 @@
 												<g:sortableColumn property="id" title="#" />
 			
 												<g:sortableColumn property="name" title="${message(code: 'equipment.name.label', default: 'Name')}" />
-												
+
 												<g:sortableColumn property="machineName" title="${message(code: 'equipment.machine.label', default: 'Machine')}" />
 											
 												<g:sortableColumn property="description" title="${message(code: 'equipment.description.label', default: 'Description')}" />
-			
+
 												<g:sortableColumn property="dateCreated" title="${message(code: 'equipment.date.label', default: 'Date')}" />
-																			
+
 												<th>Parse</th>
 												<th>Delete</th>
-											
+												<g:sortableColumn property="config" title="${message(code:
+														'equipment.config.label', default: 'Config')}" />
+
+
 											</tr>
 										</thead>
 										<tbody>
 										<g:each in="${equipmentInstanceList}" status="i" var="equipmentInstance">
 											
 											<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
-											
+
 												<td>${equipmentInstance.id}</td>
 			
 												<td>${fieldValue(bean: equipmentInstance, field: "name")}</td>
-			
+
 												<td>${fieldValue(bean: equipmentInstance, field: "machineName")}</td>
 											
 												<td>${fieldValue(bean: equipmentInstance, field: "description")}</td>
-			
+
 												<td>${fieldValue(bean: equipmentInstance, field: "dateCreated")}</td>
-											
+
+
+
 												<td>
 													<g:link id="${equipmentInstance.id}" action="load"><button class="btn btn-info btn-xs">View</button></g:link>
 												</td>	
@@ -80,9 +85,18 @@
 													</g:if>
 													<g:if test="${!equipmentInstance?.canUpdate()}">
 														<button class="btn btn-xs">--NA--</button>
-													</g:if>	
-												</td>	
-											
+													</g:if>
+												</td>
+
+												<td>
+													<button type="button" class="btn btn-info" data-toggle="collapse"
+															data-target="#config-${i}">+</button>
+													<div id="config-${i}" class="collapse">
+														${fieldValue(bean:
+																equipmentInstance, field: "config")}
+													</div>
+												</td>
+
 											</tr>
 			
 										</g:each>

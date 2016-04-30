@@ -36,11 +36,15 @@ ParsingConfig.WELL_COL_FACTOR = 3;
  */
 function ParsingConfig(name,
                        machineName,
+                       numberOfWellRows,
+                       numberOfWellColumns,
                        description,
                        delimiter){
 	this.id = null;
 	this.name = name;
     this.machineName = machineName;
+    this.numberOfWellRows = numberOfWellRows;
+    this.numberOfWellColumns = numberOfWellColumns;
     this.description = description;
     this.delimiter = delimiter;
     this.plate = null;
@@ -149,12 +153,46 @@ function ParsingConfig(name,
     };
 
     /**
+     * A getter for the description of the calling ParsingConfig object
+     * @returns {*} - the description of the calling ParsingConfig object
+     */
+    this.getNumberOfWellRows = function(){
+        return this.numberOfWellRows;
+    };
+
+    /**
+     * A getter for the description of the calling ParsingConfig object
+     * @returns {*} - the description of the calling ParsingConfig object
+     */
+    this.getNumberOfWellColumns = function(){
+        return this.numberOfWellColumns;
+    };
+
+    /**
      * A setter for the description of the calling ParsingConfig object
      * @param parsingDescription - the description to set on the calling ParsingConfig
      *                          object
      */
     this.setDescription = function(parsingDescription){
         this.description = parsingDescription;
+    };
+
+    /**
+     * A setter for the description of the calling ParsingConfig object
+     * @param parsingwellRows - the description to set on the calling ParsingConfig
+     *                          object
+     */
+    this.setNumberOfWellRows = function(numberOfWellRows){
+        this.description = numberOfWellRows;
+    };
+
+    /**
+     * A setter for the description of the calling ParsingConfig object
+     * @param parsingwellColumns - the description to set on the calling ParsingConfig
+     *                          object
+     */
+    this.setWellColumns = function(numberOfWellColumns){
+        this.description = numberOfWellColumns;
     };
 
     /**
@@ -683,6 +721,8 @@ function ParsingConfig(name,
         JSONObject["id"] = this.getID();
         JSONObject["name"] = this.getName();
         JSONObject["machineName"] = this.getMachineName();
+        JSONObject["numberOfWellRows"] = this.getNumberOfWellRows();
+        JSONObject["numberOfWellColumns"] = this.getNumberOfWellColumns();
         JSONObject["description"] = this.getDescription();
         JSONObject["delimiter"] = this.getDelimiter();
         JSONObject["plate"] = this.plate;
@@ -774,6 +814,8 @@ function ParsingConfig(name,
         _self.id = null;
         _self.setName(name);
         _self.setMachineName(machineName);
+        _self.setNumberOfWellRows(numberOfWellRows);
+        _self.setWellColumns(numberOfWellColumns);
         _self.setDescription(description);
         _self.setDelimiter(delimiter);
         _self.plate = null;
@@ -801,6 +843,8 @@ ParsingConfig.loadParsingConfig = function(JSONParsingConfig){
     var config = new ParsingConfig(
     	rawParsingConfig.name,
         rawParsingConfig.machineName,
+        rawParsingConfig.numberOfWellRows,
+        rawParsingConfig.numberOfWellColumns,
         rawParsingConfig.description,
         rawParsingConfig.delimiter);
 
