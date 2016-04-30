@@ -14,6 +14,7 @@ function Scatter_control() {
 		var j = 0;
 		var positive = [];
 		var negative = [];
+		var plateLabels = Array();
 		
 		self = this;
 		
@@ -27,6 +28,8 @@ function Scatter_control() {
 							negative.push([i,column.rawData[keys[0]]]);
 							//dotIndex array is 0 indexed
 							self.dotIndexes[i-1] = [rowIdx, colIdx];
+							//Plate plateIdx applies to all indexes "i" or lower
+							plateLabels[i] = plateIdx+":"+plate.plateID;
 							i = i+1;
 						}
 						
@@ -38,12 +41,24 @@ function Scatter_control() {
 							positive.push([j,column.rawData[keys[0]]]);
 							//dotIndex array is 0 indexed
 							self.dotIndexes[j-1] = [rowIdx, colIdx];
+							//Plate plateIdx applies to all indexes "i" or lower
+							plateLabels[j] = plateIdx+":"+plate.plateID;
 							j = j+1;
 						}
 					}
 
 				});
 			});
+			if(i > j) {
+				//let j catch up
+				j = i;
+			}
+			if(j > i) {
+				//let i catch up
+				i = j;
+			}
+			
+			
 		});
 	   
 	    var margin = {top: 20, right: 15, bottom: 60, left: 60}
@@ -70,10 +85,18 @@ function Scatter_control() {
 		.attr('height', height)
 		.attr('class', 'main')   
 	        
+		
+		var plates = ["Mon","Tues","Wed","Thurs","Fri","Sat","Sun"];
+	    var formatDay = function(d) {
+	    	//plateLabels.push([i, plateIdx]);
+	        return plateLabels[d];      
+	    }
+	    
+	    
 	    // draw the x axis
 	    var xAxis = d3.svg.axis()
 		.scale(x)
-		.orient('bottom');
+		.orient('bottom').tickFormat(formatDay);;
 
 	    main.append('g')
 		.attr('transform', 'translate(0,' + height + ')')
@@ -89,8 +112,8 @@ function Scatter_control() {
 		.attr('transform', 'translate(0,0)')
 		.attr('class', 'main axis date')
 		.call(yAxis);
-	    
-	    
+	   
+
 
 	    var g = main.append("svg:g"); 
 	    var self = this;
