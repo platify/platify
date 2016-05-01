@@ -185,7 +185,8 @@ class FitDoseResponseCurveService {
 
         def resultData = [
                 experimentID: experiment.id,
-                plates     : []
+                plates     : [],
+                compounds: [:]
         ]
 
         Result.findAllByExperiment(experiment).each { resultInstance ->
@@ -218,16 +219,17 @@ class FitDoseResponseCurveService {
                         plate.rows[well.row].columns[well.column].control = well.control.toString().toUpperCase()
                     }
                 }
-                DomainLabel.where {
-                    domainId in wellsById.keySet()
-                    labelType == DomainLabel.LabelType.WELL
-                }.each { domainLabel ->
-                    def well = wellsById[domainLabel.domainId]
-                    def wellOut = plate.rows[well.row].columns[well.column]
-                    def label = domainLabel.label
-                    wellOut.labels[label.category] = replaceDot(label.name)
-                    if (label.category == "dosage") {
-                        wellOut.labels["units"] = label.units
+                DomainLabel.findAllByPlate(plateSet).each { domainLabel ->
+                    if (domainLabel.domainId in wellsById.keySet() &&
+                            domainLabel.labelType == DomainLabel.LabelType.WELL)
+                    {
+                        def well = wellsById[domainLabel.domainId]
+                        def wellOut = plate.rows[well.row].columns[well.column]
+                        def label = domainLabel.label
+                        wellOut.labels[label.category] = replaceDot(label.name)
+                        if (label.category == "dosage") {
+                            wellOut.labels["units"] = label.units
+                        }
                     }
                 }
 
@@ -257,8 +259,10 @@ class FitDoseResponseCurveService {
                     r.columns.each { c ->
                         if (c.control == Well.WellControl.COMPOUND.toString().toUpperCase() &&
                                 "dosage" in c.labels.keySet() &&
-                                "raw_data" in c.labels.keySet())
+                                "raw_data" in c.labels.keySet()) {
                             plate.compounds[c.labels["compound"]]=1
+                            resultData.compounds[c.labels["compound"]]=1
+                        }
                     }
                 }
 
