@@ -52,10 +52,6 @@
 
 												<th>Parse</th>
 												<th>Delete</th>
-												<g:sortableColumn property="config" title="${message(code:
-														'equipment.config.label', default: 'Config')}" />
-
-
 											</tr>
 										</thead>
 										<tbody>
@@ -74,7 +70,6 @@
 												<td>${fieldValue(bean: equipmentInstance, field: "dateCreated")}</td>
 
 
-
 												<td>
 													<g:link id="${equipmentInstance.id}" action="load"><button class="btn btn-info btn-xs">View</button></g:link>
 												</td>	
@@ -86,15 +81,6 @@
 													<g:if test="${!equipmentInstance?.canUpdate()}">
 														<button class="btn btn-xs">--NA--</button>
 													</g:if>
-												</td>
-
-												<td>
-													<button type="button" class="btn btn-info" data-toggle="collapse"
-															data-target="#config-${i}">+</button>
-													<div id="config-${i}" class="collapse">
-														${fieldValue(bean:
-																equipmentInstance, field: "config")}
-													</div>
 												</td>
 
 											</tr>

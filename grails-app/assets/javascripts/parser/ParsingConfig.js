@@ -36,15 +36,15 @@ ParsingConfig.WELL_COL_FACTOR = 3;
  */
 function ParsingConfig(name,
                        machineName,
-                       numberOfWellRows,
-                       numberOfWellColumns,
+                       plateDimensions,
+                       assayType,
                        description,
                        delimiter){
 	this.id = null;
 	this.name = name;
     this.machineName = machineName;
-    this.numberOfWellRows = numberOfWellRows;
-    this.numberOfWellColumns = numberOfWellColumns;
+    this.plateDimensions = plateDimensions;
+    this.assayType = assayType;
     this.description = description;
     this.delimiter = delimiter;
     this.plate = null;
@@ -156,16 +156,16 @@ function ParsingConfig(name,
      * A getter for the description of the calling ParsingConfig object
      * @returns {*} - the description of the calling ParsingConfig object
      */
-    this.getNumberOfWellRows = function(){
-        return this.numberOfWellRows;
+    this.getPlateDimensions = function(){
+        return this.plateDimensions;
     };
 
     /**
      * A getter for the description of the calling ParsingConfig object
      * @returns {*} - the description of the calling ParsingConfig object
      */
-    this.getNumberOfWellColumns = function(){
-        return this.numberOfWellColumns;
+    this.getAssayType = function(){
+        return this.assayType;
     };
 
     /**
@@ -179,20 +179,20 @@ function ParsingConfig(name,
 
     /**
      * A setter for the description of the calling ParsingConfig object
-     * @param parsingwellRows - the description to set on the calling ParsingConfig
+     * @param plateDimensions - the description to set on the calling ParsingConfig
      *                          object
      */
-    this.setNumberOfWellRows = function(numberOfWellRows){
-        this.description = numberOfWellRows;
+    this.setPlateDimensions = function(plateDimensions){
+        this.description = plateDimensions;
     };
 
     /**
      * A setter for the description of the calling ParsingConfig object
-     * @param parsingwellColumns - the description to set on the calling ParsingConfig
+     * @param assayType - the description to set on the calling ParsingConfig
      *                          object
      */
-    this.setWellColumns = function(numberOfWellColumns){
-        this.description = numberOfWellColumns;
+    this.setAssayType = function(assayType){
+        this.assayType = assayType;
     };
 
     /**
@@ -721,8 +721,8 @@ function ParsingConfig(name,
         JSONObject["id"] = this.getID();
         JSONObject["name"] = this.getName();
         JSONObject["machineName"] = this.getMachineName();
-        JSONObject["numberOfWellRows"] = this.getNumberOfWellRows();
-        JSONObject["numberOfWellColumns"] = this.getNumberOfWellColumns();
+        JSONObject["plateDimensions"] = this.getPlateDimensions();
+        JSONObject["assayType"] = this.getAssayType();
         JSONObject["description"] = this.getDescription();
         JSONObject["delimiter"] = this.getDelimiter();
         JSONObject["plate"] = this.plate;
@@ -814,8 +814,8 @@ function ParsingConfig(name,
         _self.id = null;
         _self.setName(name);
         _self.setMachineName(machineName);
-        _self.setNumberOfWellRows(numberOfWellRows);
-        _self.setWellColumns(numberOfWellColumns);
+        _self.setPlateDimensions(plateDimensions);
+        _self.setAssayType(assayType);
         _self.setDescription(description);
         _self.setDelimiter(delimiter);
         _self.plate = null;
@@ -843,8 +843,8 @@ ParsingConfig.loadParsingConfig = function(JSONParsingConfig){
     var config = new ParsingConfig(
     	rawParsingConfig.name,
         rawParsingConfig.machineName,
-        rawParsingConfig.numberOfWellRows,
-        rawParsingConfig.numberOfWellColumns,
+        rawParsingConfig.plateDimensions,
+        rawParsingConfig.assayType,
         rawParsingConfig.description,
         rawParsingConfig.delimiter);
 
