@@ -350,12 +350,12 @@ function StdCurve() {
             .range([height, 0]);
 
         // Create graph axes
-        graph.select(".x_axis")
+        graph.select("#stdCurveVis .x_axis")
             .attr("transform", "translate(0," + height + ")")
             .call(d3.svg.axis()
                 .scale(x_scale)
                 .orient("bottom"));
-        graph.select(".y_axis")
+        graph.select("#stdCurveVis .y_axis")
             .call(d3.svg.axis()
                 .scale(y_scale)
                 .orient("left"));
@@ -409,7 +409,7 @@ function StdCurve() {
             .y(function(d) { return y_scale(d[1]); });
 
         if (fitModel == null) {
-            graph.selectAll("path.line").attr("d", line([]));
+            graph.selectAll("#stdCurveVis path.line").attr("d", line([]));
             return;
         }
 
@@ -427,7 +427,7 @@ function StdCurve() {
             return d3.ascending(a[0], b[0]);
         });
 
-        graph.selectAll("path.line")
+        graph.selectAll("#stdCurveVis path.line")
             .attr("d", line(interpolated_points))
             .attr("stroke", "lightblue")
             .attr("fill", "none");
