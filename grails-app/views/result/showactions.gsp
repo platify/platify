@@ -167,6 +167,7 @@
                             <div id="histogramOutliers"></div>
                         </div>
                         <div class="col-md-3" style="height:600px;overflow: auto;">
+                            <h4><b>Cut-Off Table</b></h4>
                             <div id="cutoffTable"></div>
                         </div>
                     </div>
