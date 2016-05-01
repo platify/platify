@@ -343,10 +343,24 @@ function Histogram(json_data) {
                 .orient("left"));
     }
 
+    
+  //This will sort your array
+    this.sortByValue = function (a, b){
+    	var sortVal = ((parseFloat(a.value) < parseFloat(b.value)) ? 1 : 0);
+      return sortVal;
+    }
+
+    
     this.updateBars = function(data, xScale, yScale, bin_width_from_min_x, cutoff) {
         var bar = d3.select(".bar_group").selectAll(".bar")
             .data(data);
         var i = 0;
+        var sortedPoints = data_points.slice();
+        var tmp = sortedPoints.sort(function(a, b){
+        	
+        	return a.value-b.value;
+        });
+        
         bar.enter().append("rect");
         //In the "indexes" attr here, use the global data var, and an incrementing index
         bar.attr("class", "bar")
@@ -354,7 +368,7 @@ function Histogram(json_data) {
             .attr("indexes", function(d){
             	var indexStr = "";
             	for(var sample = 0; sample < d.length; sample++) {
-            		indexStr = indexStr+String(data_points[i].row)+","+String(data_points[i].col)+";";
+            		indexStr = indexStr+String(sortedPoints[i].row)+","+String(sortedPoints[i].col)+";";
             		i++;
             	}
             	

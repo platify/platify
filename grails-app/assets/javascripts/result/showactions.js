@@ -9,6 +9,9 @@ var stdCurve;
 var plateTableTools;
 var showHeatMap = true;
 var showNormalized = false;
+//This is a hack to prevent complications of clicks being recorded across
+//multiple elements in JavaScript -- only the first click is recorded
+var markingAsOutlier = true;
 
 
 function cellFormatter(row, cell, value, columnDef, dataContext) {
@@ -234,9 +237,36 @@ function init() {
             histogram.updateGraphOutlier();
      });
     
-    
+    //This will make sure all the items are marked as outliers. Should only
+    //be called if the "outlier histogram" does not exist
     $("g.bar_group").on('click', 'rect', function(event){
-    	markOutlierHistogramClick(event);
+    	var indexes = $(event.target).attr('indexes');
+    	markOutlierHistogramClick(indexes, true);
+    });
+    
+    //This will "unmark" all items as outliers
+    $("g.bar_group_outliers").on('click', 'rect', function(event){
+    	//Mark this boolean and let it fall through to click on the underlying histogram,
+    	//so that we can get the correct value indexes
+    	markingAsOutlier = false;
+    	//var indexes = $(event.target).attr('indexes');
+    	//markOutlierHistogramClick(indexes, false);
+    });
+    
+    //Ths will mark all the items as outliers
+    $('#histogramOutliers').click(function(e){
+    	$('#histogramOutliers').attr('style','display:none;');
+    	var x = e.pageX-window.pageXOffset;
+    	var y = e.pageY-window.pageYOffset;
+    	var element = document.elementFromPoint(parseInt(x), parseInt(y));
+    	$('#histogramOutliers').removeAttr('style');
+    	if(element != null) {
+    		if(element.hasAttribute("indexes")) {
+        		markOutlierHistogramClick(element.getAttribute("indexes"), markingAsOutlier);
+        	}
+    	}
+    	markingAsOutlier = true;
+    	
     });
 
     // add scatterplot outlier listener
@@ -247,26 +277,19 @@ function init() {
     var resultUI = new ResultUI();
 }
 
-function markOutlierHistogramClick(event) {
+function markOutlierHistogramClick(indexes, isOutlier) {
 	//Get the indexes of the samples that this bar represents 
 	//in the format "row1,col1;ro2,col2;..."
-	var indexes = $(event.target).attr('indexes');
 	indexes = indexes.split(';');
 	for(var i = 0; i < indexes.length; i++) {
 		var rowCol = indexes[i].split(',');
 		var row = rowCol[0];
 		var col = rowCol[1];
-		if(experiment.experiment.plates[0].rows[row].columns[col].outlier == "false") {
-			markOutlierStatus(row, col, true);
-		} else {
-			markOutlierStatus(row, col, false);
-		}
-		
+		markOutlierStatus(row, col, isOutlier);		
 	}
 	//Update entire outlier histogram here
 	histogram.update_data(experiment.experiment);
 	histogram.updateGraphOutlier();
-	
 }
 
 function markOutlierScatterClick(event) {
