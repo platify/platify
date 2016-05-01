@@ -15,7 +15,6 @@ function init() {
 }
 
 $("#doseResponseButton").click(function() {
-
     updateDoseResponseCurve2(replaceDot($("#minParameter").val()),
         replaceDot($("#maxParameter").val()),
         replaceDot($("#ec50Parameter").val()),
@@ -47,6 +46,7 @@ function renderDoseResponseCurve(data) {
 
     }
 
+>>>>>>> 56270e703ced974ef0fc1ac41ce57aae72cdf11d
 }
 
 function zip2(a1, a2)
@@ -85,7 +85,6 @@ function createGraphAndTable() {
 function createAxes(points) {
     var min_x = d3.min(points, function(d) { return d[0]; });
     var max_x = d3.max(points, function(d) { return d[0]; });
-
     x_scale = d3.scale.linear()
         .domain([min_x, max_x])
         .range([0, width]);
@@ -171,6 +170,5 @@ function drawLine(points) {
 function replaceDot(dotString) {
     return dotString.replace("__dot__", ".");
 }
-
 
 window.onload = init;

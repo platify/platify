@@ -1,0 +1,153 @@
+
+$(document).click(function(e) {
+    if (e.shiftKey) {
+      alert("shift+click")
+    }
+    if (e.ctrlKey) {
+      alert("control+click")
+    }
+});
+
+
+
+//key press type
+if (!e.ctrlKey && !e.shiftKey && !e.metaKey) {
+  //normal key
+} else if (_grid.getOptions().multiSelect) {
+  if (e.ctrlKey || e.metaKey) {
+    //ctrl key
+  } else if (e.shiftKey) {
+    //shift key
+  }
+}
+
+
+var _grid, _handler = new Slick.EventHandler();
+function init(grid) {
+  ...
+    _grid = grid;
+  _handler.subscribe(_grid.onClick,
+      wrapHandler(handleClick));
+}
+
+function handleClick(e) {
+  // check shift or ctrl key press...
+  ...
+}
+
+this.grid.onClick.subscribe(function(e, args){
+	alert(JSON.stringify({row: args.row, cell: args.cell}));
+});
+
+
+
+#############################
+this.registerSelectedCellCallBack = function(callBack){
+	this.selectedCellsCallBacks.push(callBack);
+};
+
+_self.grid.registerSelectedCellCallBack(_self.handleSelectedCells);
+
+_self.handleSelectedCells = function(startRow, startCol, endRow, endCol){
+	var range = new CellRange(startRow, startCol, endRow, endCol);
+
+	_self.selectCells(range);
+};
+
+
+// set up some event handlers
+_self.grid.registerSelectedCellCallBack(_self.handleSelectedCells);
+
+selectionModel.onSelectedRangesChanged.subscribe(updateSelectedCells);
+
+function updateSelectedCells(event, data){
+	if (_self.selectionEnabled == true) {
+		_self.selectedStartRow = data[0].fromRow + 1;
+		_self.selectedStartCol = data[0].fromCell;
+		_self.selectedEndRow = data[0].toRow + 1;
+		_self.selectedEndCol = data[0].toCell;
+
+		_self.selectedCellsCallBacks.forEach(function(element){
+			if (data[0].toCell != 0 && data[0].fromCell != 0){
+				element(_self.selectedStartRow,
+					_self.selectedStartCol,
+					_self.selectedEndRow,
+					_self.selectedEndCol
+				)
+			}
+		});
+	}
+}
+
+#############################
+
+
+    _self.handleSelectedCells = function(startRow, startCol, endRow, endCol){
+        var range = new CellRange(startRow, startCol, endRow, endCol);
+
+        _self.selectCells(range);
+    };
+
+
+        _self.grid.registerSelectedCellCallBack(_self.handleSelectedCells);
+
+    this.registerSelectedCellCallBack = function(callBack){
+        this.selectedCellsCallBacks.push(callBack);
+    };
+
+
+    function updateSelectedCells(event, data){
+        if (_self.selectionEnabled == true) {
+            _self.selectedStartRow = data[0].fromRow + 1;
+            _self.selectedStartCol = data[0].fromCell;
+            _self.selectedEndRow = data[0].toRow + 1;
+            _self.selectedEndCol = data[0].toCell;
+
+            _self.selectedCellsCallBacks.forEach(function(element){
+                if (data[0].toCell != 0 && data[0].fromCell != 0){
+                    element(_self.selectedStartRow,
+                        _self.selectedStartCol,
+                        _self.selectedEndRow,
+                        _self.selectedEndCol
+                    )
+                }
+            });
+        }
+    }
+
+
+selectionModel.onSelectedRangesChanged.subscribe(updateSelectedCells);
+
+setFirstPlateCellRange ->  firstPlateRange.toString() -> 
+
+
+FUNCTIONAL PROGRAMMING
+
+
+Do you think functional programming make it easy to write parallel programs?
+Does functional approach make the code more readable?
+Are the programs easier to verify?
+When to use one vs the other?
+Which approach is more likely to introduce bugs in the program? 
+What about Maintainability, code readability?
+Data Immutability about function programming. And is that a good thing?
+
+Does functional programming result in more secure programs?
+https://www.quora.com/Does-functional-programming-result-in-more-secure-programs
+
+Which is the most widely used functional programming language today?
+https://www.quora.com/Which-is-the-most-widely-used-functional-programming-language-today-Oct-2014
+
+Why does functional programming favor concurrency?
+https://www.quora.com/Why-does-functional-programming-favor-concurrency
+
+What does folks on Stackoverflow say? 
+http://stackoverflow.com/questions/4382223/pure-functional-language-haskell?rq=1
+
+How does the performance compare between functional and imperative style of
+programming?
+
+
+functional programming trends.
+
+
