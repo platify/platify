@@ -15,7 +15,7 @@ function Histogram(json_data) {
     }
     
     this.initiateVis = function() {
-        margin = {top: 10, right: 30, bottom: 80, left: 50};
+        margin = {top: 10, right: 40, bottom: 80, left: 50};
         width = 600 - margin.left - margin.right;
         height = 600 - margin.top - margin.bottom;
 
@@ -87,6 +87,7 @@ function Histogram(json_data) {
                     data_points.push({
                         "name": compound_name,
                         "value": +column[data_type][value_label],
+                        "plate": plate.plateID,
                         "row":rowIdx,
                         "col":colIdx,
                         "outlier": column.outlier
@@ -103,8 +104,10 @@ function Histogram(json_data) {
 
         // Calculate & store median and mean values for each compound
         x_data.forEach(function(compound) {
-            var mean = d3.mean(compound.values, function(d) { return d.value; });
-            var median = d3.median(compound.values, function(d) { return d.value; });
+            var mean = d3.mean(compound.values, function(d) {
+                return (!d.outlier || d.outlier.localeCompare("true" !== 0)) ? d.value : null; });
+            var median = d3.median(compound.values, function(d) {
+                return (!d.outlier || d.outlier.localeCompare("true" !== 0)) ? d.value : null; });
 
             compound.mean = +mean;
             compound.median = +median;
@@ -168,14 +171,14 @@ function Histogram(json_data) {
         if (replicate_option.localeCompare("none") !== 0) {
             x_data.forEach(function(compound) {
                 if (compound[replicate_option] >= cutoff_value)
-                    cutoff_values.push([compound["key"], compound[replicate_option]]);
+                    cutoff_values.push([compound["key"], d3.format(".3f")(compound[replicate_option])]);
             })
         }
         else {
              x_data.forEach(function(compound) {
                 compound.values.forEach(function(data) {
-                    if (data.value >= cutoff_value)
-                        cutoff_values.push([compound["key"], data.value, data.row, data.col]);
+                    if (data.value >= cutoff_value && (!data.outlier || data.outlier.localeCompare("true") !== 0))
+                        cutoff_values.push([compound["key"], d3.format(".3f")(data.value), data.plate + "[" + data.row + "," + data.col + "]"]);
                 });
             });
         }

@@ -28,13 +28,11 @@ class DoseResponseController {
 
         def experimentList = ExperimentalPlateSet.listOrderByName();
         def eL = []
+        def resultData
         experimentList.each { e ->
-            def plates = PlateSet.findAllByExperiment(e)
-            if (plates.size()>0) {
-                def results = Result.findAllByExperiment(e)
-                if (results.size() > 0) {
-                    eL << e
-                }
+            resultData = fitDoseResponseCurveService.getData(e)
+            if (resultData.compounds.size()>0) {
+                eL << e
             }
         }
 
@@ -49,7 +47,7 @@ class DoseResponseController {
         try{
             def experiment = ExperimentalPlateSet.findById(experiment_id);
             resultData = fitDoseResponseCurveService.getData(experiment)
-            render g.select(id:"compoundSelect", name:"compound", from:resultData.plates[0].compounds.keySet(),
+            render g.select(id:"compoundSelect", name:"compound", from:resultData.compounds.keySet(),
                     noSelection:[null:' '], onchange:"updateDoseResponseCurve(this.value)")
             return resultData
         }
