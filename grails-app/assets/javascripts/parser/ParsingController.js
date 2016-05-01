@@ -119,6 +119,8 @@ function ParsingController(){
                 _self.parserUI.setParsingName(_self.parsingConfig.getName());
                 _self.parserUI.setMachineName(_self.parsingConfig.getMachineName());
                 _self.parserUI.setParsingDescription(_self.parsingConfig.getDescription());
+                _self.parserUI.setPlateDimensions(_self.parsingConfig.getPlateDimensions());
+                _self.parserUI.setAssayType(_self.parsingConfig.getAssayType());
                 _self.parserUI.setDelimiter(_self.parsingConfig.getDelimiter());
             }
 
@@ -230,6 +232,7 @@ function ParsingController(){
 
 
     }
+
 
     function selectCellsFeatures(range){
         // remove previous highlighting
@@ -400,6 +403,8 @@ function ParsingController(){
         _self.grid.scrollToRow(_self.plates[plateIndex][0]);
     };
 
+
+
     _self.setPlateLevelFeatureAsPlateID = function(featureName){
         var featureValueArray = DataExtractor.findPlateLevelFeatureValues(featureName,
                                                                           _self.plates,
@@ -506,20 +511,26 @@ function ParsingController(){
         var parseId = _self.parserUI.getParsingID();
         var parseName = _self.parserUI.getParsingName();
         var machine = _self.parserUI.getMachineName();
+        var plateDimensions = _self.parserUI.getPlateDimensions();
+        var assayType = _self.parserUI.getAssayType();
         var description = _self.parserUI.getParsingDescription();
         var delimiter = _self.parserUI.getSelectedDelimiter();
 
 
         if (_self.parsingConfig){
-            console.log( _self.parsingConfig);
             _self.parsingConfig.setID(parseId);
             _self.parsingConfig.setName(parseName);
             _self.parsingConfig.setMachineName(machine);
+            _self.parsingConfig.setPlateDimensions(plateDimensions);
+            _self.parsingConfig.setAssayType(assayType);
             _self.parsingConfig.setDescription(description);
             _self.parsingConfig.setDelimiter(delimiter);
+            console.log( _self.parsingConfig);
         } else {
             _self.parsingConfig = new ParsingConfig(parseName,
                 machine,
+                plateDimensions,
+                assayType,
                 description,
                 delimiter);
         }

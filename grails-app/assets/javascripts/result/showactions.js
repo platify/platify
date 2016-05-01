@@ -94,6 +94,10 @@ function downloadExperiment(fileformat) {
             generator.forceJSONDownload(filename);
             break;
 
+        case 'xml':
+            generator.forceXMLDownload(filename);
+            break;
+
         case 'csv':
         default:
             generator.forceCSVDownload(filename);
@@ -227,6 +231,7 @@ function init() {
     // add histogram button listener
     $('#histogramButton').on('click', function(event) {
             histogram.updateGraph();
+            histogram.updateGraphOutlier();
      });
     
     
@@ -394,10 +399,10 @@ function markAllCurrentOutliers() {
 		  //Update the outlier histogram. This, in effect updates the "CSS" for the histogram
 		  //because it rebuilds the histogram representing the outliers, based on the current
 		  //"outlier" set of data in var experiment
-		  if(histogram != null) {
-			  histogram.update_data(experiment.experiment);
-			  histogram.updateGraphOutlier();
-		  }
+//		  if(histogram != null) {
+//			  histogram.update_data(experiment.experiment);
+//			  histogram.updateGraphOutlier();
+//		  }
 
     	});
     });

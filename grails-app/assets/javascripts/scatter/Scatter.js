@@ -22,16 +22,16 @@ function Scatter() {
 			});
 		});
 	   
-	    var margin = {top: 20, right: 15, bottom: 60, left: 60}
+	    var margin = {top: 30, right: 30, bottom: 60, left: 60}
 	      , width = 960 - margin.left - margin.right
 	      , height = 500 - margin.top - margin.bottom;
 	    
 	    var x = d3.scale.linear()
-	              .domain([0, d3.max(data, function(d) { return d[0]; })])
+	              .domain([d3.min(data, function(d) { return +d[0]; }), d3.max(data, function(d) { return +d[0]; })])
 	              .range([ 0, width ]);
 	    
 	    var y = d3.scale.linear()
-	    	      .domain([0, d3.max(data, function(d) { return d[1]; })])
+	    	      .domain([d3.min(data, function(d) { return +d[1]; }), d3.max(data, function(d) { return +d[1]; })])
 	    	      .range([ height, 0 ]);
 	    
 	    var chart = d3.select('#scatterplot')

@@ -15,7 +15,7 @@ function Histogram(json_data) {
     }
     
     this.initiateVis = function() {
-        margin = {top: 10, right: 30, bottom: 80, left: 50};
+        margin = {top: 10, right: 40, bottom: 80, left: 50};
         width = 600 - margin.left - margin.right;
         height = 600 - margin.top - margin.bottom;
 
@@ -28,6 +28,7 @@ function Histogram(json_data) {
         var x_data = [];
         var data_points = [];
         var self = this;
+        var data_type = ($('#normalizeButton').is(":checked")) ? "normalizedData" : "rawData";
         $.each(json_data.plates, function(plateIdx, plate){
             $.each(plate.rows, function (rowIdx, row) {
                 $.each(row.columns, function(colIdx, column){
@@ -39,18 +40,17 @@ function Histogram(json_data) {
 
                         data_points.push({
                             "name": compound_name,
-                            "value": +column.rawData[value_label],
+                            "value": +column[data_type][value_label],
                             "row":rowIdx,
                             "col":colIdx,
                             "outlier": column.outlier
                         });
-                    	
                     }
-
                 });
             });
         });
-        //x-data is in a more useful format before this
+
+        //x-data is in a more useful format than before this
         // Group data by compound name
         x_data = d3.nest().key(function(d) {
             return d.name;
@@ -73,6 +73,8 @@ function Histogram(json_data) {
         x_data = [];
         data_points = [];
         var self = this;
+        var data_type = ($('#normalizeButton').is(":checked")) ? "normalizedData" : "rawData";
+
         $.each(json_data.plates, function(plateIdx, plate){
             $.each(plate.rows, function (rowIdx, row) {
                 $.each(row.columns, function(colIdx, column){
@@ -84,7 +86,8 @@ function Histogram(json_data) {
 
                     data_points.push({
                         "name": compound_name,
-                        "value": +column.rawData[value_label],
+                        "value": +column[data_type][value_label],
+                        "plate": plate.plateID,
                         "row":rowIdx,
                         "col":colIdx,
                         "outlier": column.outlier
@@ -92,7 +95,8 @@ function Histogram(json_data) {
                 });
             });
         });
-        //x-data is in a more useful format before this
+
+        //x-data is in a more useful format than before this
         // Group data by compound name
         x_data = d3.nest().key(function(d) {
             return d.name;
@@ -100,8 +104,10 @@ function Histogram(json_data) {
 
         // Calculate & store median and mean values for each compound
         x_data.forEach(function(compound) {
-            var mean = d3.mean(compound.values, function(d) { return d.value; });
-            var median = d3.median(compound.values, function(d) { return d.value; });
+            var mean = d3.mean(compound.values, function(d) {
+                return (!d.outlier || d.outlier.localeCompare("true" !== 0)) ? d.value : null; });
+            var median = d3.median(compound.values, function(d) {
+                return (!d.outlier || d.outlier.localeCompare("true" !== 0)) ? d.value : null; });
 
             compound.mean = +mean;
             compound.median = +median;
@@ -122,7 +128,6 @@ function Histogram(json_data) {
             	if(compound["outlier"] == "true") {
             		outlier_values.push(compound[replicate_option]);
             	}
-                
             })
         }
         else {
@@ -134,7 +139,7 @@ function Histogram(json_data) {
                 });
             });
         }
-        
+
         return outlier_values;
     }
     
@@ -166,14 +171,14 @@ function Histogram(json_data) {
         if (replicate_option.localeCompare("none") !== 0) {
             x_data.forEach(function(compound) {
                 if (compound[replicate_option] >= cutoff_value)
-                    cutoff_values.push([compound["key"], compound[replicate_option]]);
+                    cutoff_values.push([compound["key"], d3.format(".3f")(compound[replicate_option])]);
             })
         }
         else {
              x_data.forEach(function(compound) {
                 compound.values.forEach(function(data) {
-                    if (data.value >= cutoff_value)
-                        cutoff_values.push([compound["key"], data.value, data.row, data.col]);
+                    if (data.value >= cutoff_value && (!data.outlier || data.outlier.localeCompare("true") !== 0))
+                        cutoff_values.push([compound["key"], d3.format(".3f")(data.value), data.plate + "[" + data.row + "," + data.col + "]"]);
                 });
             });
         }
@@ -239,8 +244,11 @@ function Histogram(json_data) {
         var x_values = this.getXValues(x_data);
 
 
-        var min_x = d3.min(x_values_out);
-        var max_x = d3.max(x_values_out);
+        var min_x = d3.min(x_values);
+        var max_x = d3.max(x_values);
+
+        var min_x_out = d3.min(x_values_out);
+        var max_x_out = d3.max(x_values_out);
 
         var bin_width = +document.getElementById('bin_width').value;
         var num_bins;
@@ -260,14 +268,15 @@ function Histogram(json_data) {
             ticks = xScale.ticks(num_bins);
 
         var histogram = d3.layout.histogram()
-            .frequency(false)
+            .frequency(true)
             .bins(ticks);
 
         var data = histogram(x_values_out);
       //Use the yScale from the original histogram data
         var histogram_scale = d3.layout.histogram()
-        .frequency(false)
+        .frequency(true)
         .bins(ticks);
+
         var data_scale = histogram_scale(x_values);
 
         var yScale = d3.scale.linear()
@@ -303,7 +312,7 @@ function Histogram(json_data) {
             ticks = xScale.ticks(num_bins);
 
         var histogram = d3.layout.histogram()
-            .frequency(false)
+            .frequency(true)
             .bins(ticks);
         var data = histogram(x_values);
 

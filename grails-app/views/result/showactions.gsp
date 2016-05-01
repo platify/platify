@@ -33,6 +33,7 @@
 						Plates
 						<span id="downloadButtons" class="pull-right">
 							Download:
+                            <button class="btn btn-info btn-xs" type="submit" data-fileformat="xml">XML</button>
                             <button class="btn btn-info btn-xs" type="submit" data-fileformat="json">JSON</button>
 							<button class="btn btn-info btn-xs" type="submit" data-fileformat="csv">CSV</button>
 							<button class="btn btn-info btn-xs" type="submit" data-fileformat="tsv">TSV</button>
@@ -166,6 +167,7 @@
                             <div id="histogramOutliers"></div>
                         </div>
                         <div class="col-md-3" style="height:600px;overflow: auto;">
+                            <h4><b>Cut-Off Table</b></h4>
                             <div id="cutoffTable"></div>
                         </div>
                     </div>

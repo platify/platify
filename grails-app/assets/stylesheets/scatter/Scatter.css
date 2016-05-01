@@ -36,6 +36,10 @@ circle {
 	position:relative;
 }
 
+#histogramOutliers svg g .bar_group_outliers .bar {
+	opacity:.6;
+}
+
 svg {
 	padding:20px;
 }
