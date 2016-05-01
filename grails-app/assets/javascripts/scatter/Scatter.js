@@ -31,7 +31,7 @@ function Scatter() {
 	              .range([ 0, width ]);
 	    
 	    var y = d3.scale.linear()
-	    	      .domain([d3.min(data, function(d) { return +d[0]; }), d3.max(data, function(d) { return +d[1]; })])
+	    	      .domain([d3.min(data, function(d) { return +d[1]; }), d3.max(data, function(d) { return +d[1]; })])
 	    	      .range([ height, 0 ]);
 	    
 	    var chart = d3.select('#scatterplot')
