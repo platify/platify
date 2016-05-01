@@ -6,6 +6,7 @@ var plateTable;
 var scatterPlot;
 var scatterControl;
 var stdCurve;
+var drCurve;
 var plateTableTools;
 var showHeatMap = true;
 var showNormalized = false;
@@ -185,6 +186,10 @@ function init() {
     // Set up histogram
     histogram = new Histogram(experiment.experiment);
     histogram.initiateVis();
+
+    // Set up dose response curve
+    drCurve = new DoseResponseCurve(experiment);
+    drCurve.init();
 
     // process experiment object
     if (Object.keys(experiment.experiment.plates).length > 0) {
