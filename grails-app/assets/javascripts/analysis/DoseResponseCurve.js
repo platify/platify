@@ -11,9 +11,9 @@ function DoseResponseCurve() {
 
     this.init = function(experiment) {
         this.experiment = experiment;
-        margin = {top: 10, right: 30, bottom: 30, left: 60};
+        margin = {top: 10, right: 30, bottom: 60, left: 60};
         width = 650 - margin.left - margin.right;
-        height = 595 - margin.top - margin.bottom;
+        height = 550 - margin.top - margin.bottom;
 
         createGraphAndTable();
     }
@@ -140,7 +140,7 @@ function DoseResponseCurve() {
             .attr("x", 300 )
             .attr("y", 30 )
             .style("text-anchor", "middle")
-            .text("log10(compound)");
+            .text("log10(dosage)");
 
         graph.select(".y_axis")
             .call(d3.svg.axis()

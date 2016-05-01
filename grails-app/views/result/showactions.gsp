@@ -305,6 +305,7 @@
 
     function updateDoseResponseCurve(compound) {
         COMPOUND = compound;
+    }
 
 %{-- dose response curve end --}%
 
