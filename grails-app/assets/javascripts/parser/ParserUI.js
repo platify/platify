@@ -29,8 +29,8 @@ function ParserUI(parsingController){
     // Parsing
     var parsingNameElement = document.getElementById("parsingName");
     var machineNameElement = document.getElementById("machineName");
-    var wellRowElement = document.getElementById("numberOfWellRows");
-    var wellColumnElement = document.getElementById("numberOfWellColumns");
+    var wellRowElement = document.getElementById("plateDimensions");
+    var wellColumnElement = document.getElementById("assayType");
     var parsingDescriptionElement = document.getElementById("parsingDescription");
     var selectedFileElement = document.getElementById("selectedFile");
     var filesInput = document.getElementById("files");
@@ -101,7 +101,7 @@ function ParserUI(parsingController){
         }
     };
 
-    this.getNumberOfWellRows = function(){
+    this.getPlateDimensions = function(){
         if (_self.parseOnlyModeOn){
             return wellRowElement.innerHTML;
         } else {
@@ -109,16 +109,16 @@ function ParserUI(parsingController){
         }
     };
 
-    this.setNumberOfWellRows = function(numberOfWellRows){
+    this.setPlateDimensions = function(plateDimensions){
         if (_self.parseOnlyModeOn){
-            wellRowElement.innerHTML = numberOfWellRows;
+            wellRowElement.innerHTML = plateDimensions;
         } else {
-            wellRowElement.value = numberOfWellRows;
+            wellRowElement.value = plateDimensions;
         }
     };
 
 
-    this.getNumberOfWellColumns = function(){
+    this.getAssayType = function(){
         if (_self.parseOnlyModeOn){
             return wellColumnElement.innerHTML;
         } else {
@@ -126,11 +126,11 @@ function ParserUI(parsingController){
         }
     };
 
-    this.setNumberOfWellColumns = function(numberOfWellColumns){
+    this.setAssayType = function(assayType){
         if (_self.parseOnlyModeOn){
-            wellColumnElement.innerHTML = numberOfWellColumns;
+            wellColumnElement.innerHTML = assayType;
         } else {
-            wellColumnElement.value = numberOfWellColumns;
+            wellColumnElement.value = assayType;
         }
     };
 
