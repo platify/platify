@@ -15,7 +15,7 @@ function Histogram(json_data) {
     }
     
     this.initiateVis = function() {
-        margin = {top: 10, right: 30, bottom: 80, left: 50};
+        margin = {top: 10, right: 40, bottom: 80, left: 50};
         width = 600 - margin.left - margin.right;
         height = 600 - margin.top - margin.bottom;
 
@@ -103,8 +103,10 @@ function Histogram(json_data) {
 
         // Calculate & store median and mean values for each compound
         x_data.forEach(function(compound) {
-            var mean = d3.mean(compound.values, function(d) { return d.value; });
-            var median = d3.median(compound.values, function(d) { return d.value; });
+            var mean = d3.mean(compound.values, function(d) {
+                return (!d.outlier || d.outlier.localeCompare("true" !== 0)) ? d.value : null; });
+            var median = d3.median(compound.values, function(d) {
+                return (!d.outlier || d.outlier.localeCompare("true" !== 0)) ? d.value : null; });
 
             compound.mean = +mean;
             compound.median = +median;
@@ -174,7 +176,7 @@ function Histogram(json_data) {
         else {
              x_data.forEach(function(compound) {
                 compound.values.forEach(function(data) {
-                    if (data.value >= cutoff_value)
+                    if (data.value >= cutoff_value && (!data.outlier || data.outlier.localeCompare("true") !== 0))
                         cutoff_values.push([compound["key"], data.value, data.row, data.col]);
                 });
             });
