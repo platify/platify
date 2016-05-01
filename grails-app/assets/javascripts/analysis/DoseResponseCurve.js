@@ -45,8 +45,6 @@ function renderDoseResponseCurve(data) {
         });
 
     }
-
->>>>>>> 56270e703ced974ef0fc1ac41ce57aae72cdf11d
 }
 
 function zip2(a1, a2)
