@@ -244,7 +244,7 @@ function init() {
     	markOutlierScatterClick(event);
     });
 
-    var resultUI = new ResultUI();console.log(experiment);
+    var resultUI = new ResultUI();
 }
 
 function markOutlierHistogramClick(event) {
@@ -399,10 +399,10 @@ function markAllCurrentOutliers() {
 		  //Update the outlier histogram. This, in effect updates the "CSS" for the histogram
 		  //because it rebuilds the histogram representing the outliers, based on the current
 		  //"outlier" set of data in var experiment
-		  if(histogram != null) {
-			  histogram.update_data(experiment.experiment);
-			  histogram.updateGraphOutlier();
-		  }
+//		  if(histogram != null) {
+//			  histogram.update_data(experiment.experiment);
+//			  histogram.updateGraphOutlier();
+//		  }
 
     	});
     });

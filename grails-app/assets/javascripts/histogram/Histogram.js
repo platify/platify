@@ -28,6 +28,7 @@ function Histogram(json_data) {
         var x_data = [];
         var data_points = [];
         var self = this;
+        var data_type = ($('#normalizeButton').is(":checked")) ? "normalizedData" : "rawData";
         $.each(json_data.plates, function(plateIdx, plate){
             $.each(plate.rows, function (rowIdx, row) {
                 $.each(row.columns, function(colIdx, column){
@@ -39,18 +40,17 @@ function Histogram(json_data) {
 
                         data_points.push({
                             "name": compound_name,
-                            "value": +column.rawData[value_label],
+                            "value": +column[data_type][value_label],
                             "row":rowIdx,
                             "col":colIdx,
                             "outlier": column.outlier
                         });
-                    	
                     }
-
                 });
             });
         });
-        //x-data is in a more useful format before this
+
+        //x-data is in a more useful format than before this
         // Group data by compound name
         x_data = d3.nest().key(function(d) {
             return d.name;
@@ -73,6 +73,8 @@ function Histogram(json_data) {
         x_data = [];
         data_points = [];
         var self = this;
+        var data_type = ($('#normalizeButton').is(":checked")) ? "normalizedData" : "rawData";
+
         $.each(json_data.plates, function(plateIdx, plate){
             $.each(plate.rows, function (rowIdx, row) {
                 $.each(row.columns, function(colIdx, column){
@@ -84,7 +86,7 @@ function Histogram(json_data) {
 
                     data_points.push({
                         "name": compound_name,
-                        "value": +column.rawData[value_label],
+                        "value": +column[data_type][value_label],
                         "row":rowIdx,
                         "col":colIdx,
                         "outlier": column.outlier
@@ -92,7 +94,8 @@ function Histogram(json_data) {
                 });
             });
         });
-        //x-data is in a more useful format before this
+
+        //x-data is in a more useful format than before this
         // Group data by compound name
         x_data = d3.nest().key(function(d) {
             return d.name;
@@ -122,7 +125,6 @@ function Histogram(json_data) {
             	if(compound["outlier"] == "true") {
             		outlier_values.push(compound[replicate_option]);
             	}
-                
             })
         }
         else {
@@ -134,7 +136,7 @@ function Histogram(json_data) {
                 });
             });
         }
-        
+
         return outlier_values;
     }
     
@@ -241,7 +243,7 @@ function Histogram(json_data) {
 
         var min_x = d3.min(x_values);
         var max_x = d3.max(x_values);
-        
+
         var min_x_out = d3.min(x_values_out);
         var max_x_out = d3.max(x_values_out);
 
@@ -271,7 +273,7 @@ function Histogram(json_data) {
         var histogram_scale = d3.layout.histogram()
         .frequency(true)
         .bins(ticks);
-        
+
         var data_scale = histogram_scale(x_values);
 
         var yScale = d3.scale.linear()
