@@ -1,7 +1,12 @@
 package edu.harvard.capstone.result
 
+import edu.harvard.capstone.editor.DomainLabel
+import edu.harvard.capstone.editor.PlateTemplate
 import grails.plugin.springsecurity.annotation.Secured
 import edu.harvard.capstone.editor.ExperimentalPlateSet
+import edu.harvard.capstone.editor.PlateSet
+import edu.harvard.capstone.editor.Well
+
 
 import static org.springframework.http.HttpStatus.*
 import grails.validation.ValidationException
@@ -13,6 +18,7 @@ class ResultController {
 
     def springSecurityService
     def resultService
+    def editorService
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
@@ -126,7 +132,7 @@ class ResultController {
         }
 
         // TODO - don't really need the experiment object
-        respond experiment as Object, model:[importData: importData]
+        respond experiment as Object, model:[importData: importData, exp_id: experiment.id]
     }
 
 
@@ -192,6 +198,50 @@ class ResultController {
                 redirect action:"index", method:"GET"
             }
             '*'{ render status: NO_CONTENT }
+        }
+    }
+
+    @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
+    def updateOutlier(int exp_id, String barcode, String scope, int row, int col, String outlier) {
+        def experiment = ExperimentalPlateSet.findById(exp_id);
+        def plate = PlateSet.findByExperimentAndBarcode(experiment, barcode)
+        def result = Result.findByExperiment(experiment)
+        def resultPlate = ResultPlate.findByBarcode(barcode);
+        def plateTemplate = plate.plate;
+
+        def domainId;
+        def labels = null;
+        if (scope.toLowerCase() == "well") {
+            def well = Well.findByPlateAndRowAndColumn(plateTemplate, row, col)
+			println("Update outlier for well "+well.toString())
+            domainId = ResultWell.findByPlateAndWell(resultPlate, well).id
+
+            labels = ResultLabel.findAllByDomainIdAndScope(domainId, ResultLabel.LabelScope.WELL)
+        }
+        else if (scope.toLowerCase() == "plate") {
+            domainId = ResultPlate.findByResultAndBarcode(result, barcode).id
+            labels = ResultLabel.findAllByDomainIdAndScope(domainId, ResultLabel.LabelScope.PLATE);
+        }
+
+        if (labels == null) {
+            render(contentType: "application/json") {
+                [error: "Labels not found"]
+            }
+            return
+        }
+
+        labels.each { label ->
+            label.outlier = outlier
+            label.save()
+
+            if (label.hasErrors()) {
+                throw new ValidationException('Some outlier status could not be saved',
+                        label.errors)
+            }
+        }
+
+        render(contentType: "application/json") {
+            [message: "Outlier status set"]
         }
     }
 

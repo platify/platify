@@ -14,6 +14,7 @@
 
 <body>
 <div class="container">
+	<div class="alert alert-error" id="errorMessage"  style="display:inline"></div>
 	<div class="row">
 		<h3 style="margin-left: 15px">Dose Response Curve</h3>
 	</div>
@@ -29,22 +30,35 @@
 					Experiment: <g:select id="experiment" name="refExperiment" from ="${experimentList}"
 										  optionKey="id" optionValue="name" noSelection="[null:' ']" onchange="updateCompounds(this.value)"/><br>
 					Compound: <span id="compoundSelect"></span><br>
-					Params: <span id="curveParameters"></span>
 				</div>
-				<div class="centerWrapper" style="text-align: center">
-					<button id="doseResponseButton">Generate</button>
-					<button id="setParameterButton">Parameters</button>
+				<div class="col-md-8">
+					<div class="form-group">
+						<label class="control-label col-sm-2" for="maxParameter">Max:</label>
+						<div class="col-sm-4">
+							<input type="text" class="form-control" id="maxParameter" value=""/>
+						</div>
+						<label class="control-label col-sm-2" for="minParameter">Min:</label>
+						<div class="col-sm-4">
+							<input type="text" class="form-control" id="minParameter" value=""/>
+						</div>
+						<label class="control-label col-sm-2" for="ec50Parameter">EC50:</label>
+						<div class="col-sm-4">
+							<input type="text" class="form-control" id="ec50Parameter" value=""/>
+						</div>
+						<label class="control-label col-sm-2" for="slopeParameter">Slope:</label>
+						<div class="col-sm-4">
+							<input type="text" class="form-control" id="slopeParameter" value=""/>
+						</div>
+					</div>
+				</div>
+				<div class="centerWrapper" style="text-align: left">
+					<button id="doseResponseButton">Update Parameters</button>
 				</div>
 			</div>
 		</div>
 	</div>
 	<div class="col-md-8">
 		<div class="panel panel-default">
-			<div class="panel-heading">
-				<h4 class="panel-title">
-					<span id="rawDataLabel">Dose Response Curve</span>
-				</h4>
-			</div>
 			<div class="panel-body">
 				<div id="doseResponseCurveVis"></div>
 			</div>
@@ -86,15 +100,18 @@
 
     function updateDoseResponseCurve(compound) {
 		COMPOUND = compound;
-
+		if (compound=="null")
+			return;
 		<g:remoteFunction controller="doseResponse" action="getfittedData"
-						  onSuccess="updateDoseCurveData(data)"
-						  params="'experiment_id='+EXPERIMENT_ID + '&compound_name='+compound"/>
+						  onSuccess="renderDoseResponseCurve(data)"
+						  params="'experiment_id='+EXPERIMENT_ID + '&compound_name='+COMPOUND"/>
 	}
 
-function updateDoseCurveData(data) {
-    DR_CURVE_DATA_JSON = data;
-}
+    function updateDoseResponseCurve2(min_param, max_param, ec50, slope) {
+		<g:remoteFunction controller="doseResponse" action="getfittedData2"
+						  onSuccess="renderDoseResponseCurve(data)"
+						  params="'experiment_id='+EXPERIMENT_ID + '&compound_name=' + COMPOUND + '&min_param=' + min_param + '&max_param=' + max_param + '&ec50=' + ec50 + '&slope=' + slope"/>
+	}
 
 </g:javascript>
 

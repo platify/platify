@@ -7,37 +7,46 @@ var width;
 var height;
 
 function init() {
-    margin = {top: 10, right: 30, bottom: 30, left: 40};
+    margin = {top: 10, right: 30, bottom: 30, left: 60};
     width = 650 - margin.left - margin.right;
-    height = 575 - margin.top - margin.bottom;
+    height = 595 - margin.top - margin.bottom;
 
     createGraphAndTable();
 }
 
 $("#doseResponseButton").click(function() {
-    renderDoseResponseCurve();
+    updateDoseResponseCurve2(replaceDot($("#minParameter").val()),
+        replaceDot($("#maxParameter").val()),
+        replaceDot($("#ec50Parameter").val()),
+        replaceDot($("#slopeParameter").val()));
 });
 
-function renderDoseResponseCurve() {
-    var data = DR_CURVE_DATA_JSON;
+function renderDoseResponseCurve(data) {
 
-    var dose_points = zip2(data.x, data.y1);
-    var fitted_points = zip2(data.x, data.y2);
-    var extra_points = zip2(data.x3, data.y3);
+    if (data.err==false) {
+        var dose_points = zip2(data.x, data.y1);
+        var fitted_points = zip2(data.x, data.y2);
 
-    var dose_SVGgroup = ".dose_group";
-    var fitted_SVGgroup = ".fitted_group";
+        var dose_SVGgroup = ".dose_group";
+        var fitted_SVGgroup = ".fitted_group";
 
-    createAxes(dose_points.concat(fitted_points), width, height);
-    plotPoints(dose_points, dose_SVGgroup);
-    plotPoints(fitted_points, fitted_SVGgroup);
-    drawLine(fitted_points.concat(extra_points));
+        createAxes(dose_points.concat(fitted_points), width, height);
+        plotPoints(dose_points, dose_SVGgroup);
+        plotPoints(fitted_points, fitted_SVGgroup);
+        drawLine(fitted_points);
 
-    $("#curveParameters").text("Min:" + data.parameters['Min_ROUT'].toFixed(2) +
-                                " Max:" + data.parameters['Max_ROUT'].toFixed(2) +
-                                " EC50:" + data.parameters['EC50_ROUT'].toFixed(2) +
-                                " Slope:" + data.parameters['Slope_ROUT'].toFixed(2)
-    );
+        $("#minParameter").val(data.parameters['Min_ROUT'].toFixed(2));
+        $("#maxParameter").val(data.parameters['Max_ROUT'].toFixed(2));
+        $("#ec50Parameter").val(data.parameters['EC50_ROUT'].toFixed(2));
+        $("#slopeParameter").val(data.parameters['Slope_ROUT'].toFixed(2));
+    } else {
+        $('#errorMessage').text("something went wrong:" + data.msg).delay(500).fadeIn('normal', function() {
+            $(this).delay(2500).fadeOut();
+        });
+
+    }
+
+>>>>>>> 56270e703ced974ef0fc1ac41ce57aae72cdf11d
 }
 
 function zip2(a1, a2)
@@ -91,11 +100,22 @@ function createAxes(points) {
         .attr("transform", "translate(0," + height + ")")
         .call(d3.svg.axis()
             .scale(x_scale)
+            .ticks(5)
             .orient("bottom"));
+
+    chart.select(".x_axis")
+        .append("text")
+        .attr("x", 300 )
+        .attr("y", 30 )
+        .style("text-anchor", "middle")
+        .text("log10(compound)");
+
     chart.select(".y_axis")
         .call(d3.svg.axis()
             .scale(y_scale)
+            .ticks(5)
             .orient("left"));
+
 }
 
 function plotPoints(points, group) {

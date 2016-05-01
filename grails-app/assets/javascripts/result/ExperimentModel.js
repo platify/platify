@@ -22,6 +22,7 @@ function ExperimentModel() {
     this.currentPlateIndex = null;
     this.data = null;
     this.normalizedData = null;
+    this.outlier = null;
 
 
     this.fromJson = function(importDataJson) {
@@ -135,6 +136,47 @@ function ExperimentModel() {
 
 
     /**
+     * returns the mean of the well values, excluding controls.
+     */
+    this.meanWellValues = function(plateIndex) {
+        plateIndex = (plateIndex === undefined) ? this.currentPlateIndex : plateIndex;
+        var rawLabel = this.rawDataLabel(plateIndex);
+        if (!rawLabel) {
+            return null;
+        }
+        var meanLabel = rawLabel + '__meanWellValues';
+
+        var plate;
+        if (plateIndex === this.currentPlateIndex) {
+            plate = this.currentPlate;
+        }
+        else {
+            plate = this.experiment.plates[plateIndex];
+        }
+
+        var rv;
+//        if ((meanLabel in plate.rawData) && (plate.rawData[meanLabel] !== null)) {
+//            rv = plate.rawData[meanLabel];
+//        }
+//        else {
+            var nonControls = [];
+            plate.rows.forEach(function(row) {
+                row.columns.forEach(function(well) {
+                    if (well.control.localeCompare("NEGATIVE") !== 0
+                        && well.control.localeCompare("POSITIVE") !== 0
+                        && !(well.outlier && well.outlier.localeCompare("true") === 0))
+                        nonControls.push(well.rawData[rawLabel]);
+                });
+
+            });
+
+            rv = d3.mean(nonControls);
+            plate.rawData[meanLabel] = rv;
+//        }
+        return isNaN(rv) ? null : rv;
+    }
+
+    /**
      * returns the mean of the negative control values.
      */
     this.meanNegativeControl = function(plateIndex) {
@@ -157,16 +199,19 @@ function ExperimentModel() {
         }
 
         var rv;
-        if ((meanLabel in plate.rawData) && (plate.rawData[meanLabel] !== null)) {
-            rv = plate.rawData[meanLabel];
-        }
-        else {
+//        if ((meanLabel in plate.rawData) && (plate.rawData[meanLabel] !== null)) {
+//            rv = plate.rawData[meanLabel];
+//        }
+//        else {
             rv = d3.mean(controls.negative.map(function(coords) {
-                return plate.rows[coords[0]].columns[coords[1]].rawData[rawLabel];
+                var well = plate.rows[coords[0]].columns[coords[1]];
+                if (well.outlier && well.outlier.localeCompare("true") === 0)
+                    return null;
+                return well.rawData[rawLabel];
             }));
             plate.rawData[meanLabel] = rv;
-        }
-        return rv;
+//        }
+        return isNaN(rv) ? null : rv;
     }
 
 
@@ -193,18 +238,65 @@ function ExperimentModel() {
         }
 
         var rv;
-        if ((meanLabel in plate.rawData) && (plate.rawData[meanLabel] !== null)) {
-            rv = plate.rawData[meanLabel];
-        }
-        else {
+//        if ((meanLabel in plate.rawData) && (plate.rawData[meanLabel] !== null)) {
+//            rv = plate.rawData[meanLabel];
+//        }
+//        else {
             rv = d3.mean(controls.positive.map(function(coords) {
-                return plate.rows[coords[0]].columns[coords[1]].rawData[rawLabel];
+                var well = plate.rows[coords[0]].columns[coords[1]];
+                if (well.outlier && well.outlier.localeCompare("true") === 0)
+                    return null;
+                return well.rawData[rawLabel];
             }));
             plate.rawData[meanLabel] = rv;
-        }
-        return rv;
+//        }
+        return isNaN(rv) ? null : rv;
     }
 
+    
+    this.savePlate = function(plateIndex) {
+    	plateIndex = (plateIndex === undefined) ? this.currentPlateIndex : plateIndex;
+        var label = this.rawDataLabel(plateIndex);
+        var plate;
+        var controls;
+
+        if (plateIndex === this.currentPlateIndex) {
+            plate = this.currentPlate;
+            controls = this.controls;
+        }
+        else {
+            plate = this.experiment.plates[plateIndex];
+            controls = this.locateControls(plateIndex);
+        }
+
+        // make sure we've also calculated the plate-level derived values as well
+        this.zFactor(plateIndex);
+        this.zPrimeFactor(plateIndex);
+        this.meanNegativeControl(plateIndex);
+        this.meanPositiveControl(plateIndex);
+        this.meanWellValues(plateIndex);
+
+        // the save endpoint only wants the current plate
+        var data = {
+            experimentID: this.experiment.experimentID,
+            parsingID: this.currentPlate.parsingID,
+            plates: [this.currentPlate],
+        }
+
+        var url = RESULT_SAVE_REFACTORED_DATA_URL + '/' + plate.resultID;
+        var jqxhr = $.ajax({
+            url: url,
+            contentType: 'application/json; charset=UTF-8',
+            data: JSON.stringify(data),
+            method: 'POST',
+            processData: false,
+        });
+        jqxhr.done(function() {
+            var plate = experiment.experiment.plates[plateIndex];
+            console.log('POST of normalized data for plate %s, ID %s, result %s complete',
+                        plateIndex, plate.plateID, plate.resultID);
+        });
+    }
 
     /**
      * Normalizes the data for the given plate, and saves it back to the 
@@ -239,6 +331,7 @@ function ExperimentModel() {
         this.zPrimeFactor(plateIndex);
         this.meanNegativeControl(plateIndex);
         this.meanPositiveControl(plateIndex);
+        this.meanWellValues(plateIndex);
 
         // the save endpoint only wants the current plate
         var data = {
@@ -342,14 +435,14 @@ function ExperimentModel() {
         }
         
         var rv;
-        if ((zFactorLabel in plate.rawData) && (plate.rawData[zFactorLabel] !== null)) {
-            rv = plate.rawData[zFactorLabel];
-        }
-        else {
+//        if ((zFactorLabel in plate.rawData) && (plate.rawData[zFactorLabel] !== null)) {
+//            rv = plate.rawData[zFactorLabel];
+//        }
+//        else {
             rv = zFactor(plate, rawLabel,
                          controls.negative, controls.positive);
             plate.rawData[zFactorLabel] = rv;
-        }
+//        }
         return isNaN(rv) ? null : rv;
     }
 
@@ -377,14 +470,69 @@ function ExperimentModel() {
         }
 
         var rv;
-        if ((zPrimeFactorLabel in plate.rawData) && (plate.rawData[zPrimeFactorLabel] !== null)) {
-            rv = plate.rawData[zPrimeFactorLabel];
-        }
-        else {
+//        if ((zPrimeFactorLabel in plate.rawData) && (plate.rawData[zPrimeFactorLabel] !== null)) {
+//            rv = plate.rawData[zPrimeFactorLabel];
+//        }
+//        else {
             rv = zPrimeFactor(plate, rawLabel,
                               controls.negative, controls.positive);
             plate.rawData[zPrimeFactorLabel] = rv;
-        }
+//        }
         return isNaN(rv) ? null : rv;
+    }
+
+    this.toggleOutlier = function(row, col, isOutlier, scope, plateBarcode) {
+        // todo: require that barcode is always supplied.
+        // If no barcode supplied, get barcode of currently selected plate.
+        if (plateBarcode === null || plateBarcode === undefined)
+            plateBarcode = this.currentPlate.plateID;
+
+        var plate_index = this.getPlateIndex(plateBarcode);
+        if(isOutlier) {
+            experiment.experiment.plates[plate_index].rows[row].columns[col].outlier = "true";
+        } else {
+            experiment.experiment.plates[plate_index].rows[row].columns[col].outlier = "false";
+        }
+
+        var params = "?exp_id=" + this.experiment.experimentID
+            + "&barcode=" + plateBarcode
+            + "&scope=" + scope
+            + "&row=" + row
+            + "&col=" + col
+            + "&outlier=" + isOutlier;
+
+        var jqxhr = $.ajax({
+                    url: hostname + "/result/updateOutlier" + params,
+                    contentType: 'application/json; charset=UTF-8',
+                    data: null,
+                    type: "POST",
+                    processData: false
+                });
+        jqxhr.done(function() {
+            console.log('POST of outlier status complete');
+        });
+
+        // Update stats table when toggling outlier status
+        var plateData = Object.keys(experiment.experiment.plates).map(function(plateIndex) {
+            var row = [
+                       experiment.experiment.plates[plateIndex].plateID,
+                       experiment.experiment.plates[plateIndex].resultCreated,
+                       experiment.zFactor(plateIndex),
+                       experiment.zPrimeFactor(plateIndex),
+                       experiment.meanNegativeControl(plateIndex),
+                       experiment.meanPositiveControl(plateIndex),
+                       experiment.meanWellValues(plateIndex),
+                       plateIndex];
+            return row;
+        });
+        $('#plateTable').DataTable().clear().rows.add(plateData).draw();
+    }
+
+    this.getPlateIndex = function(plate_barcode) {
+        for (var i = 0; i < experiment.experiment.plates.length; i++) {
+            if (plate_barcode.localeCompare(experiment.experiment.plates[i].plateID) === 0) {
+                return i;
+            }
+        }
     }
 }

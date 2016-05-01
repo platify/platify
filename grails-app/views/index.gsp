@@ -72,11 +72,11 @@
 					<div class="col-sm-3">
 						<div id="normPanel" class="panel panel-default">
 							<div class="panel-heading">
-								<h4 class="panel-title">Standard Curve</h4>
+								<h4 class="panel-title">Dose Response Curve</h4>
 							</div>
 							<div class="panel-body ">
 								<ul class="list-unstyled">
-									<li><button type="button" class="btn btn-info btn-sm" onclick="location.href='stdCurve/show';">Normalize plate</button></li>
+									<li><button type="button" class="btn btn-info btn-sm" onclick="location.href='doseResponse/show';">Dose Response</button></li>
 								</ul>
 							</div>
 						</div>

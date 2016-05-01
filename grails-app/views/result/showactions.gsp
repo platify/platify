@@ -13,7 +13,7 @@
 		<asset:stylesheet href="colorbrewer.css"/>
 		<asset:stylesheet href="dataTables.bootstrap.css"/>
 		<asset:stylesheet href="dataTables.tableTools.css"/>
-		
+
 	</head>
 
 	<body>
@@ -50,10 +50,12 @@
 								<th>Z'-Factor</th>
 								<th>Mean Negative Control</th>
 								<th>Mean Positive Control</th>
+                                <th>Mean Non-Control</th>
 							</tr>
 						</thead>
 					</table>
 				</div>
+				<div id="slider"></div>
 			</div>
 
 			<div class="panel panel-default">
@@ -75,10 +77,71 @@
                     <ul style="background-color:#d9edf7;" >
                         <li><a href="#resultGrid">Result Grid</a></li>
                         <li><a href="#scatterplot">Scatter Plot</a></li>
+                        <li><a href="#scatterplot_control">Controls Plot</a></li>
+                        <li><a href="#standardCurve">Standard Curve</a></li>
                         <li><a href="#histogram">Histogram</a></li>
                     </ul>
 					<div id="resultGrid" class="Blues" style="width:100%;height:650px;"></div>
 					<div id="scatterplot" style="width:100%;height:650px;"></div>
+					<div id="scatterplot_control" style="width:100%;height:650px;"></div>
+                    <div id="standardCurve" style="width:100%;height:650px;">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="row">
+                                    <h5><b>PROPERTIES</b></h5>
+                                    Known Property: <span id="refXCategorySelect"></span><br>
+                                    Unknown Property: <span id="refYCategorySelect"></span>
+                                </div><br>
+                                <div class="row">
+                                    <h5><b>STANDARD CURVE SOURCE</b></h5>
+                                    <g:select name="scPlate" id="scPlate"
+                                              from="" noSelection="[null:'default']"/>
+                                </div><br>
+                                <div class="row">
+                                    <h5><b>REGRESSION MODEL</b></h5>
+                                    <input type="radio" name="fitModel" value="linearThroughOrigin" checked="checked"> Linear<br>
+                                    <input type="radio" name="fitModel" value="exponential"> Exponential<br>
+                                    <input type="radio" name="fitModel" value="logarithmic"> Logarithmic<br>
+                                    <input type="radio" name="fitModel" value="power"> Power<br>
+                                    <input type="radio" name="fitModel" value="polynomial"> Polynomial
+                                    <input type="text" id="degree" name="degree" placeholder="degree" maxlength="1" size="4"><br>
+                                </div><br>
+                                <div class="row">
+                                    <input id="regressionCheckbox" type="checkbox" checked="checked"> Apply settings to all plates
+                                    <br><br>
+                                    <div class="centerWrapper" style="text-align: center">
+                                        <button id="stdCurveButton">Generate</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-9">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">
+                                            <span id="stdCurveLabel"></span>
+                                        </h4>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div id="stdCurveVis"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            %{--<div class="col-md-4">--}%
+                                %{--<div class="panel panel-default" style="height: 430px; overflow: auto;">--}%
+                                    %{--<div class="panel-heading">--}%
+                                        %{--<h4 class="panel-title">--}%
+                                            %{--<span id="inferredLabel">Inferred Properties</span>--}%
+                                        %{--</h4>--}%
+                                    %{--</div>--}%
+                                    %{--<div class="panel-body">--}%
+                                        %{--<div id="inferredTable"></div>--}%
+                                    %{--</div>--}%
+                                %{--</div>--}%
+                            %{--</div>--}%
+                        </div>
+                    </div>
+
                     <div id="histogram" style="width:100%;height:650px;">
                         <div class="col-md-2">
                             <div class="row">
@@ -101,15 +164,17 @@
                         </div>
                         <div class="col-md-7">
                             <div id="histogramVis"></div>
+                            <div id="histogramOutliers"></div>
                         </div>
                         <div class="col-md-3" style="height:600px;overflow: auto;">
                             <div id="cutoffTable"></div>
                         </div>
                     </div>
+
                 </div>
 				</div>
 
-					
+
 			</div>
 		</div>
 
@@ -141,16 +206,56 @@
 
 	<!-- results-specific js -->
 	<asset:javascript src="plate-statistics/statistics.js" />
+
+    %{-- standard curve js--}%
+    <asset:javascript src="regression.js"/>
+    <asset:javascript src="analysis/StdCurve.js" />
+
 	<g:javascript>
-	var RESULT_SAVE_REFACTORED_DATA_URL = "${createLink(controller: 'refactoredData', action: 'save', resultInstance: null)}";
+        var RESULT_SAVE_REFACTORED_DATA_URL = "${createLink(controller: 'refactoredData', action: 'save', resultInstance: null)}";
         var IMPORT_DATA_JSON = JSON.stringify(${importData.encodeAsJSON()});
-	</g:javascript>
+        var EXPERIMENT_ID = ${exp_id};
+
+        %{-- standard curve start --}%
+
+        var PLATE_ID;
+        var PLATE_BARCODE;
+        var X_CATEGORY;
+        var Y_CATEGORY;
+
+        %{--<g:remoteFunction controller="stdCurve" action="getPlates"--}%
+                          %{--update="scPlateSelect"--}%
+                          %{--params="'experiment_id='+EXPERIMENT_ID"/>--}%
+
+        <g:remoteFunction controller="stdCurve" action="getReferenceXCategories"
+                          update="refXCategorySelect"
+                          params="'experiment_id='+EXPERIMENT_ID"/>
+
+        function scPlateChanged(plateId) {
+            var plateSelect = document.getElementById("scPlate");
+            PLATE_ID = plateId;
+            PLATE_BARCODE = plateSelect.options[plateSelect.selectedIndex].text;
+        }
+
+        function xCategoryChanged(xCategory) {
+            X_CATEGORY = document.getElementById("refXCategory").value;
+        }
+
+        function yCategoryChanged() {
+            Y_CATEGORY = document.getElementById("refYCategory").value;
+        }
+
+        %{-- standard curve start --}%
+
+    </g:javascript>
+        
 	<asset:javascript src="result/ExperimentModel.js" />
 	<asset:javascript src="result/showactions.js" />
 	<asset:javascript src="result/ResultUI.js"/>
-	
+
 	<!-- scatter plot -->
 	<asset:javascript src="scatter/Scatter.js" />
+	<asset:javascript src="scatter/Scatter_control.js" />
 
     %{-- histogram js--}%
     <asset:javascript src="histogram/Histogram.js" />

@@ -900,7 +900,7 @@ function importCompoundsFromFile() {
  * @param pModel - a data structure in the format of the internal data model.
  * @returns plateJson - a data structure in the format excepted by the server.
  */
-function translateModelToOutputJson(pModel) {
+function translateModelToOutputJson(pModel) {console.log(pModel);
 	"use strict";
 	var plateJson, plate, wellGroup, cmpdValue, row, column, well, labels, catKey, labKey, label, convCat, convLab, cmpdLabel, i, j, labelRemovedUnits;
 	plateJson = {};
@@ -910,6 +910,8 @@ function translateModelToOutputJson(pModel) {
 	plate.height = pModel.grid_height;
 	plate.experimentID = window.expId;
 	plate.templateID = window.templateId;
+	if (plate.templateID === undefined || plate.templateID === null)
+	    plate.templateID = pModel.name;
 
 	plate.plateID = document.getElementById("barcode").value;
 	if (plate.plateID === undefined || plate.plateID === null || plate.plateID === "") {

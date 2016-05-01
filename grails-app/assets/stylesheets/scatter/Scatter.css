@@ -17,5 +17,30 @@
 }
 
 circle {
+	cursor:pointer;
     fill: steelblue;
 }
+
+.outlier {
+	background-color:#000;
+	opacity: 0.4;
+	border: 2px solid red;
+}
+
+/**Where is the histogram CSS?*/
+#histogramVis {
+	position: absolute;
+}
+
+#histogramOutliers {
+	position:relative;
+}
+
+#histogramOutliers svg g .bar_group_outliers .bar {
+	opacity:.6;
+}
+
+svg {
+	padding:20px;
+}
+ 

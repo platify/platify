@@ -27,8 +27,18 @@ class DoseResponseController {
     def show() {
 
         def experimentList = ExperimentalPlateSet.listOrderByName();
-        // TODO - don't really need the experiment object
-        respond experimentList as Object, model:[experimentList: experimentList]
+        def eL = []
+        experimentList.each { e ->
+            def plates = PlateSet.findAllByExperiment(e)
+            if (plates.size()>0) {
+                def results = Result.findAllByExperiment(e)
+                if (results.size() > 0) {
+                    eL << e
+                }
+            }
+        }
+
+        respond eL as Object, model:[experimentList: eL]
 
     }
 
@@ -39,7 +49,7 @@ class DoseResponseController {
         try{
             def experiment = ExperimentalPlateSet.findById(experiment_id);
             resultData = fitDoseResponseCurveService.getData(experiment)
-            render g.select(name:"compound", from:resultData.plates[0].compounds.keySet(),
+            render g.select(id:"compoundSelect", name:"compound", from:resultData.plates[0].compounds.keySet(),
                     noSelection:[null:' '], onchange:"updateDoseResponseCurve(this.value)")
             return resultData
         }
@@ -57,6 +67,21 @@ class DoseResponseController {
         try{
             def experiment = ExperimentalPlateSet.findById(experiment_id);
             resultData = fitDoseResponseCurveService.getfittedData(experiment, compound_name)
+        }
+        catch (RuntimeException e) {
+            response.sendError(500)
+            return
+        }
+        render (resultData as JSON);
+    }
+
+    @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
+    def getfittedData2(int experiment_id, String compound_name, String max_param, String min_param, String ec50, String slope)
+    {
+        def resultData
+        try{
+            def experiment = ExperimentalPlateSet.findById(experiment_id);
+            resultData = fitDoseResponseCurveService.getfittedData2(experiment, compound_name, max_param, min_param, ec50, slope)
         }
         catch (RuntimeException e) {
             response.sendError(500)

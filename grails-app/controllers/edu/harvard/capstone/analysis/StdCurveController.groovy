@@ -4,7 +4,11 @@ import edu.harvard.capstone.editor.DomainLabel
 import edu.harvard.capstone.editor.ExperimentalPlateSet
 import edu.harvard.capstone.editor.PlateSet
 import edu.harvard.capstone.editor.Well
+import edu.harvard.capstone.result.Result
+import edu.harvard.capstone.result.ResultLabel
+import edu.harvard.capstone.result.ResultPlate
 import edu.harvard.capstone.result.ResultService
+import edu.harvard.capstone.result.ResultWell
 import grails.converters.JSON
 
 //import grails.validation.ValidationException
@@ -13,21 +17,21 @@ import grails.converters.JSON
  * Created by Monica on 3/24/2016.
  */
 class StdCurveController {
+    def springSecurityService
     def editorService
     def resultService
 
-    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
+//    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
     def show(){
 
-/*
-        if (!springSecurityService.isLoggedIn()){
-            redirect controller: 'experimentalPlateSet', action: 'index', method: 'GET'
-            return
-        }
-*/
+//        if (!springSecurityService.isLoggedIn()){
+//            redirect controller: 'experimentalPlateSet', action: 'index', method: 'GET'
+//            return
+//        }
+
         def experimentList = ExperimentalPlateSet.listOrderByName();
-        // TODO - don't really need the experiment object
+
         respond experimentList as Object, model:[experimentList: experimentList]
     }
 
@@ -45,22 +49,28 @@ class StdCurveController {
         render (resultData as JSON);
     }
 
-    def getUnknownPlates(int experiment_id) {
-        def unknownExperiment = ExperimentalPlateSet.findById(experiment_id);
-        def unknownPlate = PlateSet.findAllByExperiment(unknownExperiment);
-        render g.select(id:"unknownPlate", name:"unknownPlate", from:unknownPlate,
-                optionKey:'id', optionValue:"barcode", noSelection:[null:' '], onchange:"unknownPlateChanged()")
-    }
+//    def getPlates(int experiment_id) {
+//        def referenceExperiment = ExperimentalPlateSet.findById(experiment_id);
+//        def referencePlate = PlateSet.findAllByExperiment(referenceExperiment);
+//        render g.select(id:"scPlate", name:"scPlate", from:referencePlate,
+//            optionKey:'id', optionValue:"barcode", noSelection:[null:' '], onchange:"scPlateChanged(this.value)")
+//    }
 
-    def getReferencePlates(int experiment_id) {
-        def referenceExperiment = ExperimentalPlateSet.findById(experiment_id);
-        def referencePlate = PlateSet.findAllByExperiment(referenceExperiment);
-        render g.select(id:"refPlate", name:"refPlate", from:referencePlate,
-            optionKey:'id', optionValue:"barcode", noSelection:[null:' '], onchange:"refPlateChanged(this.value)")
-    }
+    def getReferenceXCategories(int experiment_id) {
+        def experiment = ExperimentalPlateSet.findById(experiment_id);
+        def resultInstance = Result.findByExperiment(experiment);
+        def resultPlate = ResultPlate.findByResult(resultInstance);
+        def result_well = ResultWell.findByPlate(resultPlate);
+        def result_labels = ResultLabel.findAllByDomainIdAndLabelType(result_well.id, ResultLabel.LabelType.RAW_DATA)
+        def labels = [];
+        result_labels.each { result_label -> labels.push(result_label.name) }
+        render g.select(id:"refXCategory", name:"refXCategory", from:labels,
+                noSelection:[null:' '], onchange:"xCategoryChanged(this.value)")
+    }//
 
-    def getReferenceXCategories(int plate_id) {
-        def plateInstance = PlateSet.findById(plate_id);
+    def getReferenceYCategories(String barcode, int exp_id) {
+        def experiment = ExperimentalPlateSet.findById(exp_id);
+        def plateInstance = PlateSet.findByBarcodeAndExperiment(barcode, experiment);
         def referenceWells = Well.findAllByPlate(plateInstance.plate);
         def wellLabels = [];
         referenceWells.each{
@@ -72,35 +82,7 @@ class StdCurveController {
             }
         }
 
-        render g.select(id:"refXCategory", name:"refXCategory", from:wellLabels,
-                noSelection:[null:' '], onchange:"xCategoryChanged(this.value)")
-    }
-
-    def getReferenceYCategories(int plate_id, String x_category) {
-        def plateInstance = PlateSet.findById(plate_id);
-        def referenceWells = Well.findAllByPlate(plateInstance.plate);
-        def wellLabels = [];
-        referenceWells.each{
-            def label = DomainLabel.findAllByDomainIdAndLabelTypeAndPlate(
-                    it.id, DomainLabel.LabelType.WELL, plateInstance).collect{it.label}
-            label.each{
-                if (!wellLabels.contains(it.category) && it.category != "compound"
-                    && it.category != x_category)
-                    wellLabels << it.category;
-            }
-        }
-
         render g.select(id:"refYCategory", name:"refYCategory", from:wellLabels,
                 noSelection:[null:' '], onchange:"yCategoryChanged()")
-    }
-
-    def getReferenceData(int plate_id) {
-//        def plate = PlateSet.findById(plate_id);
-//        def referenceData = editorService.getPlate(plate);
-
-        def test = ExperimentalPlateSet.findById(6);
-        def referenceData = editorService.getExperimentData(test);
-
-        render(referenceData as JSON);
     }
 }
