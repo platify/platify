@@ -102,6 +102,7 @@
 								    	<button class="btn btn-info btn-xs" id="sendImportDataToServer">Import and save the data</button>
 	                    				<button class="btn btn-info btn-xs" id="downloadFileImport">Download file import</button>
                                         <button class="btn btn-info btn-xs" id="downloadIntergroupFile">Download inter-group data format</button>
+                                        <select name="plateImportList" id="plateImportList" multiple="multiple"></select>
 								    </th>
 								  </tr>
 								  <tr  >
@@ -167,7 +168,7 @@
 			</div>
 		</div>
 	</div>
-
+	
     <g:if env="production">
         <!-- Markup to include ONLY when in production -->
         <g:javascript>
@@ -205,3 +206,4 @@
     <asset:javascript src="parser/ServerCommunicator.js"/>
     <asset:javascript src="parser/ParserUI.js"/>
     <asset:javascript src="parser/ParsingController.js"/>
+    <asset:javascript src="multi-select/jquery.multi-select.js"/>

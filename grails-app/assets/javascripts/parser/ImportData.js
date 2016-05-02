@@ -40,6 +40,7 @@ function ImportData(numPlates, numRows, numCols){
     this.plates = [];
     this.rawFiles = [];
     this.rawFilesData = [];
+    this.plateIdsToImport = [];
 
     this.wellLevelCategories = {};
     this.plateLevelCategories = {};
@@ -992,7 +993,11 @@ function ImportData(numPlates, numRows, numCols){
         object.experimentID = this.experimentID;
         object.parsingID = this.parsingID;
         object.experimentFeatures = this.experimentFeatures;
-        object.plates = this.plates;
+        object.plates = new Array();
+        for (var idx = 0; idx < this.plates.length; ++idx) {
+        	if (this.plateIdsToImport[idx])
+        		object.plates.push(this.plates[idx]);
+        }
         object.rawFiles = new Array();
         var f, fileData, fileName, worker, working;
         

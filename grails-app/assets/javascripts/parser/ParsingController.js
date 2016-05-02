@@ -30,6 +30,7 @@ function ParsingController(){
     _self.originalName = null;
     _self.stage = null;
     _self.rawFiles = null;
+    _self.platesToImport = [];
 
 
 
@@ -435,6 +436,7 @@ function ParsingController(){
 
     _self.saveImportDataToServer = function(){
         _self.importData.setExperimentID(_self.parserUI.getSelectedExperimentID());
+        _self.importData.plateIdsToImport = _self.platesToImport;
         _self.importData.setRawFilesData(_self.examiner.rawFileContents)
         _self.importData.throwErrorIfAnyPlateIDsNotSet();
 

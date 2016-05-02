@@ -66,6 +66,7 @@ function ParserUI(parsingController){
     var plateLevelFeatureListElement = document.getElementById("plateLevelFeatureList");
     var setPlateIdButton = document.getElementById("setPlateID");
     var plateIdentifierList = document.getElementById("plateList");
+    var plateImportList = document.getElementById("plateImportList");
     var experimentSelectizeElement;
 
     // an object representing the options in the experiment selectize element. This object
@@ -628,17 +629,43 @@ function ParserUI(parsingController){
         // clear the select element
         plateIdentifierList.innerHTML = "";
         plateIdentifierList.scrollTop = 0;
-
+        plateImportList.innerHTML = "";
         // load the plate ID select element
         for (var i=0; i<plateIDArray.length; i++){
             var optionContents = "plate " + (i+1) + ": " +plateIDArray[i];
+            var importOptionContents = "plate "+ (i+1);
             var option = document.createElement("option");
+            var importOption = document.createElement("option");
             option.setAttribute("value", i.toString());
+            importOption.setAttribute("value", i.toString());
             option.innerHTML = optionContents;
+            importOption.innerHTML = importOptionContents;
             plateIdentifierList.appendChild(option);
+            plateImportList.appendChild(importOption);
         }
+        $('#plateImportList').multiSelect({
+            selectableHeader: "<div class='custom-header'>Plates to Import</div>",
+            selectionHeader: "<div class='custom-header'>Plates to Skip</div>",
+            afterSelect: this.plateImportListSelection,
+            afterDeselect: this.plateImportListSelection
+        });
     };
 
+    this.plateImportListSelection = function(values) {
+    	_self.parsingController.platesToImport.length = 0;
+    	var options = plateImportList.options, cnt = 0, bImp;
+    	for (var idx = 0; idx < options.length; ++idx) {
+    		bImp = options[idx].selected;
+    		_self.parsingController.platesToImport.push(!bImp);
+    		if (bImp) cnt++;
+    	}
+    	
+    	importAndSaveDataButton.disabled = 
+    		(cnt == options.length) ? true : false;
+    	
+    };
+    
+    
     this.getListedPlatesWithIDs = function(){
         var result = [];
         var options = plateIdentifierList.options;
