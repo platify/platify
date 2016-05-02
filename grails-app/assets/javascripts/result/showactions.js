@@ -218,6 +218,15 @@ function init() {
         plateTable.clear().draw();
     }
     
+    this.addHandlers();
+
+    var resultUI = new ResultUI();
+}
+
+/**
+ * Trying to keep the code a little cleaner -- add all the even handlers here
+ */
+function addHandlers() {
     // add download buttons listener
     $('#downloadButtons button').on('click', function(event) {
         downloadExperiment(event.target.dataset.fileformat);
@@ -234,21 +243,25 @@ function init() {
     $('#heatMapButton').on('click', function(event) {
         showHeatMap = $(event.target)[0].checked;
         reloadGrid();
+        event.stopImmediatePropagation();
     });
 
     // add histogram button listener
     $('#histogramButton').on('click', function(event) {
             histogram.updateGraph();
             histogram.updateGraphOutlier();
+            event.stopImmediatePropagation();
      });
     
     //This will make sure all the items are marked as outliers. Should only
     //be called if the "outlier histogram" does not exist
+    /*
     $("g.bar_group").on('click', 'rect', function(event){
     	var indexes = $(event.target).attr('indexes');
     	markOutlierHistogramClick(indexes, true);
-    });
+    });*/
     
+    /* HISTOGRAM OUTLIER HANDLER*/
     //This will "unmark" all items as outliers
     $("g.bar_group_outliers").on('click', 'rect', function(event){
     	//Mark this boolean and let it fall through to click on the underlying histogram,
@@ -256,6 +269,7 @@ function init() {
     	markingAsOutlier = false;
     });
     
+    /* HISTOGRAM OUTLIER HANDLER*/
     //Ths will mark all the items as outliers
     $('#histogramOutliers').click(function(e){
     	$('#histogramOutliers').attr('style','display:none;');
@@ -272,17 +286,25 @@ function init() {
     	
     });
 
-    // add scatterplot outlier listener
+    /*SCATTERPLOT OUTLIER HANDLER*/
     $("#scatterplot .circle").on('click', function(event){
     	markOutlierScatterClick(event);
+    	event.stopImmediatePropagation();
     });
 
+    
+    /*SCATTERPLOT CONTROL OUTLIER HANDLER*/
     // add scatterplot outlier listener
     $("#scatterplot_control .circle").on('click', function(event){
         markOutlierScatterControlClick(event);
+        event.stopImmediatePropagation();
     });
 
-    var resultUI = new ResultUI();
+    /*GRID OUTLIER HANDLER*/
+    grid.grid.onClick.subscribe(function(event, args) {
+        markOutlierGridClick(event, args);
+        event.stopImmediatePropagation();
+    });
 }
 
 function markOutlierHistogramClick(indexes, isOutlier) {
@@ -291,9 +313,10 @@ function markOutlierHistogramClick(indexes, isOutlier) {
 	indexes = indexes.split(';');
 	for(var i = 0; i < indexes.length; i++) {
 		var rowCol = indexes[i].split(',');
-		var row = rowCol[0];
-		var col = rowCol[1];
-		markOutlierStatus(row, col, isOutlier);		
+		var plate = rowCol[0];
+		var row = rowCol[1];
+		var col = rowCol[2];
+		markOutlierStatus(plate, row, col, isOutlier);		
 	}
 	//Update entire outlier histogram here
 	histogram.update_data(experiment.experiment);
@@ -303,8 +326,9 @@ function markOutlierHistogramClick(indexes, isOutlier) {
 function markOutlierScatterClick(event) {
 	var eventObj = $(event.target);
 	var indexVar = $(event.target).attr('index');
-	var row = scatter.dotIndexes[indexVar][0];
-	var col = scatter.dotIndexes[indexVar][1];
+	
+	var row = scatter.dotIndexes[indexVar][1];
+	var col = scatter.dotIndexes[indexVar][2];
 	
     //toggleClass and hasClass aren't working here...
     //$(event.target).closest("circle").toggleClass("outlier");
@@ -312,20 +336,21 @@ function markOutlierScatterClick(event) {
 
     if(s.indexOf('outlier')!==-1) {
     	//Already has 'outlier' unset it
-    	markOutlierStatus(row, col, false);
+    	markOutlierStatus(null, row, col, false);
     } else {
-    	markOutlierStatus(row, col, true);
+    	markOutlierStatus(null, row, col, true);
     }
 //    experiment.savePlate();
     console.log("col: "+col+" row: "+row);
 }
 
+//TODO: GET PLATE INDEX IN HERE
 function markOutlierScatterControlClick(event) {
 	var eventObj = $(event.target);
 	var indexVar = $(event.target).attr('index');
-	var row = scatterControl.dotIndexes[indexVar][0];
-	var col = scatterControl.dotIndexes[indexVar][1];
-	var barcode = scatterControl.dotIndexes[indexVar][2];
+	var plate = scatterControl.dotIndexes[indexVar][0];
+	var row = scatterControl.dotIndexes[indexVar][1];
+	var col = scatterControl.dotIndexes[indexVar][2];
 
     //toggleClass and hasClass aren't working here...
     //$(event.target).closest("circle").toggleClass("outlier");
@@ -333,9 +358,9 @@ function markOutlierScatterControlClick(event) {
 
     if(s.indexOf('outlier')!==-1) {
     	//Already has 'outlier' unset it
-    	markOutlierStatus(row, col, false, barcode);
+    	markOutlierStatus(null, row, col, false);
     } else {
-    	markOutlierStatus(row, col, true, barcode);
+    	markOutlierStatus(null, row, col, true);
     }
 //    experiment.savePlate();
     console.log("col: "+col+" row: "+row);
@@ -354,31 +379,28 @@ function markOutlierGridClick(e, args) {
 //    	markOutlierStatus(row, col, true);
         isOutlier = true;
     }
-    markOutlierStatus(row, col-1, isOutlier);
+    markOutlierStatus(null, row, col-1, isOutlier);
     console.log("col: "+col+" row: "+row);
 
 }
 
 
 
-//Marks outliers in all visualizations
-function markOutlierStatus(row, col, isOutlier, plateBarcode) {
+/**
+ * Marks a single outlier in all visualizations. Is faster than markAllCurrentOutliers, 
+ * below
+ */
+function markOutlierStatus(plate, row, col, isOutlier) {
     var colNum = col;
-//	if(isOutlier) {
-//		experiment.experiment.plates[experiment.currentPlateIndex].rows[row].columns[colNum].outlier = "true";
-//	} else {
-//		experiment.experiment.plates[experiment.currentPlateIndex].rows[row].columns[colNum].outlier = "false";
-//	}
 
 	// If no barcode supplied, get barcode of currently selected plate.
-    if (plateBarcode === null || plateBarcode === undefined)
-        plateBarcode = experiment.currentPlate.plateID;
+    if (plate === null || plate === undefined)
+        plate = experiment.currentPlateIndex;
 
-    var plate_index = experiment.getPlateIndex(plateBarcode);
     if(isOutlier) {
-        experiment.experiment.plates[plate_index].rows[row].columns[col].outlier = "true";
+        experiment.experiment.plates[plate].rows[row].columns[col].outlier = "true";
     } else {
-        experiment.experiment.plates[plate_index].rows[row].columns[col].outlier = "false";
+        experiment.experiment.plates[plate].rows[row].columns[col].outlier = "false";
     }
 
 	// todo: The above is also performed in experiment.toggleOutlier(), which is called at end of this method.
@@ -386,7 +408,7 @@ function markOutlierStatus(row, col, isOutlier, plateBarcode) {
 
 	var rowNum = parseInt(row)+1;
 	var colNum = parseInt(col)+1;
-	var scatterPoint = $('circle[row="'+row+'"][col="'+col+'"][plate="'+plateBarcode+'"]');
+	var scatterPoint = $('circle[row="'+row+'"][col="'+col+'"][plate="'+plate+'"]');
 	if(isOutlier) {
 		scatterPoint.attr("class", "outlier circle");
 	} else {
@@ -410,90 +432,70 @@ function markOutlierStatus(row, col, isOutlier, plateBarcode) {
 		$(".slick-row:nth-of-type("+rowNum+") ."+classname).removeClass("outlier");
 	  }
 	  //Send the result back to the database
-	  experiment.toggleOutlier(row, col, isOutlier, "WELL");
+	  experiment.toggleOutlier(plate, row, col, isOutlier, "WELL");
 	
 }
 
 
 /**
+ * currentPlate must already be called before this is set! This will not load the values
+ * in the grids, but it will refresh the outliers
  * Marks all current outliers in the grid. This is done in the scatterplot
  * while it is being generated. slickgrid is a little more complicated, so 
  * let's let it do its thing first, and then go through and modify it
  */
 function markAllCurrentOutliers() {
-    //Iterate through wells and mark all outliers as "outlier"
+	console.log("markAllCurrentOtliers");
+	//Iterate through the current plate and mark the things as outliers that need to be marked
+	$.each(experiment.experiment.plates[experiment.currentPlateIndex].rows, function(rowIdx, row) {
+		$.each(row.columns, function(colIdx, column) {
+			//Add 1 to compensate for the headers on table
+			var rowNum = rowIdx+1;
+			//Mark "rowIdx", "colIdx" as an outlier
+			if(grid.grid != null) {
+				var targetRow = grid.grid.getDataItem(rowIdx);
+				var targetCol = grid.grid.getColumns()[colIdx+1];
+				var classname = grid.grid.getCellNode(rowIdx, colIdx+1).className;
+				classname = classname.replace(/ /g, ".");
+				//Get the rowIdx slickrow
+				var cell = $(".slick-row:nth-of-type("+rowIdx+") ."+classname);
+				var selectedEntity = $(".slick-row:nth-of-type("+rowNum+") ."+classname);
+				if(column.outlier == "true") {
+					//Add the outlier class
+		      		$(".slick-row:nth-of-type("+rowNum+") ."+classname).addClass("outlier");
+		      	} else {
+		      		//Remove the outlier class if it exists
+		      		$(".slick-row:nth-of-type("+rowNum+") ."+classname).removeClass("outlier");
+		      	}
+				
+			}
+			
+			//Update scatterplot here
+		});
+		
+	});
+    //Iterate through ALL plates/rows/cols/wells
     //experiment.experiment.plates[0].rows[row].columns[col].outlier = "false"
-    $.each(experiment.experiment.plates[0].rows, function( rowIdx, row ) {
-    	$.each(row.columns, function( colIdx, column ) {
-    		//Add 1 to compensate for the headers on table
-		  var rowNum = rowIdx+1;
-		  //Mark "rowIdx", "colIdx" as an outlier
-		  if(grid.grid != null) {
-			  var targetRow = grid.grid.getDataItem(rowIdx);
-			  var targetCol = grid.grid.getColumns()[colIdx+1];
-			  var classname = grid.grid.getCellNode(rowIdx, colIdx+1).className;
-			  classname = classname.replace(/ /g, ".");
-			  //Get the rowIdx slickrow
-			  var cell = $(".slick-row:nth-of-type("+rowIdx+") ."+classname);
-			  var selectedEntity = $(".slick-row:nth-of-type("+rowNum+") ."+classname);
-	      	  if(column.outlier == "true") {
-	      		  //Add the outlier class
-	      		$(".slick-row:nth-of-type("+rowNum+") ."+classname).addClass("outlier");
-	      	  } else {
-	      		  //Remove the outlier class if it exists
-	      		$(".slick-row:nth-of-type("+rowNum+") ."+classname).removeClass("outlier");
-	      	  }
-		  }
-		  
-		  var scatterPoint = $('col[row="'+rowIdx+'"][col="'+colIdx+'"]');
-		  if(scatterPoint != null) {
-	      	  if(column.outlier == "true") {
-	      		  //Add the outlier class
-	      		$(".slick-row:nth-of-type("+rowNum+") ."+classname).addClass("outlier");
-	      		scatterPoint.attr("class", "circle outlier");
-	      	  } else {
-	      		  //Remove the outlier class if it exists
-	      		$(".slick-row:nth-of-type("+rowNum+") ."+classname).removeClass("outlier");
-	      		scatterPoint.attr("class", "circle outlier");
-	      	  }
+	$.each(experiment.experiment.plates, function(plateIdx, plate) {
+	    $.each(plate.rows, function( rowIdx, row ) {
+	    	$.each(row.columns, function( colIdx, column ) {
+	    		
 			  
-		  }
-		  
-		  //Update the outlier histogram. This, in effect updates the "CSS" for the histogram
-		  //because it rebuilds the histogram representing the outliers, based on the current
-		  //"outlier" set of data in var experiment
-//		  if(histogram != null) {
-//			  histogram.update_data(experiment.experiment);
-//			  histogram.updateGraphOutlier();
-//		  }
+	    		//TODO: Update histogram here?
+	    	});
+	    });
+	});
+	
+	if(histogram != null) {
+		histogram.update_data(experiment.experiment);
+		histogram.updateGraphOutlier();
+	}
 
-    	});
-    });
 }
 
-function loadGrid(dataSet) {
-    grid.setData(dataSet);
-    scatter.setData(dataSet);
-    grid.fillUpGrid(null, null, true, cellFormatter, 'result-cell');
-    if (showHeatMap) {
-        colorGrid(dataSet);
-    }
-
-    //Mark the appropriate cells as "outliers" on click
-    grid.grid.onClick.subscribe(function(e, args) {
-        markOutlierGridClick(e, args);
-    });
-}
-
-function plateSelected(plateIndex) {
-    experiment.selectPlate(plateIndex);
-    loadGrid(showNormalized ? experiment.normalizedData : experiment.data);
-    $('#rawDataLabel')[0].textContent = experiment.rawDataLabel();
-
-    stdCurve.updateStdCurveWithoutRecalculate();
-}
-
-
+/**
+ * These load data values into the grid
+ */
 function reloadGrid() {
     if (showNormalized) {
         experiment.loadNormalizedDataForGrid();
@@ -502,6 +504,27 @@ function reloadGrid() {
     else {
         loadGrid(experiment.data);
     }
+}
+
+
+function loadGrid(dataSet) {
+    grid.setData(dataSet);
+    scatter.setData(dataSet);
+    grid.fillUpGrid(null, null, true, cellFormatter, 'result-cell');
+    if (showHeatMap) {
+        colorGrid(dataSet);
+    }
+    //re-add the handlers
+    this.addHandlers();
+}
+
+
+function plateSelected(plateIndex) {
+    experiment.selectPlate(plateIndex);
+    loadGrid(showNormalized ? experiment.normalizedData : experiment.data);
+    $('#rawDataLabel')[0].textContent = experiment.rawDataLabel();
+
+    stdCurve.updateStdCurveWithoutRecalculate();
 }
 
 window.onload = init;

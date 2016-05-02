@@ -27,7 +27,7 @@ function Scatter_control() {
 						if(keys.length > 0){
 							negative.push([i,column.rawData[keys[0]],column.outlier,plate.plateID,rowIdx,colIdx]);
 							//dotIndex array is 0 indexed
-							self.dotIndexes[i] = [rowIdx, colIdx, plate.plateID];
+							self.dotIndexes[i] = [plateIdx, rowIdx, colIdx, plate.plateID];
 							//Plate plateIdx applies to all indexes "i" or lower
 							plateLabels[i] = plateIdx+":"+plate.plateID;
 							i = i+1;
@@ -40,7 +40,7 @@ function Scatter_control() {
 						if(keys.length > 0){
 							positive.push([i,column.rawData[keys[0]],column.outlier,plate.plateID,rowIdx,colIdx]);
 							//dotIndex array is 0 indexed
-							self.dotIndexes[i] = [rowIdx, colIdx, plate.plateID];
+							self.dotIndexes[i] = [plateIdx, rowIdx, colIdx, plate.plateID];
 							//Plate plateIdx applies to all indexes "i" or lower
 							plateLabels[i] = plateIdx+":"+plate.plateID;
 							i = i+1;
@@ -124,9 +124,9 @@ function Scatter_control() {
 	          .attr("cy", function (d) { return y(d[1]); } )
 	          .attr("r", 8).attr("index", function (d,i) { return d[0]; })
 	          .style("fill", function (d) { return "red"; })
-	          .attr("row", function (d,i) { return self.dotIndexes[d[0]][0]; })
-              .attr("col", function (d,i) { return self.dotIndexes[d[0]][1]; })
-              .attr("plate", function (d,i) { return self.dotIndexes[d[0]][2]; });
+	          .attr("plate", function (d,i) { return self.dotIndexes[d[0]][0];})
+	          .attr("row", function (d,i) { return self.dotIndexes[d[0]][1]; })
+              .attr("col", function (d,i) { return self.dotIndexes[d[0]][2]; });
 	    
 	    g.selectAll("scatter-dots")
 	      .data(positive)
@@ -135,10 +135,9 @@ function Scatter_control() {
 	          .attr("cy", function (d) { return y(d[1]); } )
 	          .attr("r", 8).attr("index", function (d,j) { return d[0]; })
 	          .style("fill", function (d) { return "green"; })
-	    
-	          .attr("row", function (d,i) { return self.dotIndexes[d[0]][0]; })
-	          .attr("col", function (d,i) { return self.dotIndexes[d[0]][1]; })
-	          .attr("plate", function (d,i) { return self.dotIndexes[d[0]][2]; });
+	          .attr("plate", function (d,i) { return self.dotIndexes[d[0]][0]; })
+	          .attr("row", function (d,i) { return self.dotIndexes[d[0]][1]; })
+	          .attr("col", function (d,i) { return self.dotIndexes[d[0]][2]; });
 	}
 	
 }
