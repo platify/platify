@@ -254,8 +254,6 @@ function init() {
     	//Mark this boolean and let it fall through to click on the underlying histogram,
     	//so that we can get the correct value indexes
     	markingAsOutlier = false;
-    	//var indexes = $(event.target).attr('indexes');
-    	//markOutlierHistogramClick(indexes, false);
     });
     
     //Ths will mark all the items as outliers
