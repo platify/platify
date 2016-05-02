@@ -175,7 +175,7 @@ function init() {
     });
 
     //Set up scatterplot
-    scatter = new Scatter();
+    scatter = new Scatter(experiment);
     scatter.setData(experiment.data);
     
     //Get a scatter plot for all the controls in the plates
@@ -273,8 +273,13 @@ function init() {
     });
 
     // add scatterplot outlier listener
-    $(".circle").on('click', function(event){
+    $("#scatterplot .circle").on('click', function(event){
     	markOutlierScatterClick(event);
+    });
+
+    // add scatterplot outlier listener
+    $("#scatterplot_control .circle").on('click', function(event){
+        markOutlierScatterControlClick(event);
     });
 
     var resultUI = new ResultUI();
@@ -315,6 +320,27 @@ function markOutlierScatterClick(event) {
     console.log("col: "+col+" row: "+row);
 }
 
+function markOutlierScatterControlClick(event) {
+	var eventObj = $(event.target);
+	var indexVar = $(event.target).attr('index');
+	var row = scatterControl.dotIndexes[indexVar][0];
+	var col = scatterControl.dotIndexes[indexVar][1];
+	var barcode = scatterControl.dotIndexes[indexVar][2];
+
+    //toggleClass and hasClass aren't working here...
+    //$(event.target).closest("circle").toggleClass("outlier");
+	var s = $(event.target).attr('class');
+
+    if(s.indexOf('outlier')!==-1) {
+    	//Already has 'outlier' unset it
+    	markOutlierStatus(row, col, false, barcode);
+    } else {
+    	markOutlierStatus(row, col, true, barcode);
+    }
+//    experiment.savePlate();
+    console.log("col: "+col+" row: "+row);
+}
+
 function markOutlierGridClick(e, args) {
 	var col = args.cell;
     var row = args.row;
@@ -336,20 +362,31 @@ function markOutlierGridClick(e, args) {
 
 
 //Marks outliers in all visualizations
-function markOutlierStatus(row, col, isOutlier) {
+function markOutlierStatus(row, col, isOutlier, plateBarcode) {
     var colNum = col;
-	if(isOutlier) {
-		experiment.experiment.plates[experiment.currentPlateIndex].rows[row].columns[colNum].outlier = "true";
-	} else {
-		experiment.experiment.plates[experiment.currentPlateIndex].rows[row].columns[colNum].outlier = "false";
-	}
+//	if(isOutlier) {
+//		experiment.experiment.plates[experiment.currentPlateIndex].rows[row].columns[colNum].outlier = "true";
+//	} else {
+//		experiment.experiment.plates[experiment.currentPlateIndex].rows[row].columns[colNum].outlier = "false";
+//	}
+
+	// If no barcode supplied, get barcode of currently selected plate.
+    if (plateBarcode === null || plateBarcode === undefined)
+        plateBarcode = experiment.currentPlate.plateID;
+
+    var plate_index = experiment.getPlateIndex(plateBarcode);
+    if(isOutlier) {
+        experiment.experiment.plates[plate_index].rows[row].columns[col].outlier = "true";
+    } else {
+        experiment.experiment.plates[plate_index].rows[row].columns[col].outlier = "false";
+    }
 
 	// todo: The above is also performed in experiment.toggleOutlier(), which is called at end of this method.
 	// todo: Determine where is best to keep code.
 
 	var rowNum = parseInt(row)+1;
 	var colNum = parseInt(col)+1;
-	var scatterPoint = $('circle[row="'+row+'"][col="'+col+'"]');
+	var scatterPoint = $('circle[row="'+row+'"][col="'+col+'"][plate="'+plateBarcode+'"]');
 	if(isOutlier) {
 		scatterPoint.attr("class", "outlier circle");
 	} else {

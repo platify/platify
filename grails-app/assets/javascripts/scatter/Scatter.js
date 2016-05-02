@@ -1,7 +1,7 @@
 
 
-function Scatter() {
-	
+function Scatter(experiment) {
+	var plate = experiment.currentPlate.plateID;
 	//Keep track of which column/row each dot in the plot belongs to
 	this.dotIndexes = Array();
 	
@@ -18,7 +18,7 @@ function Scatter() {
 				data.push([i, column]);
 				i = i+1;
 				//dotIndex array is 0 indexed
-				self.dotIndexes[i-1] = [rowIdx, colIdx]
+				self.dotIndexes[i-1] = [rowIdx, colIdx, plate]
 			});
 		});
 	   
@@ -75,7 +75,8 @@ function Scatter() {
 	          .attr("cy", function (d) { return y(d[1]); } )
 	          .attr("r", 8).attr("index", function (d,i) { return d[0]; })
 	          .attr("row", function (d,i) { return self.dotIndexes[d[0]][0]; })
-	          .attr("col", function (d,i) { return self.dotIndexes[d[0]][1]; });
+	          .attr("col", function (d,i) { return self.dotIndexes[d[0]][1]; })
+	          .attr("plate", function (d,i) { return self.dotIndexes[d[0]][2]; });
 	    $("body").trigger("done_drawing");
 	}
 	

@@ -25,9 +25,9 @@ function Scatter_control() {
 						//negative.push([i,column.rawData["smoots"]]);
 						var keys = Object.keys(column.rawData);
 						if(keys.length > 0){
-							negative.push([i,column.rawData[keys[0]]]);
+							negative.push([i,column.rawData[keys[0]],column.outlier,plate.plateID,rowIdx,colIdx]);
 							//dotIndex array is 0 indexed
-							self.dotIndexes[i-1] = [rowIdx, colIdx];
+							self.dotIndexes[i] = [rowIdx, colIdx, plate.plateID];
 							//Plate plateIdx applies to all indexes "i" or lower
 							plateLabels[i] = plateIdx+":"+plate.plateID;
 							i = i+1;
@@ -38,12 +38,12 @@ function Scatter_control() {
 					if(column.control == "POSITIVE") {
 						var keys = Object.keys(column.rawData);
 						if(keys.length > 0){
-							positive.push([j,column.rawData[keys[0]]]);
+							positive.push([i,column.rawData[keys[0]],column.outlier,plate.plateID,rowIdx,colIdx]);
 							//dotIndex array is 0 indexed
-							self.dotIndexes[j-1] = [rowIdx, colIdx];
+							self.dotIndexes[i] = [rowIdx, colIdx, plate.plateID];
 							//Plate plateIdx applies to all indexes "i" or lower
-							plateLabels[j] = plateIdx+":"+plate.plateID;
-							j = j+1;
+							plateLabels[i] = plateIdx+":"+plate.plateID;
+							i = i+1;
 						}
 					}
 
@@ -123,7 +123,10 @@ function Scatter_control() {
 	          .attr("cx", function (d,i) { return x(d[0])} )
 	          .attr("cy", function (d) { return y(d[1]); } )
 	          .attr("r", 8).attr("index", function (d,i) { return d[0]; })
-	          .style("fill", function (d) { return "blue"; });
+	          .style("fill", function (d) { return "red"; })
+	          .attr("row", function (d,i) { return self.dotIndexes[d[0]][0]; })
+              .attr("col", function (d,i) { return self.dotIndexes[d[0]][1]; })
+              .attr("plate", function (d,i) { return self.dotIndexes[d[0]][2]; });
 	    
 	    g.selectAll("scatter-dots")
 	      .data(positive)
@@ -131,11 +134,11 @@ function Scatter_control() {
 	          .attr("cx", function (d,j) { return x(d[0])} )
 	          .attr("cy", function (d) { return y(d[1]); } )
 	          .attr("r", 8).attr("index", function (d,j) { return d[0]; })
-	          .style("fill", function (d) { return "red"; });
+	          .style("fill", function (d) { return "green"; })
 	    
-	    /*
 	          .attr("row", function (d,i) { return self.dotIndexes[d[0]][0]; })
-	          .attr("col", function (d,i) { return self.dotIndexes[d[0]][1]; });*/
+	          .attr("col", function (d,i) { return self.dotIndexes[d[0]][1]; })
+	          .attr("plate", function (d,i) { return self.dotIndexes[d[0]][2]; });
 	}
 	
 }
