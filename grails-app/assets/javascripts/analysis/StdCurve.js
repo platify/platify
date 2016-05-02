@@ -10,6 +10,7 @@ function StdCurve() {
     var ref_outlier_points;
     var regressionAllChecked;
     var previouslySet; //if standard curves were previously set
+    var stdCurvePlates;
 
     this.init = function(experiment) {
         this.experiment = experiment;
@@ -19,9 +20,9 @@ function StdCurve() {
         ref_outlier_points = [];
         previouslySet = false;
 
-        margin = {top: 10, right: 20, bottom: 30, left: 60};
-        width = 700 - margin.left - margin.right;
-        height = 500 - margin.top - margin.bottom;
+        margin = {top: 10, right: 30, bottom: 50, left: 60};
+        width = document.getElementById('stdCurveBody').offsetWidth - 100 - margin.left - margin.right;
+        height = 550 - margin.top - margin.bottom;
 
         var jqxhr = $.ajax({
             url: hostname + "/experimentalPlateSet/getControls/" + exp_id,
@@ -45,6 +46,7 @@ function StdCurve() {
         previouslySet = true;
         currentBarcode = experiment.currentPlate.plateID;
         current_result_index = getResultPlateIndex(currentBarcode);
+        setStdCurves();
         setRegression();
         updateStdCurve();
         storeNormalized();
@@ -67,31 +69,52 @@ function StdCurve() {
     });
 
     $("#refYCategorySelect").on('change','select', function() {
-        setStdCurves();
+        determineStdCurves();
+        displayStdCurveOptions();
     });
 
-    $(".circle").on('click', function(event){console.log(event);
-//        markOutlierScatterClick(event);
-    });
+    function displayStdCurveOptions() {
+        $('#scPlate').empty();
+        var sourcePlate = document.getElementById("scPlate");
+        var plateOption = new Option("default", "default", false, false);
+        sourcePlate.options[sourcePlate.options.length] = plateOption;
+        stdCurvePlates.forEach(function(barcode) {
+            var plateOption = new Option(barcode, barcode, false, false);
+            sourcePlate.options[sourcePlate.options.length] = plateOption;
+        });
+    }
 
-    // Set default std curve for each plate
-    function setStdCurves() {
-        var stdCurvePlate = [];
+    function determineStdCurves() {
+        stdCurvePlates = [];
         controls_editor_data.plates.forEach(function(plate) {
             plate.wells[0].labels.forEach(function(label) {
                 if (label.category.localeCompare(Y_CATEGORY) === 0)
-                    stdCurvePlate.push(plate.plateID);
+                    stdCurvePlates.push(plate.plateID);
                     return;
             });
         });
+    }
 
-        var currentStdCurve = stdCurvePlate[0];
-        experiment.experiment.plates.forEach(function(plate) {
-            if (stdCurvePlate.includes(plate.plateID))
-                currentStdCurve = plate.plateID;
-
-            plate.stdCurveBarcode = currentStdCurve;
-        });
+    // Set default std curve for each plate
+    function setStdCurves() {
+        var scBarcode = document.getElementById("scPlate").value;
+        if (scBarcode.localeCompare("default") === 0) {
+            var currentStdCurve = stdCurvePlates[0];
+            experiment.experiment.plates.forEach(function(plate) {
+                if (stdCurvePlates.includes(plate.plateID))
+                    currentStdCurve = plate.plateID;
+                if (regressionAllChecked || plate.plateID.localeCompare(currentBarcode) === 0) {
+                    plate.stdCurveBarcode = currentStdCurve;
+                }
+            });
+        }
+        else if (regressionAllChecked) {
+            experiment.experiment.plates.forEach(function(plate) {
+                plate.stdCurveBarcode = scBarcode;
+            });
+        }
+        else
+            experiment.experiment.plates[current_result_index].stdCurveBarcode = scBarcode;
     }
 
     // Set regression model for all plates
@@ -150,6 +173,7 @@ function StdCurve() {
             currentBarcode = experiment.currentPlate.plateID;
             current_result_index = getResultPlateIndex(currentBarcode);
             updateStdCurve();
+            updateSettings(); //display regression model settings for selected plate
         }
     }
 
@@ -167,6 +191,13 @@ function StdCurve() {
                 return i;
             }
         }
+    }
+
+    function updateSettings() {
+        var fitModel = experiment.experiment.plates[current_result_index].fitModel;
+        var degree = experiment.experiment.plates[current_result_index].degree;
+        $("input:radio[name=fitModel]").val([fitModel]);
+        document.getElementById('degree').value = degree;
     }
 
     function getRefPoints(barcode, editor_json) {
@@ -319,12 +350,12 @@ function StdCurve() {
             .range([height, 0]);
 
         // Create graph axes
-        graph.select(".x_axis")
+        graph.select("#stdCurveVis .x_axis")
             .attr("transform", "translate(0," + height + ")")
             .call(d3.svg.axis()
                 .scale(x_scale)
                 .orient("bottom"));
-        graph.select(".y_axis")
+        graph.select("#stdCurveVis .y_axis")
             .call(d3.svg.axis()
                 .scale(y_scale)
                 .orient("left"));
@@ -350,15 +381,17 @@ function StdCurve() {
             })
             .on("click", function(d) {
                 d3.select(this).style("fill", function(d) {
+                    var currentSC = experiment.experiment.plates[current_result_index].stdCurveBarcode;
+
                     if (d["outlier"].localeCompare("true") === 0) {
                         // Turn off outlier status
+                        experiment.toggleOutlier(d["row"], d["column"], false, "WELL", currentSC);
                         d["outlier"] = "false";
-                        markOutlierStatus(d["row"], d["column"], false);
                         return "green";
                     }
                     else {
+                        experiment.toggleOutlier(d["row"], d["column"], true, "WELL", currentSC);
                         d["outlier"] = "true";
-                        markOutlierStatus(d["row"], d["column"], true);
                         return "white";
                     }
                 });
@@ -376,7 +409,7 @@ function StdCurve() {
             .y(function(d) { return y_scale(d[1]); });
 
         if (fitModel == null) {
-            graph.selectAll("path.line").attr("d", line([]));
+            graph.selectAll("#stdCurveVis path.line").attr("d", line([]));
             return;
         }
 
@@ -394,9 +427,10 @@ function StdCurve() {
             return d3.ascending(a[0], b[0]);
         });
 
-        graph.selectAll("path.line")
+        graph.selectAll("#stdCurveVis path.line")
             .attr("d", line(interpolated_points))
-            .attr("stroke", "lightblue")
+            .attr("stroke", "gray")
+            .attr("width", 2)
             .attr("fill", "none");
     }
 

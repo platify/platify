@@ -1,7 +1,7 @@
 
 
-function Scatter() {
-	
+function Scatter(experiment) {
+	var plate = experiment.currentPlateIndex;
 	//Keep track of which column/row each dot in the plot belongs to
 	this.dotIndexes = Array();
 	
@@ -18,20 +18,20 @@ function Scatter() {
 				data.push([i, column]);
 				i = i+1;
 				//dotIndex array is 0 indexed
-				self.dotIndexes[i-1] = [rowIdx, colIdx]
+				self.dotIndexes[i-1] = [experiment.currentPlateIndex, rowIdx, colIdx, plate]
 			});
 		});
 	   
-	    var margin = {top: 20, right: 15, bottom: 60, left: 60}
+	    var margin = {top: 30, right: 30, bottom: 60, left: 60}
 	      , width = 960 - margin.left - margin.right
 	      , height = 500 - margin.top - margin.bottom;
 	    
 	    var x = d3.scale.linear()
-	              .domain([0, d3.max(data, function(d) { return d[0]; })])
+	              .domain([d3.min(data, function(d) { return +d[0]; }), d3.max(data, function(d) { return +d[0]; })])
 	              .range([ 0, width ]);
 	    
 	    var y = d3.scale.linear()
-	    	      .domain([0, d3.max(data, function(d) { return d[1]; })])
+	    	      .domain([d3.min(data, function(d) { return +d[1]; }), d3.max(data, function(d) { return +d[1]; })])
 	    	      .range([ height, 0 ]);
 	    
 	    var chart = d3.select('#scatterplot')
@@ -71,11 +71,12 @@ function Scatter() {
 	    g.selectAll("scatter-dots")
 	      .data(data)
 	      .enter().append("svg:circle").attr("class", "circle")
-	          .attr("cx", function (d,i) { return x(d[0]); } )
+	          .attr("cx", function (d,i) { return x(d[0])} )
 	          .attr("cy", function (d) { return y(d[1]); } )
 	          .attr("r", 8).attr("index", function (d,i) { return d[0]; })
-	          .attr("row", function (d,i) { return self.dotIndexes[d[0]][0]; })
-	          .attr("col", function (d,i) { return self.dotIndexes[d[0]][1]; });
+	          .attr("plate", function (d,i) { return self.dotIndexes[d[0]][0]; })
+	          .attr("row", function (d,i) { return self.dotIndexes[d[0]][1]; })
+	          .attr("col", function (d,i) { return self.dotIndexes[d[0]][2]; });
 	    $("body").trigger("done_drawing");
 	}
 	

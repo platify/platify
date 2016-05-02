@@ -15,9 +15,9 @@ function Histogram(json_data) {
     }
     
     this.initiateVis = function() {
-        margin = {top: 10, right: 30, bottom: 30, left: 50};
-        width = 600 - margin.left - margin.right;
-        height = 575 - margin.top - margin.bottom;
+        margin = {top: 10, right: 40, bottom: 80, left: 50};
+        width = document.getElementById('histogramBody').offsetWidth - 60 - margin.left - margin.right;
+        height = 550 - margin.top - margin.bottom;
 
         this.setUpGraph();
         this.setUpGraphOutliers();
@@ -28,6 +28,7 @@ function Histogram(json_data) {
         var x_data = [];
         var data_points = [];
         var self = this;
+        var data_type = ($('#normalizeButton').is(":checked")) ? "normalizedData" : "rawData";
         $.each(json_data.plates, function(plateIdx, plate){
             $.each(plate.rows, function (rowIdx, row) {
                 $.each(row.columns, function(colIdx, column){
@@ -39,18 +40,18 @@ function Histogram(json_data) {
 
                         data_points.push({
                             "name": compound_name,
-                            "value": +column.rawData[value_label],
+                            "value": +column[data_type][value_label],
                             "row":rowIdx,
                             "col":colIdx,
+                            "plate":plateIdx,
                             "outlier": column.outlier
                         });
-                    	
                     }
-
                 });
             });
         });
-        //x-data is in a more useful format before this
+
+        //x-data is in a more useful format than before this
         // Group data by compound name
         x_data = d3.nest().key(function(d) {
             return d.name;
@@ -73,6 +74,8 @@ function Histogram(json_data) {
         x_data = [];
         data_points = [];
         var self = this;
+        var data_type = ($('#normalizeButton').is(":checked")) ? "normalizedData" : "rawData";
+
         $.each(json_data.plates, function(plateIdx, plate){
             $.each(plate.rows, function (rowIdx, row) {
                 $.each(row.columns, function(colIdx, column){
@@ -84,7 +87,8 @@ function Histogram(json_data) {
 
                     data_points.push({
                         "name": compound_name,
-                        "value": +column.rawData[value_label],
+                        "value": +column[data_type][value_label],
+                        "plate": plateIdx,
                         "row":rowIdx,
                         "col":colIdx,
                         "outlier": column.outlier
@@ -92,7 +96,8 @@ function Histogram(json_data) {
                 });
             });
         });
-        //x-data is in a more useful format before this
+
+        //x-data is in a more useful format than before this
         // Group data by compound name
         x_data = d3.nest().key(function(d) {
             return d.name;
@@ -100,8 +105,10 @@ function Histogram(json_data) {
 
         // Calculate & store median and mean values for each compound
         x_data.forEach(function(compound) {
-            var mean = d3.mean(compound.values, function(d) { return d.value; });
-            var median = d3.median(compound.values, function(d) { return d.value; });
+            var mean = d3.mean(compound.values, function(d) {
+                return (!d.outlier || d.outlier.localeCompare("true" !== 0)) ? d.value : null; });
+            var median = d3.median(compound.values, function(d) {
+                return (!d.outlier || d.outlier.localeCompare("true" !== 0)) ? d.value : null; });
 
             compound.mean = +mean;
             compound.median = +median;
@@ -118,12 +125,7 @@ function Histogram(json_data) {
     	var replicate_option = $("input[name=replicate_option]:checked").val(); //"mean", "median", or "none"
 
         if (replicate_option.localeCompare("none") !== 0) {
-            x_data.forEach(function(compound) {
-            	if(compound["outlier"] == "true") {
-            		outlier_values.push(compound[replicate_option]);
-            	}
-                
-            })
+            return [];
         }
         else {
              x_data.forEach(function(compound) {
@@ -134,7 +136,7 @@ function Histogram(json_data) {
                 });
             });
         }
-        
+
         return outlier_values;
     }
     
@@ -166,14 +168,14 @@ function Histogram(json_data) {
         if (replicate_option.localeCompare("none") !== 0) {
             x_data.forEach(function(compound) {
                 if (compound[replicate_option] >= cutoff_value)
-                    cutoff_values.push([compound["key"], compound[replicate_option]]);
+                    cutoff_values.push([compound["key"], d3.format(".3f")(compound[replicate_option])]);
             })
         }
         else {
              x_data.forEach(function(compound) {
                 compound.values.forEach(function(data) {
-                    if (data.value >= cutoff_value)
-                        cutoff_values.push([compound["key"], data.value, data.row, data.col]);
+                    if (data.value >= cutoff_value && (!data.outlier || data.outlier.localeCompare("true") !== 0))
+                        cutoff_values.push([compound["key"], d3.format(".3f")(data.value), data.plate + "[" + data.row + "," + data.col + "]"]);
                 });
             });
         }
@@ -214,11 +216,11 @@ function Histogram(json_data) {
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-        // Set up axes
-        histogram.append("g")
-            .attr("transform", "translate(0," + height + ")")
-            .attr("class", "x_axis");
-        histogram.append("g").attr("class", "y_axis");
+//        // Set up axes
+//        histogram.append("g")
+//            .attr("transform", "translate(0," + height + ")")
+//            .attr("class", "x_axis");
+//        histogram.append("g").attr("class", "y_axis");
 
         // Create group for histogram bars
         histogram.append("g").attr("class", "bar_group_outliers");
@@ -228,19 +230,25 @@ function Histogram(json_data) {
     	//I think we can assume that x_data has already been populated here
     	var x_data_out = this.getXDataOutliers();
         var x_values_out = this.getOutlierValues(x_data_out);
-        
+
         if(x_values_out.length == 0) {
-        	//No outlier values
+        	//No outlier values. Hide outliers
+        	$(".bar_group_outliers").css("display", "none");
         	return;
+        } else {
+        	$(".bar_group_outliers").css("display", "inline");
         }
-        
+
         //Used to calculate the regular scale for the histogram
         var x_data = this.getXData();
         var x_values = this.getXValues(x_data);
-        
 
-        var min_x = d3.min(x_values_out);
-        var max_x = d3.max(x_values_out);
+
+        var min_x = d3.min(x_values);
+        var max_x = d3.max(x_values);
+
+        var min_x_out = d3.min(x_values_out);
+        var max_x_out = d3.max(x_values_out);
 
         var bin_width = +document.getElementById('bin_width').value;
         var num_bins;
@@ -260,22 +268,23 @@ function Histogram(json_data) {
             ticks = xScale.ticks(num_bins);
 
         var histogram = d3.layout.histogram()
-            .frequency(false)
+            .frequency(true)
             .bins(ticks);
-        
+
         var data = histogram(x_values_out);
       //Use the yScale from the original histogram data
         var histogram_scale = d3.layout.histogram()
-        .frequency(false)
+        .frequency(true)
         .bins(ticks);
+
         var data_scale = histogram_scale(x_values);
-        
+
         var yScale = d3.scale.linear()
             .domain([0, d3.max(data_scale, function(d) { return d.y; })])
             .range([height, 0]);
 
         var cutoff = +document.getElementById("cutoff").value;
-        
+
         this.updateBarsOutliers(data, xScale, yScale, bin_width + min_x, cutoff);
     }
     
@@ -303,7 +312,7 @@ function Histogram(json_data) {
             ticks = xScale.ticks(num_bins);
 
         var histogram = d3.layout.histogram()
-            .frequency(false)
+            .frequency(true)
             .bins(ticks);
         var data = histogram(x_values);
 
@@ -323,21 +332,38 @@ function Histogram(json_data) {
 
     this.updateAxes = function(xScale, yScale) {
     	//Check to make sure this transforms both axis
-        d3.select(".x_axis")
+        d3.select("#histogramVis .x_axis")
             .attr("transform", "translate(0," + height + ")")
             .call(d3.svg.axis()
                 .scale(xScale)
-                .orient("bottom"));
-        d3.select(".y_axis")
+                .orient("bottom"))
+            .selectAll("text")
+            .attr("transform", "rotate(-45)")
+            .style("text-anchor", "end");
+        d3.select("#histogramVis .y_axis")
             .call(d3.svg.axis()
                 .scale(yScale)
                 .orient("left"));
     }
 
+    
+  //This will sort your array
+    this.sortByValue = function (a, b){
+    	var sortVal = ((parseFloat(a.value) < parseFloat(b.value)) ? 1 : 0);
+      return sortVal;
+    }
+
+    
     this.updateBars = function(data, xScale, yScale, bin_width_from_min_x, cutoff) {
         var bar = d3.select(".bar_group").selectAll(".bar")
             .data(data);
         var i = 0;
+        var sortedPoints = data_points.slice();
+        var tmp = sortedPoints.sort(function(a, b){
+        	
+        	return a.value-b.value;
+        });
+        
         bar.enter().append("rect");
         //In the "indexes" attr here, use the global data var, and an incrementing index
         bar.attr("class", "bar")
@@ -345,7 +371,7 @@ function Histogram(json_data) {
             .attr("indexes", function(d){
             	var indexStr = "";
             	for(var sample = 0; sample < d.length; sample++) {
-            		indexStr = indexStr+String(data_points[i].row)+","+String(data_points[i].col)+";";
+            		indexStr = indexStr+String(sortedPoints[i].plate)+","+String(sortedPoints[i].row)+","+String(sortedPoints[i].col)+";";
             		i++;
             	}
             	
@@ -380,15 +406,7 @@ function Histogram(json_data) {
         //In the "indexes" attr here, use the global data var, and an incrementing index
         bar.attr("class", "bar")
             .attr("width", xScale(bin_width_from_min_x))
-            .attr("indexes", function(d){
-            	var indexStr = "";
-            	for(var sample = 0; sample < d.length; sample++) {
-            		indexStr = indexStr+String(data_points[i].row)+","+String(data_points[i].col)+";";
-            		i++;
-            	}
-            	
-            	return indexStr.slice(0, - 1);
-            })
+            .attr("indexes", function(d){return 0})
             .attr("height", function(d) { return height - yScale(d.y); })
             .attr("transform", function(d) {
                 return "translate(" + xScale(d.x) + "," + yScale(d.y) + ")";

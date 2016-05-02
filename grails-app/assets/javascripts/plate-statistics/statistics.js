@@ -12,6 +12,8 @@ var normalize = function(plate, label,
                           negativeControls, positiveControls) {
     var getRawValue = function(coords) {
         var well = plate.rows[coords[0]].columns[coords[1]];
+        if (well.outlier && well.outlier.localeCompare("true") === 0)
+            return null;
         return (well.rawData) ? well.rawData[label] : null;
     }
 
@@ -39,6 +41,8 @@ var zPrimeFactor = function(plate, label,
                             negativeControls, positiveControls) {
     var getRawValue = function(coords) {
         var well = plate.rows[coords[0]].columns[coords[1]];
+        if (well.outlier && well.outlier.localeCompare("true") === 0)
+            return null;
         return (well.rawData) ? well.rawData[label] : null;
     }
 
@@ -59,6 +63,8 @@ var zFactor = function(plate, label,
                        negativeControls, positiveControls) {
     var getRawValue = function(coords) {
         var well = plate.rows[coords[0]].columns[coords[1]];
+        if (well.outlier && well.outlier.localeCompare("true") === 0)
+            return null;
         return (well.rawData) ? well.rawData[label] : null;
     }
 
@@ -92,6 +98,8 @@ var zScore = function(plate, label,
                       negativeControls, positiveControls) {
     var getRawValue = function(coords) {
         var well = plate.rows[coords[0]].columns[coords[1]];
+        if (well.outlier && well.outlier.localeCompare("true") === 0)
+            return null;
         return (well.rawData) ? well.rawData[label] : null;
     }
 

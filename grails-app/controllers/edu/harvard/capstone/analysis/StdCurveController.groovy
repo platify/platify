@@ -49,12 +49,12 @@ class StdCurveController {
         render (resultData as JSON);
     }
 
-    def getPlates(int experiment_id) {
-        def referenceExperiment = ExperimentalPlateSet.findById(experiment_id);
-        def referencePlate = PlateSet.findAllByExperiment(referenceExperiment);
-        render g.select(id:"scPlate", name:"scPlate", from:referencePlate,
-            optionKey:'id', optionValue:"barcode", noSelection:[null:' '], onchange:"scPlateChanged(this.value)")
-    }
+//    def getPlates(int experiment_id) {
+//        def referenceExperiment = ExperimentalPlateSet.findById(experiment_id);
+//        def referencePlate = PlateSet.findAllByExperiment(referenceExperiment);
+//        render g.select(id:"scPlate", name:"scPlate", from:referencePlate,
+//            optionKey:'id', optionValue:"barcode", noSelection:[null:' '], onchange:"scPlateChanged(this.value)")
+//    }
 
     def getReferenceXCategories(int experiment_id) {
         def experiment = ExperimentalPlateSet.findById(experiment_id);

@@ -33,15 +33,30 @@
 								    </th>
 								  </tr>
 								  <tr>
+									  <td>
+										  <button type="button" class="btn btn-info" data-toggle="collapse"
+												  data-target="#config">+</button>
+										  <div id="config" class="collapse">
+											  <table>
+												  <td  ><label for="assayType">Assay Type</label></td>
+												  <td  ><input type="text" id="assayType" autocomplete="off"/></td>
+												  <td  ><label for="plateDimensions">Plate Dimensions</label></td>
+												  <td  ><input type="text" id="plateDimensions" autocomplete="off"/></td>
+											  </table>
+										  </div>
+									  </td>
+
 								    <td  ><label for="parsingName">Parsing Name</label></td>
 								    <td  ><input type="text" id="parsingName" autocomplete="off"/></td>
+
 								    <td  ><label for="machineName">Machine</label></td>
 								    <td ><input type="text" id="machineName" autocomplete="off"/></td>
+
 								  </tr>
-								  <tr>
-								    <td ><label for="parsingDescription">Parsing Description</label></td>
-								    <td  colspan="3"><textarea rows="2" cols="100" id="parsingDescription" ></textarea> </td>
-								  </tr>
+									<tr>
+										<td ><label for="parsingDescription">Parsing Description</label></td>
+										<td  colspan="3"><textarea rows="2" cols="100" id="parsingDescription" ></textarea> </td>
+									</tr>
 								</table>
                     		</h5>
                     	</div>

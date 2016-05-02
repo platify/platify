@@ -29,6 +29,8 @@ function ParserUI(parsingController){
     // Parsing
     var parsingNameElement = document.getElementById("parsingName");
     var machineNameElement = document.getElementById("machineName");
+    var wellRowElement = document.getElementById("plateDimensions");
+    var wellColumnElement = document.getElementById("assayType");
     var parsingDescriptionElement = document.getElementById("parsingDescription");
     var selectedFileElement = document.getElementById("selectedFile");
     var filesInput = document.getElementById("files");
@@ -100,6 +102,40 @@ function ParserUI(parsingController){
         }
     };
 
+    this.getPlateDimensions = function(){
+        if (_self.parseOnlyModeOn){
+            return wellRowElement.innerHTML;
+        } else {
+            return wellRowElement.value;
+        }
+    };
+
+    this.setPlateDimensions = function(plateDimensions){
+        if (_self.parseOnlyModeOn){
+            wellRowElement.innerHTML = plateDimensions;
+        } else {
+            wellRowElement.value = plateDimensions;
+        }
+    };
+
+
+    this.getAssayType = function(){
+        if (_self.parseOnlyModeOn){
+            return wellColumnElement.innerHTML;
+        } else {
+            return wellColumnElement.value;
+        }
+    };
+
+    this.setAssayType = function(assayType){
+        if (_self.parseOnlyModeOn){
+            wellColumnElement.innerHTML = assayType;
+        } else {
+            wellColumnElement.value = assayType;
+        }
+    };
+
+
     this.setParsingName = function(parsingName){
         if (_self.parseOnlyModeOn){
             parsingNameElement.innerHTML = parsingName;
@@ -125,6 +161,7 @@ function ParserUI(parsingController){
         }
     };
 
+
     this.getParsingDescription = function(){
         if (_self.parseOnlyModeOn){
             return parsingDescriptionElement.innerHTML;
@@ -132,6 +169,8 @@ function ParserUI(parsingController){
             return parsingDescriptionElement.value;
         }
     };
+
+
 
     this.setParsingDescription = function(parsingDescription){
         if (_self.parseOnlyModeOn){
@@ -315,6 +354,9 @@ function ParserUI(parsingController){
             _self.displayError(error);
         }
     };
+
+
+
 
     this.handleApplyFirstPlate = function(){
         var selectedCellRange = _self.getFirstPlateCellRange();
@@ -998,6 +1040,27 @@ function ParserUI(parsingController){
     // ---------------------- tabs event handler -----------------------------------------
 
 
+
+    this.handleClickCell = function(event, ui){
+        if (e.shiftKey) {
+            alert("shift+click")
+        }
+        if (e.ctrlKey) {
+            alert("control+click")
+        }
+
+        var newTab = ui.keyCode
+        var oldTab = ui.oldTab.index();
+
+        try {
+            _self.parsingController.changeStage(newTab, oldTab);
+        } catch (error) {
+            event.preventDefault();
+            _self.displayError(error);
+        }
+    };
+
+
     this.handleTabChange = function(event, ui){
         var newTab = ui.newTab.index();
         var oldTab = ui.oldTab.index();
@@ -1259,7 +1322,6 @@ function ParserUI(parsingController){
         addEvent(delimiterList, "change", _self.handleDelimiterChange);
 
         // ++++++++++++++++++ plate tab events +++++++++++++++++++++++++++++++++++++++++++
-
         addEvent(firstPlateCellRangeElement,
                  "change",
                  _self.handleFirstPlateCellRangeChange);
