@@ -21,7 +21,7 @@ function StdCurve() {
         previouslySet = false;
 
         margin = {top: 10, right: 30, bottom: 50, left: 60};
-        width = 700 - margin.left - margin.right;
+        width = document.getElementById('stdCurveBody').offsetWidth - 100 - margin.left - margin.right;
         height = 550 - margin.top - margin.bottom;
 
         var jqxhr = $.ajax({

@@ -16,8 +16,8 @@ function Histogram(json_data) {
     
     this.initiateVis = function() {
         margin = {top: 10, right: 40, bottom: 80, left: 50};
-        width = 600 - margin.left - margin.right;
-        height = 600 - margin.top - margin.bottom;
+        width = document.getElementById('histogramBody').offsetWidth - 60 - margin.left - margin.right;
+        height = 550 - margin.top - margin.bottom;
 
         this.setUpGraph();
         this.setUpGraphOutliers();

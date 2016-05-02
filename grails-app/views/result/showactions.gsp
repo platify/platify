@@ -114,7 +114,7 @@
                                 <div class="centerWrapper" style="text-align: center">
                                     <button id="stdCurveButton">Generate</button>
                                 </div>
-                            </div>
+                            </div><br>
                         </div>
 
                         <div class="col-md-9">
@@ -124,7 +124,7 @@
                                         <span id="stdCurveLabel"></span>
                                     </h4>
                                 </div>
-                                <div class="panel-body">
+                                <div class="panel-body" id="stdCurveBody">
                                     <div id="stdCurveVis"></div>
                                 </div>
                             </div>
@@ -147,30 +147,47 @@
                 <div id="histogram" style="width:100%;height:650px;">
                     <div class="col-md-2">
                         <div class="row">
-                            <h5><b>Replicates</b></h5>
+                            <h5><b>REPLICATE AGGREGATION</b></h5>
                             <input type="radio" name="replicate_option" value="mean"> Mean<br>
                             <input type="radio" name="replicate_option" value="median"> Median<br>
                             <input type="radio" name="replicate_option" value="none" checked="checked"> None<br>
-                        </div>
+                        </div><br>
                         <div class="row">
-                            <h5><b>Bin Width</b></h5>
+                            <h5><b>BIN WIDTH</b></h5>
                             <input type="text" id="bin_width" placeholder="bin_width" size="5" value=5>
-                        </div>
+                        </div><br>
                         <div class="row">
-                            <h5><b>Cut-off</b></h5>
+                            <h5><b>CUT-OFF</b></h5>
                             <input type="text" id="cutoff" placeholder="cutoff" size="5" value=0>
-                        </div>
+                        </div><br>
                         <div class="row">
                             <button id="histogramButton">Generate</button>
-                        </div>
+                        </div><br>
                     </div>
                     <div class="col-md-7">
-                        <div id="histogramVis"></div>
-                        <div id="histogramOutliers"></div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    %{--Empty heading label, but heading exists for consistency with other results tabs--}%
+                                </h4>
+                            </div>
+                            <div class="panel-body" id="histogramBody">
+                                <div id="histogramVis"></div>
+                                <div id="histogramOutliers"></div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-3" style="height:600px;overflow: auto;">
-                        <h4><b>Cut-Off Table</b></h4>
-                        <div id="cutoffTable"></div>
+                    <div class="col-md-3">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <span id="cutoffTableLabel">Cut-Off Table</span>
+                                </h4>
+                            </div>
+                            <div class="panel-body">
+                                <div id="cutoffTable" style="height:540px;width:100%+20;overflow: auto;"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -198,7 +215,7 @@
                             <div class="row">
                                 <div class="centerWrapper" style="text-align: center">
                                     <button id="doseResponseButton">Update Parameters</button>
-                                </div>
+                                </div><br>
                             </div>
                         </div>
 
@@ -209,7 +226,7 @@
                                         <span id="doseResponseLabel"></span>
                                     </h4>
                                 </div>
-                                <div class="panel-body">
+                                <div class="panel-body" id="doseResponseBody">
                                     <div id="doseResponseCurveVis"></div>
                                 </div>
                             </div>
