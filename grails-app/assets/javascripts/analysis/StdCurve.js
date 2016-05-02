@@ -429,7 +429,8 @@ function StdCurve() {
 
         graph.selectAll("#stdCurveVis path.line")
             .attr("d", line(interpolated_points))
-            .attr("stroke", "lightblue")
+            .attr("stroke", "gray")
+            .attr("width", 2)
             .attr("fill", "none");
     }
 

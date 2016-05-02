@@ -35,12 +35,13 @@ class FitDoseResponseCurveService {
                 parameters   : [:],
         ]
 
+        def compound_info = []
         ArrayList<Double> x = new ArrayList<Double>()
         ArrayList<Double> y = new ArrayList<Double>()
         ArrayList<String> exclusions = new ArrayList<String>()
         data.plates.each { plate ->
-            plate.rows.each { r ->
-                r.columns.each { c ->
+            plate.rows.eachWithIndex { r, r_i ->
+                r.columns.eachWithIndex { c, c_i ->
                     if (c.control == Well.WellControl.COMPOUND.toString().toUpperCase() &&
                             c.labels["compound"] == compound_name &&
                             "dosage" in c.labels.keySet() &&
@@ -48,6 +49,12 @@ class FitDoseResponseCurveService {
                         x.add(Double.parseDouble(c.labels["dosage"]))
                         y.add(Double.parseDouble(c.labels["raw_data"]))
                         exclusions.add("N")
+                        compound_info.push([
+                            barcode: plate.plateID,
+                            row: r_i,
+                            column: c_i,
+                            outlier: c.outlier
+                        ])
                     }
                 }
             }
@@ -90,6 +97,7 @@ class FitDoseResponseCurveService {
         fitData.x = s_x
         fitData.y1 = s_y1
         fitData.y2 = s_y2
+        fitData.compounds = compound_info
         fitData.err = false
         fitData.msg = ""
 
@@ -108,19 +116,27 @@ class FitDoseResponseCurveService {
                 parameters   : [:],
         ]
 
+        def compound_info = []
         ArrayList<Double> x = new ArrayList<Double>()
         ArrayList<Double> y = new ArrayList<Double>()
         ArrayList<String> exclusions = new ArrayList<String>()
         data.plates.each { plate ->
-            plate.rows.each { r ->
-                r.columns.each { c ->
+            plate.rows.eachWithIndex { r, r_i ->
+                r.columns.eachWithIndex { c, c_i ->
                     if (c.control == Well.WellControl.COMPOUND.toString().toUpperCase() &&
                             c.labels["compound"] == compound_name &&
                             "dosage" in c.labels.keySet() &&
                             "raw_data" in c.labels.keySet()) {
                         x.add(Double.parseDouble(c.labels["dosage"]))
                         y.add(Double.parseDouble(c.labels["raw_data"]))
-                        exclusions.add("N")
+                        def excludeStatus = (c.outlier && c.outlier == "true") ? "Y" : "N";
+                        exclusions.add(excludeStatus)
+                        compound_info.push([
+                                barcode: plate.plateID,
+                                row: r_i,
+                                column: c_i,
+                                outlier: c.outlier
+                        ])
                     }
                 }
             }
@@ -136,7 +152,7 @@ class FitDoseResponseCurveService {
         for(int i=0; i < x.size(); i++) {
             x1[i] = x.get(i);
             y1[i] = y.get(i);
-            exclusions1[i] = "N";
+            exclusions1[i] = exclusions.get(i);
         }
 
         try {
@@ -164,6 +180,7 @@ class FitDoseResponseCurveService {
             fitData.x = s_x
             fitData.y1 = s_y1
             fitData.y2 = s_y2
+            fitData.compounds = compound_info
             fitData.err = false
             fitData.msg = ""
         } catch (ConvergenceException e) {
@@ -207,7 +224,8 @@ class FitDoseResponseCurveService {
                     (0..n_columns - 1).each { columnIndex ->
                         plate.rows[rowIndex].columns << [
                                 labels : [:],
-                                control: Well.WellControl.EMPTY.toString().toUpperCase()
+                                control: Well.WellControl.EMPTY.toString().toUpperCase(),
+                                outlier: [:]
                         ]
                     }
                 }
@@ -247,9 +265,11 @@ class FitDoseResponseCurveService {
                         switch (resultLabel.labelType) {
                             case ResultLabel.LabelType.RAW_DATA:
                                 wellOut.labels["raw_data"] = resultLabel.value
+                                wellOut.outlier = resultLabel.outlier
                                 break
                             case ResultLabel.LabelType.NORMALIZED_DATA:
                                 wellOut.labels["normalized_data"] = resultLabel.value
+                                wellOut.outlier = resultLabel.outlier
                                 break
                         }
                     }

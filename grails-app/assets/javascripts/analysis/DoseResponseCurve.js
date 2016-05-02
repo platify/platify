@@ -1,6 +1,6 @@
 function DoseResponseCurve() {
     this.experiment;
-    var compound;
+    var currentCompoundData;
     var graph;
     var table;
     var x_scale;
@@ -56,17 +56,16 @@ function DoseResponseCurve() {
     });
 
     function renderDoseResponseCurve(data) {
-
         if (data.err==false) {
-            var dose_points = zip2(data.x, data.y1);
-            var fitted_points = zip2(data.x, data.y2);
+            var dose_points = zip2(data.x, data.y1, data.compounds);
+            var fitted_points = zip2(data.x, data.y2, data.compounds);
 
             var dose_SVGgroup = ".dose_group";
-            var fitted_SVGgroup = ".fitted_group";
+//            var fitted_SVGgroup = ".fitted_group";
 
             createAxes(dose_points.concat(fitted_points), width, height);
             plotPoints(dose_points, dose_SVGgroup);
-            plotPoints(fitted_points, fitted_SVGgroup);
+//            plotPoints(fitted_points, fitted_SVGgroup);
             drawLine(fitted_points);
 
             $("#minParameter").val(data.parameters['Min_ROUT'].toFixed(2));
@@ -81,12 +80,12 @@ function DoseResponseCurve() {
         }
     }
 
-    function zip2(a1, a2)
+    function zip2(a1, a2, c)
     {
         var i;
         var z = [];
         for(i=0; i < a1.length; i++)
-            z.push([a1[i], a2[i]]);
+            z.push([a1[i], a2[i], c[i]]);
         return z;
     }
 
@@ -162,21 +161,41 @@ function DoseResponseCurve() {
             .attr("cy", function(d) { return y_scale(d[1]); } )
             .attr("r", function() {
                 if (group == ".dose_group")
-                    return 2;
+                    return 3;
                 if (group == ".fitted_group")
                     return 3;
             })
             .style("stroke", function() {
                 if (group == ".dose_group")
-                    return "red";
+                    return "darkblue";
                 if (group == ".fitted_group")
                     return "green";
             })
-            .style("fill", function() {
-                if (group == ".dose_group")
-                    return "none";
-                if (group == ".fitted_group")
-                    return "green";
+            .style("fill", function(d) {
+                if (group == ".dose_group" && (!d[2].outlier || d[2].outlier.localeCompare("true") !== 0))
+                    return "blue";
+                else
+                    return "white";
+            })
+            .on("click", function(d) {
+                d3.select(this).style("fill", function(d) {console.log(d);
+                    if (d[2].outlier && d[2].outlier.localeCompare("true") === 0) {
+                        // Turn off outlier status
+                        experiment.toggleOutlier(d[2].row, d[2].column, false, "WELL", d[2].barcode);
+                        d[2].outlier = "false";
+                        return "blue";
+                    }
+                    else {
+                        experiment.toggleOutlier(d[2].row, d[2].column, true, "WELL", d[2].barcode);
+                        d[2].outlier = "true";
+                        return "white";
+                    }
+                });
+
+                updateDoseResponseCurve2(replaceDot($("#minParameter").val()),
+                            replaceDot($("#maxParameter").val()),
+                            replaceDot($("#ec50Parameter").val()),
+                            replaceDot($("#slopeParameter").val()));
             });
     }
 
@@ -195,8 +214,9 @@ function DoseResponseCurve() {
 
         graph.selectAll("path.line")
             .attr("d", line(sorted_points))
-            .attr("stroke", "lightblue")
-            .attr("fill", "none");
+            .attr("stroke", "gray")
+            .attr("fill", "none")
+            .attr("width", 2);
     }
 
     function replaceDot(dotString) {
