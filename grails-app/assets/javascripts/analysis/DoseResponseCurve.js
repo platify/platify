@@ -21,7 +21,10 @@ function DoseResponseCurve() {
     $("#compoundSelect").on('change','select', function() {
         if (COMPOUND=="null")
             return;
+        updateDoseResponseCurve();
+    });
 
+    function updateDoseResponseCurve() {
         var jqxhr = $.ajax({
             url: hostname + "/doseResponse/getfittedData?experiment_id=" + experiment.experiment.experimentID + "&compound_name=" + COMPOUND,
             contentType: 'application/json; charset=UTF-8',
@@ -32,7 +35,7 @@ function DoseResponseCurve() {
         jqxhr.success(function(data) {
             renderDoseResponseCurve(data);
         });
-    });
+    }
 
     function updateDoseResponseCurve2(min_param, max_param, ec50, slope) {
         var jqxhr = $.ajax({
@@ -43,7 +46,7 @@ function DoseResponseCurve() {
             method: 'POST',
             processData: false,
         });
-        jqxhr.success(function(data) {
+        jqxhr.success(function(data) {console.log("Successful retrieval of fit data.");
             renderDoseResponseCurve(data);
         });
     }
@@ -192,10 +195,7 @@ function DoseResponseCurve() {
                     }
                 });
 
-                updateDoseResponseCurve2(replaceDot($("#minParameter").val()),
-                            replaceDot($("#maxParameter").val()),
-                            replaceDot($("#ec50Parameter").val()),
-                            replaceDot($("#slopeParameter").val()));
+                updateDoseResponseCurve();
             });
     }
 

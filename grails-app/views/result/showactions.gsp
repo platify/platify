@@ -75,7 +75,7 @@
         <div class="panel-body">
             <div id="tabs" >
                 <ul style="background-color:#d9edf7;" >
-                    <li><a href="#resultGrid">Result Grid</a></li>
+                    <li><a href="#resultGrid">Heat Map</a></li>
                     <li><a href="#scatterplot">Scatter Plot</a></li>
                     <li><a href="#scatterplot_control">Controls Plot</a></li>
                     <li><a href="#standardCurve">Standard Curve</a></li>

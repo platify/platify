@@ -48,7 +48,8 @@ class FitDoseResponseCurveService {
                             "raw_data" in c.labels.keySet()) {
                         x.add(Double.parseDouble(c.labels["dosage"]))
                         y.add(Double.parseDouble(c.labels["raw_data"]))
-                        exclusions.add("N")
+                        def excludeStatus = (c.outlier && c.outlier == "true") ? "Y" : "N";
+                        exclusions.add(excludeStatus)
                         compound_info.push([
                             barcode: plate.plateID,
                             row: r_i,
