@@ -124,11 +124,7 @@ function Histogram(json_data) {
     	var replicate_option = $("input[name=replicate_option]:checked").val(); //"mean", "median", or "none"
 
         if (replicate_option.localeCompare("none") !== 0) {
-            x_data.forEach(function(compound) {
-            	if(compound["outlier"] == "true") {
-            		outlier_values.push(compound[replicate_option]);
-            	}
-            })
+            return [];
         }
         else {
              x_data.forEach(function(compound) {
@@ -235,8 +231,11 @@ function Histogram(json_data) {
         var x_values_out = this.getOutlierValues(x_data_out);
 
         if(x_values_out.length == 0) {
-        	//No outlier values
+        	//No outlier values. Hide outliers
+        	$(".bar_group_outliers").css("display", "none");
         	return;
+        } else {
+        	$(".bar_group_outliers").css("display", "inline");
         }
 
         //Used to calculate the regular scale for the histogram
