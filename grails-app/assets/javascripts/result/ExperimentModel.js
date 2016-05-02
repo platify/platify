@@ -481,18 +481,13 @@ function ExperimentModel() {
         return isNaN(rv) ? null : rv;
     }
 
-    this.toggleOutlier = function(row, col, isOutlier, scope, plateBarcode) {
+    this.toggleOutlier = function(plate, row, col, isOutlier, scope) {
         // todo: require that barcode is always supplied.
         // If no barcode supplied, get barcode of currently selected plate.
         if (plateBarcode === null || plateBarcode === undefined)
             plateBarcode = this.currentPlate.plateID;
 
-        var plate_index = this.getPlateIndex(plateBarcode);
-        if(isOutlier) {
-            experiment.experiment.plates[plate_index].rows[row].columns[col].outlier = "true";
-        } else {
-            experiment.experiment.plates[plate_index].rows[row].columns[col].outlier = "false";
-        }
+        var plateBarcode = this.experiment.plates[plate].barcode;
 
         var params = "?exp_id=" + this.experiment.experimentID
             + "&barcode=" + plateBarcode
@@ -515,14 +510,14 @@ function ExperimentModel() {
         // Update stats table when toggling outlier status
         var plateData = Object.keys(experiment.experiment.plates).map(function(plateIndex) {
             var row = [
-                       experiment.experiment.plates[plateIndex].plateID,
-                       experiment.experiment.plates[plateIndex].resultCreated,
-                       experiment.zFactor(plateIndex),
-                       experiment.zPrimeFactor(plateIndex),
-                       experiment.meanNegativeControl(plateIndex),
-                       experiment.meanPositiveControl(plateIndex),
-                       experiment.meanWellValues(plateIndex),
-                       plateIndex];
+                       experiment.experiment.plates[plate].plateID,
+                       experiment.experiment.plates[plate].resultCreated,
+                       experiment.zFactor(plate),
+                       experiment.zPrimeFactor(plate),
+                       experiment.meanNegativeControl(plate),
+                       experiment.meanPositiveControl(plate),
+                       experiment.meanWellValues(plate),
+                       plate];
             return row;
         });
         $('#plateTable').DataTable().clear().rows.add(plateData).draw();

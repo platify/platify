@@ -43,6 +43,7 @@ function Histogram(json_data) {
                             "value": +column[data_type][value_label],
                             "row":rowIdx,
                             "col":colIdx,
+                            "plate":plateIdx,
                             "outlier": column.outlier
                         });
                     }
@@ -87,7 +88,7 @@ function Histogram(json_data) {
                     data_points.push({
                         "name": compound_name,
                         "value": +column[data_type][value_label],
-                        "plate": plate.plateID,
+                        "plate": plateIdx,
                         "row":rowIdx,
                         "col":colIdx,
                         "outlier": column.outlier
@@ -370,7 +371,7 @@ function Histogram(json_data) {
             .attr("indexes", function(d){
             	var indexStr = "";
             	for(var sample = 0; sample < d.length; sample++) {
-            		indexStr = indexStr+String(sortedPoints[i].row)+","+String(sortedPoints[i].col)+";";
+            		indexStr = indexStr+String(sortedPoints[i].plate)+","+String(sortedPoints[i].row)+","+String(sortedPoints[i].col)+";";
             		i++;
             	}
             	
@@ -405,15 +406,7 @@ function Histogram(json_data) {
         //In the "indexes" attr here, use the global data var, and an incrementing index
         bar.attr("class", "bar")
             .attr("width", xScale(bin_width_from_min_x))
-            .attr("indexes", function(d){
-            	var indexStr = "";
-            	for(var sample = 0; sample < d.length; sample++) {
-            		indexStr = indexStr+String(data_points[i].row)+","+String(data_points[i].col)+";";
-            		i++;
-            	}
-
-            	return indexStr.slice(0, - 1);
-            })
+            .attr("indexes", function(d){return 0})
             .attr("height", function(d) { return height - yScale(d.y); })
             .attr("transform", function(d) {
                 return "translate(" + xScale(d.x) + "," + yScale(d.y) + ")";
