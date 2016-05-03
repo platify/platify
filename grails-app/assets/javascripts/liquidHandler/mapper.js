@@ -2,13 +2,62 @@
  * Created by rbw on 4/16/16.
  */
 
+
+// global vars
 var compounds = [];
+var assays = [];
 
-
-// Populate the Assay list dropdown in the modal dialog on "Configure Mapping"
+/**
+ * Populate the Assay list dropdown in the modal dialog on "Configure Mapping"
+ */
 function populateAssayList() {
 
+    // AJAX call to get assay list from Platify
+    fetchAssayList();
+
+    assayListSelect = document.getElementById('assayList');
+
+    var assay;
+    for (asasy in assays) {
+        assayListSelect.options[assayListSelect.options.length] = new Option(assay.name + "(" + assay.owner + ")", assay.id);
+    }
 }
+
+/**
+ * Call to Platify server to get list of compounds from experiment/assay
+ */
+function fetchAssayList() {
+    "use strict";
+    var jqxhr = $.ajax({
+        url: hostname + "/experimentalplateset/getassays/",
+        type: "GET",
+        data: null,
+        processData: false,
+        contentType: "application/json; charset=UTF-8"
+    }).done(function() {
+        console.log("success");
+    }).fail(function() {
+        console.log("error");
+        alert("An error has occurred while fetching compound data from the server.");
+    }).always(function() {
+        console.log("complete");
+    });
+
+    // Set another completion function for the request above
+    jqxhr.always(function(resData) {
+        console.log("assay list call complete");
+//        $("#gridView").show();
+        var jsonData;
+
+        console.log(JSON.stringify(resData));
+        jsonData = JSON.parse(JSON.stringify(resData));
+
+        assays = jsonData.assay;
+    });
+}
+
+
+
 
 
 // Create the compound list in the DOM
@@ -59,36 +108,6 @@ function loadCompoundJsonData(compoundJson) {
 
     setCompoundList();
 
-}
-
-
-/**
- * Call to Platify server to get list of compounds from experiment/assay
- */
-function fetchAssayList() {
-    "use strict";
-    var jqxhr = $.ajax({
-        url: hostname + "/experimentalplateset/getassays/",
-        type: "GET",
-        data: null,
-        processData: false,
-        contentType: "application/json; charset=UTF-8"
-    }).done(function() {
-        console.log("success");
-    }).fail(function() {
-        console.log("error");
-        alert("An error has occurred while fetching compound data from the server.");
-    }).always(function() {
-        console.log("complete");
-    });
-
-    // Set another completion function for the request above
-    jqxhr.always(function(resData) {
-        console.log( "compound complete" );
-//        console.log("templateJson=" + JSON.stringify(resData));
-        $("#gridView").show();
-        loadCompoundJsonData(JSON.stringify(resData));
-    });
 }
 
 
@@ -211,13 +230,12 @@ function parseCompoundLiquidHandlerLocationJsonData(jsonData) {
 }
 
 
+// Perform this function when each compound item is selected
 function onViewSelect(clickedEL) {
     "use strict";
     var elValArr, plateId;
     $("#gridView").hide();
     $("#loaderView").show();
-
-    populateAssayList();
 
 /*    elValArr = clickedEL.value.split("-");
     plateId = elValArr[0];
@@ -238,6 +256,9 @@ function onViewSelect(clickedEL) {
  */
 function init() {
 //    "use strict";
+
+    populateAssayList();
+
 }
 
 window.onload = init;
