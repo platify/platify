@@ -121,8 +121,9 @@ function loadCompoundJsonData(compoundJson) {
  */
 function fetchAssayCompoundList(selectedAssay) {
     "use strict";
+    console.log("calling with value: " + selectedAssay.value);
     var jqxhr = $.ajax({
-        url: hostname + "/plate/getCompoundsByAssay/?id=" + selectedAssay.value,
+        url: hostname + "/plate/getCompoundsByAssay/?assayId=" + selectedAssay.value,
         type: "POST",
         data: null,
         processData: false,

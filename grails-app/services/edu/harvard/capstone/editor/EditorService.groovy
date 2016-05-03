@@ -585,15 +585,13 @@ class EditorService {
 
 
 
-    // Get all compounds by experiment/assay and return in a JSON list
+    // Get all compounds by experimentalplateset/assay and return in a JSON list
     def getCompoundListByAssay(Integer assayId) {
+        def experimentalPlateSetInstance = ExperimentalPlateSet.findById(assayId);
 
-        def compound = [:]
-
-        // get list of all compounds
-        def compounds = Compound.findAll()
-
-        compound = compounds
+        // get list of all compounds in assay
+        def compounds = Compound.findAllByExperiment(experimentalPlateSetInstance);
+//        def compounds = Compound.findAll()
 
         /*
         compounds.each {
