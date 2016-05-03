@@ -4,14 +4,20 @@
 
 var compounds = [];
 
+
+// Populate the Assay list dropdown in the modal dialog on "Configure Mapping"
+function populateAssayList() {
+
+}
+
+
+// Create the compound list in the DOM
 function setCompoundList() {
     "use strict";
     var newDiv, innerDiv, newLabel, newCheckbox, compound;
     newDiv = document.createElement("div");
     for (compound in compounds) {
 
-//        console.log("id2: " + compounds[compound].id);
-//        console.log("name2: " + compounds[compound].name);
         innerDiv = document.createElement("div");
 
         newCheckbox = document.createElement("input");
@@ -34,17 +40,6 @@ function setCompoundList() {
 }
 
 
-/*jslint browser:true */
-/*global $, jQuery, alert*/
-
-// constants
-var GRID_HEIGHT = 100;
-var GRID_WIDTH = 100;
-var CELL_HEIGHT = 35;
-var CELL_WIDTH = 85;
-var plateModel = {};
-var catLegend = {};
-
 
 /**
  * Loads a json data structure received from the server and parses for the Compound list
@@ -64,6 +59,36 @@ function loadCompoundJsonData(compoundJson) {
 
     setCompoundList();
 
+}
+
+
+/**
+ * Call to Platify server to get list of compounds from experiment/assay
+ */
+function fetchAssayList() {
+    "use strict";
+    var jqxhr = $.ajax({
+        url: hostname + "/experimentalplateset/getassays/",
+        type: "GET",
+        data: null,
+        processData: false,
+        contentType: "application/json; charset=UTF-8"
+    }).done(function() {
+        console.log("success");
+    }).fail(function() {
+        console.log("error");
+        alert("An error has occurred while fetching compound data from the server.");
+    }).always(function() {
+        console.log("complete");
+    });
+
+    // Set another completion function for the request above
+    jqxhr.always(function(resData) {
+        console.log( "compound complete" );
+//        console.log("templateJson=" + JSON.stringify(resData));
+        $("#gridView").show();
+        loadCompoundJsonData(JSON.stringify(resData));
+    });
 }
 
 
@@ -191,6 +216,8 @@ function onViewSelect(clickedEL) {
     var elValArr, plateId;
     $("#gridView").hide();
     $("#loaderView").show();
+
+    populateAssayList();
 
 /*    elValArr = clickedEL.value.split("-");
     plateId = elValArr[0];
