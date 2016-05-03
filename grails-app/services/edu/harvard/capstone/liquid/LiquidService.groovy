@@ -113,7 +113,7 @@ class LiquidService {
         def jsonSlurper = new JsonSlurper()
         def responseObject = jsonSlurper.parseText(jsonResponse)
 
-        // call new LiquidHandlerDeviceController on "config"
+        // call new LiquidHandlerDevice on "config"
         def i = responseObject.inputPlatesQuantity
         def o = responseObject.outputPlatesQuantity
 
@@ -142,7 +142,7 @@ class LiquidService {
         def jsonSlurper = new JsonSlurper()
         def responseObject = jsonSlurper.parseText(jsonResponse)
 
-        // call new LiquidHandlerDeviceController on "config"
+        // call new LiquidHandlerDevice on "config"
         def barcode = responseObject.barcode
         def well = responseObject.well
         def concentration = responseObject.concentration
