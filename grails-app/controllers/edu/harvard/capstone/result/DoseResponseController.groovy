@@ -1,4 +1,4 @@
-package edu.harvard.capstone.analysis
+package edu.harvard.capstone.result
 
 import edu.harvard.capstone.editor.DomainLabel
 import edu.harvard.capstone.editor.PlateSet
