@@ -248,6 +248,12 @@ function onViewSelect(clickedEL) {
     document.getElementById("assayList").selectedIndex = 0;
     document.getElementById("getMappingInstructions").hidden = true;
 
+    // init modal values
+    document.getElementById("liquidHandlerName").textContent = clickedEL.dataset.name;
+    document.getElementById("liquidHandlerInputPlates").textContent = clickedEL.dataset.inputplates;
+    document.getElementById("liquidHandlerOutputPlates").textContent = clickedEL.dataset.outputplates;
+
+
     $("#gridView").hide();
     $("#loaderView").show();
 
