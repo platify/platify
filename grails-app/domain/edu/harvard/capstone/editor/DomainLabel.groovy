@@ -7,7 +7,7 @@ class DomainLabel {
 	LabelType labelType
 	PlateSet plate = null 	// If it's null, it a template label, if not is part of a plate
 
-	enum LabelType{
+	enum LabelType {
 		WELL, PLATE, PLATE_SET, EXPERIMENT
 	}
 

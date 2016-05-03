@@ -84,16 +84,29 @@
                     <div class="col-sm-4" style="padding:10px; height:400px;">
                         <div class="panel panel-default">
                             <div class="panel-heading">
+                                <h4 class="panel-title">Select Experiment/Assay</h4>
+                            </div>
+                            <div class="panel-body">
+                                <select id="assayList" name="assayList" onchange="fetchAssayCompoundList(this);">
+                                    <option></option>
+                                </select>
+                            </div>
+                        </div>
+
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
                                 <h4 class="panel-title">Compounds</h4>
                             </div>
                             <div class="panel-body">
                                 <div id="compoundList"></div>
                             </div>
                             <div style="padding-left: 10px; padding-bottom: 10px;">
-                                <button type="button" class="btn btn-default" onclick="getCompoundLocations();">Get Mapping Instructions</button>
+                                <button type="button" class="btn btn-default" onclick="getCompoundLocations();" id="getMappingInstructions">Get Mapping Instructions</button>
                             </div>
                         </div>
 
+                        <!--
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <h4 class="panel-title">Plate Data</h4>
@@ -102,7 +115,7 @@
                                 <div id="platedata"></div>
                             </div>
                         </div>
-
+                        -->
                     </div>
                     <div class="col-sm-8" style="padding:10px; height:400px;">
                         <div class="panel panel-default">

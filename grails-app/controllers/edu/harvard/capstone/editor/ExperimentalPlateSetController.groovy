@@ -219,6 +219,17 @@ class ExperimentalPlateSetController {
     }
   }
 
+  // Get list of all experiment/assays in Platify
+  def getAssayList(){
+    def AssayList = editorService.getAssayList()
+
+    render(contentType: "application/json") {
+      [assay: AssayList]
+    }
+
+  }
+
+
   @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
   def exportPlate(Integer max) {
 
