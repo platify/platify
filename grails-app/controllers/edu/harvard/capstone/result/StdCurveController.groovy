@@ -1,4 +1,4 @@
-package edu.harvard.capstone.analysis
+package edu.harvard.capstone.result
 
 import edu.harvard.capstone.editor.DomainLabel
 import edu.harvard.capstone.editor.ExperimentalPlateSet
@@ -18,22 +18,7 @@ import grails.converters.JSON
  */
 class StdCurveController {
     def springSecurityService
-    def editorService
     def resultService
-
-//    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
-
-    def show(){
-
-//        if (!springSecurityService.isLoggedIn()){
-//            redirect controller: 'experimentalPlateSet', action: 'index', method: 'GET'
-//            return
-//        }
-
-        def experimentList = ExperimentalPlateSet.listOrderByName();
-
-        respond experimentList as Object, model:[experimentList: experimentList]
-    }
 
     def getResultData(int experiment_id) {
         def resultData
@@ -49,13 +34,6 @@ class StdCurveController {
         render (resultData as JSON);
     }
 
-//    def getPlates(int experiment_id) {
-//        def referenceExperiment = ExperimentalPlateSet.findById(experiment_id);
-//        def referencePlate = PlateSet.findAllByExperiment(referenceExperiment);
-//        render g.select(id:"scPlate", name:"scPlate", from:referencePlate,
-//            optionKey:'id', optionValue:"barcode", noSelection:[null:' '], onchange:"scPlateChanged(this.value)")
-//    }
-
     def getReferenceXCategories(int experiment_id) {
         def experiment = ExperimentalPlateSet.findById(experiment_id);
         def resultInstance = Result.findByExperiment(experiment);
@@ -66,7 +44,7 @@ class StdCurveController {
         result_labels.each { result_label -> labels.push(result_label.name) }
         render g.select(id:"refXCategory", name:"refXCategory", from:labels,
                 noSelection:[null:' '], onchange:"xCategoryChanged(this.value)")
-    }//
+    }
 
     def getReferenceYCategories(String barcode, int exp_id) {
         def experiment = ExperimentalPlateSet.findById(exp_id);
