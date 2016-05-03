@@ -66,10 +66,12 @@ function loadCompoundJsonData(compoundJson) {
 
 }
 
+
+
 /**
- * Call to Platify server to get list of compounds.
+ * Call to Platify server to get list of compounds from experiment/assay
  */
-function fetchCompoundList() {
+function fetchAssayCompoundList(selectedAssay) {
     "use strict";
     var jqxhr = $.ajax({
         url: hostname + "/plate/getCompounds/",
@@ -190,7 +192,6 @@ function onViewSelect(clickedEL) {
     $("#gridView").hide();
     $("#loaderView").show();
 
-    fetchCompoundList();
 /*    elValArr = clickedEL.value.split("-");
     plateId = elValArr[0];
     GRID_WIDTH = elValArr[1];

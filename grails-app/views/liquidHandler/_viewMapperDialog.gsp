@@ -84,6 +84,18 @@
                     <div class="col-sm-4" style="padding:10px; height:400px;">
                         <div class="panel panel-default">
                             <div class="panel-heading">
+                                <h4 class="panel-title">Select Experiment/Assay</h4>
+                            </div>
+                            <div class="panel-body">
+                                <select id="assayList" name="assayList" onchange="fetchAssayCompoundList(this);">
+                                    <option></option>
+                                </select>
+                            </div>
+                        </div>
+
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
                                 <h4 class="panel-title">Compounds</h4>
                             </div>
                             <div class="panel-body">
