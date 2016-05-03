@@ -1,4 +1,4 @@
-package edu.harvard.capstone.analysis
+package edu.harvard.capstone.result
 
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
@@ -16,6 +16,11 @@ class StdCurveControllerSpec extends Specification {
     def cleanup() {
     }
 
-    void "test something"() {
+    void "Test getting result data"() {
+        when:"The create action is executed"
+        controller.create()
+
+        then:"The model is correctly created"
+        model.resultInstance!= null
     }
 }

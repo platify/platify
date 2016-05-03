@@ -18,21 +18,6 @@ import grails.converters.JSON
  */
 class StdCurveController {
     def springSecurityService
-    def resultService
-
-    def getResultData(int experiment_id) {
-        def resultData
-        try{
-            def experiment = ExperimentalPlateSet.findById(experiment_id);
-            resultData = resultService.getResults(experiment)
-        }
-        catch (RuntimeException e) {
-            response.sendError(500)
-            return
-        }
-
-        render (resultData as JSON);
-    }
 
     def getReferenceXCategories(int experiment_id) {
         def experiment = ExperimentalPlateSet.findById(experiment_id);
