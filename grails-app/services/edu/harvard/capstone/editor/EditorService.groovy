@@ -577,14 +577,10 @@ class EditorService {
 
     // Get all compounds by experiment/assay and return in a JSON list
     def getAssayList() {
-        def assay = [:]
-
-        // get list of all compounds
+        // get list of all experimental plate sets
         def assays = ExperimentalPlateSet.findAll()
 
-        assay = assays
-
-        return compounds
+        return assays
     }
 
 

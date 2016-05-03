@@ -11,16 +11,16 @@ var assays = [];
  * Populate the Assay list dropdown in the modal dialog on "Configure Mapping"
  */
 function populateAssayList() {
-
-    // AJAX call to get assay list from Platify
-    fetchAssayList();
-
     assayListSelect = document.getElementById('assayList');
 
+    console.log("starting html insert");
+
     var assay;
-    for (asasy in assays) {
-        assayListSelect.options[assayListSelect.options.length] = new Option(assay.name + "(" + assay.owner + ")", assay.id);
+    for (assay in assays) {
+        console.log("doing html insert");
+        assayListSelect.options[assayListSelect.options.length] = new Option(assays[assay].name + " (" + assays[assay].owner + ")", assays[assay].id);
     }
+    console.log("endedhtml insert");
 }
 
 /**
@@ -29,7 +29,7 @@ function populateAssayList() {
 function fetchAssayList() {
     "use strict";
     var jqxhr = $.ajax({
-        url: hostname + "/experimentalplateset/getassays/",
+        url: hostname + "/ExperimentalPlateSet/getAssayList",
         type: "GET",
         data: null,
         processData: false,
@@ -46,13 +46,17 @@ function fetchAssayList() {
     // Set another completion function for the request above
     jqxhr.always(function(resData) {
         console.log("assay list call complete");
-//        $("#gridView").show();
+        $("#gridView").show();
         var jsonData;
 
         console.log(JSON.stringify(resData));
         jsonData = JSON.parse(JSON.stringify(resData));
 
+        console.log("assay: " + jsonData.assay[0].name);
+
         assays = jsonData.assay;
+
+        populateAssayList();
     });
 }
 
@@ -237,15 +241,19 @@ function onViewSelect(clickedEL) {
     $("#gridView").hide();
     $("#loaderView").show();
 
-/*    elValArr = clickedEL.value.split("-");
-    plateId = elValArr[0];
-    GRID_WIDTH = elValArr[1];
-    GRID_HEIGHT = elValArr[2];
+    fetchAssayList();
 
-    console.log("selectEvent!:" + plateId);
-    fetchPlateData(plateId);
-    */
+
+    /*    elValArr = clickedEL.value.split("-");
+        plateId = elValArr[0];
+        GRID_WIDTH = elValArr[1];
+        GRID_HEIGHT = elValArr[2];
+
+        console.log("selectEvent!:" + plateId);
+        fetchPlateData(plateId);
+        */
     $("#loaderView").hide();
+    $("#gridView").show();
 
 }
 
@@ -256,8 +264,6 @@ function onViewSelect(clickedEL) {
  */
 function init() {
 //    "use strict";
-
-    populateAssayList();
 
 }
 
