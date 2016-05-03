@@ -112,8 +112,9 @@ class PlateController {
 
     }
 
-    def getCompounds(){
-        def CompoundList = editorService.getCompoundList()
+    // Get compound list for experiment/assay
+    def getCompoundsByAssay(){
+        def CompoundList = editorService.getCompoundListByAssay()
 
         render(contentType: "application/json") {
             [compound: CompoundList]
