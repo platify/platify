@@ -18,7 +18,7 @@ function populateAssayList() {
     var assay;
     for (assay in assays) {
         console.log("doing html insert");
-        assayListSelect.options[assayListSelect.options.length] = new Option(assays[assay].name + " (" + assays[assay].owner + ")", assays[assay].id);
+        assayListSelect.options[assayListSelect.options.length] = new Option(assays[assay].name, assays[assay].id);
     }
     console.log("endedhtml insert");
 }
@@ -122,7 +122,7 @@ function loadCompoundJsonData(compoundJson) {
 function fetchAssayCompoundList(selectedAssay) {
     "use strict";
     var jqxhr = $.ajax({
-        url: hostname + "/plate/getCompounds/",
+        url: hostname + "/plate/getCompoundsByAssay/?id=" + selectedAssay.value,
         type: "POST",
         data: null,
         processData: false,

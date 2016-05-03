@@ -586,7 +586,7 @@ class EditorService {
 
 
     // Get all compounds by experiment/assay and return in a JSON list
-    def getCompoundListByAssay() {
+    def getCompoundListByAssay(Integer assayId) {
 
         def compound = [:]
 
