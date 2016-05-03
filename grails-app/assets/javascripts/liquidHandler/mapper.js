@@ -257,8 +257,6 @@ function onViewSelect(clickedEL) {
     $("#gridView").hide();
     $("#loaderView").show();
 
-    fetchAssayList();
-
 
     /*    elValArr = clickedEL.value.split("-");
         plateId = elValArr[0];
@@ -280,6 +278,7 @@ function onViewSelect(clickedEL) {
  */
 function init() {
 //    "use strict";
+    fetchAssayList();
 
 }
 
