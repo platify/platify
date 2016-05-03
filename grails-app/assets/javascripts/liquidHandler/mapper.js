@@ -73,23 +73,25 @@ function setCompoundList() {
 
         innerDiv = document.createElement("div");
 
-        newCheckbox = document.createElement("input");
-        newCheckbox.type = "checkbox";
-        newCheckbox.name = compounds[compound].id;
-        newCheckbox.value = compounds[compound].id;
-        newCheckbox.id = compounds[compound].id;
-        newCheckbox.setAttribute("onchange", "getCompoundLocations(this.id, this);");
+//        newCheckbox = document.createElement("input");
+//        newCheckbox.type = "checkbox";
+//        newCheckbox.name = compounds[compound].id;
+//        newCheckbox.value = compounds[compound].id;
+//        newCheckbox.id = compounds[compound].id;
+//        newCheckbox.setAttribute("onchange", "getCompoundLocations(this.id, this);");
 
         newLabel = document.createElement("label");
         newLabel.htmlFor = compounds[compound].id;
         newLabel.appendChild(document.createTextNode(" " + compounds[compound].name));
 
-        innerDiv.appendChild(newCheckbox);
+//        innerDiv.appendChild(newCheckbox);
         innerDiv.appendChild(newLabel);
         newDiv.appendChild(innerDiv);
 
     }
     document.getElementById("compoundList").innerHTML = newDiv.innerHTML;
+
+    document.getElementById("getMappingInstructions").hidden = false;
 }
 
 
@@ -239,6 +241,13 @@ function parseCompoundLiquidHandlerLocationJsonData(jsonData) {
 function onViewSelect(clickedEL) {
     "use strict";
     var elValArr, plateId;
+
+
+    // init data to empty
+    document.getElementById("compoundList").innerHTML = "";
+    document.getElementById("assayList").selectedIndex = 0;
+    document.getElementById("getMappingInstructions").hidden = true;
+
     $("#gridView").hide();
     $("#loaderView").show();
 
