@@ -83,7 +83,7 @@
 <!-- d3 -->
 <asset:javascript src="d3.v3.min.js" />
 
-<asset:javascript src="analysis/DoseResponseCurve.js" />
+<asset:javascript src="doseResponse/DoseResponseCurve.js" />
 
 <g:javascript>
     var EXPERIMENT_ID;

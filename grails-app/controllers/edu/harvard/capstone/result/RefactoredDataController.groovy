@@ -17,7 +17,7 @@ class RefactoredDataController {
 
 
     def save(Long id) {
-        def resultInstance = Result.get(id)
+        def resultInstance = Result.findById(id)
 
         if (!resultInstance){
             render(contentType: "application/json") {

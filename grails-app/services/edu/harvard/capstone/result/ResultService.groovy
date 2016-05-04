@@ -168,11 +168,28 @@ class ResultService {
 			throw new RuntimeException("Scientist does not exist")
 		}
 
+        //get data from the experiment and the equipment used
+    	def experimentInstance = ExperimentalPlateSet.get(data.experimentID)
+    	def equipmentInstance = Equipment.get(data.parsingID)
+    	if (!experimentInstance || !equipmentInstance){
+			throw new RuntimeException("Either the equipment or the experiment does not exist")
+		}
+
+        //get the template
+    	def plateList = PlateSet.findAllByExperiment(experimentInstance).collect{ it.plate }
+    	if (!plateList){
+			throw new RuntimeException("No plates")
+		}
+
+        if (!resultInstance){
+            throw new RuntimeException("A result set must be specified")
+        }
+
         def experiment = ExperimentalPlateSet.findById(data.experimentID);
 
         data.plates.eachWithIndex{ dataPlate, plateIndex ->
             def plate = PlateSet.findByExperimentAndBarcode(experiment, dataPlate.plateID)
-            def resultPlate = ResultPlate.findByBarcode(dataPlate.plateID);
+            def resultPlate = ResultPlate.findByBarcodeAndResult(dataPlate.plateID, resultInstance);
             def plateTemplate = plate.plate;
 
             def domainId;
@@ -186,12 +203,18 @@ class ResultService {
                         def label = ResultLabel.findOrCreateByNameAndLabelTypeAndScopeAndDomainId(
                                 key, ResultLabel.LabelType.NORMALIZED_DATA, ResultLabel.LabelScope.WELL, domainId)
                         label.outlier = wellInstance.outlier
+
+                        if (value == "")
+                            value = null
                         label.value = value
-                        label.save()
+
+                        if (!label.save(flush: true)){
+			    			throw new ValidationException("Normalized Data is not valid", label.errors)
+			    		}
                     }
                 }
             }
-        }
+        }//
 
         return resultInstance
 //

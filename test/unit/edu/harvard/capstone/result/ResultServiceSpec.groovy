@@ -390,14 +390,14 @@ class ResultServiceSpec extends Specification {
 	}		
 
 
-	/* Test the get data */	
+	/* Test the get data */
 	void "Test getting results with an incorrect resultInstance"() {
 		when: "No data"
 
 		def importData = service.getResults(null)
 
 		then:
-		importData == null
+		thrown(RuntimeException)
 	}	
 
 	void "Test getting the results"() {
@@ -437,7 +437,7 @@ class ResultServiceSpec extends Specification {
 				}
 			""")
 			def resultInstance = service.newRawData(data)
-			def result = service.getResults(resultInstance)
+			def result = service.getResults(experimentInstance)
 
 		then:
 			notThrown ValidationException
@@ -448,7 +448,7 @@ class ResultServiceSpec extends Specification {
 			Result.count() == 1
 			result != null
 			result.experimentID == experimentInstance.id
-			result.parsingID == equipmentInstance.id
+			result.plates[0].parsingID == equipmentInstance.id
 			result.plates.size() == 1
 			result.plates[0].labels.key == 'value'
 			result.plates[0].rows.size() == 1
