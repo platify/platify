@@ -116,6 +116,11 @@ function loadCompoundJsonData(compoundJson) {
 function fetchAssayCompoundList(selectedAssay) {
     "use strict";
     console.log("calling with value: " + selectedAssay.value);
+
+    $("#gridView").hide();
+    $("#loaderView").show();
+
+
     var jqxhr = $.ajax({
         url: hostname + "/plate/getCompoundsByAssay/?assayId=" + selectedAssay.value,
         type: "GET",
@@ -130,6 +135,10 @@ function fetchAssayCompoundList(selectedAssay) {
     }).always(function() {
         console.log("complete");
     });
+
+    $("#gridView").show();
+    $("#loaderView").hide();
+
 
     // Set another completion function for the request above
     jqxhr.always(function(resData) {
@@ -146,7 +155,7 @@ var selectedCompounds = [];
 /**
  * Call to Platify & (spoofed) to Liquid Handler to get location of compounds.
  */
-function getCompoundLocations(id, obj) {
+function getMappingInstructions(id, obj) {
 
     "use strict";
 

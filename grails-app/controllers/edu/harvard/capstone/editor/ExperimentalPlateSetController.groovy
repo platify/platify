@@ -337,4 +337,12 @@ class ExperimentalPlateSetController {
       '*'{ render status: NOT_FOUND }
     }
   }
+
+    def getCompounds(ExperimentalPlateSet exp) {
+        def compounds = editorService.getCompoundsOfExperiment(exp)
+
+        render(contentType: "application/json") {
+            [compounds: compounds]
+        }
+    }
 }

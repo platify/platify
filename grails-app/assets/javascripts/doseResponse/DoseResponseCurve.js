@@ -25,8 +25,10 @@ function DoseResponseCurve() {
     });
 
     function updateDoseResponseCurve() {
+        var data_type = ($('#normalizeButton').is(":checked")) ? "normalized_data" : "raw_data";
+
         var jqxhr = $.ajax({
-            url: hostname + "/doseResponse/getfittedData?experiment_id=" + experiment.experiment.experimentID + "&compound_name=" + COMPOUND,
+            url: hostname + "/doseResponse/getfittedData?experiment_id=" + experiment.experiment.experimentID + "&compound_name=" + COMPOUND + '&data_type=' + data_type,
             contentType: 'application/json; charset=UTF-8',
             data: null,
             method: 'POST',
@@ -38,9 +40,11 @@ function DoseResponseCurve() {
     }
 
     function updateDoseResponseCurve2(min_param, max_param, ec50, slope) {
+        var data_type = ($('#normalizeButton').is(":checked")) ? "normalized_data" : "raw_data";
+
         var jqxhr = $.ajax({
             url: hostname + "/doseResponse/getfittedData2?experiment_id=" + experiment.experiment.experimentID + "&compound_name=" + COMPOUND
-                + '&min_param=' + min_param + '&max_param=' + max_param + '&ec50=' + ec50 + '&slope=' + slope,
+                + '&min_param=' + min_param + '&max_param=' + max_param + '&ec50=' + ec50 + '&slope=' + slope + '&data_type=' + data_type,
             contentType: 'application/json; charset=UTF-8',
             data: null,
             method: 'POST',
