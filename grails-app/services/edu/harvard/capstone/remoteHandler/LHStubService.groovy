@@ -22,7 +22,7 @@ class LHStubService {
 		def compoundDetails
 		def valIdx
 
-		Paths.get(rrfRoot + '/Compounds.txt').withReader { reader ->
+		Paths.get(rrfRoot + '/Compounds.csv').withReader { reader ->
 			CSVParser csv = new CSVParser(reader, DEFAULT.withHeader())
 			def plateIdx = -1
 			for (record in csv.iterator()) {
