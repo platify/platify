@@ -63,48 +63,48 @@ class ResultController {
     }
 
 
-    @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
-    def read(Result resultInstance){
-        if (!springSecurityService.isLoggedIn()){
-            render(contentType: "application/json") {
-                [error: "User not logged in"]
-            }
-            return
-        } 
-
-        if (resultInstance == null) {
-            render(contentType: "application/json") {
-                [error: "Result not found"]
-            }
-            return
-        }
-
-        if (resultInstance.hasErrors()) {
-            render(contentType: "application/json") {
-                [error: resultInstance.errors]
-            }
-            return   
-        }
-        def result
-        try{
-            result = resultService.getResults(resultInstance)    
-        }
-        catch (ValidationException e) {
-            render(contentType: "application/json") {
-                [error: e.errors, message: e.message]
-            }            
-            return
-        } catch (RuntimeException e) {
-            render(contentType: "application/json") {
-                [error: e.message]
-            }  
-            return                      
-        }
-
-        render(contentType: "application/json") {
-            [ImportData: result]
-        } 
-    }
+//    @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
+//    def read(Result resultInstance){
+//        if (!springSecurityService.isLoggedIn()){
+//            render(contentType: "application/json") {
+//                [error: "User not logged in"]
+//            }
+//            return
+//        }
+//
+//        if (resultInstance == null) {
+//            render(contentType: "application/json") {
+//                [error: "Result not found"]
+//            }
+//            return
+//        }
+//
+//        if (resultInstance.hasErrors()) {
+//            render(contentType: "application/json") {
+//                [error: resultInstance.errors]
+//            }
+//            return
+//        }
+//        def result
+//        try{
+//            result = resultService.getResults(resultInstance)
+//        }
+//        catch (ValidationException e) {
+//            render(contentType: "application/json") {
+//                [error: e.errors, message: e.message]
+//            }
+//            return
+//        } catch (RuntimeException e) {
+//            render(contentType: "application/json") {
+//                [error: e.message]
+//            }
+//            return
+//        }
+//println(result)
+//        render(contentType: "application/json") {
+//            [ImportData: result]
+//        }
+//    }
 
 
     @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
