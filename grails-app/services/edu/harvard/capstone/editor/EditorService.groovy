@@ -676,7 +676,7 @@ class EditorService {
             compound.name = c.name
 
             // create the destinations JSON array
-            compound.destinations = [:]
+            compound.destinations = []
 
             def wells = Well.findAllByGroupName(c.name)
 
@@ -699,7 +699,14 @@ class EditorService {
 
                 // Super hack because the Label domain was given to us in a sad state
                 def dosageunits = Label.findById(c.id.toInteger() - 1)
-                destination.dosage = dosageunits.name
+
+                // test if units is null - then go back 2 ids
+                if (!dosageunits.units)
+                {
+                    dosageunits = Label.findById(c.id.toInteger() - 2)
+                }
+                
+                destination.dosage = replaceDot(dosageunits.name)
                 destination.unit = dosageunits.units
 
                 compound.destinations << destination
