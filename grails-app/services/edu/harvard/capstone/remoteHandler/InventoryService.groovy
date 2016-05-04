@@ -1,16 +1,17 @@
 package edu.harvard.capstone.remoteHandler
 
 import grails.transaction.Transactional
-
 import org.apache.commons.csv.CSVParser
-
 import static org.apache.commons.csv.CSVFormat.*
-
 import java.nio.file.Paths
-import java.util.Random;
+import java.nio.file.*
+import grails.util.Holders
+import groovy.json.*
+import java.io.Reader
+
 
 @Transactional
-class LHStubService {
+class InventoryService {
 
 	def compoundLocations() {
 		Random rnd = new Random()
@@ -22,7 +23,10 @@ class LHStubService {
 		def compoundDetails
 		def valIdx
 
-		Paths.get(rrfRoot + '/Compounds.txt').withReader { reader ->
+		def f1 = File(Paths.get(rrfRoot + '/Compounds.csv'))
+
+//		Paths.get(rrfRoot + '/Compounds.csv').withReader { reader ->
+  		f1.withReader { reader ->
 			CSVParser csv = new CSVParser(reader, DEFAULT.withHeader())
 			def plateIdx = -1
 			for (record in csv.iterator()) {

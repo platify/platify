@@ -3,6 +3,7 @@ package edu.harvard.capstone.editor
 import edu.harvard.capstone.result.Result
 import grails.plugin.springsecurity.annotation.Secured
 import static org.springframework.http.HttpStatus.*
+import edu.harvard.capstone.remoteHandler.InventoryService
 
 /**
  * Liquid Handler Controller
@@ -16,6 +17,7 @@ import static org.springframework.http.HttpStatus.*
 class LiquidHandlerController {
     def springSecurityService
     def liquidService
+    def inventoryService
 
     /**
      * Lists the liquid handler configurations
@@ -92,8 +94,19 @@ class LiquidHandlerController {
      * @return
      */
     def spoofCompoundLocations(){
+
+        /* Reagan's original code - Caleb wrote a different function to read from csv file */
+        /*
         render(contentType: "application/json") {
             [compound: liquidService.spoofCompoundLocations()]
         }
+        */
+
+        def is = new edu.harvard.capstone.remoteHandler.InventoryService()
+
+        render(contentType: "application/json") {
+            [compound: is.compoundLocations()]
+        }
+
     }
 }
