@@ -633,24 +633,6 @@ class EditorService {
         }
 
 
-        def plateLabels = DomainLabel.findAllByDomainIdAndLabelTypeAndPlate(plateInstance.plate.id, DomainLabel.LabelType.PLATE, plateInstance).collect {
-            it.label
-        }
-        plateLabels.each {
-            def label = [:]
-            label.category = it.category
-            label.name = it.name
-            label.value = it.value
-            label.id = it.id
-            plate.labels << label
-        }
-
-        plate.wells = []
-
-
-
-
-
 //        def compounds = Compound.findAll()
 
         /*
