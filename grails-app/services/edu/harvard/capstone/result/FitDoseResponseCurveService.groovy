@@ -24,7 +24,7 @@ class FitDoseResponseCurveService {
 
     }
 
-    def getfittedData2(ExperimentalPlateSet experiment, String compound_name, String max_param, String min_param, String ec50, String slope) {
+    def getfittedData2(ExperimentalPlateSet experiment, String compound_name, String max_param, String min_param, String ec50, String slope, String data_type) {
         if (!experiment) {
             throw new RuntimeException("The experiment does not exist")
         }
@@ -45,9 +45,9 @@ class FitDoseResponseCurveService {
                     if (c.control == Well.WellControl.COMPOUND.toString().toUpperCase() &&
                             c.labels["compound"] == compound_name &&
                             "dosage" in c.labels.keySet() &&
-                            "raw_data" in c.labels.keySet()) {
+                            data_type in c.labels.keySet()) {
                         x.add(Double.parseDouble(c.labels["dosage"]))
-                        y.add(Double.parseDouble(c.labels["raw_data"]))
+                        y.add(Double.parseDouble(c.labels[data_type]))
                         def excludeStatus = (c.outlier && c.outlier == "true") ? "Y" : "N";
                         exclusions.add(excludeStatus)
                         compound_info.push([
@@ -106,7 +106,7 @@ class FitDoseResponseCurveService {
     }
 
 
-    def getfittedData(ExperimentalPlateSet experiment, String compound_name) {
+    def getfittedData(ExperimentalPlateSet experiment, String compound_name, String data_type) {
         if (!experiment) {
             throw new RuntimeException("The experiment does not exist")
         }
@@ -127,9 +127,9 @@ class FitDoseResponseCurveService {
                     if (c.control == Well.WellControl.COMPOUND.toString().toUpperCase() &&
                             c.labels["compound"] == compound_name &&
                             "dosage" in c.labels.keySet() &&
-                            "raw_data" in c.labels.keySet()) {
+                            data_type in c.labels.keySet()) {
                         x.add(Double.parseDouble(c.labels["dosage"]))
-                        y.add(Double.parseDouble(c.labels["raw_data"]))
+                        y.add(Double.parseDouble(c.labels[data_type]))
                         def excludeStatus = (c.outlier && c.outlier == "true") ? "Y" : "N";
                         exclusions.add(excludeStatus)
                         compound_info.push([
