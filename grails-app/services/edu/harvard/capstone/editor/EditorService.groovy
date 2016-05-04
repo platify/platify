@@ -3,8 +3,7 @@ package edu.harvard.capstone.editor
 import edu.harvard.capstone.user.Scientist
 
 import grails.converters.JSON
-import groovy.json.JsonOutput
-import groovy.json.JsonSlurper
+import groovy.json.*
 import groovy.xml.MarkupBuilder
 import org.codehaus.groovy.grails.web.json.JSONObject
 import grails.validation.ValidationException
@@ -607,10 +606,40 @@ class EditorService {
 
             plateSets.each { ps ->
 
+                def wellCompounds = WellCompound.findAllByCompound(c)
+
+                wellCompounds.each { wc ->
+                    // test if well compound is the compound we're looking for!
+                    if (wc.compound.id == c.id) {
+
+                        def destination = [:]
+
+                        destination.plate = ps.barcode
+                        // warning: janky conversion logic from 0-based column, row design to
+                        // 1-based letter, row output
+
+                        def asciiletter = wc.well.row.toInteger() + 65
+
+                        destination.well = Character.toChars(asciiletter).toString() + wc.well.column.toString()
+                        destination.dosage = wc.amount
+                        destination.unit = wc.unit.toString()
+
+                        compound.destinations << destination
+                        compoundList << compound
+
+                    }
+
+                }
+
+/*
+older logic (MUCH SLOWER)
+ */
+
+                /*
                 def wells = Well.findAllByPlate(ps.plate)
 
                 wells.each { w1 ->
-                    def wellCompounds = WellCompound.findAllByWell(w1)
+                    def wellCompounds = WellCompound.findAllByWellAndCompound(w1, c)
 
                     wellCompounds.each { wc ->
                         // test if well compound is the compound we're looking for!
@@ -633,71 +662,15 @@ class EditorService {
 
                         }
                     }
+
                 }
+                    */
+
+
+
             }
 
         }
-
-//        def compounds = Compound.findAll()
-
-        /*
-        compounds.each {
-            def experiments = [:]
-
-            def plate = [:]
-            PlateSet.findAllByExperiment(it.experiment)
-
-            compound << it
-
-        }
-
-        plate.assay = plateInstance.assay
-        plate.experimentID = plateInstance.experiment.id
-        plate.templateID = plateInstance.plate.id
-        plate.plateID = plateInstance.barcode
-
-        plate.labels = []
-
-        def plateLabels = DomainLabel.findAllByDomainIdAndLabelTypeAndPlate(plateInstance.plate.id, DomainLabel.LabelType.PLATE, plateInstance).collect {
-            it.label
-        }
-        plateLabels.each {
-            def label = [:]
-            label.category = it.category
-            label.name = it.name
-            label.value = it.value
-            label.id = it.id
-            plate.labels << label
-        }
-
-        plate.wells = []
-
-        def wells = Well.findAllByPlate(plateInstance.plate)
-        wells.each {
-            def well = [:]
-            well.row = it.row
-            well.column = it.column
-            well.groupName = it.groupName
-            String c = it.control
-            well.control = c.toString().toLowerCase()
-            well.labels = []
-
-            def wellLabels = DomainLabel.findAllByDomainIdAndLabelTypeAndPlate(it.id, DomainLabel.LabelType.WELL, plateInstance).collect {
-                it.label
-            }
-            wellLabels.each {
-                def label = [:]
-                label.category = it.category
-                label.name = it.name
-                label.value = it.value
-                label.id = it.id
-                label.units = it.units
-                well.labels << label
-            }
-
-            plate.wells << well
-        }
-        */
 
         return compoundList
     }
