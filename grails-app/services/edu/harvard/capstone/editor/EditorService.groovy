@@ -606,6 +606,9 @@ class EditorService {
 
                 def plate = PlateSet.findByExperimentAndPlate(experimentalPlateSetInstance, w1.plate)
 
+                if (!plate)
+                    return //continue
+
                 destination.plate = plate.barcode
 
                 // warning: janky conversion logic from 0-based column, row design to
@@ -616,7 +619,7 @@ class EditorService {
                 destination.well = Character.toChars(asciiletter).toString() + w1.column.toString()
 
                 // Super hack because the Label domain was given to us in a sad state
-                def dosageunits = Label.findById(c.id.toInteger() + 1)
+                def dosageunits = Label.findById(c.id.toInteger() - 1)
                 destination.dosage = dosageunits.name
                 destination.unit = dosageunits.units
 
