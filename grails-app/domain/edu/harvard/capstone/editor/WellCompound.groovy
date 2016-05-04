@@ -7,7 +7,7 @@ class WellCompound {
 	String amount
 	Date dateCreated
 	
-	enum Unit{
+	enum Unit {
 		ML, PERCENT, MG, MOL
 	}
 	

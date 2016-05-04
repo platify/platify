@@ -592,10 +592,13 @@ class EditorService {
         // get list of all compounds in assay
         def compounds = Compound.findAllByExperiment(experimentalPlateSetInstance);
 
+        def compoundList = [:]
+
         // walk each compound and retrieve data
         compounds.each { c ->
             def compound = [:]
             compound.id = c.id
+            compound.name = c.name
 
             // create the destinations JSON array
             compound.destinations = [:]
@@ -618,20 +621,22 @@ class EditorService {
                             destination.plate = ps.barcode
                             // warning: janky conversion logic from 0-based column, row design to
                             // 1-based letter, row output
-                            destination.well = w1.row + w1.column
-                            destination.dosage = wc.amount
-                            destination.unit = wc.unit
 
-                            compounds
+                            def asciiletter = w1.row.toInteger() + 65
+
+                            destination.well = Character.toChars(asciiletter).toString() + w1.column.toString()
+                            destination.dosage = wc.amount
+                            destination.unit = wc.unit.toString()
+
+                            compound.destinations << destination
+                            compoundList << compound
+
                         }
                     }
-
                 }
             }
 
-
         }
-
 
 //        def compounds = Compound.findAll()
 
@@ -694,7 +699,7 @@ class EditorService {
         }
         */
 
-        return compounds
+        return compoundList
     }
 
     def getCompoundLocations(Integer compoundId) {
