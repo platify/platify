@@ -123,7 +123,6 @@ class LiquidService {
     // spoof Liquid Handler service call #2 to get locations of compounds in Liquid Handler
     // At a later date this can be accurately called to the LH to get the real information
     def spoofCompoundLocations() {
-
         // spoof web service call to Liquid Handler for compound locations
 
         // stub rest get request for the future engineer who wants to build this out!

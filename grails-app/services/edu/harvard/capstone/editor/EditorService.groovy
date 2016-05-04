@@ -3,8 +3,7 @@ package edu.harvard.capstone.editor
 import edu.harvard.capstone.user.Scientist
 
 import grails.converters.JSON
-import groovy.json.JsonOutput
-import groovy.json.JsonSlurper
+import groovy.json.*
 import groovy.xml.MarkupBuilder
 import org.codehaus.groovy.grails.web.json.JSONObject
 import grails.validation.ValidationException
@@ -663,130 +662,112 @@ class EditorService {
         return numString.replace("__dot__", ".")
     }
 
-
     // Get all compounds by experimentalplateset/assay and return in a JSON list
     def getCompoundListByAssay(Integer assayId) {
-        def experimentalPlateSetInstance = ExperimentalPlateSet.findById(assayId);
+        def compoundList = [:]
 
+        def experimentalPlateSetInstance = ExperimentalPlateSet.findById(assayId)
+
+        def compounds = Label.findAllByCategory("compound")
+
+        compounds.each { c ->
+            def compound = [:]
+            compound.id = c.id
+            compound.name = c.name
+
+            // create the destinations JSON array
+            compound.destinations = [:]
+
+            def wells = Well.findAllByGroupName(c.name)
+
+            wells.each { w1 ->
+                def destination = [:]
+
+                def plate = PlateSet.findByExperimentAndPlate(experimentalPlateSetInstance, w1.plate)
+
+                if (!plate)
+                    return //continue
+
+                destination.plate = plate.barcode
+
+                // warning: janky conversion logic from 0-based column, row design to
+                // 1-based letter, row output
+                // had to do this because inherited code from previous SAMS team
+                def asciiletter = w1.row.toInteger() + 65
+
+                destination.well = Character.toChars(asciiletter).toString() + w1.column.toString()
+
+                // Super hack because the Label domain was given to us in a sad state
+                def dosageunits = Label.findById(c.id.toInteger() - 1)
+                destination.dosage = dosageunits.name
+                destination.unit = dosageunits.units
+
+                compound.destinations << destination
+                compoundList << compound
+
+            }
+
+
+        }
+
+
+/*
+Old code that was built expecting the Compound domain object to be in use.
+Sadly, when testing I realized the Compound domain object was never built out
+and we are left to deal with the poor data model design from the SAMS team
+using the Label domain object. :/
+ */
+        /*
         // get list of all compounds in assay
         def compounds = Compound.findAllByExperiment(experimentalPlateSetInstance);
 
+
         // walk each compound and retrieve data
-        compounds.each {
+        compounds.each { c ->
             def compound = [:]
-            compound.id = it.id
+            compound.id = c.id
+            compound.name = c.name
 
             // create the destinations JSON array
             compound.destinations = [:]
 
             def plateSets = PlateSet.findAllByExperiment(experimentalPlateSetInstance)
 
-            plateSets.each {
-                def destination = [:]
-                destination.barcode = it.barcode
+            plateSets.each { ps ->
 
-                def wells = Well.findAllByPlate(it)
+                def wellCompounds = WellCompound.findAllByCompound(c)
 
-                wells.each {
-                    def wellcompound = WellCompound.findAllByCompound()
+                wellCompounds.each { wc ->
+                    // test if well compound is the compound we're looking for!
+                    if (wc.compound.id == c.id) {
+
+                        def destination = [:]
+
+                        destination.plate = ps.barcode
+                        // warning: janky conversion logic from 0-based column, row design to
+                        // 1-based letter, row output
+
+                        def asciiletter = wc.well.row.toInteger() + 65
+
+                        destination.well = Character.toChars(asciiletter).toString() + wc.well.column.toString()
+                        destination.dosage = wc.amount
+                        destination.unit = wc.unit.toString()
+
+                        compound.destinations << destination
+                        compoundList << compound
+
+                    }
+
                 }
+
+
             }
 
-
         }
+*/
 
 
-
-
-
-
-        PlateSetInstance.barcode
-
-
-
-        PlateTemplateInstance
-
-
-        def plateLabels = DomainLabel.findAllByDomainIdAndLabelTypeAndPlate(plateInstance.plate.id, DomainLabel.LabelType.PLATE, plateInstance).collect {
-            it.label
-        }
-        plateLabels.each {
-            def label = [:]
-            label.category = it.category
-            label.name = it.name
-            label.value = it.value
-            label.id = it.id
-            plate.labels << label
-        }
-
-        plate.wells = []
-
-
-
-
-
-//        def compounds = Compound.findAll()
-
-        /*
-        compounds.each {
-            def experiments = [:]
-
-            def plate = [:]
-            PlateSet.findAllByExperiment(it.experiment)
-
-            compound << it
-
-        }
-
-        plate.assay = plateInstance.assay
-        plate.experimentID = plateInstance.experiment.id
-        plate.templateID = plateInstance.plate.id
-        plate.plateID = plateInstance.barcode
-
-        plate.labels = []
-
-        def plateLabels = DomainLabel.findAllByDomainIdAndLabelTypeAndPlate(plateInstance.plate.id, DomainLabel.LabelType.PLATE, plateInstance).collect {
-            it.label
-        }
-        plateLabels.each {
-            def label = [:]
-            label.category = it.category
-            label.name = it.name
-            label.value = it.value
-            label.id = it.id
-            plate.labels << label
-        }
-
-        plate.wells = []
-
-        def wells = Well.findAllByPlate(plateInstance.plate)
-        wells.each {
-            def well = [:]
-            well.row = it.row
-            well.column = it.column
-            well.groupName = it.groupName
-            String c = it.control
-            well.control = c.toString().toLowerCase()
-            well.labels = []
-
-            def wellLabels = DomainLabel.findAllByDomainIdAndLabelTypeAndPlate(it.id, DomainLabel.LabelType.WELL, plateInstance).collect {
-                it.label
-            }
-            wellLabels.each {
-                def label = [:]
-                label.category = it.category
-                label.name = it.name
-                label.value = it.value
-                label.id = it.id
-                label.units = it.units
-                well.labels << label
-            }
-
-            plate.wells << well
-        }
-        */
-
-        return compounds
+        return compoundList
     }
 
     def getCompoundLocations(Integer compoundId) {
