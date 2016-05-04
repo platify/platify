@@ -627,7 +627,7 @@ class EditorService {
                     def dosageLabels = DomainLabel.withCriteria {
                         eq("domainId", wellId)
                         eq("plate", plate)
-                        eq("label", Label.findByCategory("dosage"))
+                      //  eq("label", Label.findByCategory("dosage"))
                     }
 
                     Label dosageLabel = null
@@ -720,7 +720,9 @@ class EditorService {
 
             }
 
-            compoundList << compound
+            if (compound.destinations.size() > 0) {
+                compoundList << compound
+            }
         }
 
 
