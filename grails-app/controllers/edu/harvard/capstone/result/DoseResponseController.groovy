@@ -59,12 +59,12 @@ class DoseResponseController {
 
 
     @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
-    def getfittedData(int experiment_id, String compound_name)
+    def getfittedData(int experiment_id, String compound_name, String data_type)
     {
         def resultData
         try{
             def experiment = ExperimentalPlateSet.findById(experiment_id);
-            resultData = fitDoseResponseCurveService.getfittedData(experiment, compound_name)
+            resultData = fitDoseResponseCurveService.getfittedData(experiment, compound_name, data_type)
         }
         catch (RuntimeException e) {
             response.sendError(500)
@@ -74,12 +74,12 @@ class DoseResponseController {
     }
 
     @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
-    def getfittedData2(int experiment_id, String compound_name, String max_param, String min_param, String ec50, String slope)
+    def getfittedData2(int experiment_id, String compound_name, String max_param, String min_param, String ec50, String slope, String data_type)
     {
         def resultData
         try{
             def experiment = ExperimentalPlateSet.findById(experiment_id);
-            resultData = fitDoseResponseCurveService.getfittedData2(experiment, compound_name, max_param, min_param, ec50, slope)
+            resultData = fitDoseResponseCurveService.getfittedData2(experiment, compound_name, max_param, min_param, ec50, slope, data_type)
         }
         catch (RuntimeException e) {
             response.sendError(500)
