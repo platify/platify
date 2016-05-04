@@ -23,14 +23,10 @@ class InventoryService {
 		def compoundDetails
 		def valIdx
 
-<<<<<<< HEAD:grails-app/services/edu/harvard/capstone/remoteHandler/InventoryService.groovy
 		def f1 = File(Paths.get(rrfRoot + '/Compounds.csv'))
 
 //		Paths.get(rrfRoot + '/Compounds.csv').withReader { reader ->
   		f1.withReader { reader ->
-=======
-		Paths.get(rrfRoot + '/Compounds.csv').withReader { reader ->
->>>>>>> 4fd44ab69267a30e38356b55270aa1f4e0f59e90:grails-app/services/edu/harvard/capstone/remoteHandler/LHStubService.groovy
 			CSVParser csv = new CSVParser(reader, DEFAULT.withHeader())
 			def plateIdx = -1
 			for (record in csv.iterator()) {
