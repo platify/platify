@@ -583,15 +583,56 @@ class EditorService {
     }
 
 
-
     // Get all compounds by experimentalplateset/assay and return in a JSON list
     def getCompoundListByAssay(Integer assayId) {
-        def experimentalPlateSetInstance = ExperimentalPlateSet.findById(assayId);
+        def compoundList = [:]
 
+        def experimentalPlateSetInstance = ExperimentalPlateSet.findById(assayId)
+
+        def compounds = Label.findAllByCategory("compound")
+
+        compounds.each { c ->
+            def compound = [:]
+            compound.id = c.id
+            compound.name = c.name
+
+            // create the destinations JSON array
+            compound.destinations = [:]
+
+            def wells = Well.findAllByGroupName(c.name)
+
+            wells.each { w1 ->
+                def destination = [:]
+
+                destination.plate = ps.barcode
+                // warning: janky conversion logic from 0-based column, row design to
+                // 1-based letter, row output
+
+                def asciiletter = wc.well.row.toInteger() + 65
+
+                destination.well = Character.toChars(asciiletter).toString() + wc.well.column.toString()
+                destination.dosage = wc.amount
+                destination.unit = wc.unit.toString()
+
+                compound.destinations << destination
+                compoundList << compound
+
+            }
+
+
+        }
+
+
+/*
+Old code that was built expecting the Compound domain object to be in use.
+Sadly, when testing I realized the Compound domain object was never built out
+and we are left to deal with the poor data model design from the SAMS team
+using the Label domain object. :/
+ */
+        /*
         // get list of all compounds in assay
         def compounds = Compound.findAllByExperiment(experimentalPlateSetInstance);
 
-        def compoundList = [:]
 
         // walk each compound and retrieve data
         compounds.each { c ->
@@ -631,46 +672,12 @@ class EditorService {
 
                 }
 
-/*
-older logic (MUCH SLOWER)
- */
-
-                /*
-                def wells = Well.findAllByPlate(ps.plate)
-
-                wells.each { w1 ->
-                    def wellCompounds = WellCompound.findAllByWellAndCompound(w1, c)
-
-                    wellCompounds.each { wc ->
-                        // test if well compound is the compound we're looking for!
-                        if (wc.compound.id == c.id) {
-
-                            def destination = [:]
-
-                            destination.plate = ps.barcode
-                            // warning: janky conversion logic from 0-based column, row design to
-                            // 1-based letter, row output
-
-                            def asciiletter = w1.row.toInteger() + 65
-
-                            destination.well = Character.toChars(asciiletter).toString() + w1.column.toString()
-                            destination.dosage = wc.amount
-                            destination.unit = wc.unit.toString()
-
-                            compound.destinations << destination
-                            compoundList << compound
-
-                        }
-                    }
-
-                }
-                    */
-
-
 
             }
 
         }
+*/
+
 
         return compoundList
     }
