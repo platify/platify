@@ -17,6 +17,8 @@ node_modules
 *.ipr
 *.iws
 /out
+*.class
+out/*
 
 # raw result files
 /web-app/rrf
