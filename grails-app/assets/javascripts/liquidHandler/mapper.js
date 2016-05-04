@@ -73,18 +73,10 @@ function setCompoundList() {
 
         innerDiv = document.createElement("div");
 
-//        newCheckbox = document.createElement("input");
-//        newCheckbox.type = "checkbox";
-//        newCheckbox.name = compounds[compound].id;
-//        newCheckbox.value = compounds[compound].id;
-//        newCheckbox.id = compounds[compound].id;
-//        newCheckbox.setAttribute("onchange", "getCompoundLocations(this.id, this);");
-
         newLabel = document.createElement("label");
         newLabel.htmlFor = compounds[compound].id;
         newLabel.appendChild(document.createTextNode(" " + compounds[compound].name));
 
-//        innerDiv.appendChild(newCheckbox);
         innerDiv.appendChild(newLabel);
         newDiv.appendChild(innerDiv);
 
@@ -126,7 +118,7 @@ function fetchAssayCompoundList(selectedAssay) {
     console.log("calling with value: " + selectedAssay.value);
     var jqxhr = $.ajax({
         url: hostname + "/plate/getCompoundsByAssay/?assayId=" + selectedAssay.value,
-        type: "POST",
+        type: "GET",
         data: null,
         processData: false,
         contentType: "application/json; charset=UTF-8"

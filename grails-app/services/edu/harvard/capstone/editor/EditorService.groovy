@@ -593,39 +593,44 @@ class EditorService {
         def compounds = Compound.findAllByExperiment(experimentalPlateSetInstance);
 
         // walk each compound and retrieve data
-        compounds.each {
+        compounds.each { c ->
             def compound = [:]
-            compound.id = it.id
+            compound.id = c.id
 
             // create the destinations JSON array
             compound.destinations = [:]
 
             def plateSets = PlateSet.findAllByExperiment(experimentalPlateSetInstance)
 
-            plateSets.each {
-                def destination = [:]
-                destination.barcode = it.barcode
+            plateSets.each { ps ->
 
-                def wells = Well.findAllByPlate(it)
+                def wells = Well.findAllByPlate(ps.plate)
 
-                wells.each {
-                    def wellcompound = WellCompound.findAllByCompound()
+                wells.each { w1 ->
+                    def wellCompounds = WellCompound.findAllByWell(w1)
+
+                    wellCompounds.each { wc ->
+                        // test if well compound is the compound we're looking for!
+                        if (wc.compound.id == c.id) {
+
+                            def destination = [:]
+
+                            destination.plate = ps.barcode
+                            // warning: janky conversion logic from 0-based column, row design to
+                            // 1-based letter, row output
+                            destination.well = w1.row + w1.column
+                            destination.dosage = wc.amount
+                            destination.unit = wc.unit
+
+                            compounds
+                        }
+                    }
+
                 }
             }
 
 
         }
-
-
-
-
-
-
-        PlateSetInstance.barcode
-
-
-
-        PlateTemplateInstance
 
 
         def plateLabels = DomainLabel.findAllByDomainIdAndLabelTypeAndPlate(plateInstance.plate.id, DomainLabel.LabelType.PLATE, plateInstance).collect {
