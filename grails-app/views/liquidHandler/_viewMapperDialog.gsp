@@ -101,9 +101,10 @@
                             <div class="panel-body">
                                 <div id="compoundList"></div>
                             </div>
-                            <div style="padding-left: 10px; padding-bottom: 10px;">
-                                <button type="button" class="btn btn-default" onclick="getMappingInstructions();" id="getMappingInstructions">Get Mapping Instructions</button>
-                            </div>
+                        </div>
+
+                        <div style="padding-left: 10px; padding-bottom: 10px;">
+                            <button type="button" class="btn btn-default" onclick="getMappingInstructions();" id="getMappingInstructions">Get Mapping Instructions</button>
                         </div>
 
                         <!--

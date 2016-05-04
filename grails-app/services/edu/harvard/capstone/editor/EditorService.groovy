@@ -627,7 +627,7 @@ class EditorService {
                     def dosageLabels = DomainLabel.withCriteria {
                         eq("domainId", wellId)
                         eq("plate", plate)
-                        eq("label", Label.findByCategory("dosage"))
+                      //  eq("label", Label.findByCategory("dosage"))
                     }
 
                     Label dosageLabel = null
@@ -664,11 +664,14 @@ class EditorService {
 
     // Get all compounds by experimentalplateset/assay and return in a JSON list
     def getCompoundListByAssay(Integer assayId) {
-        def compoundList = [:]
+        def compoundList = []
 
         def experimentalPlateSetInstance = ExperimentalPlateSet.findById(assayId)
 
-        def compounds = Label.findAllByCategory("compound")
+        // find unique compounds by name
+        def compounds = Label.findAllByCategory("compound").unique { cmp ->
+            cmp.name
+        }
 
         compounds.each { c ->
             def compound = [:]
@@ -705,16 +708,21 @@ class EditorService {
                 {
                     dosageunits = Label.findById(c.id.toInteger() - 2)
                 }
-                
+
+                // if still null, then continue out of this instance of the closure
+                if (!dosageunits.units)
+                    return
+
                 destination.dosage = replaceDot(dosageunits.name)
                 destination.unit = dosageunits.units
 
                 compound.destinations << destination
-                compoundList << compound
 
             }
 
-
+            if (compound.destinations.size() > 0) {
+                compoundList << compound
+            }
         }
 
 
