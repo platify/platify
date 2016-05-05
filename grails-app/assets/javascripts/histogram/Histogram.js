@@ -435,9 +435,18 @@ function Histogram(json_data) {
         var cutoff_data = cutoff_data.sort(function(a, b) {
             return d3.ascending(a[1], b[1]);
         });
-
-        var heading = d3.select("tr.heading").selectAll("th")
+    	var replicate_option = $("input[name=replicate_option]:checked").val(); //"mean", "median", or "none"
+    	var heading = null;
+    	if(replicate_option == "none") {
+    		$("#cutoffTable").addClass("positionTable");
+    		heading = d3.select("tr.heading").selectAll("th")
             .data(["Compound", "Pos","Value"]);
+    	} else {
+    		$("#cutoffTable").removeClass("positionTable");
+    		heading = d3.select("tr.heading").selectAll("th")
+            .data(["Compound", "Value",""]);
+    	}
+        
         heading.enter().append("th");
         heading.text(function(d) { return d; });
 

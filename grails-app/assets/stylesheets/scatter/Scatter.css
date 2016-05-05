@@ -55,7 +55,7 @@ svg {
 	padding-right: 5px;
 }
 
-#cutoffTable tr td:nth-child(2) { 
+.positionTable tr td:nth-child(2) { 
 	font-size:12px
 
 }
