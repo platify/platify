@@ -1,6 +1,5 @@
 package edu.harvard.capstone.editor
 
-import edu.harvard.capstone.result.Result
 import grails.plugin.springsecurity.annotation.Secured
 import static org.springframework.http.HttpStatus.*
 import edu.harvard.capstone.remoteHandler.InventoryService
@@ -102,10 +101,8 @@ class LiquidHandlerController {
         }
         */
 
-        def is = new edu.harvard.capstone.remoteHandler.InventoryService()
-
         render(contentType: "application/json") {
-            [compound: is.compoundLocations()]
+            [compound: inventoryService.compoundLocations().toString()]
         }
 
     }

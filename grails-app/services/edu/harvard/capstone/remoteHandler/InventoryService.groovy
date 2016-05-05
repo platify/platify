@@ -1,6 +1,7 @@
 package edu.harvard.capstone.remoteHandler
 
 import grails.transaction.Transactional
+import grails.web.JSONBuilder
 import org.apache.commons.csv.CSVParser
 import static org.apache.commons.csv.CSVFormat.*
 import java.nio.file.Paths
@@ -8,7 +9,6 @@ import java.nio.file.*
 import grails.util.Holders
 import groovy.json.*
 import java.io.Reader
-
 
 @Transactional
 class InventoryService {
@@ -19,32 +19,41 @@ class InventoryService {
 		if (!rrfRoot)
 			rrfRoot = Holders.grailsApplication.mainContext.servletContext.getRealPath('rrf')
 
+
 		def compoundList = new ArrayList<CompoundDetails>()
 		def compoundDetails
 		def valIdx
 
-		def f1 = File(Paths.get(rrfRoot + '/Compounds.csv'))
+
+		FileReader f1 = new FileReader(Paths.get(rrfRoot + '/Compounds.csv').toString());
 
 //		Paths.get(rrfRoot + '/Compounds.csv').withReader { reader ->
   		f1.withReader { reader ->
 			CSVParser csv = new CSVParser(reader, DEFAULT.withHeader())
 			def plateIdx = -1
+
+
 			for (record in csv.iterator()) {
 				plateIdx++
-				for (valIdx = 0; valIdx < record.size(); ++valIdx) {
-					compoundDetails = new CompoundDetails()
-					compoundDetails.name = record.get(valIdx)
-					compoundDetails.concentration = (rnd.nextInt(20) + 1) * 5000
-					compoundDetails.row = (int)(valIdx / 10)
-					compoundDetails.col = valIdx % 10
-					compoundDetails.srcPlateId = plateIdx
-					compoundList.push(compoundDetails)
+					for (valIdx = 0; valIdx < record.size(); ++valIdx) {
+
+						compoundDetails = new CompoundDetails()
+						compoundDetails.name = record.get(valIdx)
+						compoundDetails.concentration = (rnd.nextInt(20) + 1) * 5000
+						compoundDetails.row = (int)(valIdx / 10)
+						compoundDetails.col = valIdx % 10
+						compoundDetails.srcPlateId = 'LHS' + plateIdx
+
+						compoundList.push(compoundDetails)
+					}
 				}
 			}
+
 		}
-		
+
+
 		def json = JsonOutput.toJson(compoundList)
-		   
+
 		   
 		/*
 		def builder = new groovy.json.JsonBuilder()
@@ -71,6 +80,8 @@ class InventoryService {
 			}
 		}
 		*/
+//		json = JsonOutput.prettyPrint(json.toString())
+
 		return json
     }
 }
