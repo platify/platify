@@ -54,6 +54,12 @@ svg {
 #cutoffTable tr th {
 	padding-right: 5px;
 }
+
+#cutoffTable tr td:nth-child(2) { 
+	font-size:12px
+
+}
+
 #cutoffTable tr {
 	border-bottom:1px solid #ddd;
 }
