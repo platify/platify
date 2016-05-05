@@ -42,8 +42,8 @@ class EditorServiceSpec extends Specification {
     		def experiment = service.newExperiment("", "description")
     	then:
     		experiment.hasErrors()
-    		
-    }    
+
+    }
 
     void "Test experiment creation correct params"(){
     	when: "Correct data"
@@ -54,7 +54,7 @@ class EditorServiceSpec extends Specification {
     	then:
     		experiment != null
     		ExperimentalPlateSet.count() == 1
-    }        
+    }
     /* Template level tests */
 
 	void "Test wrong Data object"() {
@@ -65,7 +65,7 @@ class EditorServiceSpec extends Specification {
 		plateTemplate == null
 		PlateTemplate.count() == 0
 	}
-	
+
 	void "Test wrong Data object param"() {
 		when: "Data object null"
 		def data = JSON.parse("{plate: ''}")
@@ -76,7 +76,7 @@ class EditorServiceSpec extends Specification {
 		PlateTemplate.count() == 0
 	}
 
-	
+
 	void "Test wrong User"() {
 		when: "No user logged in"
     	// Fake springSecurityService - login as id 1
@@ -88,7 +88,7 @@ class EditorServiceSpec extends Specification {
 		then:
 		plateTemplate == null
 		PlateTemplate.count() == 0
-	}	
+	}
 
 	void "Test wrong PlateTeamplate creation"() {
 		when: "User logged in"
@@ -128,7 +128,7 @@ class EditorServiceSpec extends Specification {
 			plateTemplate == null
 			PlateTemplate.count() == 0
 			Label.count() == 0
-	}	
+	}
 
 	void "Test wrong well creation"() {
 		when: "Wrong well parameters"
@@ -139,10 +139,10 @@ class EditorServiceSpec extends Specification {
 
 
 		def data = JSON.parse("""
-			{plate: 
-				{name: 'test name', 
+			{plate:
+				{name: 'test name',
 				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
-				wells: [{key: 'key', val: 'val'}] 
+				wells: [{key: 'key', val: 'val'}]
 				}
 			}
 		""")
@@ -166,10 +166,10 @@ class EditorServiceSpec extends Specification {
 
 
 		def data = JSON.parse("""
-			{plate: 
-				{name: 'test name', 
+			{plate:
+				{name: 'test name',
 				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
-				wells: [{row: '0', column: '0', 'groupName': 'name', labels: [{key: 'val'}]}] 
+				wells: [{row: '0', column: '0', 'groupName': 'name', labels: [{key: 'val'}]}]
 				}
 			}
 		""")
@@ -195,9 +195,9 @@ class EditorServiceSpec extends Specification {
 
 		def data = JSON.parse("""
 			{plate: {
-				name: 'test name', 
+				name: 'test name',
 				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
-				wells: [{row: '0', column: '0', 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				wells: [{row: '0', column: '0', 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}]
 				}
 			}
 		""")
@@ -212,7 +212,7 @@ class EditorServiceSpec extends Specification {
 			Well.count() == 1
 	}
 
-	
+
 	void "Test getting a template with an incorrect template"() {
 		when: "No user logged in"
 
@@ -220,7 +220,7 @@ class EditorServiceSpec extends Specification {
 
 		then:
 		plateTemplate == null
-	}	
+	}
 
 	void "Test getting a template"() {
 		when: "Correct parameters"
@@ -233,9 +233,9 @@ class EditorServiceSpec extends Specification {
 		def data = JSON.parse("""
 			{
 				plate: {
-					name: 'test name', 
+					name: 'test name',
 					labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
-					wells: [{row: 0, column: 0, 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+					wells: [{row: 0, column: 0, 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}]
 				}
 			}
 		""")
@@ -255,7 +255,7 @@ class EditorServiceSpec extends Specification {
 			data.plate.wells[0].column == plate.wells[0].column
 			data.plate.wells[0].groupName == plate.wells[0].groupName
 			data.plate.wells[0].labels.size() == plate.wells[0].labels.size()
-	}	
+	}
 
 
 	/* Plate level tests */
@@ -269,9 +269,9 @@ class EditorServiceSpec extends Specification {
 
 		def data = JSON.parse("""
 			{plate: {
-				name: 'test name', 
+				name: 'test name',
 				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
-				wells: [{row: '0', column: '0', 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				wells: [{row: '0', column: '0', 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}]
 				}
 			}
 		""")
@@ -284,12 +284,12 @@ class EditorServiceSpec extends Specification {
 
 		def plateData = JSON.parse("""
 			{plate: {
-				assay: 'my assay', 
+				assay: 'my assay',
 				experimentID: ${experiment.id},
 				templateID: ${plateTemplate.id},
 				plateID: 'barcode',
 				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
-				wells: [{row: '0', column: '0', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				wells: [{row: '0', column: '0', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}]
 				}
 			}
 		""")
@@ -318,9 +318,9 @@ class EditorServiceSpec extends Specification {
 
 		def data = JSON.parse("""
 			{plate: {
-				name: 'test name', 
+				name: 'test name',
 				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
-				wells: [{row: '0', column: '0', 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				wells: [{row: '0', column: '0', 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}]
 				}
 			}
 		""")
@@ -333,11 +333,11 @@ class EditorServiceSpec extends Specification {
 
 		def plateData = JSON.parse("""
 			{plate: {
-				assay: 'my assay', 
+				assay: 'my assay',
 				experimentID: ${experiment.id},
 				plateID: 'barcode',
 				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
-				wells: [{row: '0', column: '0', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				wells: [{row: '0', column: '0', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}]
 				}
 			}
 		""")
@@ -349,7 +349,7 @@ class EditorServiceSpec extends Specification {
 			def ex = thrown(RuntimeException)
 			ex.message.contains('A valid template ID is missing')
 			plateInstance == null
-			PlateSet.count() == 0		
+			PlateSet.count() == 0
 	}
 
 	void "Test incorrect creation of a plate, experiment missing"() {
@@ -362,9 +362,9 @@ class EditorServiceSpec extends Specification {
 
 		def data = JSON.parse("""
 			{plate: {
-				name: 'test name', 
+				name: 'test name',
 				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
-				wells: [{row: '0', column: '0', 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				wells: [{row: '0', column: '0', 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}]
 				}
 			}
 		""")
@@ -377,11 +377,11 @@ class EditorServiceSpec extends Specification {
 
 		def plateData = JSON.parse("""
 			{plate: {
-				assay: 'my assay', 
+				assay: 'my assay',
 				templateID: ${plateTemplate.id},
 				plateID: 'barcode',
 				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
-				wells: [{row: '0', column: '0', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				wells: [{row: '0', column: '0', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}]
 				}
 			}
 		""")
@@ -392,9 +392,9 @@ class EditorServiceSpec extends Specification {
 			def ex = thrown(RuntimeException)
 			ex.message.contains('A valid experiment ID is missing')
 			plateInstance == null
-			PlateSet.count() == 0	
+			PlateSet.count() == 0
 	}
-	
+
 	void "Test incorrect creation of a plate, barcode missing"() {
 		when: "Incorrect parameters"
     	// Fake springSecurityService - login as id 1
@@ -405,9 +405,9 @@ class EditorServiceSpec extends Specification {
 
 		def data = JSON.parse("""
 			{plate: {
-				name: 'test name', 
+				name: 'test name',
 				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
-				wells: [{row: '0', column: '0', 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				wells: [{row: '0', column: '0', 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}]
 				}
 			}
 		""")
@@ -420,11 +420,11 @@ class EditorServiceSpec extends Specification {
 
 		def plateData = JSON.parse("""
 			{plate: {
-				assay: 'my assay', 
+				assay: 'my assay',
 				experimentID: ${experiment.id},
 				templateID: ${plateTemplate.id},
 				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
-				wells: [{row: '0', column: '0', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				wells: [{row: '0', column: '0', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}]
 				}
 			}
 		""")
@@ -448,9 +448,9 @@ class EditorServiceSpec extends Specification {
 
 		def data = JSON.parse("""
 			{plate: {
-				name: 'test name', 
+				name: 'test name',
 				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
-				wells: [{row: '0', column: '0', 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				wells: [{row: '0', column: '0', 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}]
 				}
 			}
 		""")
@@ -463,12 +463,12 @@ class EditorServiceSpec extends Specification {
 
 		def plateData = JSON.parse("""
 			{plate: {
-				assay: 'my assay', 
+				assay: 'my assay',
 				experimentID: ${experiment.id},
 				templateID: ${plateTemplate.id},
 				plateID: 'barcode',
 				labels: [{value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
-				wells: [{row: '0', column: '0', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				wells: [{row: '0', column: '0', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}]
 				}
 			}
 		""")
@@ -493,9 +493,9 @@ class EditorServiceSpec extends Specification {
 
 		def data = JSON.parse("""
 			{plate: {
-				name: 'test name', 
+				name: 'test name',
 				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
-				wells: [{row: '0', column: '0', 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				wells: [{row: '0', column: '0', 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}]
 				}
 			}
 		""")
@@ -508,12 +508,12 @@ class EditorServiceSpec extends Specification {
 
 		def plateData = JSON.parse("""
 			{plate: {
-				assay: 'my assay', 
+				assay: 'my assay',
 				experimentID: ${experiment.id},
 				templateID: ${plateTemplate.id},
 				plateID: 'barcode',
 				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
-				wells: [{row: '1', column: '1', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				wells: [{row: '1', column: '1', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}]
 				}
 			}
 		""")
@@ -536,9 +536,9 @@ class EditorServiceSpec extends Specification {
 
 		def data = JSON.parse("""
 			{plate: {
-				name: 'test name', 
+				name: 'test name',
 				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
-				wells: [{row: '0', column: '0', 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				wells: [{row: '0', column: '0', 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}]
 				}
 			}
 		""")
@@ -551,12 +551,12 @@ class EditorServiceSpec extends Specification {
 
 		def plateData = JSON.parse("""
 			{plate: {
-				assay: 'my assay', 
+				assay: 'my assay',
 				experimentID: ${experiment.id},
 				templateID: ${plateTemplate.id},
 				plateID: 'barcode',
 				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
-				wells: [{row: '0', column: '0', labels: [{value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				wells: [{row: '0', column: '0', labels: [{value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}]
 				}
 			}
 		""")
@@ -567,7 +567,7 @@ class EditorServiceSpec extends Specification {
 			def ex = thrown(ValidationException)
 			ex.message.contains('Label for well is not valid')
 			plateInstance == null
-	}	
+	}
 
 
 	void "Test getting a plate with an incorrect plate"() {
@@ -577,7 +577,7 @@ class EditorServiceSpec extends Specification {
 
 		then:
 		plateTemplate == null
-	}	
+	}
 
 	void "Test getting a plate"() {
 		when: "Correct parameters"
@@ -588,9 +588,9 @@ class EditorServiceSpec extends Specification {
 
 		def data = JSON.parse("""
 			{plate: {
-				name: 'test name', 
+				name: 'test name',
 				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
-				wells: [{row: '0', column: '0', 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				wells: [{row: '0', column: '0', 'groupName': 'name', labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}]
 				}
 			}
 		""")
@@ -603,12 +603,12 @@ class EditorServiceSpec extends Specification {
 
 		def plateData = JSON.parse("""
 			{plate: {
-				assay: 'my assay', 
+				assay: 'my assay',
 				experimentID: ${experiment.id},
 				templateID: ${plateTemplate.id},
 				plateID: 'barcode',
 				labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}],
-				wells: [{row: 0, column: 0, labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}] 
+				wells: [{row: 0, column: 0, labels: [{category: 'val', name: 'val', value: 'val'}, {category: 'val', name: 'val', value: 'val'}]}]
 				}
 			}
 		""")
@@ -632,6 +632,39 @@ class EditorServiceSpec extends Specification {
 			plateData.plate.wells[0].column == plate.wells[0].column
 			plateData.plate.wells[0].labels.size() == plate.wells[0].labels.size()
 	}
+
+    void "Test getting control data from editor"() {
+        when:
+        Scientist scientistInstance = new Scientist(firstName: "Test", lastName: "User", email:"my@email.com", password:"test").save(flush:true)
+        ExperimentalPlateSet experimentInstance = new ExperimentalPlateSet(owner: scientistInstance, name: "my experiment", description: "my description").save(flush:true)
+        PlateTemplate templateInstance = new PlateTemplate(owner: scientistInstance, name: "my template").save(flush:true)
+        PlateSet plate = new PlateSet(plate: templateInstance, experiment: experimentInstance, barcode: 'barcode').save(flush:true)
+        Well positiveWell = new Well(plate: templateInstance, column: 0, row: 0, groupName: 'my group', control: Well.WellControl.POSITIVE).save(flush:true)
+        Well negativeWell = new Well(plate: templateInstance, column: 1, row: 0, groupName: 'my group', control: Well.WellControl.NEGATIVE).save(flush:true)
+        Label editorLabel1 = new Label(category: "dosage", name: "0", units: "ml", value: "color").save(flush:true)
+        Label editorLabel2 = new Label(category: "protein_conc", name: "1", units: "mg", value: "color").save(flush:true)
+        DomainLabel pDomainLabelRelation = new DomainLabel(labelType: DomainLabel.LabelType.WELL, plate: plate, domainId: positiveWell.id, label: editorLabel1).save(flush:true)
+        DomainLabel nDomainLabelRelation = new DomainLabel(labelType: DomainLabel.LabelType.WELL, plate: plate, domainId: negativeWell.id, label: editorLabel2).save(flush:true)
+
+        def controlData = service.getControlData(experimentInstance)
+
+        then:
+        controlData.plates[0].wells[0].labels[0].category == "dosage"
+        controlData.plates[0].wells[1].labels[0].category == "protein_conc"
+        controlData.plates[0].wells[0].labels[0].name == "0"
+        controlData.plates[0].wells[1].labels[0].name == "1"
+    }
+
+
+
+
+
+
+
+
+
+
+
 /*
 	void "Test incorrect creation of a plate, experiment missing"() {
 		when: "Incorrect parameters"
