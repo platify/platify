@@ -23,7 +23,8 @@ class InventoryService {
 		def compoundDetails
 		def valIdx
 
-		def f1 = File(Paths.get(rrfRoot + '/Compounds.csv'))
+		File f1 = new File(rrfRoot + '/Compounds.csv')
+		//def f1 = File(Paths.get(rrfRoot + '/Compounds.csv'))
 
 //		Paths.get(rrfRoot + '/Compounds.csv').withReader { reader ->
   		f1.withReader { reader ->
