@@ -239,7 +239,7 @@ function addHandlers() {
         drCurve.updateDoseResponseCurve();
         histogram.updateGraph();
         histogram.updateGraphOutlier();
-//        markAllCurrentOutliers();
+        markAllCurrentOutliers();
         event.stopImmediatePropagation();
     });
 
