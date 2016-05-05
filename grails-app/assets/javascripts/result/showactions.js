@@ -312,17 +312,26 @@ function markOutlierHistogramClick(indexes, isOutlier) {
 	//Get the indexes of the samples that this bar represents 
 	//in the format "row1,col1;ro2,col2;..."
 	indexes = indexes.split(';');
-	
+	var updateNeeded = [];
 	//Go through and update the histogram first. This should be fast
 	for(var i = 0; i < indexes.length; i++) {
+		
 		var rowCol = indexes[i].split(',');
 		var plate = rowCol[0];
 		var row = rowCol[1];
 		var col = rowCol[2];
+		
 	    if(isOutlier) {
-	        experiment.experiment.plates[plate].rows[row].columns[col].outlier = "true";
+	    	if(experiment.experiment.plates[plate].rows[row].columns[col].outlier == "false") {
+	    		updateNeeded.push([plate, row, col]);
+		        experiment.experiment.plates[plate].rows[row].columns[col].outlier = "true";
+	    	}
+	    	
 	    } else {
-	        experiment.experiment.plates[plate].rows[row].columns[col].outlier = "false";
+	    	if(experiment.experiment.plates[plate].rows[row].columns[col].outlier == "true") {
+		    	updateNeeded.push([plate, row, col]);
+		        experiment.experiment.plates[plate].rows[row].columns[col].outlier = "false";
+	    	}
 	    }	
 	}
 	
@@ -331,11 +340,10 @@ function markOutlierHistogramClick(indexes, isOutlier) {
 	histogram.updateGraphOutlier();
 	
 	//Go through and update everything else, also send the data back to the server
-	for(var i = 0; i < indexes.length; i++) {
-		var rowCol = indexes[i].split(',');
-		var plate = rowCol[0];
-		var row = rowCol[1];
-		var col = rowCol[2];
+	for(var i = 0; i < updateNeeded.length; i++) {
+		var plate = updateNeeded[i][0];
+		var row = updateNeeded[i][1];
+		var col = updateNeeded[i][2];
 		markOutlierStatus(plate, row, col, isOutlier, false);		
 	}
 }
