@@ -372,8 +372,7 @@ function markOutlierScatterClick(event) {
     } else {
     	markOutlierStatus(null, row, col, true, true);
     }
-//    experiment.savePlate();
-    console.log("col: "+col+" row: "+row);
+
 }
 
 //TODO: GET PLATE INDEX IN HERE
@@ -501,12 +500,16 @@ function markAllCurrentOutliers() {
 				//Get the rowIdx slickrow
 				var cell = $(".slick-row:nth-of-type("+rowIdx+") ."+classname);
 				var selectedEntity = $(".slick-row:nth-of-type("+rowNum+") ."+classname);
+				var scatterPoint = $('circle[row="'+rowIdx+'"][col="'+colIdx+'"][plate="'+experiment.currentPlateIndex+'"]');
+				
 				if(column.outlier == "true") {
 					//Add the outlier class
 		      		$(".slick-row:nth-of-type("+rowNum+") ."+classname).addClass("outlier");
+		      		scatterPoint.attr("class", "outlier circle");
 		      	} else {
 		      		//Remove the outlier class if it exists
 		      		$(".slick-row:nth-of-type("+rowNum+") ."+classname).removeClass("outlier");
+		      		scatterPoint.attr("class", "circle");
 		      	}
 				
 			}
