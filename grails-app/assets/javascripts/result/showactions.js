@@ -326,7 +326,10 @@ function markOutlierHistogramClick(indexes, isOutlier) {
 		var col = rowCol[2];
 		
 	    if(isOutlier) {
-	    	if(experiment.experiment.plates[plate].rows[row].columns[col].outlier == "false") {
+	    	//I'm not sure why the "or is null" hack is necessary here. The false values appear to be showing
+	    	//up as nulls in the data
+	    	if(experiment.experiment.plates[plate].rows[row].columns[col].outlier == "false" ||
+	    			experiment.experiment.plates[plate].rows[row].columns[col].outlier == null) {
 	    		updateNeeded.push([plate, row, col]);
 		        experiment.experiment.plates[plate].rows[row].columns[col].outlier = "true";
 	    	}
