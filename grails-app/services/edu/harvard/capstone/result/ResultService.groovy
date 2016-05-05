@@ -28,8 +28,6 @@ class ResultService {
 	*	Throws ValidationException if can't create a domain object
 	*/
     def newRawData(JSONObject data) {
-//		println("newRawData")
-//		println(data.toString())
     	//if no data of the template return, 
     	if (!data || !data.experimentID || !data.parsingID){
 			throw new RuntimeException("Incorrect Data")
@@ -53,12 +51,6 @@ class ResultService {
     	if (!plateList){
 			throw new RuntimeException("No plates")
 		}	
-
-		
-		//verify that the number of plates of the template are = to the result plates
-		/*if (plateList.size() != data.plates?.size()){
-			throw new RuntimeException("Plates of the JSON do not match with the template")
-		}	*/
 
     	//create a result instance
 		def resultInstance = new Result(owner: scientistInstance, equipment: equipmentInstance, experiment: experimentInstance)    	
