@@ -271,10 +271,10 @@ function addHandlers() {
     
     /* HISTOGRAM OUTLIER HANDLER*/
     //Ths will mark all the items as outliers
-    $('#histogramOutliers').click(function(e){
+    $('#histogramOutliers').click(function(event){
     	$('#histogramOutliers').attr('style','display:none;');
-    	var x = e.pageX-window.pageXOffset;
-    	var y = e.pageY-window.pageYOffset;
+    	var x = event.pageX-window.pageXOffset;
+    	var y = event.pageY-window.pageYOffset;
     	var element = document.elementFromPoint(parseInt(x), parseInt(y));
     	$('#histogramOutliers').removeAttr('style');
     	if(element != null) {
@@ -283,6 +283,7 @@ function addHandlers() {
         	}
     	}
     	markingAsOutlier = true;
+    	event.stopImmediatePropagation();
     	
     });
 
@@ -311,16 +312,32 @@ function markOutlierHistogramClick(indexes, isOutlier) {
 	//Get the indexes of the samples that this bar represents 
 	//in the format "row1,col1;ro2,col2;..."
 	indexes = indexes.split(';');
+	
+	//Go through and update the histogram first. This should be fast
 	for(var i = 0; i < indexes.length; i++) {
 		var rowCol = indexes[i].split(',');
 		var plate = rowCol[0];
 		var row = rowCol[1];
 		var col = rowCol[2];
-		markOutlierStatus(plate, row, col, isOutlier);		
+	    if(isOutlier) {
+	        experiment.experiment.plates[plate].rows[row].columns[col].outlier = "true";
+	    } else {
+	        experiment.experiment.plates[plate].rows[row].columns[col].outlier = "false";
+	    }	
 	}
+	
 	//Update entire outlier histogram here
 	histogram.update_data(experiment.experiment);
 	histogram.updateGraphOutlier();
+	
+	//Go through and update everything else, also send the data back to the server
+	for(var i = 0; i < indexes.length; i++) {
+		var rowCol = indexes[i].split(',');
+		var plate = rowCol[0];
+		var row = rowCol[1];
+		var col = rowCol[2];
+		markOutlierStatus(plate, row, col, isOutlier, false);		
+	}
 }
 
 function markOutlierScatterClick(event) {
@@ -336,9 +353,9 @@ function markOutlierScatterClick(event) {
 
     if(s.indexOf('outlier')!==-1) {
     	//Already has 'outlier' unset it
-    	markOutlierStatus(null, row, col, false);
+    	markOutlierStatus(null, row, col, false, true);
     } else {
-    	markOutlierStatus(null, row, col, true);
+    	markOutlierStatus(null, row, col, true, true);
     }
 //    experiment.savePlate();
     console.log("col: "+col+" row: "+row);
@@ -358,9 +375,9 @@ function markOutlierScatterControlClick(event) {
 
     if(s.indexOf('outlier')!==-1) {
     	//Already has 'outlier' unset it
-    	markOutlierStatus(null, row, col, false);
+    	markOutlierStatus(null, row, col, false, true);
     } else {
-    	markOutlierStatus(null, row, col, true);
+    	markOutlierStatus(null, row, col, true, true);
     }
 //    experiment.savePlate();
     console.log("col: "+col+" row: "+row);
@@ -379,7 +396,7 @@ function markOutlierGridClick(e, args) {
 //    	markOutlierStatus(row, col, true);
         isOutlier = true;
     }
-    markOutlierStatus(null, row, col-1, isOutlier);
+    markOutlierStatus(null, row, col-1, isOutlier, true);
     console.log("col: "+col+" row: "+row);
 
 }
@@ -389,8 +406,11 @@ function markOutlierGridClick(e, args) {
 /**
  * Marks a single outlier in all visualizations. Is faster than markAllCurrentOutliers, 
  * below
+ * Normally, you want to set "persist" to "true" -- this sends it back to the server.
+ * The exception is the Histogram, which toggles a lot of fields and once and needs to do 
+ * things a little more efficiently. 
  */
-function markOutlierStatus(plate, row, col, isOutlier) {
+function markOutlierStatus(plate, row, col, isOutlier, updateHistogram) {
     var colNum = col;
 
 	// If no barcode supplied, get barcode of currently selected plate.
@@ -433,8 +453,14 @@ function markOutlierStatus(plate, row, col, isOutlier) {
 	  }
 	  //Send the result back to the database
 	  experiment.toggleOutlier(plate, row, col, isOutlier, "WELL");
-	
+	  
+	  if(updateHistogram) {
+			//Update entire outlier histogram here
+			histogram.update_data(experiment.experiment);
+			histogram.updateGraphOutlier();
+	  }
 }
+
 
 
 /**
@@ -486,11 +512,6 @@ function markAllCurrentOutliers() {
 	    });
 	});
 	
-	if(histogram != null) {
-		histogram.update_data(experiment.experiment);
-		histogram.updateGraphOutlier();
-	}
-
 }
 
 /**
