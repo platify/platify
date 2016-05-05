@@ -185,7 +185,7 @@
                                 </h4>
                             </div>
                             <div class="panel-body">
-                                <div id="cutoffTable" style="height:540px;width:100%;overflow: auto;"></div>
+                                <div id="cutoffTable"></div>
                             </div>
                         </div>
                     </div>

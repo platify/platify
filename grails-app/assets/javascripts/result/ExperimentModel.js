@@ -481,13 +481,13 @@ function ExperimentModel() {
         return isNaN(rv) ? null : rv;
     }
 
-    this.toggleOutlier = function(plate, row, col, isOutlier, scope) {
+    this.toggleOutlier = function(plate, row, col, isOutlier, scope) {console.log(plate)
         // todo: require that barcode is always supplied.
         // If no barcode supplied, get barcode of currently selected plate.
-        if (plateBarcode === null || plateBarcode === undefined)
-            plateBarcode = this.currentPlate.plateID;
+        if (plate === null || plate === undefined)
+            plate = this.currentPlateIndex;
 
-        var plateBarcode = this.experiment.plates[plate].barcode;
+        var plateBarcode = this.experiment.plates[plate].plateID;
 
         var params = "?exp_id=" + this.experiment.experimentID
             + "&barcode=" + plateBarcode
@@ -508,7 +508,7 @@ function ExperimentModel() {
         });
 
         // Update stats table when toggling outlier status
-        var plateData = Object.keys(experiment.experiment.plates).map(function(plateIndex) {
+        var plateData = Object.keys(experiment.experiment.plates).map(function(plate) {
             var row = [
                        experiment.experiment.plates[plate].plateID,
                        experiment.experiment.plates[plate].resultCreated,

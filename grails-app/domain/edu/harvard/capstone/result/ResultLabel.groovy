@@ -21,4 +21,7 @@ class ResultLabel {
     	   outlier nullable:true, blank:true
     }
 	
+	static mapping = {
+		outlier defaultValue: "false"
+	 }
 }

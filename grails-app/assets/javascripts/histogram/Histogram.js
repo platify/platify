@@ -59,7 +59,10 @@ function Histogram(json_data) {
 
         // Calculate & store median and mean values for each compound
         x_data.forEach(function(compound) {
-            var mean = d3.mean(compound.values, function(d) { return d.value; });
+            var mean = d3.mean(compound.values, function(d) { 
+            	
+            	return d.value; 
+            	});
             var median = d3.median(compound.values, function(d) { return d.value; });
 
             compound.mean = +mean;
@@ -175,7 +178,7 @@ function Histogram(json_data) {
              x_data.forEach(function(compound) {
                 compound.values.forEach(function(data) {
                     if (data.value >= cutoff_value && (!data.outlier || data.outlier.localeCompare("true") !== 0))
-                        cutoff_values.push([compound["key"], d3.format(".3f")(data.value), data.plate + "[" + data.row + "," + data.col + "]"]);
+                        cutoff_values.push([compound["key"], experiment.experiment.plates[data.plate].plateID+"\n[" + data.row + "," + data.col + "]", d3.format(".3f")(data.value)]);
                 });
             });
         }
@@ -432,9 +435,18 @@ function Histogram(json_data) {
         var cutoff_data = cutoff_data.sort(function(a, b) {
             return d3.ascending(a[1], b[1]);
         });
-
-        var heading = d3.select("tr.heading").selectAll("th")
-            .data(["Compound", "Value"]);
+    	var replicate_option = $("input[name=replicate_option]:checked").val(); //"mean", "median", or "none"
+    	var heading = null;
+    	if(replicate_option == "none") {
+    		$("#cutoffTable").addClass("positionTable");
+    		heading = d3.select("tr.heading").selectAll("th")
+            .data(["Compound", "Pos","Value"]);
+    	} else {
+    		$("#cutoffTable").removeClass("positionTable");
+    		heading = d3.select("tr.heading").selectAll("th")
+            .data(["Compound", "Value",""]);
+    	}
+        
         heading.enter().append("th");
         heading.text(function(d) { return d; });
 

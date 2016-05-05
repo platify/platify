@@ -24,9 +24,7 @@ class InventoryService {
 		def compoundDetails
 		def valIdx
 
-
 		FileReader f1 = new FileReader(Paths.get(rrfRoot + '/Compounds.csv').toString());
-
 //		Paths.get(rrfRoot + '/Compounds.csv').withReader { reader ->
   		f1.withReader { reader ->
 			CSVParser csv = new CSVParser(reader, DEFAULT.withHeader())
