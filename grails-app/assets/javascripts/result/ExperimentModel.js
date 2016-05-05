@@ -508,7 +508,7 @@ function ExperimentModel() {
         });
 
         // Update stats table when toggling outlier status
-        var plateData = Object.keys(experiment.experiment.plates).map(function(plateIndex) {
+        var plateData = Object.keys(experiment.experiment.plates).map(function(plate) {
             var row = [
                        experiment.experiment.plates[plate].plateID,
                        experiment.experiment.plates[plate].resultCreated,

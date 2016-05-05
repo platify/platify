@@ -8,6 +8,7 @@ function DoseResponseCurve() {
     var margin;
     var width;
     var height;
+    var self = this;
 
     this.init = function(experiment) {
         this.experiment = experiment;
@@ -18,13 +19,7 @@ function DoseResponseCurve() {
         createGraphAndTable();
     }
 
-    $("#compoundSelect").on('change','select', function() {
-        if (COMPOUND=="null")
-            return;
-        updateDoseResponseCurve();
-    });
-
-    function updateDoseResponseCurve() {
+    this.updateDoseResponseCurve = function() {
         var data_type = ($('#normalizeButton').is(":checked")) ? "normalized_data" : "raw_data";
 
         var jqxhr = $.ajax({
@@ -54,6 +49,12 @@ function DoseResponseCurve() {
             renderDoseResponseCurve(data);
         });
     }
+
+    $("#compoundSelect").on('change','select', function() {
+        if (COMPOUND=="null")
+            return;
+        self.updateDoseResponseCurve();
+    });
 
     $("#doseResponseButton").click(function() {
         updateDoseResponseCurve2(replaceDot($("#minParameter").val()),
@@ -199,7 +200,7 @@ function DoseResponseCurve() {
                     }
                 });
 
-                updateDoseResponseCurve();
+                self.updateDoseResponseCurve();
             });
     }
 

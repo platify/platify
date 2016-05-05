@@ -236,7 +236,11 @@ function addHandlers() {
     $('#normalizeButton').on('click', function(event) {
         showNormalized = $(event.target)[0].checked;
         reloadGrid();
-        markAllCurrentOutliers();
+        drCurve.updateDoseResponseCurve();
+        histogram.updateGraph();
+        histogram.updateGraphOutlier();
+//        markAllCurrentOutliers();
+        event.stopImmediatePropagation();
     });
 
     // add heatmap button listener
