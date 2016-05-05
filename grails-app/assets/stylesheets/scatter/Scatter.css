@@ -43,4 +43,18 @@ circle {
 svg {
 	padding:20px;
 }
+
+#cutoffTable {
+	height:540px;
+	width:100%;
+	overflow: auto;
+	
+}
+
+#cutoffTable tr th {
+	padding-right: 5px;
+}
+#cutoffTable tr {
+	border-bottom:1px solid #ddd;
+}
  
