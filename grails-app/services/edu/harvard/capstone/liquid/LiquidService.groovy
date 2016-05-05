@@ -113,7 +113,7 @@ class LiquidService {
         def jsonSlurper = new JsonSlurper()
         def responseObject = jsonSlurper.parseText(jsonResponse)
 
-        // call new LiquidHandlerDeviceController on "config"
+        // call new LiquidHandlerDevice on "config"
         def i = responseObject.inputPlatesQuantity
         def o = responseObject.outputPlatesQuantity
 
@@ -123,7 +123,6 @@ class LiquidService {
     // spoof Liquid Handler service call #2 to get locations of compounds in Liquid Handler
     // At a later date this can be accurately called to the LH to get the real information
     def spoofCompoundLocations() {
-
         // spoof web service call to Liquid Handler for compound locations
 
         // stub rest get request for the future engineer who wants to build this out!
@@ -142,7 +141,7 @@ class LiquidService {
         def jsonSlurper = new JsonSlurper()
         def responseObject = jsonSlurper.parseText(jsonResponse)
 
-        // call new LiquidHandlerDeviceController on "config"
+        // call new LiquidHandlerDevice on "config"
         def barcode = responseObject.barcode
         def well = responseObject.well
         def concentration = responseObject.concentration

@@ -272,8 +272,8 @@
 
 %{-- standard curve js--}%
 <asset:javascript src="regression.js"/>
-<asset:javascript src="analysis/StdCurve.js" />
-<asset:javascript src="analysis/DoseResponseCurve.js" />
+<asset:javascript src="stdCurve/StdCurve.js" />
+<asset:javascript src="doseResponse/DoseResponseCurve.js" />
 
 <g:javascript>
     var RESULT_SAVE_REFACTORED_DATA_URL = "${createLink(controller: 'refactoredData', action: 'save', resultInstance: null)}";

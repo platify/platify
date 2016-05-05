@@ -102,9 +102,9 @@ class ExperimentalPlateSetController {
     respond experimentalPlateSetInstance
   }
 
-  def showy(ExperimentalPlateSet experimentalPlateSetInstance) {
-    render editorService.getExperimentData(experimentalPlateSetInstance) as JSON
-  }
+//  def showy(ExperimentalPlateSet experimentalPlateSetInstance) {
+//    render editorService.getExperimentData(experimentalPlateSetInstance) as JSON
+//  }
 
   def getControls(ExperimentalPlateSet experiment) {
       def editorControlsData
@@ -219,6 +219,17 @@ class ExperimentalPlateSetController {
     }
   }
 
+  // Get list of all experiment/assays in Platify
+  def getAssayList(){
+    def AssayList = editorService.getAssayList()
+
+    render(contentType: "application/json") {
+      [assay: AssayList]
+    }
+
+  }
+
+
   @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
   def exportPlate(Integer max) {
 
@@ -326,4 +337,12 @@ class ExperimentalPlateSetController {
       '*'{ render status: NOT_FOUND }
     }
   }
+
+    def getCompounds(ExperimentalPlateSet exp) {
+        def compounds = editorService.getCompoundsOfExperiment(exp)
+
+        render(contentType: "application/json") {
+            [compounds: compounds]
+        }
+    }
 }

@@ -30,6 +30,7 @@
 						<li>Select Template</li>
 					</ol>						
 					<g:render template="previewTemplateGrid"/>
+                    <g:render template="/plateTemplate/createTemplateDialog"/>
 				</div>
 			</div>
 		</div>

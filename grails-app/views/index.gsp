@@ -67,32 +67,6 @@
 					</div>
 				</div>
 			</div>
-			<div class="row">
-				<div class="col-sm-12 content-body">
-					<div class="col-sm-3">
-						<div id="normPanel" class="panel panel-default">
-							<div class="panel-heading">
-								<h4 class="panel-title">Dose Response Curve</h4>
-							</div>
-							<div class="panel-body ">
-								<ul class="list-unstyled">
-									<li><button type="button" class="btn btn-info btn-sm" onclick="location.href='doseResponse/show';">Dose Response</button></li>
-								</ul>
-							</div>
-						</div>
-						<div id="normPanel" class="panel panel-default">
-							<div class="panel-heading">
-								<h4 class="panel-title">Dose Response Curve</h4>
-							</div>
-							<div class="panel-body ">
-								<ul class="list-unstyled">
-									<li><button type="button" class="btn btn-info btn-sm" onclick="location.href='doseResponse/show';">Dose Response</button></li>
-								</ul>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
 		</div>
 
 		<g:render template="/plateTemplate/createTemplateDialog"/>

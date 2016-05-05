@@ -2,48 +2,90 @@
  * Created by rbw on 4/16/16.
  */
 
-var compounds = [];
 
+// global vars
+var compounds = [];
+var assays = [];
+
+/**
+ * Populate the Assay list dropdown in the modal dialog on "Configure Mapping"
+ */
+function populateAssayList() {
+    assayListSelect = document.getElementById('assayList');
+
+    console.log("starting html insert");
+
+    var assay;
+    for (assay in assays) {
+        console.log("doing html insert");
+        assayListSelect.options[assayListSelect.options.length] = new Option(assays[assay].name, assays[assay].id);
+    }
+    console.log("endedhtml insert");
+}
+
+/**
+ * Call to Platify server to get list of compounds from experiment/assay
+ */
+function fetchAssayList() {
+    "use strict";
+    var jqxhr = $.ajax({
+        url: hostname + "/ExperimentalPlateSet/getAssayList",
+        type: "GET",
+        data: null,
+        processData: false,
+        contentType: "application/json; charset=UTF-8"
+    }).done(function() {
+        console.log("success");
+    }).fail(function() {
+        console.log("error");
+        alert("An error has occurred while fetching compound data from the server.");
+    }).always(function() {
+        console.log("complete");
+    });
+
+    // Set another completion function for the request above
+    jqxhr.always(function(resData) {
+        console.log("assay list call complete");
+        $("#gridView").show();
+        var jsonData;
+
+        console.log(JSON.stringify(resData));
+        jsonData = JSON.parse(JSON.stringify(resData));
+
+        console.log("assay: " + jsonData.assay[0].name);
+
+        assays = jsonData.assay;
+
+        populateAssayList();
+    });
+}
+
+
+
+
+
+// Create the compound list in the DOM
 function setCompoundList() {
     "use strict";
     var newDiv, innerDiv, newLabel, newCheckbox, compound;
     newDiv = document.createElement("div");
     for (compound in compounds) {
 
-//        console.log("id2: " + compounds[compound].id);
-//        console.log("name2: " + compounds[compound].name);
         innerDiv = document.createElement("div");
-
-        newCheckbox = document.createElement("input");
-        newCheckbox.type = "checkbox";
-        newCheckbox.name = compounds[compound].id;
-        newCheckbox.value = compounds[compound].id;
-        newCheckbox.id = compounds[compound].id;
-        newCheckbox.setAttribute("onchange", "getCompoundLocations(this.id, this);");
 
         newLabel = document.createElement("label");
         newLabel.htmlFor = compounds[compound].id;
         newLabel.appendChild(document.createTextNode(" " + compounds[compound].name));
 
-        innerDiv.appendChild(newCheckbox);
         innerDiv.appendChild(newLabel);
         newDiv.appendChild(innerDiv);
 
     }
     document.getElementById("compoundList").innerHTML = newDiv.innerHTML;
+
+    document.getElementById("getMappingInstructions").hidden = false;
 }
 
-
-/*jslint browser:true */
-/*global $, jQuery, alert*/
-
-// constants
-var GRID_HEIGHT = 100;
-var GRID_WIDTH = 100;
-var CELL_HEIGHT = 35;
-var CELL_WIDTH = 85;
-var plateModel = {};
-var catLegend = {};
 
 
 /**
@@ -66,14 +108,22 @@ function loadCompoundJsonData(compoundJson) {
 
 }
 
+
+
 /**
- * Call to Platify server to get list of compounds.
+ * Call to Platify server to get list of compounds from experiment/assay
  */
-function fetchCompoundList() {
+function fetchAssayCompoundList(selectedAssay) {
     "use strict";
+    console.log("calling with value: " + selectedAssay.value);
+
+    $("#gridView").hide();
+    $("#loaderView").show();
+
+
     var jqxhr = $.ajax({
-        url: hostname + "/plate/getCompounds/",
-        type: "POST",
+        url: hostname + "/plate/getCompoundsByAssay/?assayId=" + selectedAssay.value,
+        type: "GET",
         data: null,
         processData: false,
         contentType: "application/json; charset=UTF-8"
@@ -85,6 +135,10 @@ function fetchCompoundList() {
     }).always(function() {
         console.log("complete");
     });
+
+    $("#gridView").show();
+    $("#loaderView").hide();
+
 
     // Set another completion function for the request above
     jqxhr.always(function(resData) {
@@ -101,7 +155,7 @@ var selectedCompounds = [];
 /**
  * Call to Platify & (spoofed) to Liquid Handler to get location of compounds.
  */
-function getCompoundLocations(id, obj) {
+function getMappingInstructions(id, obj) {
 
     "use strict";
 
@@ -184,22 +238,37 @@ function parseCompoundLiquidHandlerLocationJsonData(jsonData) {
 }
 
 
+// Perform this function when each compound item is selected
 function onViewSelect(clickedEL) {
     "use strict";
     var elValArr, plateId;
+
+
+    // init data to empty
+    document.getElementById("compoundList").innerHTML = "";
+    document.getElementById("assayList").selectedIndex = 0;
+    document.getElementById("getMappingInstructions").hidden = true;
+
+    // init modal values
+    document.getElementById("liquidHandlerName").textContent = clickedEL.dataset.name;
+    document.getElementById("liquidHandlerInputPlates").textContent = clickedEL.dataset.inputplates;
+    document.getElementById("liquidHandlerOutputPlates").textContent = clickedEL.dataset.outputplates;
+
+
     $("#gridView").hide();
     $("#loaderView").show();
 
-    fetchCompoundList();
-/*    elValArr = clickedEL.value.split("-");
-    plateId = elValArr[0];
-    GRID_WIDTH = elValArr[1];
-    GRID_HEIGHT = elValArr[2];
 
-    console.log("selectEvent!:" + plateId);
-    fetchPlateData(plateId);
-    */
+    /*    elValArr = clickedEL.value.split("-");
+        plateId = elValArr[0];
+        GRID_WIDTH = elValArr[1];
+        GRID_HEIGHT = elValArr[2];
+
+        console.log("selectEvent!:" + plateId);
+        fetchPlateData(plateId);
+        */
     $("#loaderView").hide();
+    $("#gridView").show();
 
 }
 
@@ -210,6 +279,8 @@ function onViewSelect(clickedEL) {
  */
 function init() {
 //    "use strict";
+    fetchAssayList();
+
 }
 
 window.onload = init;

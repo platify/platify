@@ -29,32 +29,32 @@ class ResultController {
         respond Result.list(params), model:[resultInstanceCount: Result.count()]
     }
 	
-    @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
-    def kitchenSink(ExperimentalPlateSet experiment) {
-        if (!springSecurityService.isLoggedIn()){
-            render(contentType: "application/json") {
-                [error: "User not logged in"]
-            }
-            return
-        } 
-
-        if (experiment == null) {
-            render(contentType: "application/json") {
-                [error: "Result not found"]
-            }
-            return
-        }
-
-        if (experiment.hasErrors()) {
-            render(contentType: "application/json") {
-                [error: experiment.errors]
-            }
-            return   
-        }
-
-        def result = [ImportData: resultService.getKitchenSink(experiment)]
-        render result as JSON
-    }
+//    @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
+//    def kitchenSink(ExperimentalPlateSet experiment) {
+//        if (!springSecurityService.isLoggedIn()){
+//            render(contentType: "application/json") {
+//                [error: "User not logged in"]
+//            }
+//            return
+//        }
+//
+//        if (experiment == null) {
+//            render(contentType: "application/json") {
+//                [error: "Result not found"]
+//            }
+//            return
+//        }
+//
+//        if (experiment.hasErrors()) {
+//            render(contentType: "application/json") {
+//                [error: experiment.errors]
+//            }
+//            return
+//        }
+//
+//        def result = [ImportData: resultService.getKitchenSink(experiment)]
+//        render result as JSON
+//    }
 
 
     @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
@@ -63,48 +63,48 @@ class ResultController {
     }
 
 
-    @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
-    def read(Result resultInstance){
-        if (!springSecurityService.isLoggedIn()){
-            render(contentType: "application/json") {
-                [error: "User not logged in"]
-            }
-            return
-        } 
-
-        if (resultInstance == null) {
-            render(contentType: "application/json") {
-                [error: "Result not found"]
-            }
-            return
-        }
-
-        if (resultInstance.hasErrors()) {
-            render(contentType: "application/json") {
-                [error: resultInstance.errors]
-            }
-            return   
-        }
-        def result
-        try{
-            result = resultService.getResults(resultInstance)    
-        }
-        catch (ValidationException e) {
-            render(contentType: "application/json") {
-                [error: e.errors, message: e.message]
-            }            
-            return
-        } catch (RuntimeException e) {
-            render(contentType: "application/json") {
-                [error: e.message]
-            }  
-            return                      
-        }
-
-        render(contentType: "application/json") {
-            [ImportData: result]
-        } 
-    }
+//    @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
+//    def read(Result resultInstance){
+//        if (!springSecurityService.isLoggedIn()){
+//            render(contentType: "application/json") {
+//                [error: "User not logged in"]
+//            }
+//            return
+//        }
+//
+//        if (resultInstance == null) {
+//            render(contentType: "application/json") {
+//                [error: "Result not found"]
+//            }
+//            return
+//        }
+//
+//        if (resultInstance.hasErrors()) {
+//            render(contentType: "application/json") {
+//                [error: resultInstance.errors]
+//            }
+//            return
+//        }
+//        def result
+//        try{
+//            result = resultService.getResults(resultInstance)
+//        }
+//        catch (ValidationException e) {
+//            render(contentType: "application/json") {
+//                [error: e.errors, message: e.message]
+//            }
+//            return
+//        } catch (RuntimeException e) {
+//            render(contentType: "application/json") {
+//                [error: e.message]
+//            }
+//            return
+//        }
+//println(result)
+//        render(contentType: "application/json") {
+//            [ImportData: result]
+//        }
+//    }
 
 
     @Secured(['ROLE_SCIENTIST', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
@@ -213,7 +213,7 @@ class ResultController {
         def labels = null;
         if (scope.toLowerCase() == "well") {
             def well = Well.findByPlateAndRowAndColumn(plateTemplate, row, col)
-			println("Update outlier for well "+well.toString())
+            println("Update outlier for well "+well.toString())
             domainId = ResultWell.findByPlateAndWell(resultPlate, well).id
 
             labels = ResultLabel.findAllByDomainIdAndScope(domainId, ResultLabel.LabelScope.WELL)
@@ -223,7 +223,7 @@ class ResultController {
             labels = ResultLabel.findAllByDomainIdAndScope(domainId, ResultLabel.LabelScope.PLATE);
         }
 
-        if (labels == null) {
+        if (labels == null || labels.isEmpty()) {
             render(contentType: "application/json") {
                 [error: "Labels not found"]
             }
@@ -231,8 +231,11 @@ class ResultController {
         }
 
         labels.each { label ->
-            label.outlier = outlier
-            label.save()
+            label.outlier = outlier.toLowerCase()
+
+            if (label.outlier != "true" && outlier != "false")
+                label.domainId = null //to fail
+            label.save(flush:true)
 
             if (label.hasErrors()) {
                 throw new ValidationException('Some outlier status could not be saved',

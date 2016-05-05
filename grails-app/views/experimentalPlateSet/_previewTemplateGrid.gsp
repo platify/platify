@@ -21,22 +21,26 @@
 		<div id="labelPanel" class="panel panel-default">
 			<div class="panel-heading">
 				<g:if test="${experimentalPlateSetInstance}">
-					<h4 class="panel-title">Choose Template (for assay with id: ${experimentalPlateSetInstance.id})</h4>
+					<h4 class="panel-title">Template for assay with id: ${experimentalPlateSetInstance.id}</h4>
 				</g:if>
 			</div>
-			<div class="panel-body" style="padding:2px">
-				<form class="form-horizontal">
-			      	<div class="form-group" style="margin-bottom:0px">
-						<h4><label class="control-label col-sm-2" for="plateSelect">Templates: </label></h4>
-					    <div class="col-sm-9">
-							 <div id="templateSelection">
-							  	<g:select class="form-control" id="plateSelect" name="plate.id" from="${edu.harvard.capstone.editor.PlateTemplate.list()}"
-							  		optionKey="id" optionValue="${{it.name + ' (id:' + it.id + ')'}}"
-									onchange="onPlateSelectChange(this)" onload="onPlateSelectChange(this)" value="${plateSetInstance?.plate?.id}" class="many-to-one"/>
-							 </div>
-						</div>
-			      	</div>
-				</form>
+			<div class="panel-body" style="padding:2px;">
+                <form class="form-horizontal col-sm-10">
+                    <div class="col-sm-1"></div>
+                    <div class="form-group col-sm-5" style="margin-bottom:0px">
+                        <h5><label for="plateSelect"style="margin-bottom:0px">Choose Existing: </label></h5>
+                        <div id="templateSelection">
+                            <g:select class="form-control" id="plateSelect" name="plate.id" from="${edu.harvard.capstone.editor.PlateTemplate.list()}"
+                                optionKey="id" optionValue="${{it.name + ' (id:' + it.id + ')'}}"
+                                onchange="onPlateSelectChange(this)" onload="onPlateSelectChange(this)" value="${plateSetInstance?.plate?.id}" class="many-to-one"/>
+                        </div>
+                    </div>
+                    <div class="col-sm-2" align="center"><br><br>- or -</div>
+                    <div class="col-sm-2" align="center">
+                        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#createTemplateModal"><b>Create New Template</b></button>
+                    </div>
+                    <div class="col-sm-1"></div>
+                </form>
 			</div>
 		</div>
 	</div>
