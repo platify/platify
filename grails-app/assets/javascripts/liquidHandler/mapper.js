@@ -239,14 +239,80 @@ function parseCompoundLiquidHandlerLocationJsonData(inventoryJsonData) {
 
         var j = JSON.parse(inventoryJsonData[el]);
 
-        for (var i = 0; i < j.length; i++) {
-            var obj = j[i];
+        // assume that the assay has fewer compounds than the LH Inventory, so cycle through them
+        var strCompoundsNotFoundMessage = "";
 
-            console.log("json: " + JSON.stringify(obj));
+        for (compound in compounds) {
 
-            console.log(obj.name);
+            var CompoundFound = 0;
+
+            for (var i = 0; i < j.length; i++) {
+                var obj = j[i];
+
+                var S_CompoundName = ""
+                var S_PlateId = ""
+                var S_Well = ""
+                var S_Dosage = ""
+                var D_PlateId = ""
+                var D_Well = ""
+                var D_Dosage = ""
+
+//                console.log("json: " + JSON.stringify(obj));
+
+                var SrcCompoundName = obj.name.trim();
+
+                // test if we found the compound we're looking for!
+                if (SrcCompoundName == compounds[compound].name) {
+                    console.log("here it comes2!");
+                    console.log("Compound: " + JSON.stringify(compounds[compound]));
+                    CompoundFound = 1;
+
+
+                    for (destination in compounds[compound].destinations) {
+                        S_CompoundName = compounds[compound].name;
+                        S_PlateId = obj.srcPlateId;
+                        S_Well = String.fromCharCode(65 + obj.row) + obj.col;
+                        S_Dosage = (obj.concentration / compounds[compound].destinations[destination].dosage).toString() + " " + compounds[compound].destinations[destination].unit;
+
+                        D_PlateId = compounds[compound].destinations[destination].plate;
+                        D_Well = compounds[compound].destinations[destination].well;
+                        D_Dosage = compounds[compound].destinations[destination].dosage + " " + compounds[compound].destinations[destination].unit;
+
+
+                        document.getElementById("lhmappinginstructions").value += S_PlateId + ",\t" +
+                            S_Well + ",\t" +
+                            S_Dosage + ",\t" +
+                            D_PlateId + ",\t" +
+                            D_Well + ",\t" +
+                            D_Dosage + "\n";
+
+                    }
+                    
+                }
+
+//                console.log(obj.name);
+            }
+
+            // Compound not found in Inventory System
+            if (CompoundFound == 0) {
+                strCompoundsNotFoundMessage += compounds[compound].name + " not found in Inventory System.\n";
+
+            }
+
         }
+
     }
+
+    // errors
+    if (strCompoundsNotFoundMessage.length > 0) {
+        document.getElementById("lhmappinginstructions").value = "Errors:\n " +
+            strCompoundsNotFoundMessage + "\n\n" +
+            document.getElementById("lhmappinginstructions").value
+    }
+
+
+
+
     console.log("finished parse compound func");
 }
 
@@ -295,7 +361,7 @@ function init() {
     fetchAssayList();
 
     document.getElementById("lhmappinginstructions").value = "Source (S),\tS_Well,\tS_Dosage,\tDestination (D),\tD_Well,\tD_Dosage\n";
-    document.getElementById("lhmappinginstructions").value += "==========================================================";
+    document.getElementById("lhmappinginstructions").value += "==========================================================\n";
 
 }
 
