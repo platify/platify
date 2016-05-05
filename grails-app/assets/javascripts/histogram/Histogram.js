@@ -59,7 +59,10 @@ function Histogram(json_data) {
 
         // Calculate & store median and mean values for each compound
         x_data.forEach(function(compound) {
-            var mean = d3.mean(compound.values, function(d) { return d.value; });
+            var mean = d3.mean(compound.values, function(d) { 
+            	
+            	return d.value; 
+            	});
             var median = d3.median(compound.values, function(d) { return d.value; });
 
             compound.mean = +mean;
@@ -175,7 +178,7 @@ function Histogram(json_data) {
              x_data.forEach(function(compound) {
                 compound.values.forEach(function(data) {
                     if (data.value >= cutoff_value && (!data.outlier || data.outlier.localeCompare("true") !== 0))
-                        cutoff_values.push([compound["key"], d3.format(".3f")(data.value), data.plate + "[" + data.row + "," + data.col + "]"]);
+                        cutoff_values.push([compound["key"], d3.format(".3f")(data.value), "[" + data.row + "," + data.col + "]"]);
                 });
             });
         }
@@ -434,7 +437,7 @@ function Histogram(json_data) {
         });
 
         var heading = d3.select("tr.heading").selectAll("th")
-            .data(["Compound", "Value"]);
+            .data(["Compound", "Value","Pos"]);
         heading.enter().append("th");
         heading.text(function(d) { return d; });
 
