@@ -84,7 +84,7 @@
                 </ul>
                 <div id="resultGrid" class="Blues" style="width:100%;height:650px;"></div>
                 <div id="scatterplot" style="width:100%;height:650px;"></div>
-                <div id="scatterplot_control" style="width:100%;height:650px;"></div>
+                <div id="scatterplot_control" style="width:100%;height:650px;"><div id="scatterplot_vis"></div><span style="color:green;">Positive Controls</span>, <span style="color:red;">Negative Controls</span></div>
 
                 <div id="standardCurve" style="width:100%;height:650px;">
                     <div class="row">
