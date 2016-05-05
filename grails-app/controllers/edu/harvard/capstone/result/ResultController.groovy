@@ -213,7 +213,6 @@ class ResultController {
         def labels = null;
         if (scope.toLowerCase() == "well") {
             def well = Well.findByPlateAndRowAndColumn(plateTemplate, row, col)
-            println("Update outlier for well "+well.toString())
             domainId = ResultWell.findByPlateAndWell(resultPlate, well).id
 
             labels = ResultLabel.findAllByDomainIdAndScope(domainId, ResultLabel.LabelScope.WELL)
@@ -235,7 +234,7 @@ class ResultController {
 
             if (label.outlier != "true" && outlier != "false")
                 label.domainId = null //to fail
-            label.save(flush:true)
+            label.save()
 
             if (label.hasErrors()) {
                 throw new ValidationException('Some outlier status could not be saved',

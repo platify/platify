@@ -239,7 +239,7 @@ function addHandlers() {
         drCurve.updateDoseResponseCurve();
         histogram.updateGraph();
         histogram.updateGraphOutlier();
-//        markAllCurrentOutliers();
+        markAllCurrentOutliers();
         event.stopImmediatePropagation();
     });
 
@@ -326,7 +326,10 @@ function markOutlierHistogramClick(indexes, isOutlier) {
 		var col = rowCol[2];
 		
 	    if(isOutlier) {
-	    	if(experiment.experiment.plates[plate].rows[row].columns[col].outlier == "false") {
+	    	//I'm not sure why the "or is null" hack is necessary here. The false values appear to be showing
+	    	//up as nulls in the data
+	    	if(experiment.experiment.plates[plate].rows[row].columns[col].outlier == "false" ||
+	    			experiment.experiment.plates[plate].rows[row].columns[col].outlier == null) {
 	    		updateNeeded.push([plate, row, col]);
 		        experiment.experiment.plates[plate].rows[row].columns[col].outlier = "true";
 	    	}
@@ -369,8 +372,7 @@ function markOutlierScatterClick(event) {
     } else {
     	markOutlierStatus(null, row, col, true, true);
     }
-//    experiment.savePlate();
-    console.log("col: "+col+" row: "+row);
+
 }
 
 //TODO: GET PLATE INDEX IN HERE
@@ -498,12 +500,16 @@ function markAllCurrentOutliers() {
 				//Get the rowIdx slickrow
 				var cell = $(".slick-row:nth-of-type("+rowIdx+") ."+classname);
 				var selectedEntity = $(".slick-row:nth-of-type("+rowNum+") ."+classname);
+				var scatterPoint = $('circle[row="'+rowIdx+'"][col="'+colIdx+'"][plate="'+experiment.currentPlateIndex+'"]');
+				
 				if(column.outlier == "true") {
 					//Add the outlier class
 		      		$(".slick-row:nth-of-type("+rowNum+") ."+classname).addClass("outlier");
+		      		scatterPoint.attr("class", "outlier circle");
 		      	} else {
 		      		//Remove the outlier class if it exists
 		      		$(".slick-row:nth-of-type("+rowNum+") ."+classname).removeClass("outlier");
+		      		scatterPoint.attr("class", "circle");
 		      	}
 				
 			}

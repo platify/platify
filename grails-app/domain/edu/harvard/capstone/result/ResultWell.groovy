@@ -13,7 +13,4 @@ class ResultWell {
     static constraints = {
     }
 	
-	static mapping = {
-		outlier defaultValue: "false"
-	 }
 }

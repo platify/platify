@@ -7,7 +7,7 @@ function Scatter_control() {
 	
 	this.setData = function(experiment) {
 		//Clear any existing data in the plot
-		$('#scatterplot_control').html('');
+		$('#scatterplot_vis').html('');
 		//This is in a set of rows and columns
 		//var data = [[5,3], [10,17], [15,4], [2,8]];
 		var i = 0;
@@ -73,7 +73,7 @@ function Scatter_control() {
 	    	      .domain([d3.min(positive.concat(negative), function(d) { return +d[1]; }), d3.max(positive.concat(negative), function(d) { return +d[1]; })])
 	    	      .range([ height, 0 ]);
 	    
-	    var chart = d3.select('#scatterplot_control')
+	    var chart = d3.select('#scatterplot_vis')
 		.append('svg:svg')
 		.attr('width', width + margin.right + margin.left)
 		.attr('height', height + margin.top + margin.bottom)

@@ -60,10 +60,17 @@ function Histogram(json_data) {
         // Calculate & store median and mean values for each compound
         x_data.forEach(function(compound) {
             var mean = d3.mean(compound.values, function(d) { 
-            	
-            	return d.value; 
+	            	if(d.outlier == "true") {
+	            		return null;
+	            	}
+	            	return d.value; 
             	});
-            var median = d3.median(compound.values, function(d) { return d.value; });
+            var median = d3.median(compound.values, function(d) { 
+	            	if(d.outlier == "true") {
+	            		return null;
+	            	}
+	            	return d.value; 
+            	});
 
             compound.mean = +mean;
             compound.median = +median;
