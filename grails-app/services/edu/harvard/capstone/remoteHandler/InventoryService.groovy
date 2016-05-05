@@ -33,17 +33,16 @@ class InventoryService {
 
 			for (record in csv.iterator()) {
 				plateIdx++
-					for (valIdx = 0; valIdx < record.size(); ++valIdx) {
+				for (valIdx = 0; valIdx < record.size(); ++valIdx) {
 
-						compoundDetails = new CompoundDetails()
-						compoundDetails.name = record.get(valIdx)
-						compoundDetails.concentration = (rnd.nextInt(20) + 1) * 5000
-						compoundDetails.row = (int)(valIdx / 10)
-						compoundDetails.col = valIdx % 10
-						compoundDetails.srcPlateId = 'LHS' + plateIdx
+					compoundDetails = new CompoundDetails()
+					compoundDetails.name = record.get(valIdx)
+					compoundDetails.concentration = (rnd.nextInt(20) + 1) * 5000
+					compoundDetails.row = (int)(valIdx / 10)
+					compoundDetails.col = valIdx % 10
+					compoundDetails.srcPlateId = 'LHS' + plateIdx
 
-						compoundList.push(compoundDetails)
-					}
+					compoundList.push(compoundDetails)
 				}
 			}
 
@@ -52,7 +51,8 @@ class InventoryService {
 
 		def json = JsonOutput.toJson(compoundList)
 
-		   
+		return json
+
 		/*
 		def builder = new groovy.json.JsonBuilder()
 		
@@ -80,6 +80,5 @@ class InventoryService {
 		*/
 //		json = JsonOutput.prettyPrint(json.toString())
 
-		return json
     }
 }

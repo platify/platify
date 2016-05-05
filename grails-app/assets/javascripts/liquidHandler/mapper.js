@@ -160,7 +160,6 @@ function getMappingInstructions(id, obj) {
     "use strict";
 
     // fetch data
-    if (obj.checked == true) {
         var jqxhr = $.ajax({
             url: hostname + "/plate/getCompoundLocations/" + id,
             type: "POST",
@@ -184,22 +183,9 @@ function getMappingInstructions(id, obj) {
             //loadCompoundJsonData(JSON.stringify(resData));
             //parseCompoundLocationJsonData(JSON.stringify(resData));
 
-            selectedCompounds.push(obj.id, resData);
         });
 
         spoofLiquidHandlerLocations();
-
-    } else {
-
-        // delete from existing object
-        console.log("deleting existing data");
-
-        delete selectedCompounds[obj.id];
-
-    }
-
-    console.log("selectedCompounds count: " + selectedCompounds.length);
-    console.log("selectedCompounds items: " + selectedCompounds);
 
 }
 
@@ -207,7 +193,7 @@ function spoofLiquidHandlerLocations() {
     "use strict";
     var jqxhr = $.ajax({
         url: hostname + "/LiquidHandler/spoofCompoundLocations/",
-        type: "POST",
+        type: "GET",
         data: null,
         processData: false,
         contentType: "application/json; charset=UTF-8"
@@ -222,8 +208,8 @@ function spoofLiquidHandlerLocations() {
 
     // Set another completion function for the request above
     jqxhr.always(function(resData) {
-//        console.log( "compound location complete" );
-//        console.log("templateJson=" + JSON.stringify(resData));
+        console.log( "compound location complete" );
+        console.log("templateJson=" + JSON.stringify(resData));
         //loadPlateJsonData(resData);
         //loadCompoundJsonData(JSON.stringify(resData));
         parseCompoundLiquidHandlerLocationJsonData(JSON.stringify(resData));
@@ -232,9 +218,14 @@ function spoofLiquidHandlerLocations() {
 }
 
 function parseCompoundLiquidHandlerLocationJsonData(jsonData) {
-    for (el in jsonData) {
-        document.getElementById("lhmappinginstructions").text = JSON.stringify(jsonData);
-    }
+    console.log("in parse compound func");
+
+    document.getElementById("lhmappinginstructions").value += (jsonData);
+
+//    for (el in jsonData) {
+//        document.getElementById("lhmappinginstructions").value += JSON.stringify(jsonData);
+//    }
+    console.log("finished parse compound func");
 }
 
 
@@ -280,6 +271,9 @@ function onViewSelect(clickedEL) {
 function init() {
 //    "use strict";
     fetchAssayList();
+
+    document.getElementById("lhmappinginstructions").value = "Source (S),\tS_Well,\tS_Dosage,\tDestination (D),\tD_Well,\tD_Dosage\n";
+    document.getElementById("lhmappinginstructions").value += "==========================================================";
 
 }
 
