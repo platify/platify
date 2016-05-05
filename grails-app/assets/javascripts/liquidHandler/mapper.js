@@ -217,14 +217,36 @@ function spoofLiquidHandlerLocations() {
 
 }
 
-function parseCompoundLiquidHandlerLocationJsonData(jsonData) {
+var globalscopetest = {}
+
+/**
+ * Meat and potatoes of algorithm to create LH mapping file
+ *
+ * Takes inventory Compound data from LH System and tries to map it to plates in the current
+ * Assay experiment w/Compounds to give it to the scientist.
+ *
+ * @param inventoryJsonData
+ */
+function parseCompoundLiquidHandlerLocationJsonData(inventoryJsonData) {
     console.log("in parse compound func");
 
-    document.getElementById("lhmappinginstructions").value += (jsonData);
+    inventoryJsonData = JSON.parse(inventoryJsonData);
 
-//    for (el in jsonData) {
-//        document.getElementById("lhmappinginstructions").value += JSON.stringify(jsonData);
-//    }
+    globalscopetest = inventoryJsonData;
+
+    for (var el in inventoryJsonData) {
+//        document.getElementById("lhmappinginstructions").value += "hi " + inventoryJsonData[el];
+
+        var j = JSON.parse(inventoryJsonData[el]);
+
+        for (var i = 0; i < j.length; i++) {
+            var obj = j[i];
+
+            console.log("json: " + JSON.stringify(obj));
+
+            console.log(obj.name);
+        }
+    }
     console.log("finished parse compound func");
 }
 
