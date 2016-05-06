@@ -140,6 +140,7 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 //	'/':                              ['IS_AUTHENTICATED_ANONYMOUSLY'],
 //	'/index':                         ['IS_AUTHENTICATED_ANONYMOUSLY'],
 //	'/index.gsp':                     ['IS_AUTHENTICATED_ANONYMOUSLY'],
+    '/favicon.ico':                   ['permitAll'],
     '/**/assets/**':                  ['permitAll'], // js, css, images, ico
     '/dbconsole':                     ['ROLE_SUPER_ADMIN'],//['ROLE_ADMIN', 'ROLE_SUPER_ADMIN']],
     '/dbconsole.*':                   ['ROLE_SUPER_ADMIN'],
