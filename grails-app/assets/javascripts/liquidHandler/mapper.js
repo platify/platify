@@ -287,7 +287,7 @@ function parseCompoundLiquidHandlerLocationJsonData(inventoryJsonData) {
                             D_Dosage + "\n";
 
                     }
-                    
+
                 }
 
 //                console.log(obj.name);
