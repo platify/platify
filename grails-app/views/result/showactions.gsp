@@ -196,7 +196,8 @@
                         <div class="col-md-3">
                             <div class="row">
                                 <h5><b>COMPOUND</b></h5>
-                                <span id="compoundSelect"></span>
+                                <g:select name="compound" id="compoundSelect" class="form-control"
+                                          from="" noSelection="[null:'']" onchange="updateDoseResponseCurve(this.value)"/>
                             </div><br>
                             <div class="row">
                                 <h5><b>PARAMETERS</b></h5>
@@ -214,7 +215,7 @@
                             </div><br>
                             <div class="row">
                                 <div class="centerWrapper" style="text-align: center">
-                                    <button id="doseResponseButton">Update Parameters</button>
+                                    <button id="doseResponseButton" type="button" disabled="disabled">Update Parameters</button>
                                 </div><br>
                             </div>
                         </div>

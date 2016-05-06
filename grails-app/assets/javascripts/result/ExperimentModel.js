@@ -481,7 +481,7 @@ function ExperimentModel() {
         return isNaN(rv) ? null : rv;
     }
 
-    this.toggleOutlier = function(plate, row, col, isOutlier, scope) {console.log(plate)
+    this.toggleOutlier = function(plate, row, col, isOutlier, scope) {
         // todo: require that barcode is always supplied.
         // If no barcode supplied, get barcode of currently selected plate.
         if (plate === null || plate === undefined)

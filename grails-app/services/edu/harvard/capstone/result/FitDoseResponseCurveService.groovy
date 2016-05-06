@@ -39,7 +39,7 @@ class FitDoseResponseCurveService {
         ArrayList<Double> x = new ArrayList<Double>()
         ArrayList<Double> y = new ArrayList<Double>()
         ArrayList<String> exclusions = new ArrayList<String>()
-        data.plates.each { plate ->
+        data.plates.eachWithIndex { plate, index ->
             plate.rows.eachWithIndex { r, r_i ->
                 r.columns.eachWithIndex { c, c_i ->
                     if (c.control == Well.WellControl.COMPOUND.toString().toUpperCase() &&
@@ -51,7 +51,7 @@ class FitDoseResponseCurveService {
                         def excludeStatus = (c.outlier && c.outlier == "true") ? "Y" : "N";
                         exclusions.add(excludeStatus)
                         compound_info.push([
-                            barcode: plate.plateID,
+                            plateIndex: index,
                             row: r_i,
                             column: c_i,
                             outlier: c.outlier
@@ -121,7 +121,7 @@ class FitDoseResponseCurveService {
         ArrayList<Double> x = new ArrayList<Double>()
         ArrayList<Double> y = new ArrayList<Double>()
         ArrayList<String> exclusions = new ArrayList<String>()
-        data.plates.each { plate ->
+        data.plates.eachWithIndex { plate, index ->
             plate.rows.eachWithIndex { r, r_i ->
                 r.columns.eachWithIndex { c, c_i ->
                     if (c.control == Well.WellControl.COMPOUND.toString().toUpperCase() &&
@@ -133,7 +133,7 @@ class FitDoseResponseCurveService {
                         def excludeStatus = (c.outlier && c.outlier == "true") ? "Y" : "N";
                         exclusions.add(excludeStatus)
                         compound_info.push([
-                                barcode: plate.plateID,
+                                plateIndex: index,
                                 row: r_i,
                                 column: c_i,
                                 outlier: c.outlier

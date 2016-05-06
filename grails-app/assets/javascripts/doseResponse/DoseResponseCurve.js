@@ -19,7 +19,7 @@ function DoseResponseCurve() {
         createGraphAndTable();
     }
 
-    this.updateDoseResponseCurve = function() {
+    this.updateDoseResponseCurve = function() {console.log("Updating dose response curve...");
         var data_type = ($('#normalizeButton').is(":checked")) ? "normalized_data" : "raw_data";
 
         var jqxhr = $.ajax({
@@ -31,6 +31,9 @@ function DoseResponseCurve() {
         });
         jqxhr.success(function(data) {
             renderDoseResponseCurve(data);
+        });
+        jqxhr.done(function() {
+            $('#doseResponseButton').prop("disabled", false);
         });
     }
 
@@ -50,9 +53,10 @@ function DoseResponseCurve() {
         });
     }
 
-    $("#compoundSelect").on('change','select', function() {
+    $("#compoundSelect").on('change', function() {
         if (COMPOUND=="null")
             return;
+        $('#doseResponseButton').prop("disabled", true);
         self.updateDoseResponseCurve();
     });
 
@@ -186,15 +190,15 @@ function DoseResponseCurve() {
                     return "white";
             })
             .on("click", function(d) {
-                d3.select(this).style("fill", function(d) {console.log(d);
+                d3.select(this).style("fill", function(d) {
                     if (d[2].outlier && d[2].outlier.localeCompare("true") === 0) {
                         // Turn off outlier status
-                        experiment.toggleOutlier(d[2].row, d[2].column, false, "WELL", d[2].barcode);
+                        experiment.toggleOutlier(d[2].plateIndex, d[2].row, d[2].column, false, "WELL");
                         d[2].outlier = "false";
                         return "blue";
                     }
                     else {
-                        experiment.toggleOutlier(d[2].row, d[2].column, true, "WELL", d[2].barcode);
+                        experiment.toggleOutlier(d[2].plateIndex, d[2].row, d[2].column, true, "WELL");
                         d[2].outlier = "true";
                         return "white";
                     }
