@@ -549,6 +549,8 @@ function reloadGrid() {
 function loadGrid(dataSet) {
     grid.setData(dataSet);
     scatter.setData(dataSet);
+    scatterControl.setData(experiment.experiment);
+
     grid.fillUpGrid(null, null, true, cellFormatter, 'result-cell');
     if (showHeatMap) {
         colorGrid(dataSet);

@@ -17,15 +17,16 @@ function Scatter_control() {
 		var plateLabels = Array();
 		
 		self = this;
-		
+		var data_type = ($('#normalizeButton').is(":checked")) ? "normalizedData" : "rawData";
+
 		$.each(experiment.plates, function(plateIdx, plate){
 			$.each(plate.rows, function(rowIdx, row){
 				$.each(row.columns, function(colIdx ,column){
 					if(column.control == "NEGATIVE") {
-						//negative.push([i,column.rawData["smoots"]]);
-						var keys = Object.keys(column.rawData);
+						//negative.push([i,column[data_type]["smoots"]]);
+						var keys = Object.keys(column[data_type]);
 						if(keys.length > 0){
-							negative.push([i,column.rawData[keys[0]],column.outlier,plate.plateID,rowIdx,colIdx]);
+							negative.push([i,column[data_type][keys[0]],column.outlier,plate.plateID,rowIdx,colIdx]);
 							//dotIndex array is 0 indexed
 							self.dotIndexes[i] = [plateIdx, rowIdx, colIdx, plate.plateID];
 							//Plate plateIdx applies to all indexes "i" or lower
@@ -36,9 +37,9 @@ function Scatter_control() {
 					}
 					
 					if(column.control == "POSITIVE") {
-						var keys = Object.keys(column.rawData);
+						var keys = Object.keys(column[data_type]);
 						if(keys.length > 0){
-							positive.push([i,column.rawData[keys[0]],column.outlier,plate.plateID,rowIdx,colIdx]);
+							positive.push([i,column[data_type][keys[0]],column.outlier,plate.plateID,rowIdx,colIdx]);
 							//dotIndex array is 0 indexed
 							self.dotIndexes[i] = [plateIdx, rowIdx, colIdx, plate.plateID];
 							//Plate plateIdx applies to all indexes "i" or lower
