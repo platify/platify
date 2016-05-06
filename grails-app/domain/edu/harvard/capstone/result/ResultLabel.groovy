@@ -18,7 +18,7 @@ class ResultLabel {
 	}
 
     static constraints = {
-    	   outlier nullable:false, blank:true
+    	   outlier nullable:true, blank:true
     }
 	
 	static mapping = {

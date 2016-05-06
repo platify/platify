@@ -691,6 +691,7 @@ function ParserUI(parsingController){
             afterSelect: this.plateImportListSelection,
             afterDeselect: this.plateImportListSelection
         });
+        this.plateImportListSelection();
     };
 
     this.plateImportListSelection = function(values) {
