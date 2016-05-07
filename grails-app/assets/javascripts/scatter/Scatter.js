@@ -30,6 +30,9 @@ function Scatter(experiment) {
     	
     },
    	this.cValue = function(rowIdx, colIdx) { 
+    	if(!$("#compoundsCheckbox").is(':checked')) {
+    		return "#2222dd";
+    	}
     	var colorValues = d3.scale.category20().range();
     	if(experiment.experiment.plates[experiment.currentPlateIndex].rows[rowIdx] == undefined) {
     		return "#000000";
@@ -140,12 +143,17 @@ function Scatter(experiment) {
 	        	  return self.cValue(row, col);
 	        	  });
 	    
-	    var legend = "";
-	    $.each(colors, function(key, value){
-	    	legend = legend + "<span style=\"font-weight:strong;color:"+value+"\">"+key+"</span>&nbsp;";
-	    	
-	    });
-	    $("#scatterplot_legend").html(legend);
+	    
+	    if($("#compoundsCheckbox").is(':checked')) {
+	    	var legend = "";
+		    $.each(colors, function(key, value){
+		    	legend = legend + "<span style=\"font-weight:bold;color:"+value+"\">"+key+"</span>&nbsp;";
+		    	
+		    });
+	    	$("#scatterplot_legend").html(legend);
+	    } else {
+	    	$("#scatterplot_legend").html("")
+	    }
 	    $("body").trigger("done_drawing");
 	}
 	

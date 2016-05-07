@@ -242,6 +242,11 @@ function addHandlers() {
         markAllCurrentOutliers();
         event.stopImmediatePropagation();
     });
+    
+    $('#compoundsCheckbox').change(function(){
+    	//Refresh the scatter plot
+    	scatter.setData(experiment.data);
+    });
 
     // add heatmap button listener
     $('#heatMapButton').on('click', function(event) {
