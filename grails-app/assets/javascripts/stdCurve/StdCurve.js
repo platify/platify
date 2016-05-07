@@ -1,5 +1,6 @@
 function StdCurve() {
     this.experiment;
+    var showactions;
     var controls_editor_data;
     var allControls;
     var graph, table, x_scale, y_scale, margin, width, height; //vis variables
@@ -12,15 +13,16 @@ function StdCurve() {
     var previouslySet; //if standard curves were previously set
     var stdCurvePlates;
 
-    this.init = function(experiment) {
+    this.init = function(experiment, main) {
         this.experiment = experiment;
+        showactions = main;
         exp_id = experiment.experiment.experimentID;
         currentBarcode = experiment.currentPlate.plateID;
         regressionAllChecked = $('#regressionCheckbox').attr('checked');
         ref_outlier_points = [];
         previouslySet = false;
 
-        margin = {top: 10, right: 30, bottom: 50, left: 60};
+        margin = {top: 10, right: 40, bottom: 50, left: 60};
         width = document.getElementById('stdCurveBody').offsetWidth - 100 - margin.left - margin.right;
         height = 550 - margin.top - margin.bottom;
 
@@ -177,6 +179,12 @@ function StdCurve() {
         }
     }
 
+    this.updateStdCurveWithRecalculate = function() {
+        setRegression();
+        updateStdCurve();
+        storeNormalized();
+    }
+
     function getResultPlateIndex(plate_barcode) {
         for (var i = 0; i < experiment.experiment.plates.length; i++) {
             if (plate_barcode.localeCompare(experiment.experiment.plates[i].plateID) === 0) {
@@ -218,6 +226,7 @@ function StdCurve() {
 
         // Get std curve "known" x-coordinate
         // todo: rename the mismatched x- & y-coord variable names
+        var i = 0;
         experiment.experiment.plates[sc_index].rows.forEach(function(row, row_i) {
             var x_coord = null;
             var y_coord = null;
@@ -237,7 +246,7 @@ function StdCurve() {
                         controlProperties["x"] = y_coord;
                         controlProperties["y"] = x_coord;
                         controlProperties["outlier"]
-                            = (column.outlier === null || column.outlier.localeCompare("true") !== 0) ? "false" : "true";
+                            = (column.outlier && column.outlier.localeCompare("true") === 0) ? "true" : "false";
                         controlProperties["row"] = row_i;
                         controlProperties["column"] = col_i;
                         allControls.push(controlProperties);
@@ -372,6 +381,13 @@ function StdCurve() {
         circles.attr("cx", function(d) { return x_scale(d["x"]); } )
             .attr("cy", function(d) { return y_scale(d["y"]); } )
             .attr("r", 3)
+            .attr("index", function (d,i) {
+                var currentSC_barcode = experiment.experiment.plates[current_result_index].stdCurveBarcode;
+                var currentSC_index = getResultPlateIndex(currentSC_barcode);
+                return currentSC_index;
+            })
+            .attr("row", function(d) { return d["row"]; })
+            .attr("col", function(d) { return d["column"]; })
             .style("stroke", "darkgreen")
             .style("fill", function(d) {
                 if (d["outlier"].localeCompare("true") === 0)
@@ -380,26 +396,25 @@ function StdCurve() {
                     return "green";
             })
             .on("click", function(d) {
-                d3.select(this).style("fill", function(d) {
-                    var currentSC = experiment.experiment.plates[current_result_index].stdCurveBarcode;
+////                d3.select(this).style("fill", function(d) {
+//                    var currentSC_barcode = experiment.experiment.plates[current_result_index].stdCurveBarcode;
+//                    var currentSC_index = getResultPlateIndex(currentSC_barcode);
+//
+//                    if (d["outlier"].localeCompare("true") === 0) {
+//                        // Turn off outlier status
+////                        experiment.toggleOutlier(currentSC_index, d["row"], d["column"], false, "WELL");
+//                        d["outlier"] = "false";console.log("now" + d["outlier"]);
+////                        return "green";
+//                    }
+//                    else {
+////                        experiment.toggleOutlier(currentSC_index, d["row"], d["column"], true, "WELL");
+//                        d["outlier"] = "true";
+////                        return "white";
+//                    }
+////                });
 
-                    if (d["outlier"].localeCompare("true") === 0) {
-                        // Turn off outlier status
-                        experiment.toggleOutlier(d["row"], d["column"], false, "WELL", currentSC);
-                        d["outlier"] = "false";
-                        return "green";
-                    }
-                    else {
-                        experiment.toggleOutlier(d["row"], d["column"], true, "WELL", currentSC);
-                        d["outlier"] = "true";
-                        return "white";
-                    }
-                });
 
-                setRegression();
-                updateStdCurve();
-                storeNormalized();
-        //        persistNormalized();
+//                persistNormalized();
             });
     }
 
@@ -413,8 +428,8 @@ function StdCurve() {
             return;
         }
 
-        var min_x = d3.min(points, function(d) { return d[0]; });
-        var max_x = d3.max(points, function(d) { return d[0]; });
+        var min_x = d3.min(allControls, function(d) { return d["x"]; });
+        var max_x = d3.max(allControls, function(d) { return d["x"]; });
 
         var extra_points = interpolate(min_x, max_x);
         var merged_points = points.concat(extra_points);

@@ -184,7 +184,7 @@ function init() {
 
     //Set up std curve
     stdCurve = new StdCurve();
-    stdCurve.init(experiment);
+    stdCurve.init(experiment, this);
 
     // Set up histogram
     histogram = new Histogram(experiment.experiment);
@@ -310,6 +310,21 @@ function addHandlers() {
         markOutlierGridClick(event, args);
         event.stopImmediatePropagation();
     });
+
+    $("#stdCurveVis").on('click', 'circle', function(event) {
+        var plate = $(event.target).attr('index');
+        var row = $(event.target).attr('row');
+        var col = $(event.target).attr('col');
+        var outlierStatus = experiment.experiment.plates[plate].rows[row].columns[col].outlier;
+        if(outlierStatus && outlierStatus == "true") {
+            //Already has 'outlier' unset it
+            markOutlierStatus(plate, row, col, false, true);
+        } else {
+            markOutlierStatus(plate, row, col, true, true);
+        }
+        stdCurve.updateStdCurveWithRecalculate();
+        event.stopImmediatePropagation();
+    });
 }
 
 function markOutlierHistogramClick(indexes, isOutlier) {
@@ -375,7 +390,6 @@ function markOutlierScatterClick(event) {
 
 }
 
-//TODO: GET PLATE INDEX IN HERE
 function markOutlierScatterControlClick(event) {
 	var eventObj = $(event.target);
 	var indexVar = $(event.target).attr('index');
@@ -389,9 +403,9 @@ function markOutlierScatterControlClick(event) {
 
     if(s.indexOf('outlier')!==-1) {
     	//Already has 'outlier' unset it
-    	markOutlierStatus(null, row, col, false, true);
+    	markOutlierStatus(plate, row, col, false, true);
     } else {
-    	markOutlierStatus(null, row, col, true, true);
+    	markOutlierStatus(plate, row, col, true, true);
     }
 //    experiment.savePlate();
     console.log("col: "+col+" row: "+row);
@@ -522,8 +536,17 @@ function markAllCurrentOutliers() {
     //experiment.experiment.plates[0].rows[row].columns[col].outlier = "false"
 	$.each(experiment.experiment.plates, function(plateIdx, plate) {
 	    $.each(plate.rows, function( rowIdx, row ) {
+	        var rowNum = rowIdx+1;
 	    	$.each(row.columns, function( colIdx, column ) {
-	    		
+	    		var scatterControlPoint = $('circle[row="'+rowIdx+'"][col="'+colIdx+'"][plate="'+plateIdx+'"]');
+
+                    if(column.outlier == "true") {
+                        //Add the outlier class
+                        scatterControlPoint.attr("class", "outlier circle");
+                    } else {
+                        //Remove the outlier class if it exists
+                        scatterControlPoint.attr("class", "circle");
+                    }
 			  
 	    		//TODO: Update histogram here?
 	    	});
