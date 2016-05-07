@@ -6,6 +6,8 @@
 // global vars
 var compounds = [];
 var assays = [];
+var compoundsObjArray = []; // = new Array();
+
 
 /**
  * Populate the Assay list dropdown in the modal dialog on "Configure Mapping"
@@ -71,13 +73,13 @@ function setCompoundList() {
     newDiv = document.createElement("div");
 
 
-    for (compound in compounds) {
+    for (compound in compounds.compound) {
 
         innerDiv = document.createElement("div");
 
         newLabel = document.createElement("label");
-        newLabel.htmlFor = compounds[compound].id;
-        newLabel.appendChild(document.createTextNode(" " + compounds[compound].name));
+        newLabel.htmlFor = compounds.compound[compound].id;
+        newLabel.appendChild(document.createTextNode(" " + compounds.compound[compound].name));
 
         innerDiv.appendChild(newLabel);
         newDiv.appendChild(innerDiv);
@@ -86,14 +88,15 @@ function setCompoundList() {
 
     document.getElementById("compoundList").innerHTML = newDiv.innerHTML;
 
-    if (compounds.length == 0) {
+//    console.log("compounds: " + JSON.stringify(compounds));
+
+    if (compounds.compound.length == 0) {
         document.getElementById("compoundList").innerHTML = "No compounds available";
         document.getElementById("getMappingInstructions").hidden = true;
     } else {
         document.getElementById("getMappingInstructions").hidden = false;
     }
 
-    console.log("end compound list");
 
 }
 
@@ -115,7 +118,26 @@ function loadCompoundJsonData(compoundJson) {
 
     compounds = jsonData.compound;
 
-    console.log("Compound length: " + compounds.length);
+    console.log("compound raw: " + JSON.stringify(compounds.compound));
+
+    if (compounds.compound.length == 0) {
+        console.log("empty!!!!!!!!!!!");
+
+    }
+
+    compoundsObjArray.push(compounds)
+
+    console.log("Compound length: " + compoundsObjArray[0].compound.length);
+
+    // check if empty object
+    if (compoundsObjArray.length == 1) {
+        if (compoundsObjArray[0].compound == "") {
+            console.log("empty!");
+        } else {
+            console.log("non empty!");
+        }
+        console.log("obj: " + compoundsObjArray[0].compound);
+    }
 
     setCompoundList();
 
@@ -147,7 +169,9 @@ function fetchAssayCompoundList(selectedAssay) {
 //        console.log("success");
     }).fail(function() {
         console.log("error");
-        alert("An error has occurred while fetching compound data from the server.");
+        document.getElementById("compoundList").innerHTML = "Error retrieving compound list.";
+        document.getElementById("getMappingInstructions").hidden = true;
+
     }).always(function() {
 //        console.log("complete");
     });
@@ -157,7 +181,7 @@ function fetchAssayCompoundList(selectedAssay) {
 
 
     // Set another completion function for the request above
-    jqxhr.always(function(resData) {
+    jqxhr.done(function(resData) {
 //        console.log("templateJson=" + JSON.stringify(resData));
         $("#gridView").show();
         loadCompoundJsonData(JSON.stringify(resData));
@@ -257,7 +281,7 @@ function parseCompoundLiquidHandlerLocationJsonData(inventoryJsonData) {
         // assume that the assay has fewer compounds than the LH Inventory, so cycle through them
         var strCompoundsNotFoundMessage = "";
 
-        for (compound in compounds) {
+        for (compound in compounds.compound) {
 
             var CompoundFound = 0;
 
@@ -277,21 +301,21 @@ function parseCompoundLiquidHandlerLocationJsonData(inventoryJsonData) {
                 var SrcCompoundName = obj.name.trim();
 
                 // test if we found the compound we're looking for!
-                if (SrcCompoundName == compounds[compound].name) {
+                if (SrcCompoundName == compounds.compound[compound].name) {
                     console.log("here it comes2!");
-                    console.log("Compound: " + JSON.stringify(compounds[compound]));
+                    console.log("Compound: " + JSON.stringify(compounds.compound[compound]));
                     CompoundFound = 1;
 
 
-                    for (destination in compounds[compound].destinations) {
-                        S_CompoundName = compounds[compound].name;
+                    for (destination in compounds.compound[compound].destinations) {
+                        S_CompoundName = compounds.compound[compound].name;
                         S_PlateId = obj.srcPlateId;
                         S_Well = String.fromCharCode(65 + obj.row) + obj.col;
-                        S_Dosage = (obj.concentration / compounds[compound].destinations[destination].dosage).toString() + " " + compounds[compound].destinations[destination].unit;
+                        S_Dosage = (obj.concentration / compounds.compound[compound].destinations[destination].dosage).toString() + " " + compounds.compound[compound].destinations[destination].unit;
 
-                        D_PlateId = compounds[compound].destinations[destination].plate;
-                        D_Well = compounds[compound].destinations[destination].well;
-                        D_Dosage = compounds[compound].destinations[destination].dosage + " " + compounds[compound].destinations[destination].unit;
+                        D_PlateId = compounds.compound[compound].destinations[destination].plate;
+                        D_Well = compounds.compound[compound].destinations[destination].well;
+                        D_Dosage = compounds.compound[compound].destinations[destination].dosage + " " + compounds.compound[compound].destinations[destination].unit;
 
 
                         document.getElementById("lhmappinginstructions").value += S_PlateId + ",\t" +
@@ -310,7 +334,7 @@ function parseCompoundLiquidHandlerLocationJsonData(inventoryJsonData) {
 
             // Compound not found in Inventory System
             if (CompoundFound == 0) {
-                strCompoundsNotFoundMessage += compounds[compound].name + " not found in Inventory System.\n";
+                strCompoundsNotFoundMessage += compounds.compound[compound].name + " not found in Inventory System.\n";
 
             }
 
