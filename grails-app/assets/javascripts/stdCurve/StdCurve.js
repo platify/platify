@@ -33,7 +33,7 @@ function StdCurve() {
             type: "POST",
             processData: false
         });
-        jqxhr.success(function(data) {
+        jqxhr.success(function(data) {console.log(data);
             controls_editor_data = data.editorControlsData;
         });
 
@@ -89,11 +89,13 @@ function StdCurve() {
     function determineStdCurves() {
         stdCurvePlates = [];
         controls_editor_data.plates.forEach(function(plate) {
-            plate.wells[0].labels.forEach(function(label) {
-                if (label.category.localeCompare(Y_CATEGORY) === 0)
-                    stdCurvePlates.push(plate.plateID);
-                    return;
-            });
+            if (plate.wells.length > 0) {
+                plate.wells[0].labels.forEach(function(label) {
+                    if (label.category.localeCompare(Y_CATEGORY) === 0)
+                        stdCurvePlates.push(plate.plateID);
+                        return;
+                });
+            }
         });
     }
 
