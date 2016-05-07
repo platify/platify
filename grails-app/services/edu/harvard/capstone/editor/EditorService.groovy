@@ -582,6 +582,7 @@ class EditorService {
         return assays
     }
 
+
     def getCompoundsOfExperiment(ExperimentalPlateSet experimentalPlateSet) {
         // Get all plates of experiment
         def plateList = PlateSet.findAllByExperiment(experimentalPlateSet)
@@ -664,6 +665,91 @@ class EditorService {
 
     // Get all compounds by experimentalplateset/assay and return in a JSON list
     def getCompoundListByAssay(Integer assayId) {
+        def experimentalPlateSet = ExperimentalPlateSet.findById(assayId)
+
+        // Get all plates of experiment
+        def plateList = PlateSet.findAllByExperiment(experimentalPlateSet)
+
+        // Get all well-label relationships of experiment
+        def plateDomainLabels = DomainLabel.findAllByPlateInList(plateList)
+        def wellLabelRelationList = DomainLabel.findAllByDomainIdInList(plateDomainLabels.collect{it.domainId}).collect { it.label.id }
+
+        // Get unique compound names of experiment
+        def compoundNameSet = Label.findAllByIdInListAndCategory(wellLabelRelationList, "compound").collect {
+            it.name
+        }.toSet()
+
+        def compoundList = [:]
+        compoundList.compound = []
+
+        // For each compound, determine compound's plates
+        compoundNameSet.each { compoundName ->
+            def compound = [:]
+            compound.id = compoundName
+            compound.name = compoundName
+            compound.destinations = []
+
+            // All domain-label associated with current compound
+            def domainLabelLinksOfCompound = DomainLabel.withCriteria {
+                inList("label", Label.findAllByCategoryAndName("compound", compoundName))
+                inList("plate", plateList)
+                eq("labelType", DomainLabel.LabelType.WELL)
+            }
+
+            // For each plate, determine compound's wells
+            plateList.each { plate ->
+                // Filter domainLabelLinksOfCompound further to get only current plate's
+                def domainLabelLinkOfPlate = DomainLabel.withCriteria {
+                    inList("id", domainLabelLinksOfCompound.collect { it.id })
+                    eq("plate", plate)
+                }
+
+                // For each well, determine compound's row-column, dosage, & dosage unit
+                def wellIdSet = domainLabelLinkOfPlate.collect { it.domainId }.toSet()
+                wellIdSet.each { wellId ->
+                    def destination = [:]
+
+                    def dosageLabels = DomainLabel.withCriteria {
+                        eq("domainId", wellId)
+                        eq("plate", plate)
+                        //  eq("label", Label.findByCategory("dosage"))
+                    }
+
+                    Label dosageLabel = null
+                    dosageLabels.each { domainLabel ->
+                        // Get label containing dosage
+                        if (domainLabel.label.category == "dosage") {
+                            dosageLabel = domainLabel.label
+                            return
+                        }
+                    }
+                    if (!dosageLabel)
+                        return
+
+                    Well well = Well.findById(wellId)
+
+                    destination.plate = plate.barcode
+
+                    // warning: janky conversion logic from 0-based column, row design to
+                    // 1-based letter, row output
+                    // had to do this because inherited code from previous SAMS team
+                    def asciiletter = w1.row.toInteger() + 65
+                    destination.well = Character.toChars(asciiletter).toString() + w1.column.toString()
+                    destination.dosage = replaceDot(dosageLabel.name)
+                    destination.unit = dosageLabel.units
+
+                    compound.destinations << destination
+                }
+            }
+
+            compoundList.compound << compound
+        }
+
+        return compoundList
+    }
+
+    def getCompoundListByAssay_OLD(Integer assayId) {
+
         def compoundList = []
 
         def experimentalPlateSetInstance = ExperimentalPlateSet.findById(assayId)
