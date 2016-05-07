@@ -347,7 +347,7 @@ function parseCompoundLiquidHandlerLocationJsonData(inventoryJsonData) {
 
     // errors
     if (strCompoundsNotFoundMessage.length > 0) {
-        document.getElementById("lhmappinginstructions").value = "Errors:\n " +
+        document.getElementById("lhmappinginstructions").value = "Errors:\n" +
             strCompoundsNotFoundMessage + "\n\n" +
             document.getElementById("lhmappinginstructions").value
     }
