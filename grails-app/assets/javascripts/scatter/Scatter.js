@@ -60,7 +60,7 @@ function Scatter(experiment) {
     
 	this.setData = function(matrixData) {
 		//Clear any existing data in the plot
-		$('#scatterplot').html('');
+		$('#scatterplot1_vis').html('');
 		//This is in a set of rows and columns
 		//var data = [[5,3], [10,17], [15,4], [2,8]];
 		var i = 0;
@@ -87,7 +87,7 @@ function Scatter(experiment) {
 	    	      .domain([d3.min(data, function(d) { return +d[1]; }), d3.max(data, function(d) { return +d[1]; })])
 	    	      .range([ height, 0 ]);
 	    
-	    var chart = d3.select('#scatterplot')
+	    var chart = d3.select('#scatterplot1_vis')
 		.append('svg:svg')
 		.attr('width', width + margin.right + margin.left)
 		.attr('height', height + margin.top + margin.bottom)
@@ -139,6 +139,13 @@ function Scatter(experiment) {
 	        	  var col = self.dotIndexes[d[0]][2];
 	        	  return self.cValue(row, col);
 	        	  });
+	    
+	    var legend = "";
+	    $.each(colors, function(key, value){
+	    	legend = legend + "<span style=\"font-weight:strong;color:"+value+"\">"+key+"</span>&nbsp;";
+	    	
+	    });
+	    $("#scatterplot_legend").html(legend);
 	    $("body").trigger("done_drawing");
 	}
 	
