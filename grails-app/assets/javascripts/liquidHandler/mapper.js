@@ -89,7 +89,7 @@ function setCompoundList() {
     document.getElementById("compoundList").innerHTML = newDiv.innerHTML;
 
 //    console.log("compounds: " + JSON.stringify(compounds));
-    document.getElementById("loadingspinner").style.display = "inline";
+    document.getElementById("loadingspinner").style.display = "none";
 
     if (compounds.compound.length == 0) {
         document.getElementById("compoundList").innerHTML = "No compounds available";
@@ -172,7 +172,7 @@ function fetchAssayCompoundList(selectedAssay) {
     }).fail(function() {
         console.log("error");
         document.getElementById("compoundList").innerHTML = "Error retrieving compound list.";
-        document.getElementById("loadingspinner").style.display = "inline";
+        document.getElementById("loadingspinner").style.display = "none";
         document.getElementById("getMappingInstructions").hidden = true;
 
     }).always(function() {
@@ -369,7 +369,7 @@ function onViewSelect(clickedEL) {
     document.getElementById("compoundList").innerHTML = "";
     document.getElementById("assayList").selectedIndex = 0;
     document.getElementById("getMappingInstructions").hidden = true;
-    document.getElementById("loadingspinner").style.display = "inline";
+    document.getElementById("loadingspinner").style.display = "none";
 
 
     // init modal values
