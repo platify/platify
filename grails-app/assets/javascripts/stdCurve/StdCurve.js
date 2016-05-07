@@ -589,7 +589,7 @@ function StdCurve() {
                         else
                             inferred_val = merged_regression_points[well.rawData[X_CATEGORY]];
 
-                        well.normalizedData[label] = inferred_val.toString();
+                        well.normalizedData[label] = replaceDot(inferred_val.toString());
                     });
                 });
             }
