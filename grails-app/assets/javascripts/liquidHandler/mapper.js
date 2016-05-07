@@ -13,14 +13,14 @@ var assays = [];
 function populateAssayList() {
     assayListSelect = document.getElementById('assayList');
 
-    console.log("starting html insert");
+//    console.log("starting html insert");
 
     var assay;
     for (assay in assays) {
         console.log("doing html insert");
         assayListSelect.options[assayListSelect.options.length] = new Option(assays[assay].name, assays[assay].id);
     }
-    console.log("endedhtml insert");
+//    console.log("endedhtml insert");
 }
 
 /**
@@ -45,14 +45,14 @@ function fetchAssayList() {
 
     // Set another completion function for the request above
     jqxhr.always(function(resData) {
-        console.log("assay list call complete");
+//        console.log("assay list call complete");
         $("#gridView").show();
         var jsonData;
 
-        console.log(JSON.stringify(resData));
+//        console.log(JSON.stringify(resData));
         jsonData = JSON.parse(JSON.stringify(resData));
 
-        console.log("assay: " + jsonData.assay[0].name);
+//        console.log("assay: " + jsonData.assay[0].name);
 
         assays = jsonData.assay;
 
@@ -69,6 +69,8 @@ function setCompoundList() {
     "use strict";
     var newDiv, innerDiv, newLabel, newCheckbox, compound;
     newDiv = document.createElement("div");
+
+
     for (compound in compounds) {
 
         innerDiv = document.createElement("div");
@@ -81,9 +83,18 @@ function setCompoundList() {
         newDiv.appendChild(innerDiv);
 
     }
+
     document.getElementById("compoundList").innerHTML = newDiv.innerHTML;
 
-    document.getElementById("getMappingInstructions").hidden = false;
+    if (compounds.length == 0) {
+        document.getElementById("compoundList").innerHTML = "No compounds available";
+        document.getElementById("getMappingInstructions").hidden = true;
+    } else {
+        document.getElementById("getMappingInstructions").hidden = false;
+    }
+
+    console.log("end compound list");
+
 }
 
 
@@ -104,6 +115,8 @@ function loadCompoundJsonData(compoundJson) {
 
     compounds = jsonData.compound;
 
+    console.log("Compound length: " + compounds.length);
+
     setCompoundList();
 
 }
@@ -117,6 +130,9 @@ function fetchAssayCompoundList(selectedAssay) {
     "use strict";
     console.log("calling with value: " + selectedAssay.value);
 
+    document.getElementById("compoundList").innerHTML = "Loading compounds...";
+
+
     $("#gridView").hide();
     $("#loaderView").show();
 
@@ -128,12 +144,12 @@ function fetchAssayCompoundList(selectedAssay) {
         processData: false,
         contentType: "application/json; charset=UTF-8"
     }).done(function() {
-        console.log("success");
+//        console.log("success");
     }).fail(function() {
         console.log("error");
         alert("An error has occurred while fetching compound data from the server.");
     }).always(function() {
-        console.log("complete");
+//        console.log("complete");
     });
 
     $("#gridView").show();
@@ -142,7 +158,6 @@ function fetchAssayCompoundList(selectedAssay) {
 
     // Set another completion function for the request above
     jqxhr.always(function(resData) {
-        console.log( "compound complete" );
 //        console.log("templateJson=" + JSON.stringify(resData));
         $("#gridView").show();
         loadCompoundJsonData(JSON.stringify(resData));
@@ -209,7 +224,7 @@ function spoofLiquidHandlerLocations() {
     // Set another completion function for the request above
     jqxhr.always(function(resData) {
         console.log( "compound location complete" );
-        console.log("templateJson=" + JSON.stringify(resData));
+//        console.log("templateJson=" + JSON.stringify(resData));
         //loadPlateJsonData(resData);
         //loadCompoundJsonData(JSON.stringify(resData));
         parseCompoundLiquidHandlerLocationJsonData(JSON.stringify(resData));
