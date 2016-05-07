@@ -268,7 +268,7 @@ function Histogram(json_data) {
             num_bins = (max_x - min_x) / bin_width;
 
         var xScale = d3.scale.linear()
-            .domain([min_x, max_x + 6])
+            .domain([min_x, max_x])
             .range([0, width]);
 
         var ticks;
@@ -312,7 +312,7 @@ function Histogram(json_data) {
             num_bins = (max_x - min_x) / bin_width;
 
         var xScale = d3.scale.linear()
-            .domain([min_x, max_x + 6])
+            .domain([min_x, max_x])
             .range([0, width]);
 
         var ticks;
