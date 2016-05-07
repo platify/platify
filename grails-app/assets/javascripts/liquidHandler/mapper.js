@@ -388,6 +388,9 @@ function onViewSelect(clickedEL) {
     $("#loaderView").hide();
     $("#gridView").show();
 
+    document.getElementById("lhmappinginstructions").value = "Source (S),\tS_Well,\tS_Dosage,\tDestination (D),\tD_Well,\tD_Dosage\n";
+    document.getElementById("lhmappinginstructions").value += "==========================================================\n";
+
 }
 
 
@@ -399,8 +402,7 @@ function init() {
 //    "use strict";
     fetchAssayList();
 
-    document.getElementById("lhmappinginstructions").value = "Source (S),\tS_Well,\tS_Dosage,\tDestination (D),\tD_Well,\tD_Dosage\n";
-    document.getElementById("lhmappinginstructions").value += "==========================================================\n";
+
 
 }
 
