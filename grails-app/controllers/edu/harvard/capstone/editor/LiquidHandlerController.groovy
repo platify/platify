@@ -53,7 +53,6 @@ class LiquidHandlerController {
         def liquidHandlerInstance = liquidService.newMapper(name, url, inputPlatesCount, outputPlatesCount, configStatus)
 
         if (liquidHandlerInstance == null) {
-            notFound()
             return
         }
 

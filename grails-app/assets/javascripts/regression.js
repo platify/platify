@@ -81,7 +81,7 @@
                 }
 
                 var sciNot = d3.format(".2e");
-                var string = 'y = ' + sciNot(gradient) + 'x + ' + sciNot(intercept);
+                var string = 'y = (' + sciNot(gradient) + ')x + ' + sciNot(intercept);
 //                var string = 'y = ' + Math.round(gradient*100) / 100 + 'x + ' + Math.round(intercept*100) / 100;
 
                 return {
@@ -110,7 +110,7 @@
                 }
 
                 var sciNot = d3.format(".2e");
-                var string = 'y = ' + sciNot(gradient) + 'x';
+                var string = 'y = (' + sciNot(gradient) + ')x';
 //                var string = 'y = ' + Math.round(gradient*100) / 100 + 'x';
 
                 return {r2: determinationCoefficient(data, results), equation: [gradient], points: results, string: string};
@@ -140,7 +140,7 @@
                 }
 
                 var sciNot = d3.format(".2e");
-                var string = 'y = (' + sciNot(A) + ')' + 'e^(' + sciNot(B) + 'x)';
+                var string = 'y = (' + sciNot(A) + ')' + 'e^(' + sciNot(B) + ')x';
 //                var string = 'y = ' + Math.round(A*100) / 100 + 'e^(' + Math.round(B*100) / 100 + 'x)';
 
                 return {
@@ -172,7 +172,7 @@
                 }
 
                 var sciNot = d3.format(".2e");
-                var string = 'y = ' + sciNot(A) + ' + ' + sciNot(B) + ' ln(x)';
+                var string = 'y = (' + sciNot(A) + ') + (' + sciNot(B) + ') ln(x)';
 //                var string = 'y = ' + Math.round(A*100) / 100 + ' + ' + Math.round(B*100) / 100 + ' ln(x)';
 
                 return {
@@ -204,7 +204,7 @@
                 }
 
                  var sciNot = d3.format(".2e");
-                 var string = 'y = ' + sciNot(A) + 'x^' + sciNot(B);
+                 var string = 'y = (' + sciNot(A) + ')x^(' + sciNot(B) + ')';
 //                 var string = 'y = ' + Math.round(A*100) / 100 + 'x^' + Math.round(B*100) / 100;
 
                 return {
@@ -255,9 +255,9 @@
                     var string = 'y = ';
 
                     for(var i = equation.length-1; i >= 0; i--){
-                      if(i > 1) string += sciNot(equation[i])  + 'x^' + i + ' + ';
-                      else if (i == 1) string += sciNot(equation[i]) + 'x' + ' + ';
-                      else string += sciNot(equation[i]);
+                      if(i > 1) string += '(' + sciNot(equation[i])  + ')x^' + i + ' + ';
+                      else if (i == 1) string += '(' + sciNot(equation[i]) + ')x' + ' + ';
+                      else string += '(' + sciNot(equation[i]) + ')';
                     }
 
                 return {

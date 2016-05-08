@@ -6,6 +6,8 @@
 // global vars
 var compounds = [];
 var assays = [];
+var compoundsObjArray = []; // = new Array();
+
 
 /**
  * Populate the Assay list dropdown in the modal dialog on "Configure Mapping"
@@ -13,14 +15,14 @@ var assays = [];
 function populateAssayList() {
     assayListSelect = document.getElementById('assayList');
 
-    console.log("starting html insert");
+//    console.log("starting html insert");
 
     var assay;
     for (assay in assays) {
         console.log("doing html insert");
         assayListSelect.options[assayListSelect.options.length] = new Option(assays[assay].name, assays[assay].id);
     }
-    console.log("endedhtml insert");
+//    console.log("endedhtml insert");
 }
 
 /**
@@ -45,14 +47,14 @@ function fetchAssayList() {
 
     // Set another completion function for the request above
     jqxhr.always(function(resData) {
-        console.log("assay list call complete");
+//        console.log("assay list call complete");
         $("#gridView").show();
         var jsonData;
 
-        console.log(JSON.stringify(resData));
+//        console.log(JSON.stringify(resData));
         jsonData = JSON.parse(JSON.stringify(resData));
 
-        console.log("assay: " + jsonData.assay[0].name);
+//        console.log("assay: " + jsonData.assay[0].name);
 
         assays = jsonData.assay;
 
@@ -69,21 +71,34 @@ function setCompoundList() {
     "use strict";
     var newDiv, innerDiv, newLabel, newCheckbox, compound;
     newDiv = document.createElement("div");
-    for (compound in compounds) {
+
+
+    for (compound in compounds.compound) {
 
         innerDiv = document.createElement("div");
 
         newLabel = document.createElement("label");
-        newLabel.htmlFor = compounds[compound].id;
-        newLabel.appendChild(document.createTextNode(" " + compounds[compound].name));
+        newLabel.htmlFor = compounds.compound[compound].id;
+        newLabel.appendChild(document.createTextNode(" " + compounds.compound[compound].name));
 
         innerDiv.appendChild(newLabel);
         newDiv.appendChild(innerDiv);
 
     }
+
     document.getElementById("compoundList").innerHTML = newDiv.innerHTML;
 
-    document.getElementById("getMappingInstructions").hidden = false;
+//    console.log("compounds: " + JSON.stringify(compounds));
+    document.getElementById("loadingspinner").style.display = "none";
+
+    if (compounds.compound.length == 0) {
+        document.getElementById("compoundList").innerHTML = "No compounds available";
+        document.getElementById("getMappingInstructions").hidden = true;
+    } else {
+        document.getElementById("getMappingInstructions").hidden = false;
+    }
+
+
 }
 
 
@@ -104,6 +119,27 @@ function loadCompoundJsonData(compoundJson) {
 
     compounds = jsonData.compound;
 
+    console.log("compound raw: " + JSON.stringify(compounds.compound));
+
+    if (compounds.compound.length == 0) {
+        console.log("empty!!!!!!!!!!!");
+
+    }
+
+    compoundsObjArray.push(compounds)
+
+    console.log("Compound length: " + compoundsObjArray[0].compound.length);
+
+    // check if empty object
+    if (compoundsObjArray.length == 1) {
+        if (compoundsObjArray[0].compound == "") {
+            console.log("empty!");
+        } else {
+            console.log("non empty!");
+        }
+        console.log("obj: " + compoundsObjArray[0].compound);
+    }
+
     setCompoundList();
 
 }
@@ -117,6 +153,10 @@ function fetchAssayCompoundList(selectedAssay) {
     "use strict";
     console.log("calling with value: " + selectedAssay.value);
 
+    document.getElementById("compoundList").innerHTML = "Loading compounds...";
+    document.getElementById("loadingspinner").style.display = "inline";
+
+
     $("#gridView").hide();
     $("#loaderView").show();
 
@@ -128,12 +168,15 @@ function fetchAssayCompoundList(selectedAssay) {
         processData: false,
         contentType: "application/json; charset=UTF-8"
     }).done(function() {
-        console.log("success");
+//        console.log("success");
     }).fail(function() {
         console.log("error");
-        alert("An error has occurred while fetching compound data from the server.");
+        document.getElementById("compoundList").innerHTML = "Error retrieving compound list.";
+        document.getElementById("loadingspinner").style.display = "none";
+        document.getElementById("getMappingInstructions").hidden = true;
+
     }).always(function() {
-        console.log("complete");
+//        console.log("complete");
     });
 
     $("#gridView").show();
@@ -141,8 +184,7 @@ function fetchAssayCompoundList(selectedAssay) {
 
 
     // Set another completion function for the request above
-    jqxhr.always(function(resData) {
-        console.log( "compound complete" );
+    jqxhr.done(function(resData) {
 //        console.log("templateJson=" + JSON.stringify(resData));
         $("#gridView").show();
         loadCompoundJsonData(JSON.stringify(resData));
@@ -209,7 +251,7 @@ function spoofLiquidHandlerLocations() {
     // Set another completion function for the request above
     jqxhr.always(function(resData) {
         console.log( "compound location complete" );
-        console.log("templateJson=" + JSON.stringify(resData));
+//        console.log("templateJson=" + JSON.stringify(resData));
         //loadPlateJsonData(resData);
         //loadCompoundJsonData(JSON.stringify(resData));
         parseCompoundLiquidHandlerLocationJsonData(JSON.stringify(resData));
@@ -242,7 +284,7 @@ function parseCompoundLiquidHandlerLocationJsonData(inventoryJsonData) {
         // assume that the assay has fewer compounds than the LH Inventory, so cycle through them
         var strCompoundsNotFoundMessage = "";
 
-        for (compound in compounds) {
+        for (compound in compounds.compound) {
 
             var CompoundFound = 0;
 
@@ -262,21 +304,21 @@ function parseCompoundLiquidHandlerLocationJsonData(inventoryJsonData) {
                 var SrcCompoundName = obj.name.trim();
 
                 // test if we found the compound we're looking for!
-                if (SrcCompoundName == compounds[compound].name) {
+                if (SrcCompoundName == compounds.compound[compound].name) {
                     console.log("here it comes2!");
-                    console.log("Compound: " + JSON.stringify(compounds[compound]));
+                    console.log("Compound: " + JSON.stringify(compounds.compound[compound]));
                     CompoundFound = 1;
 
 
-                    for (destination in compounds[compound].destinations) {
-                        S_CompoundName = compounds[compound].name;
+                    for (destination in compounds.compound[compound].destinations) {
+                        S_CompoundName = compounds.compound[compound].name;
                         S_PlateId = obj.srcPlateId;
                         S_Well = String.fromCharCode(65 + obj.row) + obj.col;
-                        S_Dosage = (obj.concentration / compounds[compound].destinations[destination].dosage).toString() + " " + compounds[compound].destinations[destination].unit;
+                        S_Dosage = (obj.concentration / compounds.compound[compound].destinations[destination].dosage).toString() + " " + compounds.compound[compound].destinations[destination].unit;
 
-                        D_PlateId = compounds[compound].destinations[destination].plate;
-                        D_Well = compounds[compound].destinations[destination].well;
-                        D_Dosage = compounds[compound].destinations[destination].dosage + " " + compounds[compound].destinations[destination].unit;
+                        D_PlateId = compounds.compound[compound].destinations[destination].plate;
+                        D_Well = compounds.compound[compound].destinations[destination].well;
+                        D_Dosage = compounds.compound[compound].destinations[destination].dosage + " " + compounds.compound[compound].destinations[destination].unit;
 
 
                         document.getElementById("lhmappinginstructions").value += S_PlateId + ",\t" +
@@ -295,7 +337,7 @@ function parseCompoundLiquidHandlerLocationJsonData(inventoryJsonData) {
 
             // Compound not found in Inventory System
             if (CompoundFound == 0) {
-                strCompoundsNotFoundMessage += compounds[compound].name + " not found in Inventory System.\n";
+                strCompoundsNotFoundMessage += compounds.compound[compound].name + " not found in Inventory System.\n";
 
             }
 
@@ -305,7 +347,7 @@ function parseCompoundLiquidHandlerLocationJsonData(inventoryJsonData) {
 
     // errors
     if (strCompoundsNotFoundMessage.length > 0) {
-        document.getElementById("lhmappinginstructions").value = "Errors:\n " +
+        document.getElementById("lhmappinginstructions").value = "Errors:\n" +
             strCompoundsNotFoundMessage + "\n\n" +
             document.getElementById("lhmappinginstructions").value
     }
@@ -327,6 +369,8 @@ function onViewSelect(clickedEL) {
     document.getElementById("compoundList").innerHTML = "";
     document.getElementById("assayList").selectedIndex = 0;
     document.getElementById("getMappingInstructions").hidden = true;
+    document.getElementById("loadingspinner").style.display = "none";
+
 
     // init modal values
     document.getElementById("liquidHandlerName").textContent = clickedEL.dataset.name;
@@ -349,6 +393,9 @@ function onViewSelect(clickedEL) {
     $("#loaderView").hide();
     $("#gridView").show();
 
+    document.getElementById("lhmappinginstructions").value = "Source (S),\tS_Well,\tS_Dosage,\tDestination (D),\tD_Well,\tD_Dosage\n";
+    document.getElementById("lhmappinginstructions").value += "==========================================================\n";
+
 }
 
 
@@ -360,8 +407,7 @@ function init() {
 //    "use strict";
     fetchAssayList();
 
-    document.getElementById("lhmappinginstructions").value = "Source (S),\tS_Well,\tS_Dosage,\tDestination (D),\tD_Well,\tD_Dosage\n";
-    document.getElementById("lhmappinginstructions").value += "==========================================================\n";
+
 
 }
 

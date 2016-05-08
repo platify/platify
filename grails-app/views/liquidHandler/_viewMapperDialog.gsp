@@ -100,6 +100,7 @@
                             </div>
                             <div class="panel-body">
                                 <div id="compoundList"></div>
+                                <img src="/platify/assets/loading.gif" id="loadingspinner" style="display: none;">
                             </div>
                         </div>
 

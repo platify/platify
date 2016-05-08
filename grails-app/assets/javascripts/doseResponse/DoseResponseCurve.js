@@ -12,7 +12,7 @@ function DoseResponseCurve() {
 
     this.init = function(experiment) {
         this.experiment = experiment;
-        margin = {top: 10, right: 30, bottom: 60, left: 60};
+        margin = {top: 10, right: 40, bottom: 60, left: 60};
         width = document.getElementById('doseResponseBody').offsetWidth - 100 - margin.left - margin.right;
         height = 550 - margin.top - margin.bottom;
 
