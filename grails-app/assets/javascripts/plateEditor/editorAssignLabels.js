@@ -802,18 +802,21 @@ function addDoseStep() {
 		alert('# of Replicates cannot be <= # of wells selected. Wells Selected: '+ wellGroupLength + '; Replicates: '+ replicates);
 	} else {
 		replicates++;
-		//doseStepLength = wellGroupLength / replicates;
-		currentDose = topDose;
-		currentColor = topColor;
+		doseStepLength = wellGroupLength / replicates;
 
-		for (i = 0; i < wellGroupLength; i++) {
-			for (j = 0; j < replicates && ((i + j) < wellGroupLength); j++) {
-				console.log("i+j:" + (i + j));
-				createNewLabel(cat, currentDose, units, currentColor, [selCells[i + j]]);
-			}
-			i += (replicates - 1);
-			currentColor = shade(currentColor, 0.2); // should we use 1/dilution instead ?? (might be too dramatic a difference !!
-			currentDose = currentDose / dilution;
+		for (var rep = 0; rep < replicates; rep++) {
+            currentDose = topDose;
+            currentColor = topColor;
+
+            for (i = 0; i < doseStepLength; i++) {
+    //			for (j = 0; j < replicates && ((i + j) < wellGroupLength); j++) {
+    				console.log("i+j:" + (i + rep));
+                    createNewLabel(cat, currentDose, units, currentColor, [selCells[i + rep*doseStepLength]]);
+    //			}
+//                i += (replicates - 1);
+                currentColor = shade(currentColor, 0.2); // should we use 1/dilution instead ?? (might be too dramatic a difference !!
+                currentDose = currentDose / dilution;
+            }
 		}
 
 		updateCategoryList();
