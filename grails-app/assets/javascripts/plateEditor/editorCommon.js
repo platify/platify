@@ -144,6 +144,8 @@ function translateInputJsonToModel(plateJson) {
 			// convert possible disruptive input to safer format !
 			convCat = labels[j].category.toString().split('.').join('__dot__');
 			convLab = labels[j].name.toString().split('.').join('__dot__');
+			if (convCat === "dosage")
+			    convLab = convLab + "__lu__" + labels[j].units;
 
 			if (convCat === "compound") {
 				if (groupName !== null && groupName !== "") {
